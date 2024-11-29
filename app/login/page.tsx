@@ -60,6 +60,7 @@ export default function LoginPage() {
             router.refresh();
         } catch (error) {
             setError("An error occurred during login");
+            console.log(error);
         }
     }
 
