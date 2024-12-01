@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_PRISMA_URL")
+}
+
+model feedbacks {
+  feedback_id    Int       @id @default(autoincrement())
+  reviewer_id    Int?
+  team_id        Int?
+  field1_rating  Int?      @db.SmallInt
+  field2_rating  Int?      @db.SmallInt
+  field3_rating  Int?      @db.SmallInt
+  field4_rating  Int?      @db.SmallInt
+  field5_rating  Int?      @db.SmallInt
+  average_rating Float?    @db.Real
+  feedback       String?   @db.VarChar(255)
+  reviewer       reviewer? @relation(fields: [reviewer_id], references: [reviewer_id], onDelete: NoAction, onUpdate: NoAction)
+  team           team?     @relation(fields: [team_id], references: [team_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model reviewer {
+  reviewer_id   Int         @id @default(autoincrement())
+  reviewer_name String?     @db.VarChar(30)
+  review_time   DateTime?   @db.Timestamp(6)
+  feedbacks     feedbacks[]
+}
+
+model team {
+  team_id     Int         @id @default(autoincrement())
+  team_number Int?        @unique
+  feedbacks   feedbacks[]
+}
+
+model university {
+  id       String @id @default(cuid())
+  username String @unique @db.VarChar(50)
+  password String @db.VarChar(255)
+}

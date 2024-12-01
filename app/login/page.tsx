@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,6 +24,7 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { GraduationCap } from "lucide-react";
+import { login, getSession } from "@/lib/auth";
 
 const loginSchema = z.object({
     username: z.string().min(3, "Username must be at least 3 characters"),
@@ -45,7 +45,7 @@ export default function LoginPage() {
 
     async function onSubmit(values: z.infer<typeof loginSchema>) {
         try {
-            const result = await signIn("credentials", {
+            const result = await login({
                 username: values.username,
                 password: values.password,
                 redirect: false,
