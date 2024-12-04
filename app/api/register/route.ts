@@ -1,3 +1,4 @@
+import { insertRegistrant } from "@/app/prismaClient/queryFunction";
 import { NextResponse } from "next/server";
 
 export async function POST(request : Request){
@@ -22,6 +23,8 @@ export async function POST(request : Request){
 
     //save the registerants db
 
+    const dataDB = await insertRegistrant(data)
+    console.log("this is db api",dataDB);
 
     return NextResponse.json({success:true});
 }
