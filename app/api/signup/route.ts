@@ -5,6 +5,11 @@ import { z } from "zod";
 //import { sendSMS } from "./twilio"; // Mock function for sending SMS, replace with actual implementation.
 
 const prisma = new PrismaClient();
+// export async function GET() {
+
+//   NextResponse.json({
+//     message:"Hello"
+//   })
 
 // Define Zod schema for validation
 const collegeSchema = z.object({
@@ -68,7 +73,7 @@ export async function POST(request: Request) {
     // Generate random passwords
     const password = generatePassword(8 + Math.floor(Math.random() * 5)); // 8-12 characters
     const adminPassword = generatePassword(8 + Math.floor(Math.random() * 5));
-
+    console.log(password)
     // Hash the passwords
     const hashedPassword = await bcrypt.hash(password, 10);
     const hashedAdminPassword = await bcrypt.hash(adminPassword, 10);
