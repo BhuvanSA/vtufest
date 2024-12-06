@@ -10,9 +10,11 @@
   },
   "dependencies": {
     "@prisma/client": "^6.0.1",
-<<<<<<< HEAD
     "@uploadthing/react": "^7.1.2",
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.4.7",
     "formidable": "^3.5.2",
+    "jose": "^5.9.6",
     "next": "15.0.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -20,21 +22,8 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@types/formidable": "^3.4.5",
-=======
-    "bcrypt": "^5.1.1",
-    "dotenv": "^16.4.7",
-    "jose": "^5.9.6",
-    "jsonwebtoken": "^9.0.2",
-    "next": "15.0.3",
-    "react": "19.0.0-rc-66855b96-20241106",
-    "react-dom": "19.0.0-rc-66855b96-20241106",
-    "zod": "^3.23.8"
-  },
-  "devDependencies": {
     "@types/bcrypt": "^5.0.2",
     "@types/jsonwebtoken": "^9.0.7",
->>>>>>> e3098f6b231fa80b9573024e97f82040ba2f55dd
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

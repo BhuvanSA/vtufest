@@ -1,5 +1,8 @@
 import { getRegistrantCount, getUser, insertRegistrant } from "@/app/prismaClient/queryFunction";
 import { utapi } from "@/utils/uploadthing";
+import { verify } from "crypto";
+import { jwtDecrypt, jwtVerify } from "jose";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -26,6 +29,7 @@ const fileSchema = z.instanceof(File).refine((file) => file.size <= 150 * 1024, 
     admission: fileSchema, // File validation for admission
     idcard: fileSchema, // File validation for ID card
   });
+const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || "default_secret");
 
 
 export async function POST(request : Request){
@@ -70,11 +74,20 @@ export async function POST(request : Request){
     
     //get the data from the jwt of the college and then map it to the registerant
 
+    const token = (await cookies()).get('auth_token').value;
+    console.log(token);
+
+    const verify = await jwtVerify(token,JWT_SECRET);
+        
+    const userId = verify.payload.id;
+    console.log("verify",verify);
+    console.log("userId",userId)
+
     // static kept for now
-    const user = await getUser("1");
+    const user = await getUser(userId);
     console.log("user",user)
 
-    const count = await getRegistrantCount("1");
+    const count = await getRegistrantCount(userId);
 
     console.log("count",count)
     // limit to the 45 registerants
@@ -100,7 +113,7 @@ export async function POST(request : Request){
         pucUrl : response[1].data?.url,
         admissionUrl : response[2].data?.url,
         idcardUrl :response[3].data?.url,
-        userId : "1",
+        userId : userId,
     }
     // the userId is static for now
     const dataDB = await insertRegistrant(registrantDB);

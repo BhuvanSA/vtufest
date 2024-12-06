@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 export async function GET(){
 
 
-    const token = (await cookies()).get("token")?.value
+    const token = (await cookies()).get("auth_token")?.value
     console.log(token);
     // token is by jwt which has userId
     
