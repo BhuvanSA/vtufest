@@ -31,11 +31,11 @@ export async function insertRegistrant(arg : any){
     return registrant;
 }
 
-export async function getRegistrant(arg : any){
+export async function getRegistrantsByCollege(arg : any){
 
     const registerant: Registrant = await prisma.registrants.findUnique({
         where:{
-            usn:arg.usn
+            id : arg.id
         }
     })
     console.log(registerant);
@@ -55,4 +55,13 @@ export async function getUser(id : any){
 export async function getRegistrantCount(id:any) {
     const count = await prisma.registrants.count({where:{userId : id}})
     return count;
+}
+
+export async function getRegistrant(usn : string) {
+    const registrant = await prisma.registrants.findUnique({
+        where:{
+            usn : usn
+        }
+    })
+    return registrant;
 }

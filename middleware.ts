@@ -7,7 +7,7 @@ const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || "default_s
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  if (pathname === "/api/register" || "/api/getregister") {
+  if (pathname === "/api/register" || "/api/getallregister") {
     const token = request.cookies.get("auth_token")?.value;
 
     if (!token) {
@@ -41,5 +41,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/api/register","/api/getregister"]
+  matcher: ["/api/register","/api/getallregister"]
 };

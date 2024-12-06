@@ -1,7 +1,6 @@
 import { getRegistrantCount, getUser, insertRegistrant } from "@/app/prismaClient/queryFunction";
 import { utapi } from "@/utils/uploadthing";
-import { verify } from "crypto";
-import { jwtDecrypt, jwtVerify } from "jose";
+import { jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -61,20 +60,12 @@ export async function POST(request : Request){
         if (!result.success){
             return NextResponse.json({success: false, error : result.error})
         }
-    
-
-    // jpg - (idcard) and (passport photo)
-    // pdf - (10 and 12 marks card) and (admission to BE) and (aadhar card)
-
-
-    // check all the data exists
-    
 
     // check for jwt token
     
     //get the data from the jwt of the college and then map it to the registerant
 
-    const token = (await cookies()).get('auth_token').value;
+    const token = (await cookies()).get('auth_token')?.value;
     console.log(token);
 
     const verify = await jwtVerify(token,JWT_SECRET);
@@ -83,7 +74,7 @@ export async function POST(request : Request){
     console.log("verify",verify);
     console.log("userId",userId)
 
-    // static kept for now
+
     const user = await getUser(userId);
     console.log("user",user)
 
@@ -115,7 +106,7 @@ export async function POST(request : Request){
         idcardUrl :response[3].data?.url,
         userId : userId,
     }
-    // the userId is static for now
+    // save the registrant into the DB
     const dataDB = await insertRegistrant(registrantDB);
     console.log("this is db api",dataDB);
 
