@@ -10,7 +10,7 @@ interface OuterBoxProps {
 
 const OuterBox: React.FC<OuterBoxProps> = ({
   children,
-  width = "w-96", // Default width
+  width , // Default width
   height = "h-auto", // Default height
   bgColor = "bg-white", // Default background color
 }) => {

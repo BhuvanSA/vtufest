@@ -4,7 +4,7 @@ const Heading: React.FC<props> = ({ label} ) => {
 
 
 
-    return <div className =" font-bold text-4xl pt-6 text-black pb-3">
+    return <div className =" font-bold text-4xl pt-6 text-black pb-6 px-5">
             <h1>
                 {label}
             </h1>

@@ -11,8 +11,10 @@ import '../globals.css';
 
 const Login = () => {
   return (
-   <div >
-    <OuterBox>
+    <div className="bg-slate-300 h-screen flex justify-center">
+    <div className="flex flex-col justify-center">
+ 
+    <OuterBox width="w-[120%]">
       <Heading label="Register Your College" />
       <InputField label="College Name" placeholder="Enter your college name" onChange={()=>{}} />
       <InputField label="Contact Person" placeholder="Enter your contact person"  onChange={()=>{}} />
@@ -22,6 +24,8 @@ const Login = () => {
       <WarningMessage label="Already a User?" buttonText="Log In" to="/login" />
     </OuterBox>
    </div>
+   </div>
+
   );
 };
 
