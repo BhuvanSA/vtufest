@@ -1,3 +1,4 @@
+
 "use client"
 import Button from "@/components/Button";
 import React, { useState } from "react";
@@ -111,4 +112,5 @@ const StudentTable = () => {
   );
 };
 
-export default StudentTable;
+export dfault StudentTable;
+
