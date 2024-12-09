@@ -1,5 +1,6 @@
 import { getRegistrantCount, getUser, insertRegistrant } from "@/app/prismaClient/queryFunction";
 import { utapi } from "@/utils/uploadthing";
+import { stat } from "fs";
 import { jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
@@ -40,7 +41,7 @@ export async function POST(request : Request){
     
 
     // zod validation 
-   
+    // add phone number and email
         const registrant = {
             name : data.name,
             usn : data.usn,
@@ -58,7 +59,7 @@ export async function POST(request : Request){
 
         const result = registrantSchema.safeParse(registrant);
         if (!result.success){
-            return NextResponse.json({success: false, error : result.error})
+            return NextResponse.json({success: false, error : result.error},{status:400})
         }
 
     // check for jwt token
@@ -83,7 +84,7 @@ export async function POST(request : Request){
     console.log("count",count)
     // limit to the 45 registerants
     if(count>45){
-        return NextResponse.json({success:false, message : "registrant limit exceeded"});
+        return NextResponse.json({success:false, message : "registrant limit exceeded"},{status:400});
     }
 
 
@@ -110,10 +111,10 @@ export async function POST(request : Request){
     const dataDB = await insertRegistrant(registrantDB);
     console.log("this is db api",dataDB);
 
-    return NextResponse.json({success:true, registrantDB});
+    return NextResponse.json({success:true, registrantDB},{status:200});
     }
     catch(error){
-        return NextResponse.json({success: false,error:error});
+        return NextResponse.json({success: false,error:error},{status:400});
     }
     
 
