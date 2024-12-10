@@ -33,9 +33,9 @@ export async function insertRegistrant(arg : any){
 
 export async function getRegistrantsByCollege(arg : any){
 
-    const registerant: Registrant = await prisma.registrants.findUnique({
+    const registerant: Registrant = await prisma.registrants.findMany({
         where:{
-            id : arg.id
+            userId: arg.id
         }
     })
     console.log(registerant);
@@ -64,4 +64,44 @@ export async function getRegistrant(usn : string) {
         }
     })
     return registrant;
+}
+
+export async function getRegistrantByPhone(id:string) {
+    const registerant = await prisma.registrants.findFirst({
+        where:{
+            phone : id
+        }
+    })
+
+    return registerant;
+}
+
+export async function updateRegistrant(usn: string, eventId: string) {
+    // Fetch the registrant
+    const registrant = await prisma.registrants.findFirst({
+        where: {
+            usn
+        }
+    });
+
+    if (!registrant) {
+        throw new Error(`Registrant with USN ${usn} not found`);
+    }
+
+    // Update the `events` array
+    const updatedEvents = registrant.events.map(event =>
+        event.id === eventId ? { ...event, attended: "attended" } : event
+    );
+
+    // Update the registrant's record
+    const updatedRegistrant = await prisma.registrants.update({
+        where: {
+            usn
+        },
+        data: {
+            events: updatedEvents // Updating only the `events` field
+        }
+    });
+
+    return updatedRegistrant; // Return the updated registrant if needed
 }

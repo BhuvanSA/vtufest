@@ -7,7 +7,9 @@ const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || "default_s
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  if (pathname === "/api/register" || "/api/getallregister") {
+
+  // add the path name for the register later on
+  if (pathname=="/api/register" || pathname== "/api/getallregister") {
     const token = request.cookies.get("auth_token")?.value;
 
     if (!token) {
