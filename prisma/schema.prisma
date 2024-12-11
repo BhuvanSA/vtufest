@@ -21,12 +21,12 @@ model Users{
   id String @id @default(uuid())
   collegeCode String? @unique 
   userName String @unique
+  email String @unique 
   collegeName String @unique
   phone String @unique
   password String 
   createdAt DateTime @default(now())
   updateAt DateTime @updatedAt
-  email String @unique 
   registrants Registrants[] @relation("UserRegistrants")
 
 }
