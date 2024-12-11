@@ -1,12 +1,15 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, type,Prisma} from '@prisma/client'
+
+
 
 const prisma = new PrismaClient()
 
 interface Registrant{
     name : string,
     usn : string,
-    type : any,
-    events : any,
+    type : type,
+    phone: string,
+    events : Prisma.JsonArray,
     photoUrl : string,
     aadharUrl : string,
     sslcUrl : string,
@@ -16,14 +19,19 @@ interface Registrant{
     userId : string,
 }
 
-export async function insertRegistrant(arg : any){
+export async function insertRegistrant(arg: Registrant){
 
     const registrantData : Registrant = arg;
     
     console.log(registrantData);
     console.log("inside the dbadfjklas")
 
-    const registrant = await prisma.registrants.create({data :registrantData});
+    const registrant = await prisma.registrants.create({
+        data: {
+            ...registrantData,
+            events: registrantData.events as Prisma.InputJsonValue[]
+        }
+    });
     console.log(registrant)
     console.log("saved");
 
@@ -31,9 +39,9 @@ export async function insertRegistrant(arg : any){
     return registrant;
 }
 
-export async function getRegistrantsByCollege(arg : any){
+export async function getRegistrantsByCollege(arg: { id: string }){
 
-    const registerant: Registrant = await prisma.registrants.findMany({
+    const registerant: Registrant[] = await prisma.registrants.findMany({
         where:{
             userId: arg.id
         }
@@ -42,7 +50,7 @@ export async function getRegistrantsByCollege(arg : any){
     return registerant;
 }
 
-export async function getUser(id : any){
+export async function getUser(id: string){
     const user = await prisma.users.findFirst({
         where:{
             id:id
@@ -52,7 +60,7 @@ export async function getUser(id : any){
     return user;
 }
 
-export async function getRegistrantCount(id:any) {
+export async function getRegistrantCount(id: string) {
     const count = await prisma.registrants.count({where:{userId : id}})
     return count;
 }
@@ -89,9 +97,10 @@ export async function updateRegistrant(usn: string, eventId: string) {
     }
 
     // Update the `events` array
-    const updatedEvents = registrant.events.map(event =>
-        event.id === eventId ? { ...event, attended: "attended" } : event
-    );
+    const updatedEvents = registrant.events.map(event => {
+        const eventObj = event as { id: string; attended?: string };
+        return eventObj && eventObj.id === eventId ? { ...eventObj, attended: "attended" } : event;
+    });
 
     // Update the registrant's record
     const updatedRegistrant = await prisma.registrants.update({
@@ -99,7 +108,7 @@ export async function updateRegistrant(usn: string, eventId: string) {
             usn
         },
         data: {
-            events: updatedEvents // Updating only the `events` field
+            events: updatedEvents as Prisma.InputJsonValue[] // Updating only the `events` field
         }
     });
 

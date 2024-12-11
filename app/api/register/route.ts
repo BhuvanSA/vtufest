@@ -21,7 +21,7 @@ const fileSchema = z.instanceof(File).refine((file) => file.size <= 150 * 1024, 
   const registrantSchema = z.object({
     name: z.string().min(1, "Name cannot be empty"),
     usn: z.string().min(1,"Usn cannot be empty"),
-    type: z.enum(["PARTICIPANT","TEAMMANAGER","ACCOMPANIST"], "Invalid type"), 
+    type: z.enum(["PARTICIPANT","TEAMMANAGER","ACCOMPANIST"]), 
     phone : z.string().min(10,"Invalid phone Number"),
     events: z.array(eventSchema), // Array of event objects
     photo: fileSchema, // File validation for photo
@@ -38,7 +38,11 @@ export async function POST(request : Request){
     
     const formData = await request.formData();
 
-    const data = JSON.parse(formData.get("data"));
+    const dataString = formData.get("data");
+    if (!dataString) {
+        return NextResponse.json({ success: false, error: "Data is missing" }, { status: 400 });
+    }
+    const data = JSON.parse(dataString.toString());
 
     
 
@@ -72,17 +76,20 @@ export async function POST(request : Request){
     const token = (await cookies()).get('auth_token')?.value;
     console.log(token);
 
-    const verify = await jwtVerify(token,JWT_SECRET);
+    if (!token) {
+        return NextResponse.json({ success: false, error: "Invalid Session" }, { status: 400 });
+    }
+    const verify = await jwtVerify(token, JWT_SECRET);
         
     const userId = verify.payload.id;
     console.log("verify",verify);
     console.log("userId",userId)
 
 
-    const user = await getUser(userId);
+    const user = await getUser(userId as string);
     console.log("user",user)
 
-    const count = await getRegistrantCount(userId);
+    const count = await getRegistrantCount(userId as string);
 
     console.log("count",count)
     // limit to the 45 registerants
@@ -103,13 +110,13 @@ export async function POST(request : Request){
         type : result.data.type,
         events : result.data.events,
         phone : result.data.phone,
-        photoUrl : response[4].data?.url,
-        aadharUrl : response[5].data?.url,
-        sslcUrl : response[0].data?.url,
-        pucUrl : response[1].data?.url,
-        admissionUrl : response[2].data?.url,
-        idcardUrl :response[3].data?.url,
-        userId : userId,
+        photoUrl : response[4].data?.url || "",
+        aadharUrl : response[5].data?.url || "",
+        sslcUrl : response[0].data?.url || "",
+        pucUrl : response[1].data?.url || "",
+        admissionUrl : response[2].data?.url || "",
+        idcardUrl :response[3].data?.url || "",
+        userId : userId as string,
     }
     // save the registrant into the DB
     const dataDB = await insertRegistrant(registrantDB);
@@ -128,3 +135,4 @@ export async function POST(request : Request){
 }
 
 // id userId-relation(users)  name   usn     type    photo  paymentstatus  events(list)   aadhar 10thmarks 12marks addmission idcard 
+

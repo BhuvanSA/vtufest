@@ -81,6 +81,7 @@ export async function POST(request: Request) {
 
     const userName = generatePassword(6);
     console.log("username",userName)
+    console.log("password",password,"hased:",hashedPassword)
 
     // Save user details to the Users table
     const newUser = await prisma.users.create({

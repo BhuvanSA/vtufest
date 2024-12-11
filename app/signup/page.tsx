@@ -15,9 +15,9 @@ import { useRouter } from "next/navigation";
 const Login = () => {
   const router = useRouter();
   const [collegeName,setCollegeName] = useState("");
-  const [collegeCode,setCollegeCode] =useState("");
+
   const [phone,setPhone] = useState("");
-  const [userName,setUsername] =useState("");
+  const [email,setEmail] =useState("");
 
 
 
@@ -30,11 +30,7 @@ const Login = () => {
           placeholder="Enter your college name"
           onChange={(e)=>setCollegeName(e.target.value)}
         />
-        <InputField
-          label="College Code"
-          placeholder="Enter your college code"
-          onChange={(e)=>setCollegeCode(e.target.value)}
-        />
+      
         <InputField
           label="Contact Number"
           placeholder="Enter your contact number"
@@ -45,14 +41,14 @@ const Login = () => {
           label="Email Address"
           placeholder="Enter your username"
           
-          onChange={(e)=>setUsername(e.target.value)}
+          onChange={(e)=>setEmail(e.target.value)}
         />
         <Button label="Register" OnClick={async ()=>{
             const response = await axios.post("http://localhost:3000/api/signup",{
                  collegeName,
-                 collegeCode,
+             
                  phone,
-                 userName
+                 email
               })
   
               
