@@ -9,9 +9,12 @@ const redis = new Redis(process.env.REDIS_URL || "redis://localhost:6379");
 // JWT secret
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET as string);
 
-// Rate limiting configuration
-const RATE_LIMIT_WINDOW = 60; // Time window in seconds
-const RATE_LIMIT_MAX = 10;    // Maximum requests allowed per window
+// Rate-limiting configuration
+const GLOBAL_RATE_LIMIT_WINDOW = 60; // Time window in seconds
+const GLOBAL_RATE_LIMIT_MAX = 10;    // Maximum requests allowed per window
+
+const OTP_RATE_LIMIT_WINDOW = 60; // Time window in seconds for OTP
+const OTP_RATE_LIMIT_MAX = 5;     // Maximum OTP requests per window
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -23,16 +26,30 @@ export async function middleware(request: NextRequest) {
     request.headers.get("x-real-ip") ||                             // Some proxies
     "unknown";
 
-  const redisKey = `rate-limit:${ip}:${pathname}`;
-
-  // Rate-limiting logic
-  const current = await redis.incr(redisKey);
-  if (current === 1) {
-    // Set expiration for the key if it’s the first request
-    await redis.expire(redisKey, RATE_LIMIT_WINDOW);
+  // Apply OTP-specific rate limiting
+  if (pathname === "/api/sendOtp") {
+    const otpRedisKey = `otp-rate-limit:${ip}`;
+    const currentOtpRequests = await redis.incr(otpRedisKey);
+    if (currentOtpRequests === 1) {
+      // Set expiration for the key if it’s the first request
+      await redis.expire(otpRedisKey, OTP_RATE_LIMIT_WINDOW);
+    }
+    if (currentOtpRequests > OTP_RATE_LIMIT_MAX) {
+      return NextResponse.json(
+        { success: false, message: "Too many OTP requests, please try again later." },
+        { status: 429 }
+      );
+    }
   }
 
-  if (current > RATE_LIMIT_MAX) {
+  // Apply global rate limiting for all routes
+  const globalRedisKey = `rate-limit:${ip}:${pathname}`;
+  const currentGlobalRequests = await redis.incr(globalRedisKey);
+  if (currentGlobalRequests === 1) {
+    // Set expiration for the key if it’s the first request
+    await redis.expire(globalRedisKey, GLOBAL_RATE_LIMIT_WINDOW);
+  }
+  if (currentGlobalRequests > GLOBAL_RATE_LIMIT_MAX) {
     return NextResponse.json(
       { success: false, message: "Too many requests, please try again later." },
       { status: 429 }
@@ -75,6 +92,12 @@ export async function middleware(request: NextRequest) {
   return NextResponse.next();
 }
 
+// Specify routes for middleware
 export const config = {
-  matcher: ["/api/register", "/api/getallregister","/api/logout"], // Specify routes for middleware
+  matcher: [
+    "/api/register",
+    "/api/getallregister",
+    "/api/logout",
+    "/api/sendEmailOtp", // Include OTP route for rate limiting
+  ],
 };
