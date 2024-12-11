@@ -1,17 +1,14 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
-import Redis from "ioredis";
+import { Redis } from "@upstash/redis"; // Use Upstash Redis
 
-// Redis configuration
-const redis = new Redis(process.env.REDIS_URL || "redis://localhost:6379");
+const redis = Redis.fromEnv(); // Upstash Redis, reads credentials from environment variables
 
-// JWT secret
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET as string);
 
-// Rate-limiting configuration
 const GLOBAL_RATE_LIMIT_WINDOW = 60; // Time window in seconds
-const GLOBAL_RATE_LIMIT_MAX = 10;    // Maximum requests allowed per window
+const GLOBAL_RATE_LIMIT_MAX = 100;    // Maximum requests allowed per window
 
 const OTP_RATE_LIMIT_WINDOW = 60; // Time window in seconds for OTP
 const OTP_RATE_LIMIT_MAX = 5;     // Maximum OTP requests per window
@@ -21,9 +18,9 @@ export async function middleware(request: NextRequest) {
 
   // Extract IP address
   const ip =
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || // From proxy
-    request.headers.get("cf-connecting-ip") ||                      // Cloudflare
-    request.headers.get("x-real-ip") ||                             // Some proxies
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    request.headers.get("cf-connecting-ip") ||
+    request.headers.get("x-real-ip") ||
     "unknown";
 
   // Apply OTP-specific rate limiting
@@ -31,9 +28,9 @@ export async function middleware(request: NextRequest) {
     const otpRedisKey = `otp-rate-limit:${ip}`;
     const currentOtpRequests = await redis.incr(otpRedisKey);
     if (currentOtpRequests === 1) {
-      // Set expiration for the key if it’s the first request
       await redis.expire(otpRedisKey, OTP_RATE_LIMIT_WINDOW);
     }
+
     if (currentOtpRequests > OTP_RATE_LIMIT_MAX) {
       return NextResponse.json(
         { success: false, message: "Too many OTP requests, please try again later." },
@@ -46,9 +43,9 @@ export async function middleware(request: NextRequest) {
   const globalRedisKey = `rate-limit:${ip}:${pathname}`;
   const currentGlobalRequests = await redis.incr(globalRedisKey);
   if (currentGlobalRequests === 1) {
-    // Set expiration for the key if it’s the first request
     await redis.expire(globalRedisKey, GLOBAL_RATE_LIMIT_WINDOW);
   }
+
   if (currentGlobalRequests > GLOBAL_RATE_LIMIT_MAX) {
     return NextResponse.json(
       { success: false, message: "Too many requests, please try again later." },
@@ -68,7 +65,6 @@ export async function middleware(request: NextRequest) {
     }
 
     try {
-      // Verify the JWT token using `jose`
       const verify = await jwtVerify(token, JWT_SECRET);
       console.log("json middleware", verify);
 
@@ -92,12 +88,6 @@ export async function middleware(request: NextRequest) {
   return NextResponse.next();
 }
 
-// Specify routes for middleware
 export const config = {
-  matcher: [
-    "/api/register",
-    "/api/getallregister",
-    "/api/logout",
-    "/api/sendEmailOtp", // Include OTP route for rate limiting
-  ],
+  matcher: ["/api/register", "/api/getallregister", "/api/sendEmailOtp"],
 };

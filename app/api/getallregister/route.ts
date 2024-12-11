@@ -24,6 +24,9 @@ export async function GET(){
     // return the result
     const registrant = await getRegistrantsByCollege({id:userId});
     console.log("the api registrant",registrant)
+
+    
+    
     
     return NextResponse.json({success:true,registrant});
     // use effect on the post must be made so that we can fetch the jwt 
