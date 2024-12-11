@@ -1,6 +1,6 @@
 import { getRegistrantCount, getUser, insertRegistrant } from "@/app/prismaClient/queryFunction";
 import { utapi } from "@/utils/uploadthing";
-import { stat } from "fs";
+
 import { jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
@@ -14,13 +14,15 @@ const fileSchema = z.instanceof(File).refine((file) => file.size <= 150 * 1024, 
 
   const eventSchema = z.object({
     name: z.string().min(1, "Event name cannot be empty"),
-    attended: z.boolean().default(false)
+    attended: z.boolean().default(false),
+    id : z.number()
   });
   
   const registrantSchema = z.object({
     name: z.string().min(1, "Name cannot be empty"),
     usn: z.string().min(1,"Usn cannot be empty"),
-    type: z.enum(["PARTICIPANT","TEAMMANAGER","ACCOMPANIST"], "Invalid type"), // Add more enums if needed
+    type: z.enum(["PARTICIPANT","TEAMMANAGER","ACCOMPANIST"], "Invalid type"), 
+    phone : z.string().min(10,"Invalid phone Number"),
     events: z.array(eventSchema), // Array of event objects
     photo: fileSchema, // File validation for photo
     aadhar: fileSchema, // File validation for Aadhar
@@ -47,6 +49,7 @@ export async function POST(request : Request){
             usn : data.usn,
             type : data.type,
             events : data.events ,
+            phone : data.phone,
             photo : formData.get("photo"),
             sslc : formData.get("sslc"),
             aadhar : formData.get("aadhar"),
@@ -99,6 +102,7 @@ export async function POST(request : Request){
         usn : result.data.usn,
         type : result.data.type,
         events : result.data.events,
+        phone : result.data.phone,
         photoUrl : response[4].data?.url,
         aadharUrl : response[5].data?.url,
         sslcUrl : response[0].data?.url,
@@ -111,7 +115,7 @@ export async function POST(request : Request){
     const dataDB = await insertRegistrant(registrantDB);
     console.log("this is db api",dataDB);
 
-    return NextResponse.json({success:true, registrantDB},{status:200});
+    return NextResponse.json({success:true,message : "registered successful"},{status:200});
     }
     catch(error){
         return NextResponse.json({success: false,error:error},{status:400});

@@ -14,9 +14,8 @@ const prisma = new PrismaClient();
 // Define Zod schema for validation
 const collegeSchema = z.object({
   collegeName: z.string().min(1, "College name is required"),
-  collegeCode: z.string().min(1, "College code is required"),
   phone: z.string().length(10, "Phone number must be exactly 10 digits"),
-  userName: z.string().min(1, "Username is required"),
+  email : z.string().email("email is invalid"),
 });
 
 // Utility function to generate a random password
@@ -35,14 +34,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, errors: validation.error.errors }, { status: 400 });
     }
 
-    const { collegeName, collegeCode, phone, userName } = validation.data;
+    const { collegeName, email, phone } = validation.data;
 
     // Check if the college code, userName, or phone already exists
     const existingUser = await prisma.users.findFirst({
       where: {
         OR: [
-          { collegeCode },
-          { userName },
+          {email},
           { phone },
           { collegeName },
         ],
@@ -78,15 +76,21 @@ export async function POST(request: Request) {
     const hashedPassword = await bcrypt.hash(password, 10);
     const hashedAdminPassword = await bcrypt.hash(adminPassword, 10);
 
+
+    // generate the username randomized 
+
+    const userName = generatePassword(6);
+    console.log("username",userName)
+
     // Save user details to the Users table
     const newUser = await prisma.users.create({
       data: {
         collegeName,
-        collegeCode,
+        email,
         phone,
         userName,
         password: hashedPassword,
-        adminPassword: hashedAdminPassword,
+        
       },
     });
 
@@ -103,3 +107,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: false, error: "Internal Server Error" }, { status: 500 });
   }
 }
+
+//college Code removed from zod validation because not needed 
+// added email 
+
+
+//add the userName randomized -pending

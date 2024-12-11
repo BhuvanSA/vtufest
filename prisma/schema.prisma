@@ -14,25 +14,29 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// added the collegeCode to nullable as optional and unique
+// add the email for the unique key
+
 model Users{
   id String @id @default(uuid())
-  collegeCode String @unique
+  collegeCode String? @unique 
   userName String @unique
   collegeName String @unique
   phone String @unique
   password String 
-  adminPassword String 
   createdAt DateTime @default(now())
   updateAt DateTime @updatedAt
+  email String @unique 
   registrants Registrants[] @relation("UserRegistrants")
 
 }
-
+// do add the phone of each participant
 model Registrants{
   id Int @id @default(autoincrement())
   name String
   usn String @unique
   type type 
+  phone String @unique
   events Json[] 
   photoUrl String
   aadharUrl String
