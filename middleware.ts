@@ -9,7 +9,7 @@ export async function middleware(request: NextRequest) {
 
 
   // add the path name for the register later on
-  if (pathname=="/api/register" || pathname== "/api/getallregister") {
+  if ( pathname== "/api/getallregister") {
     const token = request.cookies.get("auth_token")?.value;
 
     if (!token) {
@@ -43,5 +43,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/api/register","/api/getallregister"]
+  matcher: ["/api/getallregister"]
 };

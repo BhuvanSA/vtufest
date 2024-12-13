@@ -12,19 +12,20 @@ export async function POST(request:Request){
     if(!registrant){
         return NextResponse.json({success:false,error:"registrant not found"},{status:404});
     }
+    
+    console.log(registrant.events);
 
-    if(registrant.events.filter((value)=> value.id==eventId).length==0){
-        return NextResponse.json({success:false,error:"event not found"},{status:404});
+    const event_idfilter = registrant.events.filter((value)=> value.eventNo===eventId);
+    console.log("fadsfss",event_idfilter)
+    if(event_idfilter.length==0){
+         return NextResponse.json({success:false,message:"no event found"},{status:404});
     }
-
     try{
-    const updatedRegistrant = await updateRegistrant(usn,eventId);
+    const updatedRegistrant = await updateRegistrant(usn,event_idfilter[0].id);
+    return NextResponse.json({success:true, message:"marked attended"},{status:200});
     }
     catch(error){
-        console.log(error);
-        return NextResponse.json({success:false,error},{status:500});
+        return NextResponse.json({success:false,error},{status:400});
     }
-
-    return NextResponse.json({success:true, message:"marked attended"},{status:200});
-    
+   
 }

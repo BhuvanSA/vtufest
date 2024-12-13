@@ -70,11 +70,11 @@ export async function POST(request: Request) {
  */
     // Generate random passwords
     const password = generatePassword(8 + Math.floor(Math.random() * 5)); // 8-12 characters
-    const adminPassword = generatePassword(8 + Math.floor(Math.random() * 5));
+ 
     console.log(password)
     // Hash the passwords
     const hashedPassword = await bcrypt.hash(password, 10);
-    const hashedAdminPassword = await bcrypt.hash(adminPassword, 10);
+ 
 
 
     // generate the username randomized 
@@ -88,7 +88,6 @@ export async function POST(request: Request) {
         collegeName,
         email,
         phone,
-        userName,
         password: hashedPassword,
         
       },

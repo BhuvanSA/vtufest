@@ -69,15 +69,15 @@ export async function POST(request : Request){
     
     //get the data from the jwt of the college and then map it to the registerant
 
-    const token = (await cookies()).get('auth_token')?.value;
-    console.log(token);
+    // const token = (await cookies()).get('auth_token')?.value;
+    // console.log(token);
 
-    const verify = await jwtVerify(token,JWT_SECRET);
+    // const verify = await jwtVerify(token,JWT_SECRET);
         
-    const userId = verify.payload.id;
-    console.log("verify",verify);
-    console.log("userId",userId)
-
+    // const userId = verify.payload.id;
+    // console.log("verify",verify);
+    // console.log("userId",userId)
+    const userId = "e9ce990d-ab02-4155-9c28-c1ef5f5f7a76"
 
     const user = await getUser(userId);
     console.log("user",user)
