@@ -87,7 +87,8 @@ model Registrants {
   aadharUrl    String
   sslcUrl      String
   pucUrl       String
-  admissionUrl String
+  admission1Url String
+  admission2Url String
   idcardUrl    String
   userId       String
   verified     Boolean                @default(false)
