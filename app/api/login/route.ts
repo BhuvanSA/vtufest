@@ -37,30 +37,32 @@ export async function POST(request: Request) {
     // Parse the JSON request body
     const body = await request.json();
 
+    const {email,password} = body;
+
     // Validate using safeParse
-    const result = loginSchema.safeParse(body);
+    // const result = loginSchema.safeParse(body);
 
-    if (!result.success) {
-      // If validation fails, return the error messages
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Validation error",
-          errors: result.error.errors.map((err) => ({
-            path: err.path,
-            message: err.message,
-          })),
-        },
-        { status: 400 }
-      );
-    }
+    // if (!result.success) {
+    //   // If validation fails, return the error messages
+    //   return NextResponse.json(
+    //     {
+    //       success: false,
+    //       message: "Validation error",
+    //       errors: result.error.errors.map((err) => ({
+    //         path: err.path,
+    //         message: err.message,
+    //       })),
+    //     },
+    //     { status: 400 }
+    //   );
+    // }
 
-    // Destructure validated data
-    const { username, password } = result.data;
+    // // Destructure validated data
+    // const { username, password } = result.data;
 
     // Fetch user from the database
     const user = await prisma.users.findUnique({
-      where: { userName: username },
+      where: { email: email },
     });
 
     // If user does not exist, return error

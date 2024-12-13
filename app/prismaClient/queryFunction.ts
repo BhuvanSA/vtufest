@@ -104,6 +104,9 @@ export async function getRegistrantsByCollege(arg : any){
     const registerant: Registrant = await prisma.registrants.findMany({
         where:{
             userId: arg.id
+        },
+        include:{
+            events:true
         }
     })
     console.log(registerant);

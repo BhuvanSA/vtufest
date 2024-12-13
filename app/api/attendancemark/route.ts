@@ -22,7 +22,7 @@ export async function POST(request:Request){
     }
     try{
      await updateRegistrant(usn,event_idfilter[0].id);
-    return NextResponse.json({success:true, message:"marked attended"},{status:200});
+    return NextResponse.json({success:true, message:`marked attendend for ${event_idfilter[0].eventName}`},{status:200});
     }
     catch(error){
         return NextResponse.json({success:false,error},{status:400});
