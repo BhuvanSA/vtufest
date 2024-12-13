@@ -62,7 +62,7 @@ model Users {
   createdAt    DateTime        @default(now())
   updatedAt    DateTime        @updatedAt
   events       Events[]        
-  registrants  Registrants[]
+  registrants  Registrants[]    
 }
 
 model Events {
@@ -71,8 +71,8 @@ model Events {
   eventName            String
   userId                String
   registrants          Registrants[]           @relation("EventRegistrations")
-  user         Users                  @relation(fields: [userId], references: [id])
-  eventRegistrations   EventRegistrations[]
+  user                  Users                  @relation(fields: [userId], references: [id],onDelete: Cascade)
+  eventRegistrations   EventRegistrations[]     
 
   @@unique([userId,eventNo])
 }
@@ -91,7 +91,7 @@ model Registrants {
   idcardUrl    String
   userId       String
   verified     Boolean                @default(false)
-  user         Users                  @relation(fields: [userId], references: [id])
+  user         Users                  @relation(fields: [userId], references: [id],onDelete: Cascade)
   events       Events[]               @relation("EventRegistrations")
   eventRegistrations EventRegistrations[]
 }
@@ -102,8 +102,8 @@ model EventRegistrations {
   eventId          String 
   attendanceStatus Boolean       @default(false)
   prize            Int           @default(0)
-  registrant       Registrants   @relation(fields: [registrantId], references: [id])
-  event            Events        @relation(fields: [eventId], references: [id])
+  registrant       Registrants   @relation(fields: [registrantId], references: [id],onDelete: Cascade)
+  event            Events        @relation(fields: [eventId], references: [id],onDelete: Cascade)
   @@unique([registrantId,eventId])
 }
 

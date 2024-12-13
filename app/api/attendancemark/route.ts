@@ -21,7 +21,7 @@ export async function POST(request:Request){
          return NextResponse.json({success:false,message:"no event found"},{status:404});
     }
     try{
-    const updatedRegistrant = await updateRegistrant(usn,event_idfilter[0].id);
+     await updateRegistrant(usn,event_idfilter[0].id);
     return NextResponse.json({success:true, message:"marked attended"},{status:200});
     }
     catch(error){
