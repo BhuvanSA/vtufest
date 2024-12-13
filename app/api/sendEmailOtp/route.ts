@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import Redis from "ioredis";
+import { Redis } from "@upstash/redis";
 import nodemailer from "nodemailer";
 
-// Redis configuration
-const redis = new Redis(process.env.REDIS_URL || "redis://localhost:6379");
+// Initialize Upstash Redis client
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL as string, // Upstash Redis URL
+  token: process.env.UPSTASH_REDIS_REST_TOKEN as string, // Upstash Redis Token
+});
 
 // Zod schema for validation
 const emailOtpSchema = z.object({
@@ -17,6 +20,7 @@ const generateOtp = () => Math.floor(100000 + Math.random() * 900000);
 export async function POST(request: Request) {
   try {
     const body = await request.json();
+    
 
     // Validate input
     const validation = emailOtpSchema.safeParse(body);
@@ -27,13 +31,15 @@ export async function POST(request: Request) {
     const { email } = validation.data;
 
     // Rate limiting logic
-    const redisKey = `email-otp-rate-limit:${email}`;
-    const currentOtpRequests = await redis.incr(redisKey);
-    if (currentOtpRequests === 1) {
+    const rateLimitKey = `email-otp-rate-limit:${email}`;
+    const rateLimitValue = await redis.incr(rateLimitKey);
+
+    if (rateLimitValue === 1) {
       // Set expiration for the key if it's the first request
-      await redis.expire(redisKey, 60); // 60 seconds window
+      await redis.expire(rateLimitKey, 60); // 60 seconds window
     }
-    if (currentOtpRequests > 5) {
+
+    if (rateLimitValue > 5) {
       return NextResponse.json(
         { success: false, message: "Too many OTP requests, please try again later." },
         { status: 429 }
@@ -44,14 +50,16 @@ export async function POST(request: Request) {
     const otp = generateOtp();
 
     // Save OTP to Redis
-    await redis.set(`otp:${email}`, otp, "EX", 300); // OTP valid for 5 minutes
+    await redis.set(`otp:${email}`, otp, {
+      ex: 300, // OTP valid for 5 minutes
+    });
 
     // Configure Nodemailer
     const transporter = nodemailer.createTransport({
       service: "gmail", // Use your email provider (e.g., Gmail, Sendinblue, Outlook)
       auth: {
-        user: process.env.EMAIL_USER, // Your email address
-        pass: process.env.EMAIL_PASSWORD, // Your email password or app password
+        user: process.env.EMAIL_USER as string, // Your email address
+        pass: process.env.EMAIL_PASSWORD as string, // Your email password or app password
       },
     });
 
@@ -68,7 +76,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true, message: "OTP sent successfully!" });
   } catch (error) {
-    console.error(error);
+    console.error("Error sending OTP:", error);
     return NextResponse.json({ success: false, error: "Internal Server Error" }, { status: 500 });
   }
 }

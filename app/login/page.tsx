@@ -1,56 +1,98 @@
-// pages/login.tsx
-"use client"
-import React from "react";
- // Import Link to navigate
-import OuterBox from "../../components/OuterBox";
-import Heading from "../../components/Heading";
-import InputField from "../../components/InputField";
-import Button from "../../components/Button";
-import { WarningMessage } from "../../components/WarningMessage";
-import { useState } from "react";
-import '../globals.css';
-import axios from "axios";
-import { useRouter } from "next/navigation";
+'use client'
 
-const Login = () => {
-  const router = useRouter();
-  const [username,setUsername] = useState("");
-  const [password,setPassword] =useState("");
+import { useState } from "react";
+import {motion} from "framer-motion"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import axios from "axios";
+import {useRouter} from "next/navigation";
+import Link from "next/link";
+
+
+const SignIn = () => {
+  const[username, setUsername] = useState('')
+  const[password, setPassword] = useState('')
+  const router = useRouter()
+
+
   return (
-    <div>
-      <OuterBox>
-        {" "}
-        <Heading label="Login" />
-        <InputField
-          label="Username"
-          placeholder="Enter your username"
-          onChange={(e)=>setUsername(e.target.value)}
-        />
-        <InputField
-          label="Password"
-          placeholder="Enter your password"
-          type="password"
-          onChange={(e)=>setPassword(e.target.value)}
-        />
-        <Button label="Login" OnClick={ async ()=>{
-           const response = await axios.post("http://localhost:3000/api/login",{
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center p-4">
+      <motion.div
+          initial={{opacity: 0,y: -20}}
+          animate = {{opacity: 1, y: 0}}
+          transition={{duration: 0.5}}
+          className="w-full max-w-md"
+      >
+        <div className="bg-white rounded-2xl shadow-xl p-8 space-y-6">
+          <div className="text-center space-y-2">
+            <h1 className="text-3xl font-bold tracking-tighter">VTU Fest Sign-IN</h1>
+            <p className="text-muted-foreground">Enter your Credentials</p>
+          </div>
+          <form className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="string">Username</Label>
+              <Input
+                id="username"
+                type="string"
+                placeholder="Enter your username"
+                value={username}
+                onChange={(e)=>setUsername(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="phone">Password</Label>
+              <div className="relative">
+                <Input
+                id="phone"
+                value={password}
+                onChange={(e)=>setPassword(e.target.value)}
+                required
+                />
+              </div>
+            </div> 
+            
+            <Button type="submit" className="w-full" onClick={ async ()=>{
+              const response = await axios.post("http://localhost:3000/api/login",{
               username,
               password
-              
             })
-             console.log(response)
-             if (response.data.success) {
+            if (response.data.success) {
               // Navigate to the login page after signup
-              router.push('/');
+              router.push('/login');
             } else {
               console.error('Signup failed');
-            }
+            }
+            }}>
+
+              Sign IN
+            </Button>
+
+          </form>
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t"/>
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-white px-2 text-muted-foreground">Not yet Registered ?</span>
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
             
-            } } />
-        <WarningMessage label="New User?" buttonText="Sign Up" to="/signup" />
-      </OuterBox>
+            <Link href={"/signup"}>
+            <Button type="submit" className="w-full" >
+              Sign UP
+            </Button>
+            </Link>
+            </div>
+
+          </div>
+        </div>
+
+
+      </motion.div>
     </div>
   );
-};
+}
 
-export default Login;
+export default SignIn;
