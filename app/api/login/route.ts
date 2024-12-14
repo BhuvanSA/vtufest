@@ -21,10 +21,10 @@ const COOKIE_OPTIONS: object = {
 
 // Zod schema for login validation
 const loginSchema = z.object({
-  username: z
-    .string()
-    .min(1, "Username is required")
-    .max(50, "Username must be less than 50 characters"),
+  email: z
+    .string().email()
+    .min(1, "Email is required")
+    ,
   password: z
     .string()
     .min(8, "Password must be at least 8 characters long")
@@ -56,12 +56,14 @@ export async function POST(request: Request) {
     }
 
     // Destructure validated data
-    const { username, password } = result.data;
+    const { email, password } = result.data;
+
 
     // Fetch user from the database
     const user = await prisma.users.findUnique({
-      where: { userName: username },
+      where: { email:email },
     });
+    
 
     // If user does not exist, return error
     if (!user) {
@@ -81,7 +83,7 @@ export async function POST(request: Request) {
     }
 
     // Generate JWT token using jose
-    const token = await new SignJWT({ id: user.id, username: user.userName })
+    const token = await new SignJWT({ id: user.id, email: user.email })
       .setProtectedHeader({ alg: "HS256" })
       .setIssuedAt()
       .setExpirationTime("1h") // Set expiration time
@@ -93,7 +95,7 @@ export async function POST(request: Request) {
     });
 
     response.cookies.set(COOKIE_NAME, token, COOKIE_OPTIONS);
-
+    
     return response;
   } catch (error) {
     console.error("Error during login:", error);

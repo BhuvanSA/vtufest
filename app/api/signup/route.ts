@@ -122,6 +122,12 @@ export async function POST(request: Request) {
       },
     });
 
+    if(newUser){
+      const response = await axios.post("http://localhost:3000/api/sendpassword",{
+        email,
+        password
+      }) 
+    }
     // Return successful response
     return NextResponse.json({ success: true, message: "Registration successful", user: newUser });
   } catch (error) {

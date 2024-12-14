@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import {motion} from "framer-motion"
-import { Button } from "@/components/ui/button";
+import Button1 from "@/components/Button";
+import {Button} from "@/components/ui/button"
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import axios from "axios";
@@ -11,10 +12,25 @@ import Link from "next/link";
 
 
 const SignIn = () => {
-  const[username, setUsername] = useState('')
+  const[email, setEmail] = useState('')
   const[password, setPassword] = useState('')
   const router = useRouter()
 
+ const  handleButtonClick = async()=>{
+  const response = await axios.post("http://localhost:3000/api/login",{
+  email,
+  password
+})
+console.log(response)
+
+if (response.data.success) {
+  
+  router.push('/');
+} else {
+  console.error('Login failed');
+            }
+
+ }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center p-4">
@@ -36,8 +52,8 @@ const SignIn = () => {
                 id="username"
                 type="string"
                 placeholder="Enter your username"
-                value={username}
-                onChange={(e)=>setUsername(e.target.value)}
+                value={email}
+                onChange={(e)=>setEmail(e.target.value)}
                 required
               />
             </div>
@@ -45,31 +61,19 @@ const SignIn = () => {
               <Label htmlFor="phone">Password</Label>
               <div className="relative">
                 <Input
-                id="phone"
+                id="password"
+                type="password"
                 value={password}
                 onChange={(e)=>setPassword(e.target.value)}
                 required
                 />
               </div>
             </div> 
-            
-            <Button type="submit" className="w-full" onClick={ async ()=>{
-              const response = await axios.post("http://localhost:3000/api/login",{
-              username,
-              password
-            })
-            if (response.data.success) {
-              // Navigate to the login page after signup
-              router.push('/login');
-            } else {
-              console.error('Signup failed');
-            }
-            }}>
-
-              Sign IN
-            </Button>
-
+            <button type="button"  onClick={handleButtonClick}>
+             Sign in 
+              </button>
           </form>
+          
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
                 <span className="w-full border-t"/>
