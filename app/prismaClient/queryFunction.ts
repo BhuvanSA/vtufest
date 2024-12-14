@@ -1,5 +1,4 @@
 import { PrismaClient } from '@prisma/client'
-import { connect } from 'http2';
 
 const prisma = new PrismaClient()
 
@@ -7,6 +6,7 @@ interface Registrant{
     name : string,
     usn : string,
     type : any,
+    phone : string,
     photoUrl : string,
     aadharUrl : string,
     sslcUrl : string,
@@ -27,13 +27,40 @@ export async function insertRegistrant(arg : any){
         photoUrl: arg.photoUrl,
         sslcUrl: arg.sslcUrl,
         pucUrl: arg.pucUrl,
-        admissionUrl: arg.admissionUrl,
+        admission1Url: arg.admission1Url,
+        admission2Url : arg.admission2Url,
         idcardUrl: arg.idcardUrl,
         userId: arg.userId,
         verified: false,
         aadharUrl : arg.aadharUrl
     }
-    console.log(values)
+    console.log("values",values)
+
+    const alleventList = await getAllEventsByUser(arg.userId);
+
+    const eventList = [];
+
+    if(arg.type==='PARTICIPANT'){
+        arg.events.forEach((x:any)=>{
+            let selectedEvent = alleventList.find(y=> parseInt(y.eventNo) === parseInt(x.eventNo))
+            
+            if(selectedEvent.maxParticipant >= selectedEvent.registeredParticipant+1){
+                selectedEvent.registeredParticipant += 1;
+                eventList.push(selectedEvent);
+            }
+        })
+    }
+    else if(arg.type==="ACCOMPANIST"){
+        arg.events.forEach((x:any)=>{
+            let selectedEvent = alleventList.find(parseInt(y=> y.eventNo) === parseInt(x.eventNo));
+            if(selectedEvent.maxAccompanist >= selectedEvent.registeredAccompanist+1){
+                selectedEvent.registeredAccompanist +=1;
+                eventList.push(selectedEvent);
+            }
+        })
+    }
+    
+    console.log("the final list ",eventList);
 
     const registrant = await prisma.registrants.create({
         data:{
@@ -45,35 +72,39 @@ export async function insertRegistrant(arg : any){
             sslcUrl: values.sslcUrl,
             pucUrl: values.pucUrl,
             aadharUrl : values.aadharUrl,
-            admissionUrl: values.admissionUrl,
+            admission1Url: values.admission1Url,
+            admission2Url : values.admission2Url,
             idcardUrl: values.idcardUrl,
             userId: values.userId,
         }
     })
     console.log(registrant);
     console.log("it is savee");
-    console.log(arg.events.map((event:any)=>({
-        id : event.id
+    console.log(eventList.map((event:any)=>({
+        id : parseInt(event.eventNo)
     })))
     console.log(registrant.id)
-
+    
         const events = await Promise.all(
-        arg.events.map((event: any) =>
+        eventList.map((event: any) =>
           prisma.events.update({
             where: {
               userId_eventNo: {
                 userId: arg.userId,
-                eventNo: event.id,  // Make sure this matches the correct event number
+                eventNo: parseInt(event.eventNo),  // Make sure this matches the correct event number
               },
             },
             data: {
               registrants: {
                 connect: { id: registrant.id },  // Connect registrant by their ID
               },
+              registeredParticipant : event.registeredParticipant,
+              registeredAccompanist : event.registeredAccompanist
             },
           })
         )
       );
+    
       console.log(events);
     console.log("the above e")
 
@@ -83,7 +114,8 @@ export async function insertRegistrant(arg : any){
             prisma.eventRegistrations.create({
                 data: {
                     registrantId : registrant.id,
-                    eventId : event.id
+                    eventId :event.id,
+
                 }
             })
         ))
@@ -155,35 +187,55 @@ export async function updateRegistrant(usn: string, eventId: string) {
     // Fetch the registrant
     const registrant = await prisma.registrants.findFirst({
         where: {
-            usn
+          usn,
         },
-        include:{
-            eventRegistrations:true,
-            events:true
-        }
-    });
+        include: {
+          eventRegistrations: true,
+          events: true,
+        },
+      });
+      console.log(registrant)
+      
+      if (!registrant) {
+        console.log("Registrant not found for the provided USN");
+        return "Registrant not found";
+      }
+      
+      console.log("Registrant ID:", registrant.id);
+      console.log("Event ID:", eventId);
+      
+      const registrantId = registrant.id;
+      
+      // Fetch the current attendanceStatus
+      const existingRegistration = await prisma.eventRegistrations.findUnique({
+        where: {
+            id:eventId,
+        },
+      });
+      console.log("fdafads",existingRegistration)
+      
+      if (!existingRegistration) {
+        console.log("Event registration not found");
+        return "Event registration not found";
+      }
+      
+      console.log("Existing Registration:", existingRegistration);
+      
+      // Toggle attendanceStatus
+      const updatedRegistrant = await prisma.eventRegistrations.update({
+        where: {
+          id:eventId
+        },
+        data: {
+          attendanceStatus: !existingRegistration.attendanceStatus, // Toggle attendanceStatus
+        },
+      });
+      
+      console.log("Updated Attendance Status:", updatedRegistrant.attendanceStatus);
+      return updatedRegistrant.attendanceStatus;
+      
 
-    if (!registrant) {
-        return "no "
-    }
-
-    // Update the `events` array
-    
-   
-    // Update the registrant's record
-    const updatedRegistrant = await prisma.eventRegistrations.update({
-        where:{
-        registrantId_eventId: {
-            registrantId: registrant.id,  // Use the registrant's ID
-            eventId          // Use the event's ID
-        }},
-        data:{
-            attendanceStatus:true
-        }
-    });
-
-
-    return updatedRegistrant; // Return the updated registrant if needed
+     // Return the updated registrant if needed
 }
 
 
@@ -208,7 +260,10 @@ export async function registerUserEvents(userId:string,events:any){
         data:events.map((event:any)=>({
             userId,
             eventName:event.eventName,
-            eventNo : event.eventNo
+            eventNo : event.eventNo,
+            maxParticipant:event.maxParticipant,              
+            maxAccompanist : event.maxAccompanist,
+            category : event.category         
         }))
     })
 

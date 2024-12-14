@@ -13,9 +13,8 @@ const fileSchema = z.instanceof(File).refine((file) => file.size <= 150 * 1024, 
   });
 
   const eventSchema = z.object({
-    name: z.string().min(1, "Event name cannot be empty"),
-    attended: z.boolean().default(false),
-    id : z.number()
+    eventName: z.string().min(1, "Event name cannot be empty"),
+    eventNo: z.number()
   });
   
   const registrantSchema = z.object({
@@ -28,7 +27,8 @@ const fileSchema = z.instanceof(File).refine((file) => file.size <= 150 * 1024, 
     aadhar: fileSchema, // File validation for Aadhar
     sslc: fileSchema, // File validation for SSLC
     puc: fileSchema, // File validation for PUC
-    admission: fileSchema, // File validation for admission
+    admission1: fileSchema, // File validation for admission
+    admission2 : fileSchema,
     idcard: fileSchema, // File validation for ID card
   });
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || "default_secret");
@@ -38,29 +38,30 @@ export async function POST(request : Request){
     
     const formData = await request.formData();
 
-    const data = JSON.parse(formData.get("data"));
 
-    
+    const dataEvent = JSON.parse(formData.get("events"));
 
     // zod validation 
     // add phone number and email
         const registrant = {
-            name : data.name,
-            usn : data.usn,
-            type : data.type,
-            events : data.events ,
-            phone : data.phone,
+            name : formData.get("name"),
+            usn : formData.get("usn"),
+            type : formData.get("type"),
+            events : dataEvent ,
+            phone : formData.get("phone"),
             photo : formData.get("photo"),
             sslc : formData.get("sslc"),
             aadhar : formData.get("aadhar"),
             puc : formData.get("puc"),
-            admission : formData.get('admission'),
+            admission1 : formData.get('admission1'),
+            admission2 : formData.get('admission2'),
             idcard : formData.get('idcard')
         }
 
-        console.log(registrant)
+        console.log("registrants",registrant)
 
         const result = registrantSchema.safeParse(registrant);
+        console.log(result.error?.message)
         if (!result.success){
             return NextResponse.json({success: false, error : result.error},{status:400})
         }
@@ -91,8 +92,8 @@ export async function POST(request : Request){
 
 
     //upload the files to the file uploader
-    const files = [result.data.sslc,result.data.puc,result.data.admission,result.data.idcard,result.data.photo,
-        result.data.aadhar
+    const files = [result.data.sslc,result.data.puc,result.data.admission1,result.data.idcard,result.data.photo,
+        result.data.aadhar,result.data.admission2
     ]
     try{
     const response = await utapi.uploadFiles(files);
@@ -106,11 +107,12 @@ export async function POST(request : Request){
         aadharUrl : response[5].data?.url,
         sslcUrl : response[0].data?.url,
         pucUrl : response[1].data?.url,
-        admissionUrl : response[2].data?.url,
+        admission1Url : response[2].data?.url,
+        admission2Url : response[6].data?.url,
         idcardUrl :response[3].data?.url,
         userId : userId,
     }
-    // save the registrant into the DB
+    // // save the registrant into the DB
     const dataDB = await insertRegistrant(registrantDB);
     console.log("this is db api",dataDB);
 

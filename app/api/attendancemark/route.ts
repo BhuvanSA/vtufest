@@ -3,9 +3,9 @@ import { NextResponse } from "next/server";
 
 export async function POST(request:Request){
     
-    const req = await request.json();
-    const eventId = req.eventId;
-    const usn = req.usn;
+    const {usn,eventId} = await request.json();
+    
+    
 
     const registrant = await getRegistrant(usn);
 
@@ -13,16 +13,17 @@ export async function POST(request:Request){
         return NextResponse.json({success:false,error:"registrant not found"},{status:404});
     }
     
-    console.log(registrant.events);
+    console.log(registrant.eventRegistrations);
 
-    const event_idfilter = registrant.events.filter((value)=> value.eventNo===eventId);
-    console.log("fadsfss",event_idfilter)
-    if(event_idfilter.length==0){
+    const eventFilter = registrant.eventRegistrations.find(x => x.eventId === eventId);
+    console.log("eventFIlter",eventFilter)
+    if(!eventFilter){
          return NextResponse.json({success:false,message:"no event found"},{status:404});
     }
+
     try{
-     await updateRegistrant(usn,event_idfilter[0].id);
-    return NextResponse.json({success:true, message:`marked attendend for ${event_idfilter[0].eventName}`},{status:200});
+    const res = await updateRegistrant(usn,eventFilter.id);
+    return NextResponse.json({success:true, message:`marked attendence ${res}`},{status:200});
     }
     catch(error){
         return NextResponse.json({success:false,error},{status:400});

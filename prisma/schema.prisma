@@ -73,7 +73,11 @@ model Events {
   registrants          Registrants[]           @relation("EventRegistrations")
   user                  Users                  @relation(fields: [userId], references: [id],onDelete: Cascade)
   eventRegistrations   EventRegistrations[]     
-
+  maxParticipant        Int    
+  registeredParticipant     Int @default(0)
+  maxAccompanist          Int
+  registeredAccompanist     Int @default(0) 
+  category                  String
   @@unique([userId,eventNo])
 }
 
