@@ -8,13 +8,19 @@ import axios from "axios";
 const prisma = new PrismaClient();
 
 // Define Zod schema for validation
-const signupSchema = z.object({
-  collegeName: z.string().min(1, "College name is required"),
+const formSchema = z.object({
+  college: z
+    .string()
+    .min(1, "College name is required")
+    .max(100, "College name should not exceed 100 characters"),
+  phone: z
+    .string()
+    .regex(/^\d{10}$/, "Phone number must be a 10-digit number"),
   email: z.string().email("Invalid email address"),
-  phone: z.string().length(10, "Phone number must be exactly 10 digits"),
-  otp: z.string().length(6, "OTP must be exactly 6 digits"), // Validate OTP input
+  otp: z
+    .string()
+    .regex(/^\d{6}$/, "OTP must be a 6-digit number")
 });
-
 // Utility function to generate a random password
 const generatePassword = (length: number) => {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$!";
@@ -41,43 +47,49 @@ const generatePassword = (length: number) => {
 // };
 
 // Function to verify OTP
-const verifyOtp = async (email: string, otp: string) => {
-  const response = await axios.post(
-    `http://localhost:3000/api/verifyOtp`,
-    { email, otp },
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
+async function verifyOtp(email :string, otp:string ) {
+  try {
+    const response = await axios.post("http://localhost:3000/api/verifyOtp", {
+      email: email,
+      otp: otp,
+    });
+  
+    if (response.data.success) {
+      console.log("OTP verified successfully:", response.data.message);
+      return true;
+    } else {
+      console.log("Error:", response.data.message);
     }
-  );
-
-  const data = response.data;
-  if (!data.success) {
-    throw new Error("Invalid OTP");
+  } catch (error : any) {
+    if (error.response) {
+      // Server responded with a status code other than 2xx
+      console.error("Server Error:", error.response.data);
+    } else if (error.request) {
+      // Request was sent but no response was received
+      console.error("No Response:", error.request);
+    } else {
+      // Something else caused the error
+      console.error("Error:", error.message);
+    }
   }
-  return true;
-};
+}
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-
-    // Validate input with Zod schema
-    const validation = signupSchema.safeParse(body);
-    if (!validation.success) {
-      return NextResponse.json({ success: false, errors: validation.error.errors }, { status: 400 });
-    }
-
-    const { collegeName, email, phone, otp } = validation.data;
-
-    // Check if the user already exists in the database (by email, phone, or collegeName)
+    // // Validate input with Zod schema
+    // const validation = formSchema.safeParse(body);
+    // console.log(validation)
+    // if (!validation.success) {
+    //   return NextResponse.json({ success: false, errors: validation.error.errors }, { status: 400 });
+    // }
+    const { college, email, phone, otp } = body;
+    // Check if the user already exists in the database (by email, phone, or college)
     const existingUser = await prisma.users.findFirst({
       where: {
         OR: [
           { email },
-          { phone },
-          { collegeName },
+          { phone }
         ],
       },
     });
@@ -90,7 +102,7 @@ export async function POST(request: Request) {
     }
 
     // Verify OTP entered by the user
-    const otpValid = await verifyOtp(email, otp);
+    const otpValid : any = await verifyOtp(email, otp);
     if (!otpValid) {
       return NextResponse.json({ success: false, error: "OTP validation failed" }, { status: 401 });
     }
@@ -98,10 +110,8 @@ export async function POST(request: Request) {
     // Generate random password for the user
     const password = generatePassword(8 + Math.floor(Math.random() * 5)); // Length between 8-12
     const hashedPassword = await bcrypt.hash(password, 10); // Hash the password
-
-    // Generate unique username
     
-
+    const collegeName = college;
     // Create the user in the database
     const newUser = await prisma.users.create({
       data: {

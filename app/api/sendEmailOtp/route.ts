@@ -50,10 +50,9 @@ export async function POST(request: Request) {
     const otp = generateOtp();
 
     // Save OTP to Redis
-    await redis.set(`otp:${email}`, otp, {
+    const response = await redis.set(`otp:${email}`, otp, {
       ex: 300, // OTP valid for 5 minutes
     });
-
     // Configure Nodemailer
     const transporter = nodemailer.createTransport({
       service: "gmail", // Use your email provider (e.g., Gmail, Sendinblue, Outlook)

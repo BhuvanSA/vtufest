@@ -17,18 +17,18 @@ const verifyOtpSchema = z.object({
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-
     // Validate input
-    const validation = verifyOtpSchema.safeParse(body);
-    if (!validation.success) {
-      return NextResponse.json({ success: false, errors: validation.error.errors }, { status: 400 });
-    }
+    // const validation = verifyOtpSchema.safeParse(body);
+    // if (!validation.success) {
+    //   return NextResponse.json({ success: false, errors: validation.error.errors }, { status: 400 });
+    // }
 
-    const { email, otp } = validation.data;
-
+    const { email, otp } = body;
     // Retrieve OTP from Redis
-    const storedOtp = await redis.get(`otp:${email}`);
-
+    const storedOtp : any = await redis.get(`otp:${email}`)
+    // console.log("Stored OTP:", storedOtp);
+    // console.log("Received OTP:", otp);
+    // console.log("Comparison Result:", storedOtp === otp);
     if (!storedOtp) {
       return NextResponse.json(
         { success: false, message: "OTP has expired or is invalid" },
@@ -37,12 +37,13 @@ export async function POST(request: Request) {
     }
 
     // Verify OTP
-    if (storedOtp !== otp) {
+    if (String(storedOtp) !== String(otp)) {
       return NextResponse.json(
         { success: false, message: "Invalid OTP" },
         { status: 400 }
       );
     }
+    
 
     // OTP verification successful, delete OTP from Redis
     await redis.del(`otp:${email}`);

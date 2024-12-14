@@ -109,9 +109,8 @@ const SignUp = () => {
         email,
         otp
       });
-  
       if (response.status === 200) {
-        router.push('/');
+        router.push('/login');
       } else {
         toast.error("Signup failed. Please try again.", {
           position: "bottom-left",
