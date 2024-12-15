@@ -2,11 +2,16 @@
 
 import React, { useEffect, useState } from "react";
 
+enum type {
+  PARTICIPANT = "PARTICIPANT",
+  ACCOMPANIST = "ACCOMPANIST",
+}
+
 interface FormData {
   name: string;
   usn: string;
-  type: string;
-  events: { eventNo: number; eventName: string }[]; // Updated to store event objects
+  teamManager : boolean;
+  events:  { eventNo: number; eventName: string; type: string }[]; // Updated to store event objects
   photo: File | null;
   phone: string;
   aadhar: File | null;
@@ -21,7 +26,7 @@ const Register = () => {
   const [formData, setFormData] = useState<FormData>({
     name: "",
     usn: "",
-    type: "",
+    teamManager:false,
     events: [],
     photo: null,
     phone : "",
@@ -34,7 +39,7 @@ const Register = () => {
   });
 
   const [eventCategories, setEventCategories] = useState([]);
-
+  const [selectedEvents, setSelectedEvents] = useState([])
   useEffect(() => {
     
     async function getEvents(){
@@ -44,41 +49,54 @@ const Register = () => {
 
       let {userEvents} = await res.json();
       console.log(userEvents)
-      if(formData.type === 'PARTICIPANT'){
+      if(formData.teamManager != true){
         console.log("filtering")
-        userEvents = userEvents.filter(x => x.registeredParticipant < x.maxParticipant)
+        userEvents = userEvents.filter(x => x.registeredParticipant < x.maxParticipant || x.registeredAccompanist <x.maxAccompanist)
+        setEventCategories(userEvents)
       }
-      else if(formData.type === 'ACCOMPANIST'){
-        userEvents = userEvents.filter(x => x.registeredAccompanist < x.maxAccompanist)
+      else{
+      setEventCategories([])
       }
-
-      setEventCategories(userEvents)
     }
     getEvents()
-  }, [formData.type])
+  }, [formData.teamManager])
   
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const validate = () => {
     const newErrors: { [key: string]: string } = {};
+    
+    // Name validation
     if (!formData.name) newErrors.name = "Name is required.";
+    
+    // USN validation
     if (!formData.usn) newErrors.usn = "USN is required.";
-    if (!formData.type) newErrors.type = "Participant type is required.";
-    if (formData.events.length === 0)
+    
+    // Team Manager validation
+    if (!formData.teamManager) newErrors.type = "team manager type is required.";
+    
+    // Events validation for non-Team Managers
+    if (formData.teamManager === false && formData.events.length === 0)
       newErrors.events = "Select at least one event.";
+    
+    // Phone validation
     if (!formData.phone || !/^\d{10}$/.test(formData.phone)) {
       newErrors.phone = "Valid 10-digit phone number is required.";
-    }    
+    }
+    
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const updatedValue =
+      name === "teamManager" ? (value === "true" ? true : false) : value;
+    
+      setFormData((prev) => ({ ...prev, [name]: updatedValue }));
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -108,23 +126,72 @@ const Register = () => {
 
   const handleEventSelection = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = e.target;
-    const [eventNo, eventName] = value.split('|'); // Split the value into eventNo and eventName
-    
-    // Convert eventNo to a number
+    const [eventNo, eventName] = value.split("|"); // Split value into eventNo and eventName
+  
     const eventNoNumber = parseInt(eventNo, 10);
   
-    setFormData((prev) => ({
-      ...prev,
-      events: checked
-        ? [...prev.events, { eventNo: eventNoNumber, eventName }]
-        : prev.events.filter((event) => event.eventNo !== eventNoNumber), // Remove event by eventNo
+    const updatedSelectedEvents = checked
+      ? [
+          ...selectedEvents,
+          { eventNo: eventNoNumber, eventName, type: "" }, // Initially set role to empty
+        ]
+      : selectedEvents.filter((event) => event.eventNo !== eventNoNumber); // Remove event by eventNo
+  
+    setSelectedEvents(updatedSelectedEvents);
+  
+    // Update formData.events as well
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      events: updatedSelectedEvents,
     }));
   };
   
+  const handleRoleChange = (
+    e: React.ChangeEvent<HTMLSelectElement>,
+    eventNo: number
+  ) => {
+    const type = e.target.value;
+  
+    setSelectedEvents((prevSelectedEvents) => {
+      const updatedSelectedEvents = prevSelectedEvents.map((event) =>
+        event.eventNo === eventNo ? { ...event, type } : event
+      );
+  
+      // Update formData.events in sync
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        events: updatedSelectedEvents,
+      }));
+  
+      return updatedSelectedEvents; // Return the updated state
+    });
+  };
   
   const handleSubmit = async (e: React.FormEvent) => {
+
+    
     e.preventDefault();
-    if (validate()) {
+    console.log("hit")
+    console.log('Name:', formData.name);
+    console.log('USN:', formData.usn);
+    console.log('Team Manager:', formData.teamManager);
+    console.log('Phone:', formData.phone);
+    
+    // Logging events array
+    console.log('Events:');
+    console.log(formData.events)
+    // Logging file fields
+    console.log('Photo:', formData.photo);
+    console.log('Aadhar:', formData.aadhar);
+    console.log('SSLC:', formData.sslc);
+    console.log('PUC:', formData.puc);
+    console.log('Admission1:', formData.admission1);
+    console.log('Admission2:', formData.admission2);
+    console.log('ID Card:', formData.idcard);
+    
+
+    // if (validate()) {
+      console.log("val")
       const formDataToSend = new FormData();
       Object.entries(formData).forEach(([key, value]) => {
         if (key === "events") {
@@ -133,6 +200,8 @@ const Register = () => {
           formDataToSend.append(key, value as Blob | string); // Append files or string data
         }
       });
+
+      console.log(formDataToSend.get("events"))
       
       try {
         const response = await fetch('/api/register', {
@@ -150,7 +219,7 @@ const Register = () => {
         alert("Failed to register. Please try again later.");
         console.error(err);
       }
-    }
+
   };
   
 
@@ -232,24 +301,35 @@ const Register = () => {
               )}
             </div>
           <div className="mb-4">
-            <label className="block text-sm font-medium text-yellow-600 mb-2">
-              Type
+          <label className="block text-sm font-medium text-yellow-600 mb-2">
+              Are you registering as Team Manager?
             </label>
-            <select
-              name="type"
-              value={formData.type}
-              onChange={handleChange}
-              className={`w-full px-4 py-2 border ${
-                errors.type ? "border-red-500" : "border-[#333333]"
-              } rounded-lg text-sm bg-white-600 text-black focus:outline-none focus:border-yellow-500`}
-            >
-              <option value="">Select type</option>
-              <option value="PARTICIPANT">PARTICIPANT</option>
-              <option value="TEAMMANAGER">TEAM MANAGER</option>
-              <option value="ACCOMPANIST">ACCOMPANIST</option>
-            </select>
-            {errors.type && (
-              <p className="text-red-500 text-xs mt-1">{errors.type}</p>
+            <div className="flex items-center">
+              <label className="mr-4 text-black">
+                <input
+                  type="radio"
+                  name="teamManager"
+                  value="true"
+                  checked={formData.teamManager === true}
+                  onChange={handleChange}
+                  className="mr-2"
+                />
+                Yes
+              </label>
+              <label className="mr-4 text-black">
+                <input
+                  type="radio"
+                  name="teamManager"
+                  value="false"
+                  checked={formData.teamManager === false}
+                  onChange={handleChange}
+                  className="mr-2"
+                />
+                No
+              </label>
+            </div>
+            {errors.teamManager && (
+              <p className="text-red-500 text-xs mt-1">{errors.teamManager}</p>
             )}
           </div>
             </div>
@@ -258,38 +338,56 @@ const Register = () => {
             <h1 className="block text-2xl text-yellow-600 mb-4">Events</h1>
           </center>
           <div className="mb-6">
-  <div className="grid grid-cols-2 gap-4">
-    {Object.entries(
-      eventCategories.reduce((acc, { category, eventNo, eventName }) => {
-        if (!acc[category]) acc[category] = [];
-        acc[category].push({ eventNo, eventName });
-        return acc;
-      }, {})
-    ).map(([category, events], index) => (
-      <fieldset
-        key={index}
-        className="mb-4 border-2 border-black p-2 rounded-lg hover:scale-105 transform transition-all"
-      >
-        <legend className="font-semibold text-yellow-600">{category}</legend>
-        {(events as { eventNo: number; eventName: string }[]).map((event, i) => (
-          <div
-            key={i}
-            className="flex items-center mb-1 hover:bg-gray-200 p-1 rounded-md transition-all"
+          <div className="grid grid-cols-2 gap-4">
+          {eventCategories.map((event, index) => (
+  <fieldset
+    key={index}
+    className="mb-4 border-2 border-black p-2 rounded-lg hover:scale-105 transform transition-all"
+  >
+    <legend className="font-semibold text-yellow-600">
+      {event.category}
+    </legend>
+    <div className="flex items-center mb-1 hover:bg-gray-200 p-1 rounded-md transition-all">
+      <input
+        type="checkbox"
+        name="events"
+        value={`${event.eventNo}|${event.eventName}`}
+        onChange={handleEventSelection}
+        className="mr-2 accent-yellow-400"
+      />
+      <label className="text-sm text-black">
+        {event.eventName}
+      </label>
+    </div>
+
+    {selectedEvents
+      .filter((e) => e.eventNo === event.eventNo)
+      .map((selectedEvent) => (
+        <div key={selectedEvent.eventNo} className="mt-2">
+          <label className="text-sm text-black">Select Type</label>
+          <select
+            value={selectedEvent.type}
+            onChange={(e) => handleRoleChange(e, selectedEvent.eventNo)}
+            className="w-full px-4 py-2 border rounded-lg text-sm bg-white-600 text-black focus:outline-none focus:border-yellow-500"
           >
-            <input
-              type="checkbox"
-              name="events"
-              value={`${event.eventNo}|${event.eventName}`} // Store both eventNo and eventName
-              onChange={handleEventSelection}
-              className="mr-2 accent-yellow-400"
-            />
-            <label className="text-sm text-black">{event.eventName}</label>
-          </div>
-        ))}
-      </fieldset>
-    ))}
-  </div>
-  {errors.events && <p className="text-red-500 text-xs mt-1">{errors.events}</p>}
+            <option value="">Select type</option>
+
+            {/* Only show "Participant" if registeredParticipant < maxParticipant */}
+            {event.registeredParticipant < event.maxParticipant && (
+              <option value="PARTICIPANT">Participant</option>
+            )}
+
+            {/* Only show "Accompanist" if registeredAccompanist < maxAccompanist */}
+            {event.registeredAccompanist < event.maxAccompanist && (
+              <option value="ACCOMPANIST">Accompanist</option>
+            )}
+          </select>
+        </div>
+      ))}
+  </fieldset>
+))}
+</div>
+
 </div>
 
   
