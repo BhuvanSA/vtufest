@@ -89,5 +89,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/api/register", "/api/getallregister", "/api/sendEmailOtp"],
+  matcher: ["/api/register", "/api/getallregister", "/api/sendEmailOtp","/register"],
 };

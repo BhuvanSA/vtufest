@@ -58,7 +58,7 @@ export async function POST(request: Request) {
     // Destructure validated data
     const { email, password } = result.data;
 
-
+    console.log(email,"pass",password)
     // Fetch user from the database
     const user = await prisma.users.findUnique({
       where: { email:email },
@@ -75,7 +75,7 @@ export async function POST(request: Request) {
 
     // Compare the provided password with the stored hashed password
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
+    if (isPasswordValid==false) {
       return NextResponse.json(
         { success: false, message: "Invalid password" },
         { status: 401 }

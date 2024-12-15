@@ -77,13 +77,13 @@ async function verifyOtp(email :string, otp:string ) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    // // Validate input with Zod schema
-    // const validation = formSchema.safeParse(body);
-    // console.log(validation)
-    // if (!validation.success) {
-    //   return NextResponse.json({ success: false, errors: validation.error.errors }, { status: 400 });
-    // }
-    const { college, email, phone, otp } = body;
+    // Validate input with Zod schema
+    const validation = formSchema.safeParse(body);
+    console.log(validation)
+    if (!validation.success) {
+      return NextResponse.json({ success: false, errors: validation.error.errors }, { status: 400 });
+    }
+    const { college, email, phone, otp } = validation.data;
     // Check if the user already exists in the database (by email, phone, or college)
     const existingUser = await prisma.users.findFirst({
       where: {
@@ -109,7 +109,7 @@ export async function POST(request: Request) {
 
     // Generate random password for the user
     const password = generatePassword(8 + Math.floor(Math.random() * 5)); // Length between 8-12
-    const hashedPassword = await bcrypt.hash(password, 10); // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 13); // Hash the password
     
     const collegeName = college;
     // Create the user in the database

@@ -28,7 +28,7 @@ if (response.data.success) {
   router.push('/');
 } else {
   console.error('Login failed');
-            }
+}
 
  }
 
