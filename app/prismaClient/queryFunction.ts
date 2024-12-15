@@ -251,7 +251,7 @@ export async function markVerified(usn:string){
 }
 
 export async function registerUserEvents(userId:string,events:any){
-    
+    console.log("query",events);
     const userEvents = await prisma.events.createMany({
         data:events.map((event:any)=>({
             userId,

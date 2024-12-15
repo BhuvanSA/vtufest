@@ -13,10 +13,10 @@ export async function POST(request:Request) {
     console.log(token);
 
     const verify = await jwtVerify(token,JWT_SECRET);
-        
+    const eventData = JSON.parse(events)
     const userId = verify.payload.id;
-
-    const userEvents = await registerUserEvents(userId,events);
+    console.log("backend",userId,events);
+    const userEvents = await registerUserEvents(userId,eventData.events);
 
     return NextResponse.json({success:true,userEvents},{status:200})
 }
