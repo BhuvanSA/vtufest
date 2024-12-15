@@ -61,8 +61,17 @@ export default function GetRegistrant({ params }: { params: Promise<{ slug: stri
   }, []);
 
   // Handle toggle verification status
-  const toggleVerification = () => {
+  const toggleVerification = async() => {
     setIsVerified(!isVerified);
+    const res = await fetch('/api/markverified',{
+      method:"POST",
+      body : JSON.stringify({
+        usn : studentData?.usn
+      }),
+      headers:{'Content-Type' :'application/json'},
+    })
+    const resData = await res.json();
+    alert(resData.message);
   };
 
   // Handle toggle attendance for event registration
