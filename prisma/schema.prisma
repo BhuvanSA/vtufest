@@ -51,8 +51,8 @@ model Registrants {
   id           String                 @id @default(uuid())
   name         String
   usn          String                 @unique
-  type         Type
   phone        String                 @unique
+  teamManager Boolean                  @default(false)
   photoUrl     String
   aadharUrl    String
   sslcUrl      String
@@ -71,6 +71,7 @@ model EventRegistrations {
   id               String        @id @default(uuid())
   registrantId     String
   eventId          String 
+  type              Type
   attendanceStatus Boolean       @default(false)
   prize            Int           @default(0)
   registrant       Registrants   @relation(fields: [registrantId], references: [id],onDelete: Cascade)
@@ -80,6 +81,5 @@ model EventRegistrations {
 
 enum Type {
   PARTICIPANT
-  TEAMMANAGER
   ACCOMPANIST
 }
