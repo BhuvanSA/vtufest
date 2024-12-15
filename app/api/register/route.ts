@@ -13,22 +13,22 @@ const fileSchema = z.instanceof(File).refine((file) => file.size <= 150 * 1024, 
   });
 
   const eventSchema = z.object({
-    name: z.string().min(1, "Event name cannot be empty"),
-    attended: z.boolean().default(false),
-    id : z.number()
+    eventName: z.string().min(1, "Event name cannot be empty"),
+    eventNo: z.number()
   });
   
   const registrantSchema = z.object({
     name: z.string().min(1, "Name cannot be empty"),
     usn: z.string().min(1,"Usn cannot be empty"),
-    type: z.enum(["PARTICIPANT","TEAMMANAGER","ACCOMPANIST"]), 
+    type: z.enum(["PARTICIPANT","TEAMMANAGER","ACCOMPANIST"], "Invalid type"), 
     phone : z.string().min(10,"Invalid phone Number"),
     events: z.array(eventSchema), // Array of event objects
     photo: fileSchema, // File validation for photo
     aadhar: fileSchema, // File validation for Aadhar
     sslc: fileSchema, // File validation for SSLC
     puc: fileSchema, // File validation for PUC
-    admission: fileSchema, // File validation for admission
+    admission1: fileSchema, // File validation for admission
+    admission2 : fileSchema,
     idcard: fileSchema, // File validation for ID card
   });
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || "default_secret");
@@ -38,33 +38,30 @@ export async function POST(request : Request){
     
     const formData = await request.formData();
 
-    const dataString = formData.get("data");
-    if (!dataString) {
-        return NextResponse.json({ success: false, error: "Data is missing" }, { status: 400 });
-    }
-    const data = JSON.parse(dataString.toString());
 
-    
+    const dataEvent = JSON.parse(formData.get("events"));
 
     // zod validation 
     // add phone number and email
         const registrant = {
-            name : data.name,
-            usn : data.usn,
-            type : data.type,
-            events : data.events ,
-            phone : data.phone,
+            name : formData.get("name"),
+            usn : formData.get("usn"),
+            type : formData.get("type"),
+            events : dataEvent ,
+            phone : formData.get("phone"),
             photo : formData.get("photo"),
             sslc : formData.get("sslc"),
             aadhar : formData.get("aadhar"),
             puc : formData.get("puc"),
-            admission : formData.get('admission'),
+            admission1 : formData.get('admission1'),
+            admission2 : formData.get('admission2'),
             idcard : formData.get('idcard')
         }
 
-        console.log(registrant)
+        console.log("registrants",registrant)
 
         const result = registrantSchema.safeParse(registrant);
+        console.log(result.error?.message)
         if (!result.success){
             return NextResponse.json({success: false, error : result.error},{status:400})
         }
@@ -76,20 +73,16 @@ export async function POST(request : Request){
     const token = (await cookies()).get('auth_token')?.value;
     console.log(token);
 
-    if (!token) {
-        return NextResponse.json({ success: false, error: "Invalid Session" }, { status: 400 });
-    }
-    const verify = await jwtVerify(token, JWT_SECRET);
+    const verify = await jwtVerify(token,JWT_SECRET);
         
     const userId = verify.payload.id;
     console.log("verify",verify);
     console.log("userId",userId)
 
-
-    const user = await getUser(userId as string);
+    const user = await getUser(userId);
     console.log("user",user)
 
-    const count = await getRegistrantCount(userId as string);
+    const count = await getRegistrantCount(userId);
 
     console.log("count",count)
     // limit to the 45 registerants
@@ -99,8 +92,8 @@ export async function POST(request : Request){
 
 
     //upload the files to the file uploader
-    const files = [result.data.sslc,result.data.puc,result.data.admission,result.data.idcard,result.data.photo,
-        result.data.aadhar
+    const files = [result.data.sslc,result.data.puc,result.data.admission1,result.data.idcard,result.data.photo,
+        result.data.aadhar,result.data.admission2
     ]
     try{
     const response = await utapi.uploadFiles(files);
@@ -110,15 +103,16 @@ export async function POST(request : Request){
         type : result.data.type,
         events : result.data.events,
         phone : result.data.phone,
-        photoUrl : response[4].data?.url || "",
-        aadharUrl : response[5].data?.url || "",
-        sslcUrl : response[0].data?.url || "",
-        pucUrl : response[1].data?.url || "",
-        admissionUrl : response[2].data?.url || "",
-        idcardUrl :response[3].data?.url || "",
-        userId : userId as string,
+        photoUrl : response[4].data?.url,
+        aadharUrl : response[5].data?.url,
+        sslcUrl : response[0].data?.url,
+        pucUrl : response[1].data?.url,
+        admission1Url : response[2].data?.url,
+        admission2Url : response[6].data?.url,
+        idcardUrl :response[3].data?.url,
+        userId : userId,
     }
-    // save the registrant into the DB
+    // // save the registrant into the DB
     const dataDB = await insertRegistrant(registrantDB);
     console.log("this is db api",dataDB);
 
@@ -135,4 +129,3 @@ export async function POST(request : Request){
 }
 
 // id userId-relation(users)  name   usn     type    photo  paymentstatus  events(list)   aadhar 10thmarks 12marks addmission idcard 
-

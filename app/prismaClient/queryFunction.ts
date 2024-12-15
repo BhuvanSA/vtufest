@@ -7,9 +7,8 @@ const prisma = new PrismaClient()
 interface Registrant{
     name : string,
     usn : string,
-    type : type,
-    phone: string,
-    events : Prisma.JsonArray,
+    type : any,
+    phone : string,
     photoUrl : string,
     aadharUrl : string,
     sslcUrl : string,
@@ -19,36 +18,129 @@ interface Registrant{
     userId : string,
 }
 
-export async function insertRegistrant(arg: Registrant){
+export async function insertRegistrant(arg: any){
 
-    const registrantData : Registrant = arg;
+    const values = {
+        name: arg.name,
+        usn: arg.usn,
+        type: arg.type,  // Ensure type is valid enum
+        phone: arg.phone,
+        photoUrl: arg.photoUrl,
+        sslcUrl: arg.sslcUrl,
+        pucUrl: arg.pucUrl,
+        admission1Url: arg.admission1Url,
+        admission2Url : arg.admission2Url,
+        idcardUrl: arg.idcardUrl,
+        userId: arg.userId,
+        verified: false,
+        aadharUrl : arg.aadharUrl
+    }
+    console.log("values",values)
+
+    const alleventList = await getAllEventsByUser(arg.userId);
+
+    const eventList = [];
+
+    if(arg.type==='PARTICIPANT'){
+        arg.events.forEach((x:any)=>{
+            let selectedEvent = alleventList.find(y=> parseInt(y.eventNo) === parseInt(x.eventNo))
+            
+            if(selectedEvent.maxParticipant >= selectedEvent.registeredParticipant+1){
+                selectedEvent.registeredParticipant += 1;
+                eventList.push(selectedEvent);
+            }
+        })
+    }
+    else if(arg.type==="ACCOMPANIST"){
+        arg.events.forEach((x:any)=>{
+            let selectedEvent = alleventList.find(parseInt(y=> y.eventNo) === parseInt(x.eventNo));
+            if(selectedEvent.maxAccompanist >= selectedEvent.registeredAccompanist+1){
+                selectedEvent.registeredAccompanist +=1;
+                eventList.push(selectedEvent);
+            }
+        })
+    }
     
-    console.log(registrantData);
-    console.log("inside the dbadfjklas")
+    console.log("the final list ",eventList);
 
     const registrant = await prisma.registrants.create({
-        data: {
-            ...registrantData,
-            events: registrantData.events as Prisma.InputJsonValue[]
+        data:{
+            name : values.name,
+            usn :values.usn,
+            type: values.type,  // Ensure type is valid enum
+            phone: values.phone,
+            photoUrl: values.photoUrl,
+            sslcUrl: values.sslcUrl,
+            pucUrl: values.pucUrl,
+            aadharUrl : values.aadharUrl,
+            admission1Url: values.admission1Url,
+            admission2Url : values.admission2Url,
+            idcardUrl: values.idcardUrl,
+            userId: values.userId,
         }
-    });
-    console.log(registrant)
-    console.log("saved");
-
+    })
     console.log(registrant);
+    console.log("it is savee");
+    console.log(eventList.map((event:any)=>({
+        id : parseInt(event.eventNo)
+    })))
+    console.log(registrant.id)
+    
+        const events = await Promise.all(
+        eventList.map((event: any) =>
+          prisma.events.update({
+            where: {
+              userId_eventNo: {
+                userId: arg.userId,
+                eventNo: parseInt(event.eventNo),  // Make sure this matches the correct event number
+              },
+            },
+            data: {
+              registrants: {
+                connect: { id: registrant.id },  // Connect registrant by their ID
+              },
+              registeredParticipant : event.registeredParticipant,
+              registeredAccompanist : event.registeredAccompanist
+            },
+          })
+        )
+      );
+    
+      console.log(events);
+    console.log("the above e")
+
+
+    const eventRegistrant = await Promise.all(
+        events.map((event:any)=>
+            prisma.eventRegistrations.create({
+                data: {
+                    registrantId : registrant.id,
+                    eventId :event.id,
+
+                }
+            })
+        ))
+    
+    console.log(eventRegistrant);    
+    
     return registrant;
 }
 
-export async function getRegistrantsByCollege(arg: { id: string }){
 
-    const registerant: Registrant[] = await prisma.registrants.findMany({
+export async function getRegistrantsByCollege(arg : any){
+
+    const registerant: Registrant = await prisma.registrants.findMany({
         where:{
             userId: arg.id
+        },
+        include:{
+            events:true
         }
     })
     console.log(registerant);
     return registerant;
 }
+
 
 export async function getUser(id: string){
     const user = await prisma.users.findFirst({
@@ -69,6 +161,10 @@ export async function getRegistrant(usn : string) {
     const registrant = await prisma.registrants.findUnique({
         where:{
             usn : usn
+        },
+        include:{
+            events:true,
+            eventRegistrations:true
         }
     })
     return registrant;
@@ -88,29 +184,95 @@ export async function updateRegistrant(usn: string, eventId: string) {
     // Fetch the registrant
     const registrant = await prisma.registrants.findFirst({
         where: {
-            usn
-        }
-    });
-
-    if (!registrant) {
-        throw new Error(`Registrant with USN ${usn} not found`);
-    }
-
-    // Update the `events` array
-    const updatedEvents = registrant.events.map(event => {
-        const eventObj = event as { id: string; attended?: string };
-        return eventObj && eventObj.id === eventId ? { ...eventObj, attended: "attended" } : event;
-    });
-
-    // Update the registrant's record
-    const updatedRegistrant = await prisma.registrants.update({
+          usn,
+        },
+        include: {
+          eventRegistrations: true,
+          events: true,
+        },
+      });
+      console.log(registrant)
+      
+      if (!registrant) {
+        console.log("Registrant not found for the provided USN");
+        return "Registrant not found";
+      }
+      
+      console.log("Registrant ID:", registrant.id);
+      console.log("Event ID:", eventId);
+      
+      const registrantId = registrant.id;
+      
+      // Fetch the current attendanceStatus
+      const existingRegistration = await prisma.eventRegistrations.findUnique({
         where: {
-            usn
+            id:eventId,
+        },
+      });
+      console.log("fdafads",existingRegistration)
+      
+      if (!existingRegistration) {
+        console.log("Event registration not found");
+        return "Event registration not found";
+      }
+      
+      console.log("Existing Registration:", existingRegistration);
+      
+      // Toggle attendanceStatus
+      const updatedRegistrant = await prisma.eventRegistrations.update({
+        where: {
+          id:eventId
         },
         data: {
-            events: updatedEvents as Prisma.InputJsonValue[] // Updating only the `events` field
-        }
-    });
+          attendanceStatus: !existingRegistration.attendanceStatus, // Toggle attendanceStatus
+        },
+      });
+      
+      console.log("Updated Attendance Status:", updatedRegistrant.attendanceStatus);
+      return updatedRegistrant.attendanceStatus;
+      
 
-    return updatedRegistrant; // Return the updated registrant if needed
+     // Return the updated registrant if needed
 }
+
+export async function markVerified(usn:string){
+   
+
+    const updatedRegistrant  = await prisma.registrants.update({
+        where:{
+            usn,
+        },
+        data:{
+            verified:true
+        }
+    })
+
+    return updatedRegistrant;
+}
+
+export async function registerUserEvents(userId:string,events:any){
+    
+    const userEvents = await prisma.events.createMany({
+        data:events.map((event:any)=>({
+            userId,
+            eventName:event.eventName,
+            eventNo : event.eventNo,
+            maxParticipant:event.maxParticipant,              
+            maxAccompanist : event.maxAccompanist,
+            category : event.category         
+        }))
+    })
+
+    return userEvents;
+}
+
+export async function getAllEventsByUser(userId:string) {
+    console.log(userId)
+    const userEvents = await prisma.events.findMany({
+        where:{
+            userId:userId
+        }
+    })  
+    return userEvents;
+}
+

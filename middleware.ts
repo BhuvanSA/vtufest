@@ -54,7 +54,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // JWT authentication for specific routes
-  if (pathname === "/api/register" || pathname === "/api/getallregister") {
+  if (pathname === "/api/register" || pathname === "/api/getallregister" || pathname=="/api/eventsregister") {
     const token = request.cookies.get("auth_token")?.value;
 
     if (!token) {
@@ -89,5 +89,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/api/register", "/api/getallregister", "/api/sendEmailOtp","/register"],
+  matcher: ["/api/register", "/api/getallregister", "/api/sendEmailOtp","/register","/api/eventsregister"],
 };
