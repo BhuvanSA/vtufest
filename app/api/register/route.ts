@@ -14,14 +14,15 @@ const fileSchema = z.instanceof(File).refine((file) => file.size <= 150 * 1024, 
 
   const eventSchema = z.object({
     eventName: z.string().min(1, "Event name cannot be empty"),
-    eventNo: z.number()
+    eventNo: z.number(),
+    type: z.enum(["PARTICIPANT","ACCOMPANIST"], "Invalid type")
   });
   
   const registrantSchema = z.object({
     name: z.string().min(1, "Name cannot be empty"),
     usn: z.string().min(1,"Usn cannot be empty"),
-    type: z.enum(["PARTICIPANT","TEAMMANAGER","ACCOMPANIST"], "Invalid type"), 
     phone : z.string().min(10,"Invalid phone Number"),
+    teamManager : z.boolean(),
     events: z.array(eventSchema), // Array of event objects
     photo: fileSchema, // File validation for photo
     aadhar: fileSchema, // File validation for Aadhar
@@ -46,7 +47,7 @@ export async function POST(request : Request){
         const registrant = {
             name : formData.get("name"),
             usn : formData.get("usn"),
-            type : formData.get("type"),
+            teamManager : formData.get("teamManager")==="true"? true:false,
             events : dataEvent ,
             phone : formData.get("phone"),
             photo : formData.get("photo"),
@@ -100,7 +101,7 @@ export async function POST(request : Request){
     const registrantDB = {
         name: result.data.name,
         usn : result.data.usn,
-        type : result.data.type,
+        teamManager : result.data.teamManager,
         events : result.data.events,
         phone : result.data.phone,
         photoUrl : response[4].data?.url,
