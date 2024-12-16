@@ -3,11 +3,10 @@ import { PrismaClient, type,Prisma} from '@prisma/client'
 
 
 const prisma = new PrismaClient()
-
 interface Registrant{
     name : string,
     usn : string,
-    type : any,
+    teamManager : boolean,
     phone : string,
     photoUrl : string,
     aadharUrl : string,
@@ -18,12 +17,13 @@ interface Registrant{
     userId : string,
 }
 
-export async function insertRegistrant(arg: any){
+export async function insertRegistrant(arg : any){
+
 
     const values = {
         name: arg.name,
         usn: arg.usn,
-        type: arg.type,  // Ensure type is valid enum
+        teamManager: arg.teamManager,  // Ensure type is valid enum
         phone: arg.phone,
         photoUrl: arg.photoUrl,
         sslcUrl: arg.sslcUrl,
@@ -37,29 +37,52 @@ export async function insertRegistrant(arg: any){
     }
     console.log("values",values)
 
+    if(arg.teamManager === true){
+        const registrant = await prisma.registrants.create({
+            data:{
+                name : values.name,
+                usn :values.usn,
+                teamManager: true,  // Ensure type is valid enum
+                phone: values.phone,
+                photoUrl: values.photoUrl,
+                sslcUrl: values.sslcUrl,
+                pucUrl: values.pucUrl,
+                aadharUrl : values.aadharUrl,
+                admission1Url: values.admission1Url,
+                admission2Url : values.admission2Url,
+                idcardUrl: values.idcardUrl,
+                userId: values.userId,
+            }
+        })
+        return registrant;
+    }
+
     const alleventList = await getAllEventsByUser(arg.userId);
+
+    console.log("all event list ",alleventList)
 
     const eventList = [];
 
-    if(arg.type==='PARTICIPANT'){
-        arg.events.forEach((x:any)=>{
-            let selectedEvent = alleventList.find(y=> parseInt(y.eventNo) === parseInt(x.eventNo))
-            
+   
+
+    arg.events.forEach((x:any)=>{
+        let selectedEvent = alleventList.find(y=> parseInt(y.eventNo)===parseInt(x.eventNo))
+        
+        if(x.type === 'PARTICIPANT'){
             if(selectedEvent.maxParticipant >= selectedEvent.registeredParticipant+1){
                 selectedEvent.registeredParticipant += 1;
-                eventList.push(selectedEvent);
+                eventList.push({...selectedEvent,type:x.type});
             }
-        })
-    }
-    else if(arg.type==="ACCOMPANIST"){
-        arg.events.forEach((x:any)=>{
-            let selectedEvent = alleventList.find(parseInt(y=> y.eventNo) === parseInt(x.eventNo));
+        }
+        else if(x.type === 'ACCOMPANIST'){
             if(selectedEvent.maxAccompanist >= selectedEvent.registeredAccompanist+1){
                 selectedEvent.registeredAccompanist +=1;
-                eventList.push(selectedEvent);
+                eventList.push({...selectedEvent,type:x.type});
             }
-        })
-    }
+        }
+    })
+
+
     
     console.log("the final list ",eventList);
 
@@ -67,7 +90,7 @@ export async function insertRegistrant(arg: any){
         data:{
             name : values.name,
             usn :values.usn,
-            type: values.type,  // Ensure type is valid enum
+            teamManager: false,  
             phone: values.phone,
             photoUrl: values.photoUrl,
             sslcUrl: values.sslcUrl,
@@ -81,12 +104,9 @@ export async function insertRegistrant(arg: any){
     })
     console.log(registrant);
     console.log("it is savee");
-    console.log(eventList.map((event:any)=>({
-        id : parseInt(event.eventNo)
-    })))
-    console.log(registrant.id)
+
     
-        const events = await Promise.all(
+        let events = await Promise.all(
         eventList.map((event: any) =>
           prisma.events.update({
             where: {
@@ -109,6 +129,13 @@ export async function insertRegistrant(arg: any){
       console.log(events);
     console.log("the above e")
 
+    events = events.map((x:any)=>{
+
+        const findEvent = eventList.find(y => y.id===x.id);
+        return {...x,type : findEvent.type}
+    })
+
+    console.log("the udfaadsfjldkas",events)
 
     const eventRegistrant = await Promise.all(
         events.map((event:any)=>
@@ -116,16 +143,21 @@ export async function insertRegistrant(arg: any){
                 data: {
                     registrantId : registrant.id,
                     eventId :event.id,
-
+                    type : event.type,
                 }
             })
         ))
     
     console.log(eventRegistrant);    
     
+    
+    
+    console.log(registrant)
+    console.log("saved");
+
+    console.log(registrant);
     return registrant;
 }
-
 
 export async function getRegistrantsByCollege(arg : any){
 
