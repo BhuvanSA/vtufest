@@ -16,7 +16,7 @@ export const navItems = [
 ];
 
 // TODO: Implment logout functionality as before here
-// TODO: Set the theme as required
+// TODO: Overlay causes errors in the application
 
 const NavMenu = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -31,12 +31,7 @@ const NavMenu = () => {
     }, [pathname]);
 
     return (
-        <div className="text-white">
-            <style jsx>{`
-                ::-webkit-scrollbar {
-                    z-index: -1;
-                }
-            `}</style>
+        <header className="text-white">
             <div className="flex items-center justify-between max-w-6xl lg:max-w-[72rem] xl:max-w-6xl px-4 py-6 mx-auto sm:px-6">
                 <div className="flex items-center">
                     <Link href="/" passHref>
@@ -103,7 +98,7 @@ const NavMenu = () => {
                     </div>
                 </Dialog>
             )}
-        </div>
+        </header>
     );
 };
 
