@@ -1,98 +1,110 @@
-"use client"
-import React from "react";
-import Image from "next/image";
+// NewNavBar.tsx
+import { useEffect, useState } from "react";
+import { Dialog } from "@headlessui/react";
 import Link from "next/link";
-import Button from "./Button";
-import axios from "axios";
+import { usePathname } from "next/navigation";
+import MobileMenu from "./MobileMenu";
+import NavItem from "./NavItem";
 
-const Navbar = () => {
-  return (
-    <header className="bg-[#f6f6f6] w-full">
-      {/* Logo and text container */}
-      <div className="flex justify-between">
-      <div className="pl-5 pt-5 ">
-      <Image
-      src="/images/college-logo.png"
-      alt="GAT"
-      width = {80}
-      height={80}
-      />
-      
-      </div>
-     
-      
-      <div className="flex flex-col items-center justify-center text-center py-6">
-        <h1 className="text-5xl font-bold mb-5">GAT VTU Youth Fest 2025</h1>
-        <p className="text-2xl mb-10 py-6 text-[#3f3f3f]">
-          Celebrating 25 Years of Excellence
-        </p>
-      </div>
-      <div className="pr-5 pt-5 justify-end">
-      <Image
-      src="/images/fest-logo.png"
-      alt="GAT"
-      width = {80}
-      height={80  }
-      />
-      
-      </div>
-      </div>
-      {/* Navbar links */}
-      <nav>
-        <ul className="flex justify-center text-2xl space-x-8 bg-gray-200 py-3 w-full">
-          <li>
-            <Link
-              href="/"
-              className="bg-gray-200 px-4 py-2 rounded-md transition-all duration-300 hover:bg-yellow-500"
-            >
-              Home
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/about"
-              className="bg-gray-200 px-4 py-2 rounded-md transition-all duration-300 hover:bg-yellow-500"
-            >
-              About
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/events"
-              className="bg-gray-200 px-4 py-2 rounded-md transition-all duration-300 hover:bg-yellow-500"
-            >
-              Events
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/schedule"
-              className="bg-gray-200 px-4 py-2 rounded-md transition-all duration-300 hover:bg-yellow-500"
-            >
-              Schedule
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/login"
-              className="bg-gray-200 px-4 py-2 rounded-md transition-all duration-300 hover:bg-yellow-500"
-            >
-              Login/Sign Up
-            </Link>
-            </li>
-            <li>
-            <Link href="/login">
-            <Button label="Logout" OnClick={async ()=>{
-              await axios.post("http://localhost:3000/api/logout")
-            }} />
-           </Link>
-           </li>
-              
-         
-        </ul>
-      </nav>
-    </header>
-  );
+export const navItems = [
+    { href: "/", text: "Home" },
+    { href: "/about", text: "About Us" },
+    { href: "/events", text: "Events" },
+    { href: "/schedule", text: "Schedule" },
+    { href: "/login", text: "Log In" },
+    { href: "/logout", text: "Logout" },
+];
+
+// TODO: Implment logout functionality as before here
+// TODO: Set the theme as required
+
+const NavMenu = () => {
+    const [isOpen, setIsOpen] = useState(false);
+    const pathname = usePathname();
+
+    const handleClick = () => {
+        setIsOpen(true);
+    };
+
+    useEffect(() => {
+        setIsOpen(false);
+    }, [pathname]);
+
+    return (
+        <div className="text-white">
+            <style jsx>{`
+                ::-webkit-scrollbar {
+                    z-index: -1;
+                }
+            `}</style>
+            <div className="flex items-center justify-between max-w-6xl lg:max-w-[72rem] xl:max-w-6xl px-4 py-6 mx-auto sm:px-6">
+                <div className="flex items-center">
+                    <Link href="/" passHref>
+                        <span className="opacity-3000 hover:text-lightGreen dark:hover:text-white mr-8">
+                            Global Academy of Technology
+                        </span>
+                    </Link>
+                </div>
+                <div className="-my-2 -mr-2 lg:hidden" onClick={handleClick}>
+                    <MobileMenu />
+                </div>
+                <div className="hidden lg:block overflow-x-auto whitespace-nowrap">
+                    <nav className="flex space-x-3 text-lg">
+                        {navItems.map(({ href, text }, index) => (
+                            <NavItem key={index} href={href} text={text} />
+                        ))}
+                    </nav>
+                </div>
+            </div>
+            {isOpen && (
+                <Dialog
+                    open={isOpen}
+                    onClose={() => setIsOpen(false)}
+                    className="fixed inset-0 z-50 lg:hidden"
+                >
+                    <Dialog.Overlay className="fixed inset-0 bg-black/20 backdrop-blur-sm dark:bg-gray-900/80" />
+                    <div className="fixed w-full max-w-xs p-6 text-base font-semibold text-gray-900 bg-white rounded-lg shadow-lg top-4 right-4 dark:bg-gray-800 dark:text-gray-400 dark:highlight-white/5">
+                        <button
+                            onClick={() => setIsOpen(false)}
+                            className="absolute flex items-center justify-center w-8 h-8 text-gray-500 top-5 right-5 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300"
+                        >
+                            <span className="sr-only">Close navigation</span>
+                            <svg
+                                viewBox="0 0 10 10"
+                                className="w-2.5 h-2.5 overflow-visible"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    d="M0 0L10 10M10 0L0 10"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                ></path>
+                            </svg>
+                        </button>
+                        <ul className="space-y-6">
+                            {navItems.map(({ href, text }) => (
+                                <li key={href}>
+                                    <Link
+                                        href={{
+                                            pathname: href,
+                                            query: { showNav: text !== "Home" },
+                                        }}
+                                        onClick={() => setIsOpen(false)}
+                                    >
+                                        <p className="hover:text-lightGreen dark:hover:text-emerald-500">
+                                            {text}
+                                        </p>
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </Dialog>
+            )}
+        </div>
+    );
 };
 
-export default Navbar;
+export default NavMenu;
