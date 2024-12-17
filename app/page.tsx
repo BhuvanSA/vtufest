@@ -2,7 +2,7 @@
 import React from "react";
 import Image from "next/image";
 import "./globals.css"; // Adjust the import path as needed
-import Header from "@/components/Header";
+import Header from "@/components/Background";
 
 const Home = () => {
     return (

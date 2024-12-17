@@ -1,7 +1,4 @@
-import Image from "next/image";
-import logo from "/images/college-logo.png";
-
-const Header = () => {
+const Background = () => {
     return (
         <>
             <div>
@@ -10,15 +7,7 @@ const Header = () => {
                         autoPlay
                         muted
                         loop
-                        className="absolute inset-0 w-full h-full object-cover"
-                        style={{
-                            position: "fixed",
-                            width: "100%",
-                            height: "100vh",
-                            objectFit: "cover",
-                            zIndex: -1,
-                            opacity: 0.9,
-                        }}
+                        className="fixed inset-0 w-full h-screen object-cover opacity-100 -z-10"
                     >
                         <source src="/backround_video.mp4" type="video/mp4" />
                     </video>
@@ -42,4 +31,4 @@ const Header = () => {
     );
 };
 
-export default Header;
+export default Background;

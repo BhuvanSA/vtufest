@@ -31,7 +31,7 @@ const NavMenu = () => {
     }, [pathname]);
 
     return (
-        <header className="text-white">
+        <header className="fixed top-0 left-0 right-0 w-full bg-slate-900/75 backdrop-blur-sm shadow-lg z-50 text-white">
             <div className="flex items-center justify-between max-w-6xl lg:max-w-[72rem] xl:max-w-6xl px-4 py-6 mx-auto sm:px-6">
                 <div className="flex items-center">
                     <Link href="/" passHref>

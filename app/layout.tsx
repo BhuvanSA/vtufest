@@ -3,7 +3,7 @@ import React, { ReactNode, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Footer from ".././components/Footer";
 import "./globals.css";
-import Header from "@/components/Header";
+import Header from "@/components/Background";
 
 // Global layout for pages
 const Layout = ({ children }: { children: React.ReactNode }) => {

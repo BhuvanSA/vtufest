@@ -231,11 +231,6 @@ const Register = () => {
       <div className="w-full max-w-4xl p-6 bg-white text-white shadow-lg rounded-md">
         <h2
           className="text-2xl font-bold mb-6 text-yellow-800 font-Barrio text-center"
-          style={{
-            textShadow: "2px 2px 8px rgba(255, 255, 0, 0.7)",
-            letterSpacing: "1.5px",
-            textTransform: "uppercase",
-          }}
         >
           Registrant Page
         </h2>
