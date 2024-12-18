@@ -150,9 +150,16 @@ export default function EventRegister() {
 
                 {/* Selected Events and Response Section */}
                 <div className="mt-10 text-center">
-                    <h2 className="text-2xl font-semibold text-gray-700">
-                        Selected Events
-                    </h2>
+                    <div className="flex items-center justify-center gap-3">
+                        <h2 className="text-2xl font-semibold text-gray-700">
+                            Selected Events
+                        </h2>
+                        {selectedEvents.length > 0 && (
+                            <span className="bg-blue-100 text-blue-700 rounded-full w-7 h-7 flex items-center justify-center text-sm">
+                                {selectedEvents.length}
+                            </span>
+                        )}
+                    </div>
                     <ul className="mt-4">
                         {selectedEvents.length > 0 ? (
                             eventCategories
