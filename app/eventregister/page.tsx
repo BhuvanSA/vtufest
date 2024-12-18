@@ -8,184 +8,7 @@ import {
     AccordionTrigger,
 } from "@/components/ui/accordion";
 
-// TODO: Move this to a separate file
-const eventCategories = [
-    {
-        eventNo: 1,
-        eventName: "Classical Vocal Solo (Hindustani/Carnatic)",
-        category: "MUSIC",
-        maxParticipant: 1,
-        maxAccompanist: 2,
-    },
-    {
-        eventNo: 2,
-        eventName: "Classical Instrumental Solo (Percussion Tala Vadya)",
-        category: "MUSIC",
-        maxParticipant: 1,
-        maxAccompanist: 2,
-    },
-    {
-        eventNo: 3,
-        eventName: "Classical Instrumental Solo (Non-Percussion Swara Vadya)",
-        category: "MUSIC",
-        maxParticipant: 1,
-        maxAccompanist: 2,
-    },
-    {
-        eventNo: 4,
-        eventName: "Light Vocal Solo (Indian)",
-        category: "MUSIC",
-        maxParticipant: 1,
-        maxAccompanist: 2,
-    },
-    {
-        eventNo: 5,
-        eventName: "Western Vocal Solo",
-        category: "MUSIC",
-        maxParticipant: 1,
-        maxAccompanist: 2,
-    },
-    {
-        eventNo: 6,
-        eventName: "Group Song (Indian)",
-        category: "MUSIC",
-        maxParticipant: 6,
-        maxAccompanist: 3,
-    },
-    {
-        eventNo: 7,
-        eventName: "Group Song (Western)",
-        category: "MUSIC",
-        maxParticipant: 6,
-        maxAccompanist: 3,
-    },
-    {
-        eventNo: 8,
-        eventName: "Folk Orchestra",
-        category: "MUSIC",
-        maxParticipant: 12,
-        maxAccompanist: 3,
-    },
-    {
-        eventNo: 9,
-        eventName: "Folk / Tribal Dance",
-        category: "DANCE",
-        maxParticipant: 10,
-        maxAccompanist: 5,
-    },
-    {
-        eventNo: 10,
-        eventName: "Classical Dance Solo",
-        category: "DANCE",
-        maxParticipant: 1,
-        maxAccompanist: 3,
-    },
-    {
-        eventNo: 11,
-        eventName: "Skit",
-        category: "THEATRE",
-        maxParticipant: 6,
-        maxAccompanist: 3,
-    },
-    {
-        eventNo: 12,
-        eventName: "Mime",
-        category: "THEATRE",
-        maxParticipant: 6,
-        maxAccompanist: 2,
-    },
-    {
-        eventNo: 13,
-        eventName: "Mimicry",
-        category: "THEATRE",
-        maxParticipant: 1,
-        maxAccompanist: 0,
-    },
-    {
-        eventNo: 14,
-        eventName: "One Act Play",
-        category: "THEATRE",
-        maxParticipant: 9,
-        maxAccompanist: 5,
-    },
-    {
-        eventNo: 15,
-        eventName: "Quiz",
-        category: "LITERARY",
-        maxParticipant: 3,
-        maxAccompanist: 0,
-    },
-    {
-        eventNo: 16,
-        eventName: "Debate",
-        category: "LITERARY",
-        maxParticipant: 2,
-        maxAccompanist: 0,
-    },
-    {
-        eventNo: 17,
-        eventName: "Elocution",
-        category: "LITERARY",
-        maxParticipant: 1,
-        maxAccompanist: 0,
-    },
-    {
-        eventNo: 18,
-        eventName: "Collage",
-        category: "FINE-ARTS",
-        maxParticipant: 1,
-        maxAccompanist: 0,
-    },
-    {
-        eventNo: 19,
-        eventName: "Rangoli",
-        category: "FINE-ARTS",
-        maxParticipant: 1,
-        maxAccompanist: 0,
-    },
-    {
-        eventNo: 20,
-        eventName: "Cartooning",
-        category: "FINE-ARTS",
-        maxParticipant: 1,
-        maxAccompanist: 0,
-    },
-    {
-        eventNo: 21,
-        eventName: "Installation",
-        category: "FINE-ARTS",
-        maxParticipant: 4,
-        maxAccompanist: 0,
-    },
-    {
-        eventNo: 22,
-        eventName: "Poster Making",
-        category: "FINE-ARTS",
-        maxParticipant: 1,
-        maxAccompanist: 0,
-    },
-    {
-        eventNo: 23,
-        eventName: "Clay Modelling",
-        category: "FINE-ARTS",
-        maxParticipant: 1,
-        maxAccompanist: 0,
-    },
-    {
-        eventNo: 24,
-        eventName: "On Spot Painting",
-        category: "FINE-ARTS",
-        maxParticipant: 1,
-        maxAccompanist: 0,
-    },
-    {
-        eventNo: 25,
-        eventName: "Spot Photography",
-        category: "FINE-ARTS",
-        maxParticipant: 1,
-        maxAccompanist: 0,
-    },
-];
+import { eventCategories } from "@/data/eventCategories";
 
 export default function EventRegister() {
     const [selectedEvents, setSelectedEvents] = useState<number[]>([]);
@@ -254,46 +77,75 @@ export default function EventRegister() {
                 </h1>
                 {/* Render sections by category using Accordion */}
                 <Accordion type="single" collapsible className="w-full">
-                    {Object.keys(groupedEvents).map((category) => (
-                        <AccordionItem key={category} value={category}>
-                            <AccordionTrigger>{category}</AccordionTrigger>
-                            <AccordionContent>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    {groupedEvents[category].map((event) => (
-                                        <div
-                                            key={event.eventNo}
-                                            onClick={() =>
-                                                toggleSelection(event.eventNo)
-                                            }
-                                            className={`p-5 border-2 rounded-lg shadow-md cursor-pointer transition duration-300 ${
-                                                selectedEvents.includes(
-                                                    event.eventNo
-                                                )
-                                                    ? "border-blue-500 bg-blue-50"
-                                                    : "border-gray-300 bg-white hover:shadow-lg"
-                                            }`}
-                                        >
-                                            <h3 className="text-lg font-semibold text-gray-700 mb-2">
-                                                {event.eventName}
-                                            </h3>
-                                            <p className="text-sm text-gray-600">
-                                                Max Participants:{" "}
-                                                <span className="font-medium text-gray-800">
-                                                    {event.maxParticipant}
-                                                </span>
-                                            </p>
-                                            <p className="text-sm text-gray-600">
-                                                Max Accompanists:{" "}
-                                                <span className="font-medium text-gray-800">
-                                                    {event.maxAccompanist}
-                                                </span>
-                                            </p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </AccordionContent>
-                        </AccordionItem>
-                    ))}
+                    {Object.keys(groupedEvents).map((category) => {
+                        // Calculate the number of selected events in this category
+                        const selectedCount = groupedEvents[category].filter(
+                            (event) => selectedEvents.includes(event.eventNo)
+                        ).length;
+
+                        return (
+                            <AccordionItem key={category} value={category}>
+                                <AccordionTrigger className="flex justify-between items-center w-full pr-4">
+                                    <div className="flex-1">
+                                        <span className="text-lg font-medium">
+                                            {category}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center ml-auto">
+                                        {selectedCount > 0 && (
+                                            <span className="bg-blue-100 text-blue-700 rounded-full w-6 h-6 flex items-center justify-center text-sm mr-2">
+                                                {selectedCount}
+                                            </span>
+                                        )}
+                                        {/* <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" /> */}
+                                    </div>
+                                </AccordionTrigger>
+                                <AccordionContent>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        {groupedEvents[category].map(
+                                            (event) => (
+                                                <div
+                                                    key={event.eventNo}
+                                                    onClick={() =>
+                                                        toggleSelection(
+                                                            event.eventNo
+                                                        )
+                                                    }
+                                                    className={`p-5 border-2 rounded-lg shadow-md cursor-pointer transition duration-300 ${
+                                                        selectedEvents.includes(
+                                                            event.eventNo
+                                                        )
+                                                            ? "border-blue-500 bg-blue-50"
+                                                            : "border-gray-300 bg-white hover:shadow-lg"
+                                                    }`}
+                                                >
+                                                    <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                                                        {event.eventName}
+                                                    </h3>
+                                                    <p className="text-sm text-gray-600">
+                                                        Max Participants:{" "}
+                                                        <span className="font-medium text-gray-800">
+                                                            {
+                                                                event.maxParticipant
+                                                            }
+                                                        </span>
+                                                    </p>
+                                                    <p className="text-sm text-gray-600">
+                                                        Max Accompanists:{" "}
+                                                        <span className="font-medium text-gray-800">
+                                                            {
+                                                                event.maxAccompanist
+                                                            }
+                                                        </span>
+                                                    </p>
+                                                </div>
+                                            )
+                                        )}
+                                    </div>
+                                </AccordionContent>
+                            </AccordionItem>
+                        );
+                    })}
                 </Accordion>
 
                 {/* Selected Events and Response Section */}
