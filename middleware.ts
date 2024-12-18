@@ -22,6 +22,7 @@ const protectedPages: string[] = [
     "/getallregister",
     "/register",
     "/getregister",
+    "/eventregister",
 ];
 
 export async function middleware(request: NextRequest) {
@@ -137,5 +138,6 @@ export const config = {
         "/register",
         "/getregister",
         "/getallregister",
+        "/eventregister",
     ],
 };

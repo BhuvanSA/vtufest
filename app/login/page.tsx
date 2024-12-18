@@ -27,15 +27,20 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { GraduationCap } from "lucide-react";
+import { LoadingButton } from "@/components/LoadingButton";
 
 const loginSchema = z.object({
-    email: z.string().email("Invalid email address"),
+    email: z
+        .string()
+        .email("Invalid email address")
+        .min(1, "Email is required"),
     password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
 export default function SignIn() {
     const router = useRouter();
     const [error, setError] = useState<string>("");
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const form = useForm<z.infer<typeof loginSchema>>({
         resolver: zodResolver(loginSchema),
@@ -46,23 +51,35 @@ export default function SignIn() {
     });
 
     async function onSubmit(values: z.infer<typeof loginSchema>) {
+        setIsLoading(true);
         try {
-            const response = await axios.post(
-                "http://localhost:3000/api/login",
-                {
-                    email: values.email,
-                    password: values.password,
-                }
-            );
+            const response = await axios.post("/api/login", {
+                email: values.email,
+                password: values.password,
+            });
 
             if (response.data.success) {
                 router.push("/register");
             } else {
-                setError("Invalid credentials");
+                form.setError("email", {
+                    type: "manual",
+                    message: "Invalid credentials",
+                });
+                form.setError("password", {
+                    type: "manual",
+                    message: "Invalid credentials",
+                });
+                setError(response.data.message);
+                setIsLoading(false);
             }
-        } catch (error) {
-            setError("An error occurred during login");
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error) && error.response?.data?.message) {
+                setError(error.response.data.message);
+            } else {
+                setError("An error occurred during login");
+            }
             console.error("Login failed:", error);
+            setIsLoading(false);
         }
     }
 
@@ -130,9 +147,12 @@ export default function SignIn() {
                                         {error}
                                     </div>
                                 )}
-                                <Button type="submit" className="w-full">
+                                <LoadingButton
+                                    type="submit"
+                                    loading={isLoading}
+                                >
                                     Sign In
-                                </Button>
+                                </LoadingButton>
                             </form>
                         </Form>
                     </CardContent>
