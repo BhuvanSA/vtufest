@@ -1,9 +1,8 @@
 "use client";
-import React, { ReactNode, useEffect } from "react";
+import React, { useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Footer from ".././components/Footer";
 import "./globals.css";
-import Header from "@/components/Background";
 
 // Global layout for pages
 const Layout = ({ children }: { children: React.ReactNode }) => {
@@ -14,7 +13,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     }, []);
 
     return (
-        <html lang="en">
+        <html lang="en" suppressHydrationWarning>
             <head>
                 {/* You can add custom head tags here, like meta tags, link to styles, etc. */}
             </head>
