@@ -2,136 +2,188 @@ import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { z } from "zod";
-import axios from "axios";
+import { Redis } from "@upstash/redis";
+import nodemailer from "nodemailer";
 
 // Initialize Prisma Client
 const prisma = new PrismaClient();
 
+// Initialize Upstash Redis client
+const redis = new Redis({
+    url: process.env.UPSTASH_REDIS_REST_URL as string, // Upstash Redis URL
+    token: process.env.UPSTASH_REDIS_REST_TOKEN as string, // Upstash Redis Token
+});
+
 // Define Zod schema for validation
 const formSchema = z.object({
-  college: z
-    .string()
-    .min(1, "College name is required")
-    .max(100, "College name should not exceed 100 characters"),
-  phone: z
-    .string()
-    .regex(/^\d{10}$/, "Phone number must be a 10-digit number"),
-  email: z.string().email("Invalid email address"),
-  otp: z
-    .string()
-    .regex(/^\d{6}$/, "OTP must be a 6-digit number")
+    college: z
+        .string()
+        .min(3, "College name must be at least 3 characters")
+        .max(100, "College name should not exceed 100 characters"),
+    phone: z
+        .string()
+        .regex(/^\d{10,15}$/, "Phone number must be between 10 to 15 digits"),
+    email: z.string().email("Invalid email address"),
+    otp: z.string().regex(/^\d{6}$/, "OTP must be a 6-digit number"),
 });
+
 // Utility function to generate a random password
 const generatePassword = (length: number) => {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$!";
-  return Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+    const chars =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$!";
+    return Array.from(
+        { length },
+        () => chars[Math.floor(Math.random() * chars.length)]
+    ).join("");
 };
 
-// Function to send OTP
-// const sendOtpRequest = async (email: string) => {
-//   const response = await axios.post(
-//     `${process.env.BASE_URL}/api/sendEmailOtp`,
-//     { email },
-//     {
-//       headers: {
-//         "Content-Type": "application/json",
-//       },
-//     }
-//   );
-// 
-//   const data = response.data;
-//   if (!data.success) {
-//     throw new Error("Failed to send OTP");
-//   }
-//   return data.message;
-// };
+// Function to verify OTP internally
+async function verifyOtp(
+    email: string,
+    otp: string
+): Promise<{ success: boolean; message: string }> {
+    try {
+        const storedOtp = await redis.get<string>(`otp:${email}`);
 
-// Function to verify OTP
-async function verifyOtp(email :string, otp:string ) {
-  try {
-    const response = await axios.post("http://localhost:3000/api/verifyOtp", {
-      email: email,
-      otp: otp,
-    });
-  
-    if (response.data.success) {
-      console.log("OTP verified successfully:", response.data.message);
-      return true;
-    } else {
-      console.log("Error:", response.data.message);
+        // Debug Logs
+        console.log(`Stored OTP for ${email}: ${storedOtp}`);
+        console.log(`Received OTP for ${email}: ${otp}`);
+
+        if (!storedOtp) {
+            console.log("OTP has expired or does not exist.");
+            return {
+                success: false,
+                message: "OTP has expired or does not exist.",
+            };
+        }
+
+        if (storedOtp != otp) {
+            console.log(
+                "Invalid OTP provided. Stored OTP:",
+                storedOtp,
+                "Received OTP:",
+                otp
+            );
+            return { success: false, message: "Invalid OTP provided." };
+        }
+
+        // OTP is valid, delete it from Redis
+        try {
+            await redis.del(`otp:${email}`);
+        } catch (error: any) {
+            console.error("Error deleting OTP from Redis:", error);
+        }
+
+        return { success: true, message: "OTP verified successfully." };
+    } catch (error: any) {
+        console.error("Error verifying OTP internally:", error);
+        return { success: false, message: "Internal Server Error" };
     }
-  } catch (error : any) {
-    if (error.response) {
-      // Server responded with a status code other than 2xx
-      console.error("Server Error:", error.response.data);
-    } else if (error.request) {
-      // Request was sent but no response was received
-      console.error("No Response:", error.request);
-    } else {
-      // Something else caused the error
-      console.error("Error:", error.message);
+}
+
+// Function to send password via email
+async function sendPasswordEmail(email: string, password: string) {
+    try {
+        // Configure Nodemailer
+        const transporter = nodemailer.createTransport({
+            service: "gmail", // Use your email provider
+            auth: {
+                user: process.env.EMAIL_USER as string, // Your email address
+                pass: process.env.EMAIL_PASSWORD as string, // Your email password or app password
+            },
+        });
+
+        // Email content
+        const mailOptions = {
+            from: process.env.EMAIL_USER, // Sender email address
+            to: email, // Receiver email address
+            subject: "Your Account Password",
+            text: `Your account has been created successfully. Your password is: ${password}. Please change it after logging in.`,
+        };
+
+        // Send email
+        await transporter.sendMail(mailOptions);
+    } catch (error: any) {
+        console.error("Error sending password email:", error);
+        // Optionally, handle email sending failures (e.g., delete the created user, retry, etc.)
     }
-  }
 }
 
 export async function POST(request: Request) {
-  try {
-    const body = await request.json();
-    // Validate input with Zod schema
-    const validation = formSchema.safeParse(body);
-    console.log(validation)
-    if (!validation.success) {
-      return NextResponse.json({ success: false, errors: validation.error.errors }, { status: 400 });
-    }
-    const { college, email, phone, otp } = validation.data;
-    // Check if the user already exists in the database (by email, phone, or college)
-    const existingUser = await prisma.users.findFirst({
-      where: {
-        OR: [
-          { email },
-          { phone }
-        ],
-      },
-    });
+    try {
+        const body = await request.json();
+        // Validate input with Zod schema
+        const validation = formSchema.safeParse(body);
+        console.log(validation);
+        if (!validation.success) {
+            return NextResponse.json(
+                { success: false, errors: validation.error.errors },
+                { status: 400 }
+            );
+        }
+        const { college, email, phone, otp } = validation.data;
 
-    if (existingUser) {
-      return NextResponse.json(
-        { success: false, error: "A user with the provided details already exists" },
-        { status: 400 }
-      );
-    }
+        // Check if the user already exists in the database (by email or phone)
+        const existingUser = await prisma.users.findFirst({
+            where: {
+                OR: [{ email }, { phone }],
+            },
+        });
 
-    // Verify OTP entered by the user
-    const otpValid : any = await verifyOtp(email, otp);
-    if (!otpValid) {
-      return NextResponse.json({ success: false, error: "OTP validation failed" }, { status: 401 });
-    }
+        if (existingUser) {
+            return NextResponse.json(
+                { success: false, error: "User already exists" },
+                { status: 400 }
+            );
+        }
 
-    // Generate random password for the user
-    const password = generatePassword(8 + Math.floor(Math.random() * 5)); // Length between 8-12
-    const hashedPassword = await bcrypt.hash(password, 13); // Hash the password
-    
-    const collegeName = college;
-    // Create the user in the database
-    const newUser = await prisma.users.create({
-      data: {
-        collegeName,
-        email,
-        phone,
-        password: hashedPassword, // Store the hashed password 
-      },
-    });
+        // Verify OTP entered by the user
+        const otpValidation = await verifyOtp(email, otp);
+        if (!otpValidation.success) {
+            return NextResponse.json(
+                { success: false, error: otpValidation.message },
+                { status: 401 }
+            );
+        }
 
-    if(newUser){
-      const response = await axios.post("http://localhost:3000/api/sendpassword",{
-        email,
-        password
-      }) 
+        // Generate random password for the user
+        const password = generatePassword(8 + Math.floor(Math.random() * 5)); // Length between 8-12
+        const hashedPassword = await bcrypt.hash(password, 13); // Hash the password
+
+        // Create the user in the database
+        const newUser = await prisma.users.create({
+            data: {
+                collegeName: college,
+                email,
+                phone,
+                password: hashedPassword, // Store the hashed password
+            },
+        });
+
+        if (newUser) {
+            // Send password to user's email
+            await sendPasswordEmail(email, password);
+        }
+
+        // Return successful response
+        return NextResponse.json(
+            {
+                success: true,
+                message: "Registration successful",
+                user: {
+                    id: newUser.id,
+                    email: newUser.email,
+                    phone: newUser.phone,
+                    collegeName: newUser.collegeName,
+                },
+            },
+            { status: 200 }
+        );
+    } catch (error: any) {
+        console.error("Error in registration process:", error);
+        return NextResponse.json(
+            { success: false, error: "Internal Server Error" },
+            { status: 500 }
+        );
     }
-    // Return successful response
-    return NextResponse.json({ success: true, message: "Registration successful", user: newUser });
-  } catch (error) {
-    console.error("Error in registration process:", error);
-    return NextResponse.json({ success: false, error: "Internal Server Error" }, { status: 500 });
-  }
 }

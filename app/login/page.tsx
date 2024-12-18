@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import axios from "axios";
 import Link from "next/link";
+import Image from "next/image";
 import {
     Card,
     CardContent,
@@ -26,7 +27,6 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form";
-import { GraduationCap } from "lucide-react";
 import { LoadingButton } from "@/components/LoadingButton";
 
 const loginSchema = z.object({
@@ -94,10 +94,17 @@ export default function SignIn() {
                 <Card>
                     <CardHeader className="space-y-1">
                         <div className="flex items-center justify-center mb-6">
-                            <GraduationCap className="h-12 w-12 text-indigo-600" />
+                            <Image
+                                src="/images/college-logo.png"
+                                alt="College Logo"
+                                width={80}
+                                height={80}
+                                priority
+                                className="object-contain"
+                            />
                         </div>
                         <CardTitle className="text-2xl text-center font-bold">
-                            VTU Fest Sign In
+                            Sign In
                         </CardTitle>
                         <CardDescription className="text-center">
                             Enter your credentials to access the platform
