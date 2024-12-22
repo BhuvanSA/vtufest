@@ -1,105 +1,151 @@
 "use client";
-import Button from "@/components/Button";
 import React, { useEffect, useState } from "react";
-import Link from "next/link"; // Import Link from Next.js
 
-// Reusable Button Component
+// Custom Button Component
+const Button = ({ label, onClick, className }) => (
+  <button
+    className={`bg-gray-500 text-white text-sm px-6 py-2 rounded-md transition-transform duration-300 hover:scale-105 hover:bg-gray-600 ${className}`}
+    onClick={onClick}
+  >
+    {label}
+  </button>
+);
 
 const StudentTable = () => {
   const [rows, setRows] = useState([]);
 
   useEffect(() => {
-    
     async function getAllregistrant() {
-        
-        const res = await fetch('/api/getallregister',{
-            method:"GET",
-        })
+      const res = await fetch("/api/getallregister", {
+        method: "GET",
+      });
 
-        const data = await res.json();
-        const resData = data.registrant;
+      const data = await res.json();
+      const resData = data.registrant;
 
-        const ListData = [];
-        
-        resData.forEach((registrant:any,index:number)=>{
-            const x = {
-                id : index,
-                name : registrant.name,
-                phone : registrant.phone,
-                usn : registrant.usn,
-                type : registrant.type,
-                totalEvents : registrant.events.length
-            }
-            ListData.push(x);
-        })
-        setRows(ListData);
+      const ListData = resData.map((registrant, index) => ({
+        id: index + 1,
+        name: registrant.name,
+        usn: registrant.usn,
+        phone: registrant.phone,
+        totalEvents: registrant.events.length,
+      }));
+
+      setRows(ListData);
     }
-    getAllregistrant()
-  }, [])
-  
+    getAllregistrant();
+  }, []);
 
-  // Function to remove a row based on its id
   const handleRemove = (id) => {
     const updatedRows = rows.filter((row) => row.id !== id);
     setRows(updatedRows);
   };
 
   return (
-    <div className="container mx-auto p-4 bg-white">
-      <h1 className="text-2xl font-bold mb-4 text-center">Student Entries</h1>
-      <h2 className="text-1xl text-center text-red-600 font-bold">
-        45 entries is the limit!
-      </h2>
-      <div className="overflow-x-auto">
-        <table className="table-auto border-collapse border border-gray-300 w-full text-sm">
-          <thead className="bg-gray-200">
-            <tr>
-              <th className="border border-gray-300 px-4 py-2">ID</th>
-              <th className="border border-gray-300 px-4 py-2">Name</th>
-              <th className="border border-gray-300 px-4 py-2">Phone</th>
-              <th className="border border-gray-300 px-4 py-2">USN</th>
-              <th className="border border-gray-300 px-4 py-2">Type</th>
-              <th className="border border-gray-300 px-4 py-2">Total Events</th>
-              <th className="border border-gray-300 px-4 py-2">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row, index) => (
-              <tr key={index} className="odd:bg-white even:bg-gray-50">
-                <td className="border border-gray-300 px-4 py-2 text-center">
-                  {row.id}
-                </td>
-                <td className="border border-gray-300 px-4 py-2">{row.name}</td>
-                <td className="border border-gray-300 px-4 py-2">
-                  {row.phone}
-                </td>
-                <td className="border border-gray-300 px-4 py-2">{row.usn}</td>
-                <td className="border border-gray-300 px-4 py-2">
-                  {row.type}
-                </td>
-                <td className="border border-gray-300 px-4 py-2 text-center">
-                  {row.totalEvents}
-                </td>
-                <td className="border border-gray-300 px-4 py-2 text-center flex space-x-2 justify-center">
-                  <Button
-                    label="Edit"
-                    OnClick={() => alert(`Edit row with ID ${row.id}`)}
-                  />
-                  <Button label="Remove" OnClick={() => handleRemove(row.id)} />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Add Button with Link */}
-      <div className="mt-4 text-center justify-center flex space-x-4">
-        <Link href="/register">
-          <Button label="Add" 
-          />
-        </Link>
-        <Button label="Submit" />
+    <div id="webcrumbs" >
+      <div className="w-full bg-gradient-to-br from-white via-blue-50 to-white shadow-2xl rounded-lg overflow-hidden border border-neutral-300">
+        <div className="p-5 ">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-title font-semibold text-neutral-950 uppercase tracking-wide">
+              List of students registered for the event
+            </h2>
+            <span className="bg-primary-100 text-primary-950 text-sm rounded-full px-4 py-2 font-medium">
+              {rows.length}/45
+            </span>
+          </div>
+          <div className="overflow-x-auto">
+            <div className="max-h-[300px] overflow-y-scroll">
+              <table className="min-w-full border-t border-neutral-300">
+                <thead className="sticky top-0">
+                  <tr className="bg-neutral-950 shadow-sm">
+                    <th className="text-left py-4 px-6 text-white font-semibold uppercase tracking-wide">
+                      Sl. No
+                    </th>
+                    <th className="text-left py-4 px-6 text-white font-semibold uppercase tracking-wide">
+                      Name
+                    </th>
+                    <th className="text-left py-4 px-6 text-white font-semibold uppercase tracking-wide">
+                      USN
+                    </th>
+                    <th className="text-left py-4 px-6 text-white font-semibold uppercase tracking-wide">
+                      Phone
+                    </th>
+                    <th className="text-left py-4 px-6 text-white font-semibold uppercase tracking-wide">
+                      Events Registered
+                    </th>
+                    <th className="text-left py-4 px-6 text-white font-semibold uppercase tracking-wide">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows.map((student, index) => {
+                    const colors = [
+                      "text-neutral-900",
+                      "text-neutral-800",
+                      "text-neutral-700",
+                      "text-neutral-600",
+                      "text-neutral-500",
+                    ];
+                    const rowColor = colors[index % colors.length];
+                    return (
+                      <tr
+                        key={student.id}
+                        className={`${
+                          index % 2 === 0 ? "bg-blue-50" : "bg-white"
+                        } hover:bg-gray-200 transition-all duration-300`}
+                      >
+                        <td
+                          className={`border-t border-neutral-300 py-4 px-6 ${rowColor}`}
+                        >
+                          {student.id}
+                        </td>
+                        <td
+                          className={`border-t border-neutral-300 py-4 px-6 ${rowColor}`}
+                        >
+                          {student.name}
+                        </td>
+                        <td
+                          className={`border-t border-neutral-300 py-4 px-6 ${rowColor}`}
+                        >
+                          {student.usn}
+                        </td>
+                        <td
+                          className={`border-t border-neutral-300 py-4 px-6 ${rowColor}`}
+                        >
+                          {student.phone}
+                        </td>
+                        <td
+                          className={`border-t border-neutral-300 py-4 px-6 ${rowColor}`}
+                        >
+                          {student.totalEvents}
+                        </td>
+                        <td className="border-t border-neutral-300 py-4 px-6 flex items-center gap-2">
+                          <Button
+                            label="Update"
+                            onClick={() => alert(`Edit row with ID ${student.id}`)}
+                          />
+                          <Button
+                            label="Remove"
+                            onClick={() => handleRemove(student.id)}
+                            className="bg-red-500 hover:bg-red-600"
+                          />
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div className="flex justify-center mt-4 gap-4">
+            <Button
+              label="Add"
+              onClick={() => alert("Navigate to Add Student Page")}
+            />
+            <Button label="Submit" onClick={() => alert("Submit All Changes")} />
+          </div>
+        </div>
       </div>
     </div>
   );

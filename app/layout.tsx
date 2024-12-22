@@ -18,8 +18,10 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                 {/* You can add custom head tags here, like meta tags, link to styles, etc. */}
             </head>
             <body>
-                <Navbar />
-                <main className="flex flex-col">{children}</main>
+                <Navbar/>
+                <div className="mt-28">
+                <main className="flex flex-col ">{children}</main>
+                </div>
                 <Footer />
             </body>
         </html>

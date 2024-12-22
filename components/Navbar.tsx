@@ -84,7 +84,7 @@ const NavMenu = () => {
                                     <Link
                                         href={{
                                             pathname: href,
-                                            query: { showNav: text !== "Home" },
+                                            
                                         }}
                                         onClick={() => setIsOpen(false)}
                                     >
