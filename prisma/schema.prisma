@@ -54,12 +54,12 @@ model Registrants {
   phone        String                 @unique
   teamManager Boolean                  @default(false)
   photoUrl     String
-  aadharUrl    String
-  sslcUrl      String
-  pucUrl       String
-  admission1Url String
-  admission2Url String
-  idcardUrl    String
+  aadharUrl    String?
+  sslcUrl      String?
+  pucUrl       String?
+  admission1Url String?
+  admission2Url String?
+  idcardUrl    String?
   userId       String
   verified     Boolean                @default(false)
   user         Users                  @relation(fields: [userId], references: [id],onDelete: Cascade)

@@ -22,13 +22,15 @@ const StudentTable = () => {
 
       const data = await res.json();
       const resData = data.registrant;
+      console.log(resData);
 
       const ListData = resData.map((registrant, index) => ({
-        id: index + 1,
+        slno: index + 1,
         name: registrant.name,
         usn: registrant.usn,
         phone: registrant.phone,
         totalEvents: registrant.events.length,
+        id: registrant.id,
       }));
 
       setRows(ListData);
@@ -36,13 +38,28 @@ const StudentTable = () => {
     getAllregistrant();
   }, []);
 
-  const handleRemove = (id) => {
+  const handleRemove = async (id) => {
     const updatedRows = rows.filter((row) => row.id !== id);
+    try {
+      console.log("derleaw");
+      const response = await fetch("/api/deleteregister", {
+        method: "DELETE",
+        body: JSON.stringify({ registrantId: id }),
+         headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      console.log(response);
+    }
+    catch (err) {
+      alert(err);
+    }
     setRows(updatedRows);
   };
 
   return (
-    <div id="webcrumbs" >
+    <div id="webcrumbs">
       <div className="w-full bg-gradient-to-br from-white via-blue-50 to-white shadow-2xl rounded-lg overflow-hidden border border-neutral-300">
         <div className="p-5 ">
           <div className="flex justify-between items-center mb-4">
@@ -90,15 +107,14 @@ const StudentTable = () => {
                     const rowColor = colors[index % colors.length];
                     return (
                       <tr
-                        key={student.id}
-                        className={`${
-                          index % 2 === 0 ? "bg-blue-50" : "bg-white"
-                        } hover:bg-gray-200 transition-all duration-300`}
+                        key={student.slno}
+                        className={`${index % 2 === 0 ? "bg-blue-50" : "bg-white"
+                          } hover:bg-gray-200 transition-all duration-300`}
                       >
                         <td
                           className={`border-t border-neutral-300 py-4 px-6 ${rowColor}`}
                         >
-                          {student.id}
+                          {student.slno}
                         </td>
                         <td
                           className={`border-t border-neutral-300 py-4 px-6 ${rowColor}`}
@@ -123,7 +139,9 @@ const StudentTable = () => {
                         <td className="border-t border-neutral-300 py-4 px-6 flex items-center gap-2">
                           <Button
                             label="Update"
-                            onClick={() => alert(`Edit row with ID ${student.id}`)}
+                            onClick={() =>
+                              alert(`Edit row with ID ${student.id}`)
+                            }
                           />
                           <Button
                             label="Remove"
@@ -143,7 +161,10 @@ const StudentTable = () => {
               label="Add"
               onClick={() => alert("Navigate to Add Student Page")}
             />
-            <Button label="Submit" onClick={() => alert("Submit All Changes")} />
+            <Button
+              label="Submit"
+              onClick={() => alert("Submit All Changes")}
+            />
           </div>
         </div>
       </div>

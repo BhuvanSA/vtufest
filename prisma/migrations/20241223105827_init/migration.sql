@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "Type" AS ENUM ('PARTICIPANT', 'TEAMMANAGER', 'ACCOMPANIST');
+CREATE TYPE "Type" AS ENUM ('PARTICIPANT', 'ACCOMPANIST');
 
 -- CreateTable
 CREATE TABLE "Users" (
@@ -21,6 +21,11 @@ CREATE TABLE "Events" (
     "eventNo" INTEGER NOT NULL,
     "eventName" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
+    "maxParticipant" INTEGER NOT NULL,
+    "registeredParticipant" INTEGER NOT NULL DEFAULT 0,
+    "maxAccompanist" INTEGER NOT NULL,
+    "registeredAccompanist" INTEGER NOT NULL DEFAULT 0,
+    "category" TEXT NOT NULL,
 
     CONSTRAINT "Events_pkey" PRIMARY KEY ("id")
 );
@@ -30,14 +35,15 @@ CREATE TABLE "Registrants" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "usn" TEXT NOT NULL,
-    "type" "Type" NOT NULL,
     "phone" TEXT NOT NULL,
+    "teamManager" BOOLEAN NOT NULL DEFAULT false,
     "photoUrl" TEXT NOT NULL,
-    "aadharUrl" TEXT NOT NULL,
-    "sslcUrl" TEXT NOT NULL,
-    "pucUrl" TEXT NOT NULL,
-    "admissionUrl" TEXT NOT NULL,
-    "idcardUrl" TEXT NOT NULL,
+    "aadharUrl" TEXT,
+    "sslcUrl" TEXT,
+    "pucUrl" TEXT,
+    "admission1Url" TEXT,
+    "admission2Url" TEXT,
+    "idcardUrl" TEXT,
     "userId" TEXT NOT NULL,
     "verified" BOOLEAN NOT NULL DEFAULT false,
 
@@ -49,6 +55,7 @@ CREATE TABLE "EventRegistrations" (
     "id" TEXT NOT NULL,
     "registrantId" TEXT NOT NULL,
     "eventId" TEXT NOT NULL,
+    "type" "Type" NOT NULL,
     "attendanceStatus" BOOLEAN NOT NULL DEFAULT false,
     "prize" INTEGER NOT NULL DEFAULT 0,
 
