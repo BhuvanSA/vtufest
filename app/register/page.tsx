@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { z, ZodError } from "zod";
 
@@ -41,13 +42,13 @@ const Register = () => {
 
   const [eventCategories, setEventCategories] = useState([]);
   const [selectedEvents, setSelectedEvents] = useState([]);
-  
+  const router = useRouter();
   useEffect(() => {
     async function getEvents() {
       const res = await fetch('/api/getalleventregister', {
-        method: "POST",
+        method: "GET",
       });
-
+      console.log(await res.json())
       let { userEvents } = await res.json();
       console.log(userEvents);
       if (!formData.teamManager) {
@@ -200,6 +201,7 @@ const Register = () => {
 
         if (data.success) {
           alert("Registration successful!");
+          router.push("/getallregister");
         } else {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const errorArray: any[] = data.error;
@@ -352,9 +354,7 @@ const Register = () => {
                           key={index}
                           className="mb-4 border-2 border-black p-2 rounded-lg hover:scale-105 transform transition-all"
                         >
-                          <legend className="font-semibold text-yellow-600">
-                            {event.category}
-                          </legend>
+                          
                           <div className="flex items-center mb-1 hover:bg-gray-200 p-1 rounded-md transition-all">
                             <input
                               type="checkbox"

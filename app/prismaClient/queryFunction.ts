@@ -1,5 +1,4 @@
-import { PrismaClient } from "@prisma/client";
-
+import { PrismaClient, Type } from "@prisma/client";
 
 const prisma = new PrismaClient();
 interface Registrant {
@@ -275,10 +274,126 @@ export async function getAllEventsByUser(userId: string) {
 }
 
 export async function deleteRegistrant(registrantId: string) {
-    const userEvents = await prisma.registrants.delete({
-        where: {
-            id: registrantId,
+
+    try {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const transaction = await prisma.$transaction(async (prisma) => {
+            const userEvents = await prisma.registrants.delete({
+                where: {
+                    id: registrantId,
+                },
+                include: {
+                    eventRegistrations: true,
+                },
+            });
+
+            const eventsUpdate = await Promise.all(
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                userEvents.eventRegistrations.map(async (event: any) => {
+                    if (event.type === "PARTICIPANT") {
+                        await prisma.events.update({
+                            where: {
+                                id: event.eventId,
+                            },
+                            data: {
+                                registeredParticipant: {
+                                    decrement: 1,
+                                },
+                            },
+                        });
+                    }
+                    else if (event.type === "ACCOMPANIST") {
+                        await prisma.events.update({
+                            where: {
+                                id: event.eventId,
+                            },
+                            data: {
+                                registeredAccompanist: {
+                                    decrement: 1,
+                                },
+                            },
+                        });
+                    }
+                })
+
+            );
+            return { userEvents, eventsUpdate };
+        })
+    } catch (err) {
+        throw new Error(err);
+    }
+}
+
+
+export async function deleteEvent(id: string) {
+    try {
+        const dbQuery = await prisma.events.delete({
+            where: {
+                id: id,
+            }
+        })
+        return dbQuery;
+    }
+    catch (err: any) {
+        throw new Error(err);
+    }
+}
+
+export async function getRegistrantById(id:string) {
+
+    try{
+        const dbQuery = await prisma.registrants.findFirst({
+            where:{
+                id,
+            },
+            include:{
+                eventRegistrations : true,
+                events:true
+            }
+        })
+        return dbQuery;
+    }catch(err){
+        throw new Error(err);
+    }
+    
+}
+
+export async function updateRegisterDetails(data:any) {
+    try{
+    const updatedRegister = await prisma.registrants.update({
+        where:{
+            id:data.id
         },
-    });
-    return userEvents;
+        data:{
+            name:data.name,
+            usn : data.usn,
+            phone : data.phone
+        }
+    })}
+    catch(err){
+        throw new Error(err);
+    }
+}
+
+export async function updateEventRole(eventId:string,type : any) {
+    
+    try{
+        if(type === 'ACCOMPANIST'){
+        const updateRole = await prisma.eventRegistrations.update({
+            where: {
+                id:eventId
+            },
+            data: {
+                type: type
+            },
+            include:{
+                event:true
+            }
+        });}
+
+        return updateRole;
+    }
+    catch(err){
+        throw new(err);
+    }
 }

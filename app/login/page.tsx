@@ -59,7 +59,7 @@ export default function SignIn() {
             });
 
             if (response.data.success) {
-                router.push("/register");
+                router.push("/getallregister");
             } else {
                 form.setError("email", {
                     type: "manual",

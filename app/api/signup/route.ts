@@ -113,23 +113,24 @@ export async function POST(request: Request) {
     try {
         const body = await request.json();
         // Validate input with Zod schema
+        
         const validation = formSchema.safeParse(body);
         console.log(validation);
-        if (!validation.success) {
+        if (validation.success===false) {
             return NextResponse.json(
                 { success: false, errors: validation.error.errors },
                 { status: 400 }
             );
         }
         const { college, email, phone, otp } = validation.data;
-
+    
         // Check if the user already exists in the database (by email or phone)
         const existingUser = await prisma.users.findFirst({
             where: {
                 OR: [{ email }, { phone }],
             },
         });
-
+        
         if (existingUser) {
             return NextResponse.json(
                 { success: false, error: "User already exists" },

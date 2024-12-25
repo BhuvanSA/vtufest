@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 // Custom Button Component
@@ -13,7 +14,7 @@ const Button = ({ label, onClick, className }) => (
 
 const StudentTable = () => {
   const [rows, setRows] = useState([]);
-
+  const router = useRouter();
   useEffect(() => {
     async function getAllregistrant() {
       const res = await fetch("/api/getallregister", {
@@ -41,7 +42,6 @@ const StudentTable = () => {
   const handleRemove = async (id) => {
     const updatedRows = rows.filter((row) => row.id !== id);
     try {
-      console.log("derleaw");
       const response = await fetch("/api/deleteregister", {
         method: "DELETE",
         body: JSON.stringify({ registrantId: id }),
@@ -51,6 +51,7 @@ const StudentTable = () => {
       });
 
       console.log(response);
+      alert(response.message);
     }
     catch (err) {
       alert(err);
@@ -66,9 +67,12 @@ const StudentTable = () => {
             <h2 className="text-xl font-title font-semibold text-neutral-950 uppercase tracking-wide">
               List of students registered for the event
             </h2>
+            <div className="flex gap-4">
+            <Button label={"ADD Events"} className="" onClick={()=>router.push('/eventregister')}/>
             <span className="bg-primary-100 text-primary-950 text-sm rounded-full px-4 py-2 font-medium">
               {rows.length}/45
             </span>
+            </div>
           </div>
           <div className="overflow-x-auto">
             <div className="max-h-[300px] overflow-y-scroll">
@@ -159,10 +163,13 @@ const StudentTable = () => {
           <div className="flex justify-center mt-4 gap-4">
             <Button
               label="Add"
-              onClick={() => alert("Navigate to Add Student Page")}
+              onClick={() => router.push("/register")}
+              className="bg-yellow-600 hover:bg-yellow-600 hover:scale-105"
+              disabled={rows.length > 45}
             />
             <Button
               label="Submit"
+              className="bg-yellow-600 hover:bg-yellow-600 hover:scale-105"
               onClick={() => alert("Submit All Changes")}
             />
           </div>

@@ -5,9 +5,10 @@ import { NextResponse } from "next/server";
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || "default_secret");
 export async function DELETE(request : Request){
-   
+    console.log("**********************delete register********");
     const body = await request.json();
     const token : string = (await cookies()).get('auth_token')?.value as string;
+    console.log(token);
     if(!token){
         return NextResponse.json({success:false,message:"token not found"},{status:401});
     }
@@ -19,7 +20,10 @@ export async function DELETE(request : Request){
 
     const userId :string = verify.payload.id as string;
 
+    
+
     const user = await getUser(userId);
+    console.log("user",user);
 
     if(!user){
         return  NextResponse.json({success:false,message:"User not found"},{status:404});
@@ -31,13 +35,16 @@ export async function DELETE(request : Request){
         return NextResponse.json({success:false,message:"Registrant not found"},{status:404});
     }
 
-    if(!user.registrants.includes(registrantId)){
+    if(!user.registrants.some((registrant: { id: string }) => registrant.id === registrantId)){
         return NextResponse.json({success:false,message:"Registrant not found"},{status:404});
     }
 
-    
+    try{
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const userEvents = await deleteRegistrant(registrantId);
-
-    return new Response(JSON.stringify({success:true,userEvents}),{status:200});
+    }catch(err){
+        return NextResponse.json({success:false,message:err},{status:500});
+    }
+    return NextResponse.json({success:true,message:"Registrant Deleted"},{status:200});
 
 }
