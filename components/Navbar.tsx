@@ -11,8 +11,7 @@ export const navItems = [
     { href: "/about", text: "About Us" },
     { href: "/events", text: "Events" },
     { href: "/schedule", text: "Schedule" },
-    { href: "/login", text: "Log In" },
-    { href: "/logout", text: "Logout" },
+    { href: "/auth", text: "Login" },
 ];
 
 // TODO: Implment logout functionality as before here
