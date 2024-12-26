@@ -18,6 +18,7 @@ export async function PATCH(request:Request) {
         const updateRole = await updateEventRole(eventId,type);
         return NextResponse.json({success:true,message:"event Updated"},{status:200})
     }catch(err){
+        console.log(err)
         return NextResponse.json({success:false,message:err},{status:400});
     }
 }

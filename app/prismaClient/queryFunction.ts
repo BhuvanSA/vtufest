@@ -1,3 +1,4 @@
+import { utapi } from "@/utils/uploadthing";
 import { PrismaClient, Type } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -339,61 +340,357 @@ export async function deleteEvent(id: string) {
     }
 }
 
-export async function getRegistrantById(id:string) {
+export async function getRegistrantById(id: string) {
 
-    try{
+    try {
         const dbQuery = await prisma.registrants.findFirst({
-            where:{
+            where: {
                 id,
             },
-            include:{
-                eventRegistrations : true,
-                events:true
+            include: {
+                eventRegistrations: true,
+                events: true
             }
         })
         return dbQuery;
-    }catch(err){
+    } catch (err) {
         throw new Error(err);
     }
-    
+
 }
 
-export async function updateRegisterDetails(data:any) {
-    try{
-    const updatedRegister = await prisma.registrants.update({
-        where:{
-            id:data.id
-        },
-        data:{
-            name:data.name,
-            usn : data.usn,
-            phone : data.phone
-        }
-    })}
-    catch(err){
-        throw new Error(err);
-    }
-}
-
-export async function updateEventRole(eventId:string,type : any) {
-    
-    try{
-        if(type === 'ACCOMPANIST'){
-        const updateRole = await prisma.eventRegistrations.update({
+export async function updateRegisterDetails(data: any) {
+    try {
+        const updatedRegister = await prisma.registrants.update({
             where: {
-                id:eventId
+                id: data.id
             },
             data: {
-                type: type
-            },
-            include:{
-                event:true
+                name: data.name,
+                usn: data.usn,
+                phone: data.phone
             }
-        });}
-
-        return updateRole;
+        })
     }
-    catch(err){
-        throw new(err);
+    catch (err) {
+        throw new Error(err);
+    }
+}
+
+export async function updateEventRole(eventId: string, type: any) {
+
+    try {
+        if (type === 'ACCOMPANIST') {
+            const getRole = await prisma.eventRegistrations.findFirst({
+                where: {
+                    id: eventId
+                },
+                include: {
+                    event: true
+                }
+            })
+            if (!getRole) {
+                throw new Error("Invalid Registrant unauthorized");
+            }
+            if (getRole.event.registeredAccompanist + 1 <= getRole.event.maxAccompanist) {
+                console.log("hello")
+                const updateRole = await prisma.eventRegistrations.update({
+                    where: {
+                        id: eventId
+                    },
+                    data: {
+                        type: type,
+                    },
+                    include: {
+                        event: true
+                    }
+                });
+                const updateEventCount = await prisma.events.update({
+                    where: {
+                        userId_eventNo: {
+                            userId: updateRole.event.userId,
+                            eventNo: updateRole.event.eventNo
+                        }
+                    },
+                    data: {
+                        registeredAccompanist: {
+                            increment: 1
+                        },
+                        registeredParticipant: {
+                            decrement: 1
+                        }
+                    }
+                })
+                return updateRole;
+            }
+            else {
+                throw new Error("accompanist is invalid")
+            }
+
+        }
+        else if (type === "PARTICIPANT") {
+            const getRole = await prisma.eventRegistrations.findFirst({
+                where: {
+                    id: eventId
+                },
+                include: {
+                    event: true
+                }
+            })
+            if (!getRole) {
+                throw new Error("Invalid Registrant unauthorized");
+            }
+
+            if (getRole.event.registeredParticipant + 1 <= getRole.event.maxParticipant) {
+                const updateRole = await prisma.eventRegistrations.update({
+                    where: {
+                        id: eventId
+                    },
+                    data: {
+                        type: type,
+                    },
+                    include: {
+                        event: true
+                    }
+                });
+                const updateEventCount = await prisma.events.update({
+                    where: {
+                        userId_eventNo: {
+                            userId: updateRole.event.userId,
+                            eventNo: updateRole.event.eventNo
+                        }
+                    },
+                    data: {
+                        registeredAccompanist: {
+                            decrement: 1
+                        },
+                        registeredParticipant: {
+                            increment: 1
+                        }
+                    }
+                })
+
+
+                return updateRole;
+
+            }
+            else {
+                throw new Error("participant invalid")
+            }
+
+        }
+
+    }
+    catch (err) {
+        throw new Error(err);
+    }
+}
+
+export async function updateFile(registrantId: string, file: File, field: string) {
+
+    const registrant = await prisma.registrants.findFirst({
+        where: {
+            id: registrantId
+        }
+    })
+    const FileUpload = await utapi.uploadFiles([file]);
+    console.log("the upload thing file upl;oad", FileUpload)
+
+    if (field === "sslc") {
+        const FileTobeDeletedURL = registrant?.sslcUrl;
+        const updatedRegistrant = await prisma.registrants.update({
+            where: {
+                id: registrantId
+            },
+            data: {
+                sslcUrl: FileUpload[0].data?.url
+            }
+        })
+
+        if (FileTobeDeletedURL) {
+            const deleteFileUpload = await utapi.deleteFiles(FileTobeDeletedURL.split("/").pop() as string);
+        }
+
+    }
+    else if (field === "puc") {
+        const FileTobeDeletedURL = registrant?.sslcUrl;
+        const updatedRegistrant = await prisma.registrants.update({
+            where: {
+                id: registrantId
+            },
+            data: {
+                pucUrl: FileUpload[0].data?.url
+            }
+        })
+        console.log("file deleted ", FileTobeDeletedURL);
+        if (FileTobeDeletedURL) {
+            const deleteFileUpload = await utapi.deleteFiles(FileTobeDeletedURL.split("/").pop() as string);
+        }
+    }
+    else if (field === "idcard") {
+        const FileTobeDeletedURL = registrant?.sslcUrl;
+        const updatedRegistrant = await prisma.registrants.update({
+            where: {
+                id: registrantId
+            },
+            data: {
+                idcardUrl: FileUpload[0].data?.url
+            }
+        })
+        console.log("file deleted ", FileTobeDeletedURL);
+        if (FileTobeDeletedURL) {
+            const deleteFileUpload = await utapi.deleteFiles(FileTobeDeletedURL.split("/").pop() as string);
+        }
+    }
+    else if (field === "aadhar") {
+        const FileTobeDeletedURL = registrant?.sslcUrl;
+        const updatedRegistrant = await prisma.registrants.update({
+            where: {
+                id: registrantId
+            },
+            data: {
+                aadharUrl: FileUpload[0].data?.url
+            }
+        })
+        console.log("file deleted ", FileTobeDeletedURL.substring(FileTobeDeletedURL.indexOf('f') + 2));
+        if (FileTobeDeletedURL) {
+            const deleteFileUpload = await utapi.deleteFiles(FileTobeDeletedURL.split("/").pop() as string);
+        }
+
+    }
+    else if (field === "admission1") {
+        const FileTobeDeletedURL = registrant?.sslcUrl;
+        const updatedRegistrant = await prisma.registrants.update({
+            where: {
+                id: registrantId
+            },
+            data: {
+                admission1Url: FileUpload[0].data?.url
+            }
+        })
+        console.log(FileTobeDeletedURL.split("/").pop() as string)
+        if (FileTobeDeletedURL) {
+            const deleteFileUpload = await utapi.deleteFiles(FileTobeDeletedURL.split("/").pop() as string);
+        }
+    }
+    else if (field === "admission2") {
+        const FileTobeDeletedURL = registrant?.sslcUrl;
+        const updatedRegistrant = await prisma.registrants.update({
+            where: {
+                id: registrantId
+            },
+            data: {
+                admission2Url: FileUpload[0].data?.url
+            }
+        })
+        if (FileTobeDeletedURL) {
+            const deleteFileUpload = await utapi.deleteFiles(FileTobeDeletedURL.split("/").pop() as string);
+        }
+    }
+    else if (field === "photo") {
+        const FileTobeDeletedURL = registrant?.sslcUrl;
+        const updatedRegistrant = await prisma.registrants.update({
+            where: {
+                id: registrantId
+            },
+            data: {
+                photoUrl: FileUpload[0].data?.url
+            }
+        })
+        if (FileTobeDeletedURL) {
+            const deleteFileUpload = await utapi.deleteFiles(FileTobeDeletedURL.split("/").pop() as string);
+        }
+    }
+    return true;
+}
+
+
+export async function deleteEventOfRegistrant(eventId: string) {
+
+    try {
+        const deleteQuery = await prisma.eventRegistrations.delete({
+            where: {
+                id: eventId
+            },
+            include: {
+                event: true
+            }
+        })
+
+        if (deleteQuery.type === "ACCOMPANIST") {
+            const updateQuery = await prisma.events.update({
+                where: {
+                    id: deleteQuery.eventId
+                },
+                data: {
+                    registeredAccompanist: {
+                        decrement: 1
+                    }
+                }
+            })
+        }
+        else if (deleteQuery.type === "PARTICIPANT") {
+            const updateQuery = await prisma.events.update({
+                where: {
+                    id: deleteQuery.eventId
+                },
+                data: {
+                    registeredParticipant: {
+                        decrement: 1
+                    }
+                }
+            })
+        }
+    }
+    catch (err) {
+        throw new Error(err)
+    }
+}
+
+export async function AddEvent(registrantId: string, event: any,type:any) {
+
+    const eventRegistrantAdd = await prisma.eventRegistrations.create({
+        data: {
+            registrantId: registrantId,
+            eventId: event.id,
+            type: type
+        },
+        include: {
+            event: true
+        }
+    })
+    if (type === "ACCOMPANIST") {
+        const addEvent = await prisma.events.update({
+            where: {
+                id: eventRegistrantAdd.eventId
+            },
+            data: {
+                registeredAccompanist: {
+                    increment: 1
+                },
+                registrants:{
+                    connect:{
+                        id:registrantId
+                    }
+                }
+            }
+        })
+    }
+    else if (type === "PARTICIPANT") {
+        const addEvent = await prisma.events.update({
+            where: {
+                id: eventRegistrantAdd.eventId
+            },
+            data: {
+                registeredParticipant: {
+                    increment: 1
+                },
+                registrants:{
+                    connect:{
+                        id:registrantId
+                    }
+                }
+            }
+        })
     }
 }

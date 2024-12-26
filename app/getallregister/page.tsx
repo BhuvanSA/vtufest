@@ -39,6 +39,9 @@ const StudentTable = () => {
     getAllregistrant();
   }, []);
 
+  const handleUpdate = async(id)=>{
+    router.push(`/updateregister/${id}` )
+  }
   const handleRemove = async (id) => {
     const updatedRows = rows.filter((row) => row.id !== id);
     try {
@@ -144,7 +147,7 @@ const StudentTable = () => {
                           <Button
                             label="Update"
                             onClick={() =>
-                              alert(`Edit row with ID ${student.id}`)
+                              handleUpdate(student.id)
                             }
                           />
                           <Button

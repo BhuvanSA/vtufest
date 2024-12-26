@@ -7,6 +7,8 @@ export async function GET(request: Request) {
 
     const token:string = (await cookies()).get('auth_token')?.value as string;
 
+    console.log(token)
+
     if (!token) {
         return NextResponse.json({ success: false, message: 'token not found' }, { status: 401 })
     }

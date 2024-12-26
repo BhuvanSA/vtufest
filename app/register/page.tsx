@@ -48,7 +48,7 @@ const Register = () => {
       const res = await fetch('/api/getalleventregister', {
         method: "GET",
       });
-      console.log(await res.json())
+      
       let { userEvents } = await res.json();
       console.log(userEvents);
       if (!formData.teamManager) {
