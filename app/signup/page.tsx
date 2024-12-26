@@ -102,7 +102,7 @@ export default function SignUp() {
                 );
             }
         } catch (error: any) {
-            console.error("Failed to send OTP:", error);
+            
             form.setError("email", {
                 message: "Failed to send OTP. Please try again.",
             });
@@ -141,7 +141,7 @@ export default function SignUp() {
                 }
             }
         } catch (error: any) {
-            console.error("Signup failed:", error);
+            
             toast.error("An error occurred during signup.");
         } finally {
             setIsLoading(false);
