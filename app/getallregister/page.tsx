@@ -173,7 +173,7 @@ const StudentTable = () => {
             <Button
               label="Submit"
               className="bg-yellow-600 hover:bg-yellow-600 hover:scale-105"
-              onClick={() => alert("Submit All Changes")}
+              onClick={() =>router.push('/paymentinfo')}
             />
           </div>
         </div>

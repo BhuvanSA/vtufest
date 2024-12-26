@@ -40,7 +40,7 @@ const UpdateRegister = ({ params }: { params: Promise<{ slug: string }> }) => {
     setName(data.registrant.name);
     setUsn(data.registrant.usn);
     setPhone(data.registrant.phone);
-    setIsTeamManager(data.registrant.isTeamManager);
+    setIsTeamManager(data.registrant.teamManager);
     setId(data.registrant.id);
     setRegistrant(data.registrant);
 
@@ -345,7 +345,7 @@ const UpdateRegister = ({ params }: { params: Promise<{ slug: string }> }) => {
               )}
             </div>
           </div>
-
+          {!isTeamManager &&<>
           <h2 className="text-yellow-600 text-lg font-semibold mt-6">Select Event</h2>
           <div className="mt-4">
             <form onSubmit={handleAddEvent} className="flex gap-4 flex-col">
@@ -460,6 +460,8 @@ const UpdateRegister = ({ params }: { params: Promise<{ slug: string }> }) => {
               <p className="text-gray-500">No events registered.</p>
             )}
           </div>
+          </>
+          }
           <div>
             <label className="block text-sm font-medium mt-10 text-yellow-600 mb-2">
               Select Field for Upload:
@@ -468,6 +470,7 @@ const UpdateRegister = ({ params }: { params: Promise<{ slug: string }> }) => {
               onChange={(e) => handleSetField(e.target.value)}
               className="w-full px-4 py-2 border rounded-lg text-sm bg-white-600 text-black focus:outline-none focus:border-yellow-500"
             >
+              {!isTeamManager &&<>
               <option value="">Select Field</option>
               <option value="sslc">SSLC</option>
               <option value="puc">PUC</option>
@@ -476,6 +479,13 @@ const UpdateRegister = ({ params }: { params: Promise<{ slug: string }> }) => {
               <option value="admission1">Admission 1</option>
               <option value="admission2">Admission 2</option>
               <option value="photo">Photo</option>
+              </>}
+              {isTeamManager && 
+              <>
+              <option value="">Select Field</option>
+              <option value="photo">Photo</option>
+              <option value="idcard">ID Card</option>
+              </>}
             </select>
 
             {
