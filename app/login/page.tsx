@@ -78,7 +78,7 @@ export default function SignIn() {
             } else {
                 setError("An error occurred during login");
             }
-            console.error("Login failed:", error);
+           
             setIsLoading(false);
         }
     }
