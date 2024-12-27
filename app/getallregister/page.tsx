@@ -53,8 +53,8 @@ const StudentTable = () => {
         },
       });
 
-      console.log(response);
-      alert(response.message);
+      const data = await response.json();
+      alert(data.message);
     }
     catch (err) {
       alert(err);

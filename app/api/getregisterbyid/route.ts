@@ -1,4 +1,4 @@
-import { getRegistrant, getRegistrantById } from "@/app/prismaClient/queryFunction";
+import { getRegistrantById } from "@/app/prismaClient/queryFunction";
 import { NextResponse } from "next/server";
 
 export async function POST(request : Request){
@@ -10,9 +10,10 @@ export async function POST(request : Request){
     }
 
     try{
-    const registrant = await getRegistrantById(registrantId);
-        return NextResponse.json({success:true,registrant},{status:200})
+    const registrant = await getRegistrantById(registrantId as string);
+    return NextResponse.json({success:true,registrant},{status:200})
     }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     catch(err){
         return NextResponse.json({success:false,message:"unable to fetch details"},{status:400});
     }

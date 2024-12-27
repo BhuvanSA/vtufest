@@ -6,6 +6,8 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+
+
 const fileSchema = z
     .instanceof(File)
     .refine((file) => file.size <= 150 * 1024, {
@@ -20,34 +22,41 @@ const fileSchema = z
     );
 
 const eventSchema = z.object({
-    eventName: z.string().min(1, "Event name cannot be empty"),
+    eventName: z.string().min(1, { message: "Event name cannot be empty" }),
     eventNo: z.number(),
-    type: z.enum(["PARTICIPANT", "ACCOMPANIST"], "Invalid type"),
-});
+    type: z.enum(["PARTICIPANT", "ACCOMPANIST"]),
+}).strict();
 
 const registrantSchema = z.object({
-    name: z.string().min(1, "Name cannot be empty"),
-    usn: z.string().min(1, "Usn cannot be empty"),
-    phone: z.string().min(10, "Invalid phone Number"),
+    name: z.string().min(1, { message: "Name cannot be empty" }),
+    usn: z.string().min(1, { message: "Usn cannot be empty" }),
+    phone: z.string().min(10, "Invalid phone Number must be of 10 digits")
+        .refine((value) => /^\d+$/.test(value), {
+            message: "Phone number must contain only digits",
+        })
+    ,
     teamManager: z.boolean(),
-    events: z.array(eventSchema), // Array of event objects
-    photo: fileSchema, // File validation for photo
-    aadhar: fileSchema, // File validation for Aadhar
-    sslc: fileSchema, // File validation for SSLC
-    puc: fileSchema, // File validation for PUC
-    admission1: fileSchema, // File validation for admission
+    events: z.array(eventSchema),
+    photo: fileSchema,
+    aadhar: fileSchema,
+    sslc: fileSchema,
+    puc: fileSchema,
+    admission1: fileSchema,
     admission2: fileSchema,
-    idcard: fileSchema, // File validation for ID card
-});
+    idcard: fileSchema,
+}).strict();
 
 const TeamMangerRegistrantSchema = z.object({
-    name: z.string().min(1, "Name cannot be empty"),
-    usn: z.string().min(1, "Usn/Id Number cannot be empty"),
-    phone: z.string().min(10, "Invalid phone Number"),
+    name: z.string().min(1, { message: "Name cannot be empty" }),
+    usn: z.string().min(1, { message: "Usn/Id Number cannot be empty" }),
+    phone: z.string().min(10, "Invalid phone Number must be of 10 digits")
+        .refine((value) => /^\d+$/.test(value), {
+            message: "Phone number must contain only digits",
+        }),
     teamManager: z.boolean(),
-    photo: fileSchema, // File validation for photo
-    idcard: fileSchema, // File validation for ID card
-});
+    photo: fileSchema,
+    idcard: fileSchema,
+}).strict();
 
 const JWT_SECRET = new TextEncoder().encode(
     process.env.JWT_SECRET || "default_secret"
@@ -67,8 +76,6 @@ export async function POST(request: Request) {
 
     const dataEvent = JSON.parse(events as string);
 
-    // zod validation
-    // add phone number and email
     const registrant = {
         name: formData.get("name"),
         usn: formData.get("usn"),
@@ -84,14 +91,7 @@ export async function POST(request: Request) {
         idcard: formData.get("idcard"),
     };
 
-    console.log("registrants", registrant);
-
-    // check for jwt token
-
-    //get the data from the jwt of the college and then map it to the registerant
-
-    const token = (await cookies()).get("auth_token")?.value;
-    console.log(token);
+    const token: string = (await cookies()).get("auth_token")?.value as string;
 
     if (!token) {
         return NextResponse.json(
@@ -104,11 +104,7 @@ export async function POST(request: Request) {
 
     const userId: string = verify.payload.id as string;
 
-    console.log("the user Id :" ,userId)
-
     const user = await getUser(userId);
-
-    console.log("the user is :",user)
 
     if (!user) {
         return NextResponse.json(
@@ -125,14 +121,19 @@ export async function POST(request: Request) {
         );
     }
 
+    if (user.registrants.some((reg) => reg.usn === registrant.usn || reg.phone === registrant.phone)) {
+        return NextResponse.json({ success: false, message: "Registrant already exists" }, { status: 400 });
+    }
+
     let result = null;
 
     if (registrant.teamManager === true) {
         result = TeamMangerRegistrantSchema.safeParse(registrant);
         console.log(result);
         if (!result.success) {
+            const errorMessages = result.error.errors.map((err) => err.message).join(", ");
             return NextResponse.json(
-                { success: false, message: result.error.message },
+                { success: false, message: errorMessages },
                 { status: 400 }
             );
         }
@@ -146,25 +147,25 @@ export async function POST(request: Request) {
                 usn: result.data.usn,
                 teamManager: result.data.teamManager,
                 phone: result.data.phone,
-                photoUrl: response[0].data?.url,
-                idcardUrl: response[1].data?.url,
+                photoUrl: response[0].data?.url as string,
+                idcardUrl: response[1].data?.url as string,
                 userId: userId,
             };
 
             // save the registrant into the DB
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const dataDB = await insertRegistrant(registrantDB);
+            const dataDB = await insertRegistrant(registrantDB, null);
 
             return NextResponse.json(
-                { success: true, message: "registered successful" },
+                { success: true, message: "Registered Successful" },
                 { status: 200 }
             );
         } catch (err) {
-            return NextResponse.json({ success: false, error: err }, { status: 400 });
+            return NextResponse.json({ success: false, message: err.message }, { status: 400 });
         }
-    } 
+    }
     else {
-        
+
         result = registrantSchema.safeParse(registrant);
         console.log(result.error?.message);
         if (!result.success) {
@@ -172,6 +173,12 @@ export async function POST(request: Request) {
                 { success: false, message: result.error.message },
                 { status: 400 }
             );
+        }
+
+        if (result.data.events.length == 0) {
+            return NextResponse.json({
+                success: false, message: "Atleast one event must registered"
+            }, { status: 400 })
         }
 
         const files: File[] = [
@@ -191,35 +198,27 @@ export async function POST(request: Request) {
                 teamManager: result.data.teamManager,
                 events: result.data.events,
                 phone: result.data.phone,
-                photoUrl: response[4].data?.url,
-                aadharUrl: response[5].data?.url,
-                sslcUrl: response[0].data?.url,
-                pucUrl: response[1].data?.url,
-                admission1Url: response[2].data?.url,
-                admission2Url: response[6].data?.url,
-                idcardUrl: response[3].data?.url,
+                photoUrl: response[4].data?.url as string,
+                aadharUrl: response[5].data?.url as string,
+                sslcUrl: response[0].data?.url as string,
+                pucUrl: response[1].data?.url as string,
+                admission1Url: response[2].data?.url as string,
+                admission2Url: response[6].data?.url as string,
+                idcardUrl: response[3].data?.url as string,
                 userId: userId,
             };
-            
+
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const dataDB = await insertRegistrant(registrantDB,user.events);
-    
+            const dataDB = await insertRegistrant(registrantDB, user.events);
+
             return NextResponse.json(
                 { success: true, message: "registered successful" },
                 { status: 200 }
             );
         } catch (error) {
-            return NextResponse.json({ success: false, error: error }, { status: 400 });
+            return NextResponse.json({ success: false, message: error.message }, { status: 400 });
         }
     }
 
-    // if the registrant is user then we can register him with this only id file and photo file
-
-    //upload the files to the file uploader
-   
-    //get the response from the url and file uploader and then save the url to the database
-
-    //save the registerants db
 }
 
-// id userId-relation(users)  name   usn     type    photo  paymentstatus  events(list)   aadhar 10thmarks 12marks addmission idcard

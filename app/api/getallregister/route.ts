@@ -1,4 +1,4 @@
-import {  getRegistrantsByCollege } from "@/app/prismaClient/queryFunction";
+import { getRegistrantsByCollege } from "@/app/prismaClient/queryFunction";
 import { jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
@@ -10,7 +10,7 @@ export async function GET() {
 
 
     const token: string = (await cookies()).get("auth_token")?.value as string;
-    console.log(token);
+
 
     if (!token) {
         return NextResponse.json({ success: false, message: "token not found" }, { status: 401 });
@@ -23,16 +23,16 @@ export async function GET() {
     if (!verify) {
         return NextResponse.json({ success: false, message: "unauthorized" }, { status: 401 });
     }
-    const userId = verify.payload.id;
+    const userId: string = verify.payload.id as string;
     // get all the registerants with the userId of the signup
 
     // return the result
     try {
-        const registrant = await getRegistrantsByCollege({ id: userId });
-        return NextResponse.json({ success: true, registrant },{status:200});
-    }catch(err){
+        const registrant = await getRegistrantsByCollege(userId);
+        return NextResponse.json({ success: true, registrant }, { status: 200 });
+    } catch (err) {
         return NextResponse.json({ success: false, message: err }, { status: 500 });
     }
-    
+
     // use effect on the post must be made so that we can fetch the jwt 
 }

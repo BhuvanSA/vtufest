@@ -1,6 +1,18 @@
 import { AddEvent } from "@/app/prismaClient/queryFunction";
 import { NextResponse } from "next/server";
 
+enum ParticipantType{
+    ACCOMPANIST = "ACCOMPANIST",
+    PARTICIPANT = "PARTICIPANT"
+}   
+export interface AddEvent{
+    registrantId : string,
+    event :{
+        id : string,
+    },
+    type : ParticipantType
+}
+
 export async function POST(request : Request){
     const {registrantId,event,type} = await request.json();
 
@@ -10,7 +22,8 @@ export async function POST(request : Request){
     }
 
     try{
-        const addEvent = await AddEvent(registrantId,event,type);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const addEvent = await AddEvent({registrantId, event, type} as AddEvent);
         return NextResponse.json({success:true,message:"event added"},{status:200});
     }
     catch(err){

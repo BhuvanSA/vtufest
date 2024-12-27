@@ -14,7 +14,7 @@ export async function DELETE(request : Request){
 
     try{
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const deletedEvent = await deleteEvent(eventId);
+    const deletedEvent = await deleteEvent(eventId as string);
     return NextResponse.json({success:true,message:"Event Deleted"},{status:200});
     }
     catch(err){
