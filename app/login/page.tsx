@@ -174,6 +174,9 @@ export default function SignIn() {
                                 </span>
                             </div>
                         </div>
+                        <Link href="/resetpassword">
+                          Forgot Password?
+                        </Link>
                         <Link href="/signup" className="w-full">
                             <Button variant="outline" className="w-full">
                                 Sign Up

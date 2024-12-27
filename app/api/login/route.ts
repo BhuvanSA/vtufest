@@ -26,7 +26,7 @@ const loginSchema = z.object({
     password: z
         .string()
         .min(8, "Password must be at least 8 characters")
-        .max(12, "Password must be less than 12 characters"),
+        .max(100, "Password must be less than 12 characters"),
 });
 
 export async function POST(request: Request) {
@@ -57,7 +57,7 @@ export async function POST(request: Request) {
             return NextResponse.json(
                 {
                     success: false,
-                    message: "Invalid email or password",
+                    message: "Invalid email or password"
                 },
                 { status: 401 }
             );
