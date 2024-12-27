@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+// import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
@@ -35,7 +35,6 @@ import {
     InputOTPSlot,
 } from "@/components/ui/input-otp";
 import Image from "next/image";
-import { Sign } from "crypto";
 
 const signupSchema = z.object({
     college: z.string().min(3, "College name must be at least 3 characters"),
@@ -155,172 +154,150 @@ export default function SignUp({ onSwitch }: SignUpFormProps) {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center p-4">
-            <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="w-full max-w-md"
-            >
-                <Card>
-                    <CardHeader className="space-y-1">
-                        <div className="flex items-center justify-center mb-6">
-                            <Image
-                                src="/images/college-logo.png"
-                                alt="College Logo"
-                                width={100}
-                                height={100}
-                                priority
-                                className="object-contain"
-                            />
-                        </div>
-                        <CardTitle className="text-2xl text-center font-bold">
-                            Sign Up
-                        </CardTitle>
-                        <CardDescription className="text-center">
-                            Enter your details to create an account
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <Form {...form}>
-                            <form
-                                onSubmit={form.handleSubmit(onSubmit)}
-                                className="space-y-4"
-                            >
-                                <FormField
-                                    control={form.control}
-                                    name="college"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>College Name</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    placeholder="Enter your college name"
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="phone"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Phone Number</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    placeholder="Enter your phone number"
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="email"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Email</FormLabel>
-                                            <FormControl>
-                                                <div className="relative">
-                                                    <Input
-                                                        placeholder="example@domain.com"
-                                                        {...field}
-                                                        disabled={isSendingOTP}
-                                                    />
-                                                    <Button
-                                                        type="button"
-                                                        onClick={sendOTP}
-                                                        disabled={
-                                                            isSendingOTP ||
-                                                            resendTimer > 0
-                                                        }
-                                                        className="absolute right-2 top-1/2 transform -translate-y-1/2"
-                                                    >
-                                                        {isSendingOTP
-                                                            ? "Sending..."
-                                                            : resendTimer > 0
-                                                            ? `Resend OTP (${resendTimer}s)`
-                                                            : "Send OTP"}
-                                                    </Button>
-                                                </div>
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="otp"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Enter OTP</FormLabel>
-                                            <FormControl>
-                                                <InputOTP
-                                                    maxLength={6}
-                                                    value={field.value}
-                                                    onChange={field.onChange}
-                                                >
-                                                    <InputOTPGroup>
-                                                        <InputOTPSlot
-                                                            index={0}
-                                                        />
-                                                        <InputOTPSlot
-                                                            index={1}
-                                                        />
-                                                        <InputOTPSlot
-                                                            index={2}
-                                                        />
-                                                        <InputOTPSlot
-                                                            index={3}
-                                                        />
-                                                        <InputOTPSlot
-                                                            index={4}
-                                                        />
-                                                        <InputOTPSlot
-                                                            index={5}
-                                                        />
-                                                    </InputOTPGroup>
-                                                </InputOTP>
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                <LoadingButton
-                                    type="submit"
-                                    loading={isLoading}
-                                >
-                                    Sign Up
-                                </LoadingButton>
-                            </form>
-                        </Form>
-                    </CardContent>
-                    <CardFooter className="flex flex-col space-y-4">
-                        <div className="relative w-full">
-                            <div className="absolute inset-0 flex items-center">
-                                <span className="w-full border-t" />
-                            </div>
-                            <div className="relative flex justify-center text-xs uppercase">
-                                <span className="bg-white px-2 text-muted-foreground">
-                                    Already Registered?
-                                </span>
-                            </div>
-                        </div>
-                        <Button
-                            variant="outline"
-                            className="w-full"
-                            onClick={onSwitch}
+            <Card className="w-full max-w-md">
+                <CardHeader className="space-y-1">
+                    <div className="flex items-center justify-center mb-6">
+                        <Image
+                            src="/images/college-logo.png"
+                            alt="College Logo"
+                            width={100}
+                            height={100}
+                            priority
+                            className="object-contain"
+                        />
+                    </div>
+                    <CardTitle className="text-2xl text-center font-bold">
+                        Sign Up
+                    </CardTitle>
+                    <CardDescription className="text-center">
+                        Enter your details to create an account
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Form {...form}>
+                        <form
+                            onSubmit={form.handleSubmit(onSubmit)}
+                            className="space-y-4"
                         >
-                            Sign In
-                        </Button>
-                    </CardFooter>
-                </Card>
-            </motion.div>
+                            <FormField
+                                control={form.control}
+                                name="college"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>College Name</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                placeholder="Enter your college name"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="phone"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Phone Number</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                placeholder="Enter your phone number"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="email"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Email</FormLabel>
+                                        <FormControl>
+                                            <div className="relative">
+                                                <Input
+                                                    placeholder="example@domain.com"
+                                                    {...field}
+                                                    disabled={isSendingOTP}
+                                                />
+                                                <Button
+                                                    type="button"
+                                                    onClick={sendOTP}
+                                                    disabled={
+                                                        isSendingOTP ||
+                                                        resendTimer > 0
+                                                    }
+                                                    className="absolute right-2 top-1/2 transform -translate-y-1/2"
+                                                >
+                                                    {isSendingOTP
+                                                        ? "Sending..."
+                                                        : resendTimer > 0
+                                                        ? `Resend OTP (${resendTimer}s)`
+                                                        : "Send OTP"}
+                                                </Button>
+                                            </div>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="otp"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Enter OTP</FormLabel>
+                                        <FormControl>
+                                            <InputOTP
+                                                maxLength={6}
+                                                value={field.value}
+                                                onChange={field.onChange}
+                                            >
+                                                <InputOTPGroup>
+                                                    <InputOTPSlot index={0} />
+                                                    <InputOTPSlot index={1} />
+                                                    <InputOTPSlot index={2} />
+                                                    <InputOTPSlot index={3} />
+                                                    <InputOTPSlot index={4} />
+                                                    <InputOTPSlot index={5} />
+                                                </InputOTPGroup>
+                                            </InputOTP>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <LoadingButton type="submit" loading={isLoading}>
+                                Sign Up
+                            </LoadingButton>
+                        </form>
+                    </Form>
+                </CardContent>
+                <CardFooter className="flex flex-col space-y-4">
+                    <div className="relative w-full">
+                        <div className="absolute inset-0 flex items-center">
+                            <span className="w-full border-t" />
+                        </div>
+                        <div className="relative flex justify-center text-xs uppercase">
+                            <span className="bg-white px-2 text-muted-foreground">
+                                Already Registered?
+                            </span>
+                        </div>
+                    </div>
+                    <Button
+                        variant="outline"
+                        className="w-full"
+                        onClick={onSwitch}
+                    >
+                        Sign In
+                    </Button>
+                </CardFooter>
+            </Card>
         </div>
     );
 }
