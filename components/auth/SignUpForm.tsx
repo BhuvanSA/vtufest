@@ -311,15 +311,13 @@ export default function SignUp({ onSwitch }: SignUpFormProps) {
                                 </span>
                             </div>
                         </div>
-                        <Link href="/login" className="w-full">
-                            <Button
-                                variant="outline"
-                                className="w-full"
-                                onClick={onSwitch}
-                            >
-                                Sign In
-                            </Button>
-                        </Link>
+                        <Button
+                            variant="outline"
+                            className="w-full"
+                            onClick={onSwitch}
+                        >
+                            Sign In
+                        </Button>
                     </CardFooter>
                 </Card>
             </motion.div>

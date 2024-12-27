@@ -1,11 +1,15 @@
-// NewNavBar.tsx
 import { useEffect, useState } from "react";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import MobileMenu from "./MobileMenu";
 import NavItem from "./NavItem";
-import { Dialog, DialogContent, DialogHeader, DialogOverlay } from "./ui/dialog";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogOverlay,
+} from "./ui/dialog";
 
 export const navItems = [
     { href: "/", text: "Home" },
@@ -46,7 +50,12 @@ const NavBar = () => {
                 <div className="hidden lg:block overflow-x-auto whitespace-nowrap">
                     <nav className="flex space-x-3 text-lg">
                         {navItems.map(({ href, text }, index) => (
-                            <NavItem key={index} href={href} text={text} />
+                            <NavItem
+                                key={index}
+                                href={href}
+                                text={text}
+                                isActive={pathname === href}
+                            />
                         ))}
                     </nav>
                 </div>
@@ -84,7 +93,6 @@ const NavBar = () => {
                                     <Link
                                         href={{
                                             pathname: href,
-                                            
                                         }}
                                         onClick={() => setIsOpen(false)}
                                     >
