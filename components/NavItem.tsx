@@ -15,7 +15,7 @@ const NavItem: React.FC<NavItemProps> = ({ href, text }) => {
         <Link
             href={{
                 pathname: href,
-                query: { showNav: href !== "/" },
+                
             }}
             className={`xl:ml-0 ${
                 isActive

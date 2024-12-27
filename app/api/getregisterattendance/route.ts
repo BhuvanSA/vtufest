@@ -2,36 +2,35 @@
 import { getRegistrant, getRegistrantByPhone } from "@/app/prismaClient/queryFunction";
 import { NextResponse } from "next/server";
 
-export async function POST(request : Request){
+export async function POST(request: Request) {
 
     const req = await request.json();
-   let flag = false;
+    let flag = false;
 
-    let id = null;
-    if(!req.usn && !req.phone){
-        return NextResponse.json({success:false,error:"usn and phone cannot be empty"},{status:404});
+    let id : null|string = null;
+    if (!req.usn && !req.phone) {
+        return NextResponse.json({ success: false, error: "usn and phone cannot be empty" }, { status: 404 });
     }
-    else if(!req.usn){
-        id = req.phone;
+    else if (!req.usn) {
+        id = req.phone  as string;
     }
-    else{
+    else {
         flag = true;
-        id = req.usn;
+        id = req.usn as string;
     }
 
-    if(!id){
-        return NextResponse.json({success:false,error:"internal server error"},{status:500});
+    if (!id) {
+        return NextResponse.json({ success: false, error: "internal server error" }, { status: 500 });
     }
 
-    console.log(id);
 
-    if(flag == true){
-        const registrant = await getRegistrant(id);
+    if (flag == true) {
+        const registrant = await getRegistrant(id as string);
 
-        return NextResponse.json({success:true,registrant},{status:200});
+        return NextResponse.json({ success: true, registrant }, { status: 200 });
     }
-    else{
-        const registrant = await getRegistrantByPhone(id);
-        return NextResponse.json({success:true,registrant},{status:200});
+    else {
+        const registrant = await getRegistrantByPhone(id as string);
+        return NextResponse.json({ success: true, registrant }, { status: 200 });
     }
 }

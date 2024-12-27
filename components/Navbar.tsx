@@ -1,10 +1,11 @@
 // NewNavBar.tsx
 import { useEffect, useState } from "react";
-import { Dialog } from "@headlessui/react";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import MobileMenu from "./MobileMenu";
 import NavItem from "./NavItem";
+import { Dialog, DialogContent, DialogHeader, DialogOverlay } from "./ui/dialog";
 
 export const navItems = [
     { href: "/", text: "Home" },
@@ -17,7 +18,7 @@ export const navItems = [
 // TODO: Implment logout functionality as before here
 // TODO: Overlay causes errors in the application
 
-const NavMenu = () => {
+const NavBar = () => {
     const [isOpen, setIsOpen] = useState(false);
     const pathname = usePathname();
 
@@ -56,7 +57,7 @@ const NavMenu = () => {
                     onClose={() => setIsOpen(false)}
                     className="fixed inset-0 z-50 lg:hidden"
                 >
-                    <Dialog.Overlay className="fixed inset-0 bg-black/20 backdrop-blur-sm dark:bg-gray-900/80" />
+                    <DialogOverlay className="fixed inset-0 bg-black/20 backdrop-blur-sm dark:bg-gray-900/80" />
                     <div className="fixed w-full max-w-xs p-6 text-base font-semibold text-gray-900 bg-white rounded-lg shadow-lg top-4 right-4 dark:bg-gray-800 dark:text-gray-400 dark:highlight-white/5">
                         <button
                             onClick={() => setIsOpen(false)}
@@ -83,7 +84,7 @@ const NavMenu = () => {
                                     <Link
                                         href={{
                                             pathname: href,
-                                            query: { showNav: text !== "Home" },
+                                            
                                         }}
                                         onClick={() => setIsOpen(false)}
                                     >
@@ -101,4 +102,4 @@ const NavMenu = () => {
     );
 };
 
-export default NavMenu;
+export default NavBar;

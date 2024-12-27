@@ -59,7 +59,7 @@ export default function SignIn() {
             });
 
             if (response.data.success) {
-                router.push("/register");
+                router.push("/getallregister");
             } else {
                 form.setError("email", {
                     type: "manual",
@@ -78,7 +78,7 @@ export default function SignIn() {
             } else {
                 setError("An error occurred during login");
             }
-            console.error("Login failed:", error);
+           
             setIsLoading(false);
         }
     }
