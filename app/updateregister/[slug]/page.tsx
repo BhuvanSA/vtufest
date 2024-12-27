@@ -88,18 +88,22 @@ const UpdateRegister = ({ params }: { params: Promise<{ slug: string }> }) => {
       method: "PATCH",
       body: JSON.stringify({
         id: id,
-        usn: usn,
+        usn : usn,
         phone: phone,
         name: name,
-        selectedEvents,
+        
       }),
       headers: { "Content-Type": "application/json" },
     });
     const data = await response.json();
     fetchRegistrant();
     setEditOne(false);
-    console.log(data);
-    alert(data.message);
+    if(!data.success){
+      const errorMessage = JSON.parse(data.message);
+      errorMessage.forEach(message =>{
+        alert(message.message);
+      })
+    }
   };
 
   // Handle event selection
@@ -149,14 +153,13 @@ const UpdateRegister = ({ params }: { params: Promise<{ slug: string }> }) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        eventId: event.id,
-        registrantId: event.registrantId,
+        eventRegistrantId: event.id,
         type: event.editRole,
       }),
     });
 
     const data = await response.json();
-
+    console.log(data);
     if (data.success) {
       alert(`Role for ${event.eventName} saved as ${event.editRole}`);
       setEvents((prevEvents) =>
@@ -195,38 +198,12 @@ const UpdateRegister = ({ params }: { params: Promise<{ slug: string }> }) => {
   }
 
   const handleSetField = (value) => {
-
     setField(value);  // Set the selected field
-
-    if (value === "sslc") {
-      // Assuming registrant.sslcUrl contains the URL of the SSLC file
-      setFileUrl(registrant.sslcUrl);  // Set the file URL for SSLC
-    } else if (value === "puc") {
-      // Assuming registrant.pucUrl contains the URL of the PUC file
-      setFileUrl(registrant.pucUrl);  // Set the file URL for PUC
-    } else if (value === "idcard") {
-      // Assuming registrant.idcardUrl contains the URL of the ID Card file
-      setFileUrl(registrant.idcardUrl);  // Set the file URL for ID Card
-    } else if (value === "aadhar") {
-      // Assuming registrant.aadharUrl contains the URL of the Aadhar file
-      setFileUrl(registrant.aadharUrl);  // Set the file URL for Aadhar
-    } else if (value === "admission1") {
-      // Assuming registrant.admission1Url contains the URL of the Admission 1 file
-      setFileUrl(registrant.admission1Url);  // Set the file URL for Admission 1
-    } else if (value === "admission2") {
-      // Assuming registrant.admission2Url contains the URL of the Admission 2 file
-      setFileUrl(registrant.admission2Url);  // Set the file URL for Admission 2
-    } else if (value === "photo") {
-      // Assuming registrant.photoUrl contains the URL of the Photo file
-      setFileUrl(registrant.photoUrl);  // Set the file URL for Photo
-    } else {
-      // If no valid field is selected, reset the file URL
-      setFileUrl("");
-    }
+    setFileUrl(registrant[value]);
   };
 
   const handleFileUpload = async () => {
-    console.log("fdafkjsdjfkl")
+    
     if (!fileUpload) {
       alert("Please select a file to upload.");
       return;
@@ -472,19 +449,19 @@ const UpdateRegister = ({ params }: { params: Promise<{ slug: string }> }) => {
             >
               {!isTeamManager &&<>
               <option value="">Select Field</option>
-              <option value="sslc">SSLC</option>
-              <option value="puc">PUC</option>
-              <option value="idcard">ID Card</option>
-              <option value="aadhar">Aadhar</option>
-              <option value="admission1">Admission 1</option>
-              <option value="admission2">Admission 2</option>
-              <option value="photo">Photo</option>
+              <option value="sslcUrl">SSLC</option>
+              <option value="pucUrl">PUC</option>
+              <option value="idcardUrl">ID Card</option>
+              <option value="aadharUrl">Aadhar</option>
+              <option value="admission1Url">Admission 1</option>
+              <option value="admission2Url">Admission 2</option>
+              <option value="photoUrl">Photo</option>
               </>}
               {isTeamManager && 
               <>
               <option value="">Select Field</option>
-              <option value="photo">Photo</option>
-              <option value="idcard">ID Card</option>
+              <option value="photoUrl">Photo</option>
+              <option value="idcardUrl">ID Card</option>
               </>}
             </select>
 

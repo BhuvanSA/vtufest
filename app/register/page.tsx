@@ -1,8 +1,11 @@
 "use client";
 
+
+import { Toast, ToastProvider } from "@radix-ui/react-toast";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { z, ZodError } from "zod";
+
+
 
 enum type {
   PARTICIPANT = "PARTICIPANT",
@@ -42,13 +45,15 @@ const Register = () => {
 
   const [eventCategories, setEventCategories] = useState([]);
   const [selectedEvents, setSelectedEvents] = useState([]);
+  const [responseToast,SetresponseToast] = useState("");
+
   const router = useRouter();
   useEffect(() => {
     async function getEvents() {
       const res = await fetch('/api/getalleventregister', {
         method: "GET",
       });
-      
+
       let { userEvents } = await res.json();
       console.log(userEvents);
       if (!formData.teamManager) {
@@ -62,7 +67,7 @@ const Register = () => {
     getEvents();
   }, [formData.teamManager]);
 
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [errors, setErrors] = useState<null | object>({});
 
   const validate = () => {
     const newErrors: { [key: string]: string } = {};
@@ -142,9 +147,9 @@ const Register = () => {
 
     const updatedSelectedEvents = checked
       ? [
-          ...selectedEvents,
-          { eventNo: eventNoNumber, eventName, type: "" },
-        ]
+        ...selectedEvents,
+        { eventNo: eventNoNumber, eventName, type: "" },
+      ]
       : selectedEvents.filter((event) => event.eventNo !== eventNoNumber);
 
     setSelectedEvents(updatedSelectedEvents);
@@ -178,7 +183,9 @@ const Register = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log("hit");
-
+    if(selectedEvents.length==0){
+      alert("aleast one event must be selected")
+    }
     if (validate()) {
       const formDataToSend = new FormData();
       console.log("validated hit");
@@ -198,21 +205,19 @@ const Register = () => {
           body: formDataToSend,
         });
         const data = await response.json();
-
+        
         if (data.success) {
-          alert("Registration successful!");
+          SetresponseToast(data.message);
+          alert(data.message)
           router.push("/getallregister");
         } else {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const errorArray: any[] = data.error;
-          const newErrors: { [key: string]: string } = {};
-          errorArray.forEach((error) => {
-            newErrors[error.path[0]] = error.message;
-          });
-          setErrors(newErrors);
+          alert(data.message)
+          SetresponseToast(data.message);
         }
       } catch (err) {
-        alert("Failed to register. Please try again later.");
+       alert("Failed to register. Please try again later.")
+        SetresponseToast("Failed to register. Please try again later.");
         console.error(err);
       }
     }
@@ -231,10 +236,12 @@ const Register = () => {
   const groupedEvents = groupEventsByCategory(eventCategories);
 
   return (
+    <ToastProvider >
     <section
       id="register"
       className="min-h-screen py-16 px-4 bg-gray-200 flex justify-center items-center"
     >
+      
       <div className="w-full max-w-4xl p-6 bg-white text-white shadow-lg rounded-md">
         <h2
           className="text-2xl font-bold mb-6 text-yellow-800 font-Barrio text-center"
@@ -354,7 +361,7 @@ const Register = () => {
                           key={index}
                           className="mb-4 border-2 border-black p-2 rounded-lg hover:scale-105 transform transition-all"
                         >
-                          
+
                           <div className="flex items-center mb-1 hover:bg-gray-200 p-1 rounded-md transition-all">
                             <input
                               type="checkbox"
@@ -421,6 +428,7 @@ const Register = () => {
                       required
                       className="w-full text-sm text-black bg-white-600 p-0 rounded-lg focus:outline-white hover:bg-gray-200"
                     />
+                    {errors.photo && <p className="text-red-500 text-xs mt-1">{errors.photo}</p>}
                   </div>
                   <div>
                     <label
@@ -437,6 +445,7 @@ const Register = () => {
                       required
                       className="w-full text-sm text-black bg-white-600 p-0 rounded-lg focus:outline-white hover:bg-gray-200"
                     />
+                    {errors.idcard && <p className="text-red-500 text-xs mt-1">{errors.idcard}</p>}
                   </div>
                 </>
               ) : (
@@ -456,6 +465,9 @@ const Register = () => {
                       required
                       className="w-full text-sm text-black bg-white-600 p-0 rounded-lg focus:outline-white hover:bg-gray-200"
                     />
+                    {errors[fileField] && (
+                      <p className="text-red-500 text-xs mt-1">{errors[fileField]}</p>
+                    )}
                   </div>
                 ))
               )}
@@ -472,6 +484,7 @@ const Register = () => {
         </form>
       </div>
     </section>
+    </ToastProvider>
   );
 };
 

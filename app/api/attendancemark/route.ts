@@ -5,24 +5,25 @@ export async function POST(request:Request){
     
     const {usn,eventId} = await request.json();
     
-    
+    if(!usn){
+        return NextResponse.json({success:false,message :"usn is missing"},{status:400});
+    }
 
-    const registrant = await getRegistrant(usn);
+    const registrant = await getRegistrant(usn as string);
 
     if(!registrant){
         return NextResponse.json({success:false,error:"registrant not found"},{status:404});
     }
     
-    console.log(registrant.eventRegistrations);
-
+   
     const eventFilter = registrant.eventRegistrations.find(x => x.eventId === eventId);
-    console.log("eventFIlter",eventFilter)
+    
     if(!eventFilter){
          return NextResponse.json({success:false,message:"no event found"},{status:404});
     }
 
     try{
-    const res = await updateRegistrant(usn,eventFilter.id);
+    const res = await updateRegistrant(usn as string,eventFilter.id as string);
     return NextResponse.json({success:true, message:`marked attendence ${res}`},{status:200});
     }
     catch(error){

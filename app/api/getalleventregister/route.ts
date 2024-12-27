@@ -3,11 +3,9 @@ import { jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || "default_secret");
-export async function GET(request: Request) {
+export async function GET() {
 
     const token:string = (await cookies()).get('auth_token')?.value as string;
-
-    console.log(token)
 
     if (!token) {
         return NextResponse.json({ success: false, message: 'token not found' }, { status: 401 })

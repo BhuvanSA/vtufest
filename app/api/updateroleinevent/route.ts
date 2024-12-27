@@ -1,21 +1,39 @@
 import { updateEventRole } from "@/app/prismaClient/queryFunction";
 import { NextResponse } from "next/server";
+import { z } from "zod";
+
+const UpdateRoleSchema = z.object({
+    eventRegistrantId : z.string({message :"eventRegistrant Id is missing"}).min(1),
+    type : z.enum(["PARTICIPANT","ACCOMPANIST"],{message:"invalid Type"})
+}).strict();
+
+ enum RoleType {
+    ACCOMPANIST = "ACCOMPANIST",
+    PARTICIPANT = "PARTICIPANT",
+}
+
+export interface UpdateRole{
+    eventRegistrantId : string;
+    type : RoleType
+} 
 
 export async function PATCH(request:Request) {
     
     const body = await request.json();
-    console.log(body);
+    
+    const result = UpdateRoleSchema.safeParse(body);
 
-    const {type,eventId} = body;
-
-    if(!eventId || !type ){
+    if(!result.success){
         return NextResponse.json({success:false,
-            message:"either id or Type or registrantId is not sent"
+            message: result.error.errors
         },{status:400});
     }
+
     
     try{
-        const updateRole = await updateEventRole(eventId,type);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const updateRole = await updateEventRole(result.data as UpdateRole);
+    
         return NextResponse.json({success:true,message:"event Updated"},{status:200})
     }catch(err){
         console.log(err)
