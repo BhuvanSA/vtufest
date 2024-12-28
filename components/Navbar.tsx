@@ -10,13 +10,15 @@ import {
     // DialogHeader,
     DialogOverlay,
 } from "./ui/dialog";
+import axios from "axios";
+import { useCookies } from "react-cookie";
 
 export const navItems = [
     { href: "/", text: "Home" },
     { href: "/about", text: "About Us" },
     { href: "/events", text: "Events" },
     { href: "/schedule", text: "Schedule" },
-    { href: "/auth", text: "Login" },
+    { href: "/register", text: "Register" },
 ];
 
 // TODO: Implment logout functionality as before here
@@ -24,7 +26,18 @@ export const navItems = [
 
 const NavBar = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [cookies, , removeCookie] = useCookies(["auth_token"]);
     const pathname = usePathname();
+
+    useEffect(() => {
+        // Simple check if auth_token cookie exists
+        if (cookies.auth_token) {
+            setIsLoggedIn(true);
+        } else {
+            setIsLoggedIn(false);
+        }
+    }, [cookies.auth_token]);
 
     const handleClick = () => {
         setIsOpen(true);
@@ -33,6 +46,16 @@ const NavBar = () => {
     useEffect(() => {
         setIsOpen(false);
     }, [pathname]);
+
+    const handleLogout = async () => {
+        try {
+            await axios.post("/api/logout");
+            removeCookie("auth_token");
+            setIsLoggedIn(false);
+        } catch (error) {
+            console.error("Logout failed:", error);
+        }
+    };
 
     return (
         <header className="fixed top-0 left-0 right-0 w-full bg-slate-900/75 backdrop-blur-sm shadow-lg z-50 text-white">
@@ -44,9 +67,6 @@ const NavBar = () => {
                         </span>
                     </Link>
                 </div>
-                <div className="-my-2 -mr-2 lg:hidden" onClick={handleClick}>
-                    <MobileMenu />
-                </div>
                 <div className="hidden lg:block overflow-x-auto whitespace-nowrap">
                     <nav className="flex space-x-3 text-lg">
                         {navItems.map(({ href, text }, index) => (
@@ -57,9 +77,28 @@ const NavBar = () => {
                                 isActive={pathname === href}
                             />
                         ))}
+                        {!isLoggedIn && (
+                            <NavItem
+                                href="/auth"
+                                text="Login"
+                                isActive={pathname === "/auth"}
+                            />
+                        )}
+                        {isLoggedIn && (
+                            <button
+                                onClick={handleLogout}
+                                className="hover:text-lightGreen dark:hover:text-emerald-500"
+                            >
+                                Logout
+                            </button>
+                        )}
                     </nav>
                 </div>
+                <div className="-my-2 -mr-2 lg:hidden" onClick={handleClick}>
+                    <MobileMenu />
+                </div>
             </div>
+
             {isOpen && (
                 <Dialog
                     open={isOpen}
@@ -100,6 +139,31 @@ const NavBar = () => {
                                     </Link>
                                 </li>
                             ))}
+                            {!isLoggedIn && (
+                                <li>
+                                    <Link
+                                        href="/auth"
+                                        onClick={() => setIsOpen(false)}
+                                    >
+                                        <p className="hover:text-lightGreen dark:hover:text-emerald-500">
+                                            Login
+                                        </p>
+                                    </Link>
+                                </li>
+                            )}
+                            {isLoggedIn && (
+                                <li>
+                                    <button
+                                        onClick={() => {
+                                            handleLogout();
+                                            setIsOpen(false);
+                                        }}
+                                        className="hover:text-lightGreen dark:hover:text-emerald-500"
+                                    >
+                                        Logout
+                                    </button>
+                                </li>
+                            )}
                         </ul>
                     </div>
                 </Dialog>

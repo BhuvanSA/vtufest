@@ -35,6 +35,7 @@ import {
     InputOTPSlot,
 } from "@/components/ui/input-otp";
 import Image from "next/image";
+import { on } from "events";
 
 const signupSchema = z.object({
     college: z.string().min(3, "College name must be at least 3 characters"),
@@ -122,7 +123,7 @@ export default function SignUp({ onSwitch }: SignUpFormProps) {
             const response = await axios.post("/api/signup", values);
             if (response.data.success) {
                 toast.success("Signup successful! Redirecting to login...");
-                router.push("/login");
+                onSwitch();
             } else {
                 if (
                     response.data.error === "Invalid OTP" ||

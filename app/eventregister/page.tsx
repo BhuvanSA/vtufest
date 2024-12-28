@@ -14,20 +14,22 @@ export default function EventRegister() {
     const [responseBody, setResponseBody] = useState<object | null>(null);
     const [registeredEvents, setRegisteredEvents] = useState<any[]>([]);
 
-    const handleDelete = async (id: number) => { 
-        const confirmDelete = window.confirm("Are you sure you want to delete this event?");
+    const handleDelete = async (id: number) => {
+        const confirmDelete = window.confirm(
+            "Are you sure you want to delete this event?"
+        );
         if (!confirmDelete) return; // Exit if the user cancels
-        const response = await fetch('/api/deleteeventregister', {
-            method: 'DELETE',
+        const response = await fetch("/api/deleteeventregister", {
+            method: "DELETE",
             headers: {
-                'Content-Type': 'application/json',
+                "Content-Type": "application/json",
             },
-            body: JSON.stringify({eventId:id}),
+            body: JSON.stringify({ eventId: id }),
         });
         const data = await response.json();
-        setRegisteredEvents(prev => prev.filter(event => event.id !== id));
+        setRegisteredEvents((prev) => prev.filter((event) => event.id !== id));
         alert(data.message);
-    }
+    };
 
     useEffect(() => {
         async function fetchRegisteredEvents() {
@@ -36,26 +38,27 @@ export default function EventRegister() {
                 headers: {
                     "Content-Type": "application/json",
                 },
-            })
+            });
             const data = await res.json();
             console.log(data);
             setRegisteredEvents(data.userEvents);
         }
         console.log("Fetching registered events");
         fetchRegisteredEvents();
-    }, [selectedEvents])
+    }, [selectedEvents]);
     const availableEvents = eventCategories.filter(
-        (event) => !registeredEvents.some((regEvent) => regEvent.eventNo === event.eventNo)
+        (event) =>
+            !registeredEvents.some(
+                (regEvent) => regEvent.eventNo === event.eventNo
+            )
     );
-    
+
     // Group events by category
     const groupedEvents = availableEvents.reduce((acc, event) => {
         acc[event.category] = acc[event.category] || [];
         acc[event.category].push(event);
         return acc;
     }, {} as Record<string, typeof eventCategories>);
-
-    
 
     const toggleSelection = (eventNo: number) => {
         setSelectedEvents((prev) =>
@@ -64,8 +67,6 @@ export default function EventRegister() {
                 : [...prev, eventNo]
         );
     };
-
-
 
     const generateResponse = async () => {
         try {
@@ -92,7 +93,6 @@ export default function EventRegister() {
                 console.log("Response successfully sent:", response.data);
                 alert("Response sent successfully!");
                 setSelectedEvents([]);
-
             } else {
                 console.error("Unexpected response status:", response.status);
                 alert("Something went wrong! Please try again.");
@@ -125,7 +125,8 @@ export default function EventRegister() {
                                 <AccordionTrigger className="flex justify-between items-center w-full pr-4">
                                     <div className="flex-1">
                                         <span className="text-lg font-semibold">
-                                            {category} ({totalEvents}) {/* Add total events count here */}
+                                            {category} ({totalEvents}){" "}
+                                            {/* Add total events count here */}
                                         </span>
                                     </div>
                                     <div className="flex items-center ml-auto">
@@ -138,43 +139,55 @@ export default function EventRegister() {
                                 </AccordionTrigger>
                                 <AccordionContent>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                        {groupedEvents[category].map((event) => (
-                                            <div
-                                                key={event.eventNo}
-                                                onClick={() => toggleSelection(event.eventNo)}
-                                                className={`p-4 border-2 rounded-lg shadow-md cursor-pointer transition duration-300 ${selectedEvents.includes(event.eventNo)
-                                                        ? "border-blue-500 bg-blue-50"
-                                                        : "border-gray-300 bg-white hover:shadow-lg"
+                                        {groupedEvents[category].map(
+                                            (event) => (
+                                                <div
+                                                    key={event.eventNo}
+                                                    onClick={() =>
+                                                        toggleSelection(
+                                                            event.eventNo
+                                                        )
+                                                    }
+                                                    className={`p-4 border-2 rounded-lg shadow-md cursor-pointer transition duration-300 ${
+                                                        selectedEvents.includes(
+                                                            event.eventNo
+                                                        )
+                                                            ? "border-blue-500 bg-blue-50"
+                                                            : "border-gray-300 bg-white hover:shadow-lg"
                                                     }`}
-                                            >
-                                                <h3 className="text-md sm:text-lg font-semibold text-gray-700 mb-2">
-                                                    {event.eventName}
-                                                </h3>
-                                                <p className="text-sm text-gray-600">
-                                                    Max Participants:{" "}
-                                                    <span className="font-medium text-gray-800">
-                                                        {event.maxParticipant}
-                                                    </span>
-                                                </p>
-                                                <p className="text-sm text-gray-600">
-                                                    Max Accompanists:{" "}
-                                                    <span className="font-medium text-gray-800">
-                                                        {event.maxAccompanist}
-                                                    </span>
-                                                </p>
-                                            </div>
-                                        ))}
+                                                >
+                                                    <h3 className="text-md sm:text-lg font-semibold text-gray-700 mb-2">
+                                                        {event.eventName}
+                                                    </h3>
+                                                    <p className="text-sm text-gray-600">
+                                                        Max Participants:{" "}
+                                                        <span className="font-medium text-gray-800">
+                                                            {
+                                                                event.maxParticipant
+                                                            }
+                                                        </span>
+                                                    </p>
+                                                    <p className="text-sm text-gray-600">
+                                                        Max Accompanists:{" "}
+                                                        <span className="font-medium text-gray-800">
+                                                            {
+                                                                event.maxAccompanist
+                                                            }
+                                                        </span>
+                                                    </p>
+                                                </div>
+                                            )
+                                        )}
                                     </div>
                                 </AccordionContent>
                             </AccordionItem>
                         );
                     })}
                 </Accordion>
-
             </div>
 
             {/* Selected Events Section */}
-            <div className="lg:w-[38%] w-full ">
+            <div className="lg:w-[38%] w-full">
                 <div className="border border-gray-300 text-center p-6 rounded-lg shadow-sm bg-white flex flex-col gap-4">
                     <div className="flex items-center text justify-between p-3 rounded-md">
                         <h2 className="text-lg sm:text-xl  font-semibold ">
@@ -188,21 +201,32 @@ export default function EventRegister() {
                     </div>
                     <ul className=" flex flex-col gap-2 ">
                         {registeredEvents.length > 0 ? (
-                            registeredEvents
-                                .map((event, index) => (
-                                    <li
-                                        key={event.eventNo}
-                                        className="text-gray-800 font-medium flex items-start justify-between"
-                                    >   
-                                        <div className=" hover:bg-gray-200 ">
-                                        <small className="font-semibold">{index + 1}.</small>
-                                        <small className="font-semibold ">{event.eventName}</small>
-                                        </div>
-                                        <div>
-                                        <small className="font-semibold text-lg hover:bg-slate-600" onClick={()=>handleDelete(event.id)}> &times;</small>
-                                        </div>
-                                    </li>
-                                ))
+                            registeredEvents.map((event, index) => (
+                                <li
+                                    key={event.eventNo}
+                                    className="text-gray-800 font-medium flex items-start justify-between"
+                                >
+                                    <div className=" hover:bg-gray-200 ">
+                                        <small className="font-semibold">
+                                            {index + 1}.
+                                        </small>
+                                        <small className="font-semibold ">
+                                            {event.eventName}
+                                        </small>
+                                    </div>
+                                    <div>
+                                        <small
+                                            className="font-semibold text-lg hover:bg-slate-600"
+                                            onClick={() =>
+                                                handleDelete(event.id)
+                                            }
+                                        >
+                                            {" "}
+                                            &times;
+                                        </small>
+                                    </div>
+                                </li>
+                            ))
                         ) : (
                             <p className="text-gray-500">No events selected</p>
                         )}
@@ -230,9 +254,12 @@ export default function EventRegister() {
                                         key={event.eventNo}
                                         className="text-gray-800 font-medium flex items-start  hover:bg-gray-200 "
                                     >
-                                        <small className="font-semibold">{index + 1}.</small>
-                                        <small className="font-semibold ">{event.eventName}</small>
-
+                                        <small className="font-semibold">
+                                            {index + 1}.
+                                        </small>
+                                        <small className="font-semibold ">
+                                            {event.eventName}
+                                        </small>
                                     </li>
                                 ))
                         ) : (
