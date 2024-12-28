@@ -35,6 +35,7 @@ export async function middleware(request: NextRequest) {
         request.headers.get("x-real-ip") ||
         "unknown";
 
+
     // Apply OTP-specific rate limiting
     if (pathname === "/api/sendOtp") {
         const otpRedisKey = `otp-rate-limit:${ip}`;

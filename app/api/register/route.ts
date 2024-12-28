@@ -56,7 +56,7 @@ const TeamMangerRegistrantSchema = z.object({
     teamManager: z.boolean(),
     photo: fileSchema,
     idcard: fileSchema,
-}).strict();
+});
 
 const JWT_SECRET = new TextEncoder().encode(
     process.env.JWT_SECRET || "default_secret"
@@ -103,7 +103,6 @@ export async function POST(request: Request) {
     const verify = await jwtVerify(token, JWT_SECRET);
 
     const userId: string = verify.payload.id as string;
-
     const user = await getUser(userId);
 
     if (!user) {
@@ -124,6 +123,7 @@ export async function POST(request: Request) {
     if (user.registrants.some((reg) => reg.usn === registrant.usn || reg.phone === registrant.phone)) {
         return NextResponse.json({ success: false, message: "Registrant already exists" }, { status: 400 });
     }
+
 
     let result = null;
 

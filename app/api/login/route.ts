@@ -69,6 +69,7 @@ export async function POST(request: Request) {
             .setExpirationTime("1h")
             .sign(JWT_SECRET);
 
+
         const response = NextResponse.json({
             success: true,
             message: "Authentication successful",

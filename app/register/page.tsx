@@ -198,13 +198,13 @@ const Register = () => {
       });
 
       console.log(formDataToSend.get("events"));
-
       try {
         const response = await fetch('/api/register', {
           method: "POST",
           body: formDataToSend,
         });
         const data = await response.json();
+
         
         if (data.success) {
           SetresponseToast(data.message);
@@ -223,6 +223,7 @@ const Register = () => {
     }
   };
 
+
   const groupEventsByCategory = (events) => {
     return events.reduce((acc, event) => {
       if (!acc[event.category]) {
@@ -237,14 +238,17 @@ const Register = () => {
 
   return (
     <ToastProvider >
+
     <section
       id="register"
       className="min-h-screen py-16 px-4 bg-gray-200 flex justify-center items-center"
     >
+
       
       <div className="w-full max-w-4xl p-6 bg-white text-white shadow-lg rounded-md">
         <h2
           className="text-2xl font-bold mb-6 text-yellow-800 font-Barrio text-center"
+
         >
           Registrant Page
         </h2>
@@ -473,7 +477,6 @@ const Register = () => {
               )}
             </div>
           </fieldset>
-
           {/* Submit Button */}
           <button
             type="submit"

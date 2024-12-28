@@ -2,6 +2,7 @@ import { registerUserEvents } from "@/app/prismaClient/queryFunction";
 import { jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+
 import { z } from "zod";
 
 export interface EventCreate{
@@ -73,3 +74,4 @@ export async function POST(request: Request) {
         return NextResponse.json({ success: false, message: err }, { status: 400 });
     }
 }
+

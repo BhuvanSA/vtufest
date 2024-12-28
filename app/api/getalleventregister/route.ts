@@ -3,6 +3,7 @@ import { jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || "default_secret");
+
 export async function GET() {
 
     const token:string = (await cookies()).get('auth_token')?.value as string;
@@ -25,4 +26,5 @@ export async function GET() {
     } catch (err) {
         return NextResponse.json({ success: false, message: err }, { status: 400 })
     }
+
 }
