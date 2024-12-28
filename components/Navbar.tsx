@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import MobileMenu from "./MobileMenu";
@@ -10,8 +9,6 @@ import {
     // DialogHeader,
     DialogOverlay,
 } from "./ui/dialog";
-import axios from "axios";
-import { useCookies } from "react-cookie";
 
 export const navItems = [
     { href: "/", text: "Home" },
@@ -26,18 +23,18 @@ export const navItems = [
 
 const NavBar = () => {
     const [isOpen, setIsOpen] = useState(false);
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [cookies, , removeCookie] = useCookies(["auth_token"]);
     const pathname = usePathname();
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     useEffect(() => {
-        // Simple check if auth_token cookie exists
-        if (cookies.auth_token) {
-            setIsLoggedIn(true);
-        } else {
-            setIsLoggedIn(false);
-        }
-    }, [cookies.auth_token]);
+        (async () => {
+            try {
+                const res = await fetch("/api/checkAuth");
+                setIsLoggedIn(res.ok);
+            } catch {}
+        })();
+    }, []);
+
 
     const handleClick = () => {
         setIsOpen(true);
@@ -46,16 +43,6 @@ const NavBar = () => {
     useEffect(() => {
         setIsOpen(false);
     }, [pathname]);
-
-    const handleLogout = async () => {
-        try {
-            await axios.post("/api/logout");
-            removeCookie("auth_token");
-            setIsLoggedIn(false);
-        } catch (error) {
-            console.error("Logout failed:", error);
-        }
-    };
 
     return (
         <header className="fixed top-0 left-0 right-0 w-full bg-slate-900/75 backdrop-blur-sm shadow-lg z-50 text-white">
@@ -77,20 +64,18 @@ const NavBar = () => {
                                 isActive={pathname === href}
                             />
                         ))}
-                        {!isLoggedIn && (
+                        {isLoggedIn ? (
                             <NavItem
-                                href="/auth"
-                                text="Login"
-                                isActive={pathname === "/auth"}
+                                href="/auth/logout"
+                                text="Logout"
+                                isActive={pathname.startsWith("/auth")}
                             />
-                        )}
-                        {isLoggedIn && (
-                            <button
-                                onClick={handleLogout}
-                                className="hover:text-lightGreen dark:hover:text-emerald-500"
-                            >
-                                Logout
-                            </button>
+                        ) : (
+                            <NavItem
+                                href="/auth/signin"
+                                text="Login"
+                                isActive={pathname.startsWith("/auth")}
+                            />
                         )}
                     </nav>
                 </div>
@@ -102,8 +87,8 @@ const NavBar = () => {
             {isOpen && (
                 <Dialog
                     open={isOpen}
-                    onClose={() => setIsOpen(false)}
-                    className="fixed inset-0 z-50 lg:hidden"
+                    // onClose={() => setIsOpen(false)}
+                    // className="fixed inset-0 z-50 lg:hidden"
                 >
                     <DialogOverlay className="fixed inset-0 bg-black/20 backdrop-blur-sm dark:bg-gray-900/80" />
                     <div className="fixed w-full max-w-xs p-6 text-base font-semibold text-gray-900 bg-white rounded-lg shadow-lg right-4 dark:bg-gray-800 dark:text-gray-400 dark:highlight-white/5">
@@ -139,31 +124,6 @@ const NavBar = () => {
                                     </Link>
                                 </li>
                             ))}
-                            {!isLoggedIn && (
-                                <li>
-                                    <Link
-                                        href="/auth"
-                                        onClick={() => setIsOpen(false)}
-                                    >
-                                        <p className="hover:text-lightGreen dark:hover:text-emerald-500">
-                                            Login
-                                        </p>
-                                    </Link>
-                                </li>
-                            )}
-                            {isLoggedIn && (
-                                <li>
-                                    <button
-                                        onClick={() => {
-                                            handleLogout();
-                                            setIsOpen(false);
-                                        }}
-                                        className="hover:text-lightGreen dark:hover:text-emerald-500"
-                                    >
-                                        Logout
-                                    </button>
-                                </li>
-                            )}
                         </ul>
                     </div>
                 </Dialog>
