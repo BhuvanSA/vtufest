@@ -19,9 +19,6 @@ export const navItems = [
 ];
 import { useAuthContext } from "@/contexts/auth-context";
 
-// TODO: Implment logout functionality as before here
-// TODO: Overlay causes errors in the application
-
 const NavBar = () => {
     const [isOpen, setIsOpen] = useState(false);
     const pathname = usePathname();
