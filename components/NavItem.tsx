@@ -1,21 +1,17 @@
 // NavItem.tsx
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 
 interface NavItemProps {
     href: string;
     text: string;
+    isActive: boolean;
 }
 
-const NavItem: React.FC<NavItemProps> = ({ href, text }) => {
-    const pathname = usePathname();
-    const isActive = pathname === href;
-
+const NavItem: React.FC<NavItemProps> = ({ href, text, isActive }) => {
     return (
         <Link
             href={{
                 pathname: href,
-                
             }}
             className={`xl:ml-0 ${
                 isActive
