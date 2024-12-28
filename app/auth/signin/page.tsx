@@ -35,11 +35,7 @@ const loginSchema = z.object({
     password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
-interface SignInFormProps {
-    onSwitch: () => void;
-}
-
-export default function SignIn({ onSwitch }: SignInFormProps) {
+export default function SignIn() {
     const router = useRouter();
     const [error, setError] = useState<string>("");
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -59,7 +55,6 @@ export default function SignIn({ onSwitch }: SignInFormProps) {
                 email: values.email,
                 password: values.password,
             });
-
             if (response.data.success) {
                 router.push("/register");
             } else {
@@ -75,12 +70,8 @@ export default function SignIn({ onSwitch }: SignInFormProps) {
                 setIsLoading(false);
             }
         } catch (error: unknown) {
-            if (axios.isAxiosError(error) && error.response?.data?.message) {
-                setError(error.response.data.message);
-            } else {
-                setError("An error occurred during login");
-            }
-            console.error("Login failed:", error);
+            setError("An error occurred during login");
+            console.error(error);
             setIsLoading(false);
         }
     }
@@ -88,7 +79,7 @@ export default function SignIn({ onSwitch }: SignInFormProps) {
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100 p-4">
             <Card className="w-full max-w-md">
-                <CardHeader className="">
+                <CardHeader>
                     <div className="flex items-center justify-center mb-6">
                         <Image
                             src="/images/college-logo.png"
@@ -156,7 +147,16 @@ export default function SignIn({ onSwitch }: SignInFormProps) {
                         </form>
                     </Form>
                 </CardContent>
-                <CardFooter className="flex flex-col space-y-4">
+                <CardFooter className="flex flex-col space-y-2">
+                    <div className="relative w-full">
+                        <Button
+                            variant="link"
+                            className="w-full -mt-4"
+                            onClick={() => router.push("/auth/forgotpassword")}
+                        >
+                            Forgot Password?
+                        </Button>
+                    </div>
                     <div className="relative w-full">
                         <div className="absolute inset-0 flex items-center">
                             <span className="w-full border-t" />
@@ -170,7 +170,7 @@ export default function SignIn({ onSwitch }: SignInFormProps) {
                     <Button
                         variant="outline"
                         className="w-full"
-                        onClick={onSwitch}
+                        onClick={() => router.push("/auth/signup")}
                     >
                         Sign Up
                     </Button>

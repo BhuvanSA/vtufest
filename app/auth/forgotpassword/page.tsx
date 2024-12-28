@@ -15,9 +15,9 @@ import {
     Card,
     CardContent,
     CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
+    CardFooter,
 } from "@/components/ui/card";
 import {
     Form,
@@ -28,7 +28,11 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { LoadingButton } from "@/components/LoadingButton";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import {
+    InputOTP,
+    InputOTPGroup,
+    InputOTPSlot,
+} from "@/components/ui/input-otp";
 import Image from "next/image";
 
 const resetPasswordSchema = z
@@ -38,7 +42,9 @@ const resetPasswordSchema = z
             .string()
             .length(6, "OTP must be 6 digits")
             .regex(/^\d{6}$/, "OTP must be numeric"),
-        newPassword: z.string().min(8, "Password must be at least 8 characters"),
+        newPassword: z
+            .string()
+            .min(8, "Password must be at least 8 characters"),
         confirmPassword: z.string(),
     })
     .refine((data) => data.newPassword === data.confirmPassword, {
@@ -103,6 +109,7 @@ export default function ResetPassword() {
                 message: "Failed to send OTP. Please try again.",
             });
             toast.error("Failed to send OTP. Please try again.");
+            console.error(error);
         } finally {
             setIsSendingOTP(false);
         }
@@ -113,8 +120,10 @@ export default function ResetPassword() {
         try {
             const response = await axios.post("/api/resetpassword", values);
             if (response.data.success) {
-                toast.success("Password reset successful! Redirecting to login...");
-                router.push("/login");
+                toast.success(
+                    "Password reset successful! Redirecting to login..."
+                );
+                router.push("/auth/signin");
             } else {
                 if (response.data.error === "Invalid OTP") {
                     form.setError("otp", {
@@ -134,7 +143,7 @@ export default function ResetPassword() {
                 }
             }
         } catch (error: any) {
-            toast.error("An error occurred during password reset.");
+            toast.error("An error occurred during password reset.", error);
         } finally {
             setIsLoading(false);
         }
@@ -220,12 +229,24 @@ export default function ResetPassword() {
                                                     onChange={field.onChange}
                                                 >
                                                     <InputOTPGroup>
-                                                        <InputOTPSlot index={0} />
-                                                        <InputOTPSlot index={1} />
-                                                        <InputOTPSlot index={2} />
-                                                        <InputOTPSlot index={3} />
-                                                        <InputOTPSlot index={4} />
-                                                        <InputOTPSlot index={5} />
+                                                        <InputOTPSlot
+                                                            index={0}
+                                                        />
+                                                        <InputOTPSlot
+                                                            index={1}
+                                                        />
+                                                        <InputOTPSlot
+                                                            index={2}
+                                                        />
+                                                        <InputOTPSlot
+                                                            index={3}
+                                                        />
+                                                        <InputOTPSlot
+                                                            index={4}
+                                                        />
+                                                        <InputOTPSlot
+                                                            index={5}
+                                                        />
                                                     </InputOTPGroup>
                                                 </InputOTP>
                                             </FormControl>
@@ -255,7 +276,9 @@ export default function ResetPassword() {
                                     name="confirmPassword"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>Confirm Password</FormLabel>
+                                            <FormLabel>
+                                                Confirm Password
+                                            </FormLabel>
                                             <FormControl>
                                                 <Input
                                                     type="password"
@@ -276,6 +299,15 @@ export default function ResetPassword() {
                             </form>
                         </Form>
                     </CardContent>
+                    <CardFooter className="flex flex-col space-y-4">
+                        <Button
+                            variant="outline"
+                            className="w-full"
+                            onClick={() => router.push("/auth/signin")}
+                        >
+                            Back to Sign In
+                        </Button>
+                    </CardFooter>
                 </Card>
             </motion.div>
         </div>
