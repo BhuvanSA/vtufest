@@ -1,3 +1,4 @@
+import UserData from '@/lib/user';
 import React, { useEffect, useState } from 'react';
 
 // // Define the UserData type

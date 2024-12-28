@@ -248,4 +248,4 @@ export default function GetRegistrant({ params }: { params: Promise<{ slug: stri
       </div>
     </div>
   );
-}
+
