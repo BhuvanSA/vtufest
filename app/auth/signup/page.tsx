@@ -7,7 +7,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import * as z from "zod";
 import axios from "axios";
-import Link from "next/link";
 import { toast } from "react-toastify";
 
 import { Button } from "@/components/ui/button";
@@ -35,7 +34,6 @@ import {
     InputOTPSlot,
 } from "@/components/ui/input-otp";
 import Image from "next/image";
-import { on } from "events";
 
 const signupSchema = z.object({
     college: z.string().min(3, "College name must be at least 3 characters"),
@@ -50,11 +48,7 @@ const signupSchema = z.object({
         .regex(/^\d{6}$/, "OTP must be numeric"),
 });
 
-interface SignUpFormProps {
-    onSwitch: () => void;
-}
-
-export default function SignUp({ onSwitch }: SignUpFormProps) {
+export default function SignUp() {
     const router = useRouter();
     const [isSendingOTP, setIsSendingOTP] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -123,7 +117,7 @@ export default function SignUp({ onSwitch }: SignUpFormProps) {
             const response = await axios.post("/api/signup", values);
             if (response.data.success) {
                 toast.success("Signup successful! Redirecting to login...");
-                onSwitch();
+                router.push("/auth/signin");
             } else {
                 if (
                     response.data.error === "Invalid OTP" ||
@@ -293,7 +287,7 @@ export default function SignUp({ onSwitch }: SignUpFormProps) {
                     <Button
                         variant="outline"
                         className="w-full"
-                        onClick={onSwitch}
+                        onClick={() => router.push("/auth/signin")}
                     >
                         Sign In
                     </Button>

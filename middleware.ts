@@ -35,7 +35,6 @@ export async function middleware(request: NextRequest) {
         request.headers.get("x-real-ip") ||
         "unknown";
 
-
     // Apply OTP-specific rate limiting
     if (pathname === "/api/sendOtp") {
         const otpRedisKey = `otp-rate-limit:${ip}`;
@@ -109,7 +108,7 @@ export async function middleware(request: NextRequest) {
         const token = request.cookies.get("auth_token")?.value;
 
         if (!token) {
-            return NextResponse.redirect(new URL("/auth", request.url));
+            return NextResponse.redirect(new URL("/auth/signin", request.url));
         }
 
         try {
@@ -117,13 +116,15 @@ export async function middleware(request: NextRequest) {
             console.log("json middleware", verify);
 
             if (!verify) {
-                return NextResponse.redirect(new URL("/auth", request.url));
+                return NextResponse.redirect(
+                    new URL("/auth/sigin", request.url)
+                );
             }
 
             return NextResponse.next();
         } catch (err) {
             console.error("Invalid or expired token:", err);
-            return NextResponse.redirect(new URL("/auth", request.url));
+            return NextResponse.redirect(new URL("/auth/signin", request.url));
         }
     }
 
