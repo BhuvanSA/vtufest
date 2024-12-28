@@ -17,6 +17,7 @@ export const navItems = [
     { href: "/schedule", text: "Schedule" },
     { href: "/register", text: "Register" },
 ];
+import { useAuthContext } from "@/contexts/auth-context";
 
 // TODO: Implment logout functionality as before here
 // TODO: Overlay causes errors in the application
@@ -24,17 +25,7 @@ export const navItems = [
 const NavBar = () => {
     const [isOpen, setIsOpen] = useState(false);
     const pathname = usePathname();
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-    useEffect(() => {
-        (async () => {
-            try {
-                const res = await fetch("/api/checkAuth");
-                setIsLoggedIn(res.ok);
-            } catch {}
-        })();
-    }, []);
-
+    const { isLoggedIn } = useAuthContext();
 
     const handleClick = () => {
         setIsOpen(true);
