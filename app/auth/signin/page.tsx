@@ -26,6 +26,8 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { LoadingButton } from "@/components/LoadingButton";
+import { useAuthContext } from "@/contexts/auth-context";
+// import { set } from "date-fns";
 
 const loginSchema = z.object({
     email: z
@@ -39,6 +41,7 @@ export default function SignIn() {
     const router = useRouter();
     const [error, setError] = useState<string>("");
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const { setIsLoggedIn } = useAuthContext();
 
     const form = useForm<z.infer<typeof loginSchema>>({
         resolver: zodResolver(loginSchema),
@@ -56,6 +59,7 @@ export default function SignIn() {
                 password: values.password,
             });
             if (response.data.success) {
+                setIsLoggedIn(true);
                 router.push("/register");
             } else {
                 form.setError("email", {
