@@ -1,19 +1,24 @@
-// NewNavBar.tsx
 import { useEffect, useState } from "react";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import MobileMenu from "./MobileMenu";
 import NavItem from "./NavItem";
-import { Dialog, DialogContent, DialogHeader, DialogOverlay } from "./ui/dialog";
+import {
+    Dialog,
+    // DialogContent,
+    // DialogHeader,
+    DialogOverlay,
+} from "./ui/dialog";
+import axios from "axios";
+import { useCookies } from "react-cookie";
 
 export const navItems = [
     { href: "/", text: "Home" },
     { href: "/about", text: "About Us" },
     { href: "/events", text: "Events" },
     { href: "/schedule", text: "Schedule" },
-    { href: "/login", text: "Log In" },
-    { href: "/logout", text: "Logout" },
+    { href: "/register", text: "Register" },
 ];
 
 // TODO: Implment logout functionality as before here
@@ -21,7 +26,18 @@ export const navItems = [
 
 const NavBar = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [cookies, , removeCookie] = useCookies(["auth_token"]);
     const pathname = usePathname();
+
+    useEffect(() => {
+        // Simple check if auth_token cookie exists
+        if (cookies.auth_token) {
+            setIsLoggedIn(true);
+        } else {
+            setIsLoggedIn(false);
+        }
+    }, [cookies.auth_token]);
 
     const handleClick = () => {
         setIsOpen(true);
@@ -30,6 +46,16 @@ const NavBar = () => {
     useEffect(() => {
         setIsOpen(false);
     }, [pathname]);
+
+    const handleLogout = async () => {
+        try {
+            await axios.post("/api/logout");
+            removeCookie("auth_token");
+            setIsLoggedIn(false);
+        } catch (error) {
+            console.error("Logout failed:", error);
+        }
+    };
 
     return (
         <header className="fixed top-0 left-0 right-0 w-full bg-slate-900/75 backdrop-blur-sm shadow-lg z-50 text-white">
@@ -41,17 +67,38 @@ const NavBar = () => {
                         </span>
                     </Link>
                 </div>
-                <div className="-my-2 -mr-2 lg:hidden" onClick={handleClick}>
-                    <MobileMenu />
-                </div>
                 <div className="hidden lg:block overflow-x-auto whitespace-nowrap">
                     <nav className="flex space-x-3 text-lg">
                         {navItems.map(({ href, text }, index) => (
-                            <NavItem key={index} href={href} text={text} />
+                            <NavItem
+                                key={index}
+                                href={href}
+                                text={text}
+                                isActive={pathname === href}
+                            />
                         ))}
+                        {!isLoggedIn && (
+                            <NavItem
+                                href="/auth"
+                                text="Login"
+                                isActive={pathname === "/auth"}
+                            />
+                        )}
+                        {isLoggedIn && (
+                            <button
+                                onClick={handleLogout}
+                                className="hover:text-lightGreen dark:hover:text-emerald-500"
+                            >
+                                Logout
+                            </button>
+                        )}
                     </nav>
                 </div>
+                <div className="-my-2 -mr-2 lg:hidden" onClick={handleClick}>
+                    <MobileMenu />
+                </div>
             </div>
+
             {isOpen && (
                 <Dialog
                     open={isOpen}
@@ -59,7 +106,7 @@ const NavBar = () => {
                     className="fixed inset-0 z-50 lg:hidden"
                 >
                     <DialogOverlay className="fixed inset-0 bg-black/20 backdrop-blur-sm dark:bg-gray-900/80" />
-                    <div className="fixed w-full max-w-xs p-6 text-base font-semibold text-gray-900 bg-white rounded-lg shadow-lg top-4 right-4 dark:bg-gray-800 dark:text-gray-400 dark:highlight-white/5">
+                    <div className="fixed w-full max-w-xs p-6 text-base font-semibold text-gray-900 bg-white rounded-lg shadow-lg right-4 dark:bg-gray-800 dark:text-gray-400 dark:highlight-white/5">
                         <button
                             onClick={() => setIsOpen(false)}
                             className="absolute flex items-center justify-center w-8 h-8 text-gray-500 top-5 right-5 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300"
@@ -83,10 +130,7 @@ const NavBar = () => {
                             {navItems.map(({ href, text }) => (
                                 <li key={href}>
                                     <Link
-                                        href={{
-                                            pathname: href,
-                                            
-                                        }}
+                                        href={href}
                                         onClick={() => setIsOpen(false)}
                                     >
                                         <p className="hover:text-lightGreen dark:hover:text-emerald-500">
@@ -95,6 +139,31 @@ const NavBar = () => {
                                     </Link>
                                 </li>
                             ))}
+                            {!isLoggedIn && (
+                                <li>
+                                    <Link
+                                        href="/auth"
+                                        onClick={() => setIsOpen(false)}
+                                    >
+                                        <p className="hover:text-lightGreen dark:hover:text-emerald-500">
+                                            Login
+                                        </p>
+                                    </Link>
+                                </li>
+                            )}
+                            {isLoggedIn && (
+                                <li>
+                                    <button
+                                        onClick={() => {
+                                            handleLogout();
+                                            setIsOpen(false);
+                                        }}
+                                        className="hover:text-lightGreen dark:hover:text-emerald-500"
+                                    >
+                                        Logout
+                                    </button>
+                                </li>
+                            )}
                         </ul>
                     </div>
                 </Dialog>
