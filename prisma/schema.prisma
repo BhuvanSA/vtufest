@@ -45,6 +45,7 @@ model Events {
   registeredAccompanist     Int @default(0) 
   category                  String
   @@unique([userId,eventNo])
+
 }
 
 model Registrants {

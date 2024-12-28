@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { markVerified } from "../../prismaClient/queryFunction";
 
+import { markVerified } from "../../prismaClient/queryFunction";
 
 export async function POST(request : Request){
     

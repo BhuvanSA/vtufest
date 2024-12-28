@@ -5,6 +5,7 @@ import { RegistrantDetailUpdate } from "../api/updateregisterdetails/route";
 import { UpdateRole } from "../api/updateroleinevent/route";
 import type { AddEvent } from "../api/addeventregister/route";
 
+
 const prisma = new PrismaClient();
 interface Registrant {
     name: string;
@@ -75,7 +76,6 @@ export async function insertRegistrant(arg: Registrant, userEvents: any) {
                 }
             }
         }
-
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const eventList: any[] = [];
 
@@ -162,7 +162,6 @@ export async function insertRegistrant(arg: Registrant, userEvents: any) {
                     })
                 )
             );
-
             return { registrant, events, eventRegistrant };
         });
     } catch (err: unknown) {
@@ -256,6 +255,7 @@ export async function getRegistrantCount(id: string) {
     const count = await prisma.registrants.count({ where: { userId: id } });
     return count;
 }
+
 
 export async function getRegistrant(usn: string) {
     try {
@@ -990,5 +990,5 @@ export async function AddEvent(arg: AddEvent) {
             }
         }
     }
-
 }
+

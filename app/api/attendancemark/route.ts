@@ -15,15 +15,21 @@ export async function POST(request:Request){
         return NextResponse.json({success:false,error:"registrant not found"},{status:404});
     }
     
+
    
     const eventFilter = registrant.eventRegistrations.find(x => x.eventId === eventId);
     
+
+    const eventFilter = registrant.eventRegistrations.find(x => x.eventId === eventId);
+
     if(!eventFilter){
          return NextResponse.json({success:false,message:"no event found"},{status:404});
     }
 
     try{
+
     const res = await updateRegistrant(usn as string,eventFilter.id as string);
+
     return NextResponse.json({success:true, message:`marked attendence ${res}`},{status:200});
     }
     catch(error){
