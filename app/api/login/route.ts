@@ -52,7 +52,6 @@ export async function POST(request: Request) {
         const user = await prisma.users.findUnique({
             where: { email },
         });
-
         if (!user || !(await bcrypt.compare(password, user.password))) {
             return NextResponse.json(
                 {
@@ -62,7 +61,6 @@ export async function POST(request: Request) {
                 { status: 401 }
             );
         }
-
         const token = await new SignJWT({ id: user.id, email: user.email })
             .setProtectedHeader({ alg: "HS256" })
             .setIssuedAt()

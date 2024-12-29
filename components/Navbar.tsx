@@ -49,7 +49,7 @@ const NavBar = () => {
                                 key={index}
                                 href={href}
                                 text={text}
-                                isActive={pathname === href}
+                                isActive={pathname.startsWith(href)}
                             />
                         ))}
                         {isLoggedIn ? (
