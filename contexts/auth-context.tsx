@@ -1,5 +1,5 @@
 "use client";
-import React, { createContext, useState, useContext } from "react";
+import React, { createContext, useState, useContext, useEffect } from "react";
 
 type AuthContextProviderProps = {
     children: React.ReactNode;
@@ -8,6 +8,7 @@ type AuthContextProviderProps = {
 type AuthContext = {
     isLoggedIn: boolean;
     setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
+    checkAuth: () => Promise<void>;
 };
 
 export const AuthContext = createContext<AuthContext | null>(null);
@@ -16,9 +17,30 @@ export default function AuthContextProvider({
     children,
 }: AuthContextProviderProps) {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const checkAuth = async () => {
+        try {
+            const response = await fetch("/api/checkAuth");
+            setIsLoggedIn(response.ok);
+        } catch (error) {
+            console.error("Auth check failed:", error);
+            setIsLoggedIn(false);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        checkAuth();
+    }, []);
+
+    if (isLoading) {
+        return <p>Loading...</p>;
+    }
 
     return (
-        <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn }}>
+        <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn, checkAuth }}>
             {children}
         </AuthContext.Provider>
     );
