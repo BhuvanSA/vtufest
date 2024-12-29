@@ -57,7 +57,7 @@ export async function POST(request: Request) {
             return NextResponse.json(
                 {
                     success: false,
-                    message: "Invalid email or password"
+                    message: "Invalid email or password",
                 },
                 { status: 401 }
             );
@@ -68,7 +68,6 @@ export async function POST(request: Request) {
             .setIssuedAt()
             .setExpirationTime("1h")
             .sign(JWT_SECRET);
-
 
         const response = NextResponse.json({
             success: true,

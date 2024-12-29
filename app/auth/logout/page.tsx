@@ -1,22 +1,22 @@
 "use client";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useAuthContext } from "@/contexts/auth-context";
 
 export default function LogoutPage() {
     const router = useRouter();
+    const { setIsLoggedIn } = useAuthContext();
 
     useEffect(() => {
         (async () => {
             try {
                 await fetch("/api/logout", { method: "POST" });
             } finally {
-                // Could show animation, then redirect after a short delay
-                setTimeout(() => {
-                    router.replace("/auth/signin");
-                }, 1000);
+                router.replace("/auth/signin");
+                setIsLoggedIn(false);
             }
         })();
-    }, [router]);
+    }, [router, setIsLoggedIn]);
 
     return (
         <div className="flex items-center justify-center min-h-screen">
