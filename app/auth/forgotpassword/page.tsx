@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
@@ -151,165 +150,141 @@ export default function ResetPassword() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center p-4">
-            <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="w-full max-w-md"
-            >
-                <Card>
-                    <CardHeader className="space-y-1">
-                        <div className="flex items-center justify-center mb-6">
-                            <Image
-                                src="/images/college-logo.png"
-                                alt="College Logo"
-                                width={100}
-                                height={100}
-                                priority
-                                className="object-contain"
-                            />
-                        </div>
-                        <CardTitle className="text-2xl text-center font-bold">
-                            Reset Password
-                        </CardTitle>
-                        <CardDescription className="text-center">
-                            Enter your email to reset your password
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <Form {...form}>
-                            <form
-                                onSubmit={form.handleSubmit(onSubmit)}
-                                className="space-y-4"
-                            >
-                                <FormField
-                                    control={form.control}
-                                    name="email"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Email</FormLabel>
-                                            <FormControl>
-                                                <div className="relative">
-                                                    <Input
-                                                        placeholder="example@domain.com"
-                                                        {...field}
-                                                        disabled={isSendingOTP}
-                                                    />
-                                                    <Button
-                                                        type="button"
-                                                        onClick={sendOTP}
-                                                        disabled={
-                                                            isSendingOTP ||
-                                                            resendTimer > 0
-                                                        }
-                                                        className="absolute right-2 top-1/2 transform -translate-y-1/2"
-                                                    >
-                                                        {isSendingOTP
-                                                            ? "Sending..."
-                                                            : resendTimer > 0
-                                                            ? `Resend OTP (${resendTimer}s)`
-                                                            : "Send OTP"}
-                                                    </Button>
-                                                </div>
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="otp"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Enter OTP</FormLabel>
-                                            <FormControl>
-                                                <InputOTP
-                                                    maxLength={6}
-                                                    value={field.value}
-                                                    onChange={field.onChange}
-                                                >
-                                                    <InputOTPGroup>
-                                                        <InputOTPSlot
-                                                            index={0}
-                                                        />
-                                                        <InputOTPSlot
-                                                            index={1}
-                                                        />
-                                                        <InputOTPSlot
-                                                            index={2}
-                                                        />
-                                                        <InputOTPSlot
-                                                            index={3}
-                                                        />
-                                                        <InputOTPSlot
-                                                            index={4}
-                                                        />
-                                                        <InputOTPSlot
-                                                            index={5}
-                                                        />
-                                                    </InputOTPGroup>
-                                                </InputOTP>
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="newPassword"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>New Password</FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    type="password"
-                                                    placeholder="Enter your new password"
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="confirmPassword"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>
-                                                Confirm Password
-                                            </FormLabel>
-                                            <FormControl>
-                                                <Input
-                                                    type="password"
-                                                    placeholder="Confirm your new password"
-                                                    {...field}
-                                                />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <LoadingButton
-                                    type="submit"
-                                    loading={isLoading}
-                                >
-                                    Reset Password
-                                </LoadingButton>
-                            </form>
-                        </Form>
-                    </CardContent>
-                    <CardFooter className="flex flex-col space-y-4">
-                        <Button
-                            variant="outline"
-                            className="w-full"
-                            onClick={() => router.push("/auth/signin")}
+            <Card className="w-full max-w-md">
+                <CardHeader className="space-y-1">
+                    <div className="flex items-center justify-center mb-6">
+                        <Image
+                            src="/images/college-logo.png"
+                            alt="College Logo"
+                            width={100}
+                            height={100}
+                            priority
+                            className="object-contain"
+                        />
+                    </div>
+                    <CardTitle className="text-2xl text-center font-bold">
+                        Reset Password
+                    </CardTitle>
+                    <CardDescription className="text-center">
+                        Enter your email to reset your password
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Form {...form}>
+                        <form
+                            onSubmit={form.handleSubmit(onSubmit)}
+                            className="space-y-4"
                         >
-                            Back to Sign In
-                        </Button>
-                    </CardFooter>
-                </Card>
-            </motion.div>
+                            <FormField
+                                control={form.control}
+                                name="email"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Email</FormLabel>
+                                        <FormControl>
+                                            <div className="relative">
+                                                <Input
+                                                    placeholder="example@domain.com"
+                                                    {...field}
+                                                    disabled={isSendingOTP}
+                                                />
+                                                <Button
+                                                    type="button"
+                                                    onClick={sendOTP}
+                                                    disabled={
+                                                        isSendingOTP ||
+                                                        resendTimer > 0
+                                                    }
+                                                    className="absolute right-2 top-1/2 transform -translate-y-1/2"
+                                                >
+                                                    {isSendingOTP
+                                                        ? "Sending..."
+                                                        : resendTimer > 0
+                                                        ? `Resend OTP (${resendTimer}s)`
+                                                        : "Send OTP"}
+                                                </Button>
+                                            </div>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="otp"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Enter OTP</FormLabel>
+                                        <FormControl>
+                                            <InputOTP
+                                                maxLength={6}
+                                                value={field.value}
+                                                onChange={field.onChange}
+                                            >
+                                                <InputOTPGroup>
+                                                    <InputOTPSlot index={0} />
+                                                    <InputOTPSlot index={1} />
+                                                    <InputOTPSlot index={2} />
+                                                    <InputOTPSlot index={3} />
+                                                    <InputOTPSlot index={4} />
+                                                    <InputOTPSlot index={5} />
+                                                </InputOTPGroup>
+                                            </InputOTP>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="newPassword"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>New Password</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type="password"
+                                                placeholder="Enter your new password"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="confirmPassword"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Confirm Password</FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type="password"
+                                                placeholder="Confirm your new password"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <LoadingButton type="submit" loading={isLoading}>
+                                Reset Password
+                            </LoadingButton>
+                        </form>
+                    </Form>
+                </CardContent>
+                <CardFooter className="flex flex-col space-y-4">
+                    <Button
+                        variant="outline"
+                        className="w-full"
+                        onClick={() => router.push("/auth/signin")}
+                    >
+                        Back to Sign In
+                    </Button>
+                </CardFooter>
+            </Card>
         </div>
     );
 }
