@@ -4,7 +4,9 @@ import { EventCreate } from "../api/eventsregister/route";
 import { RegistrantDetailUpdate } from "../api/updateregisterdetails/route";
 import { UpdateRole } from "../api/updateroleinevent/route";
 import type { AddEvent } from "../api/addeventregister/route";
-
+import bcrypt from "bcrypt";
+import { SignJWT } from "jose";
+import { z } from "zod";
 
 const prisma = new PrismaClient();
 interface Registrant {
@@ -69,7 +71,9 @@ export async function insertRegistrant(arg: Registrant, userEvents: any) {
                     console.log("Unexpected error:", err);
                     if (err instanceof Error) {
                         console.log(err.message);
-                        throw new Error(err.message || "An unexpected error occurred");
+                        throw new Error(
+                            err.message || "An unexpected error occurred"
+                        );
                     } else {
                         throw new Error("An unexpected error occurred");
                     }
@@ -80,7 +84,7 @@ export async function insertRegistrant(arg: Registrant, userEvents: any) {
         const eventList: any[] = [];
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        arg.events.forEach((x: any) => {
+        arg?.events?.forEach((x: any) => {
             const selectedEvent = userEvents.find(
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 (y: any) => parseInt(y.eventNo) === parseInt(x.eventNo)
@@ -138,8 +142,12 @@ export async function insertRegistrant(arg: Registrant, userEvents: any) {
                             registrants: {
                                 connect: { id: registrant.id }, // Connect registrant by their ID
                             },
-                            registeredParticipant: parseInt(event.registeredParticipant),
-                            registeredAccompanist: parseInt(event.registeredAccompanist),
+                            registeredParticipant: parseInt(
+                                event.registeredParticipant
+                            ),
+                            registeredAccompanist: parseInt(
+                                event.registeredAccompanist
+                            ),
                         },
                     })
                 )
@@ -256,7 +264,6 @@ export async function getRegistrantCount(id: string) {
     return count;
 }
 
-
 export async function getRegistrant(usn: string) {
     try {
         const registrant = await prisma.registrants.findUnique({
@@ -277,7 +284,9 @@ export async function getRegistrant(usn: string) {
         } else if (err instanceof Error) {
             throw new Error(`Unexpected error occurred: ${err.message}`);
         } else {
-            throw new Error("An unknown error occurred while registering events.");
+            throw new Error(
+                "An unknown error occurred while registering events."
+            );
         }
     }
 }
@@ -298,7 +307,9 @@ export async function getRegistrantByPhone(id: string) {
         } else if (err instanceof Error) {
             throw new Error(`Unexpected error occurred: ${err.message}`);
         } else {
-            throw new Error("An unknown error occurred while registering events.");
+            throw new Error(
+                "An unknown error occurred while registering events."
+            );
         }
     }
 }
@@ -317,19 +328,17 @@ export async function updateRegistrant(usn: string, eventId: string) {
                 },
             });
 
-
             if (!registrant) {
                 return "Registrant not found";
             }
 
-
             // Fetch the current attendanceStatus
-            const existingRegistration = await prisma.eventRegistrations.findUnique({
-                where: {
-                    id: eventId,
-                },
-            });
-
+            const existingRegistration =
+                await prisma.eventRegistrations.findUnique({
+                    where: {
+                        id: eventId,
+                    },
+                });
 
             if (!existingRegistration) {
                 return "Event registration not found";
@@ -355,7 +364,9 @@ export async function updateRegistrant(usn: string, eventId: string) {
         } else if (err instanceof Error) {
             throw new Error(`Unexpected error occurred: ${err.message}`);
         } else {
-            throw new Error("An unknown error occurred while registering events.");
+            throw new Error(
+                "An unknown error occurred while registering events."
+            );
         }
     }
 
@@ -381,7 +392,9 @@ export async function markVerified(usn: string) {
         } else if (err instanceof Error) {
             throw new Error(`Unexpected error occurred: ${err.message}`);
         } else {
-            throw new Error("An unknown error occurred while registering events.");
+            throw new Error(
+                "An unknown error occurred while registering events."
+            );
         }
     }
 }
@@ -411,7 +424,9 @@ export async function registerUserEvents(
         } else if (err instanceof Error) {
             throw new Error(`Unexpected error occurred: ${err.message}`);
         } else {
-            throw new Error("An unknown error occurred while registering events.");
+            throw new Error(
+                "An unknown error occurred while registering events."
+            );
         }
     }
 }
@@ -432,10 +447,11 @@ export async function getAllEventsByUser(userId: string) {
         } else if (err instanceof Error) {
             throw new Error(`Unexpected error occurred: ${err.message}`);
         } else {
-            throw new Error("An unknown error occurred while registering events.");
+            throw new Error(
+                "An unknown error occurred while registering events."
+            );
         }
     }
-
 }
 
 export async function deleteRegistrant(registrantId: string) {
@@ -680,8 +696,8 @@ export async function updateEventRole(data: UpdateRole) {
                             registeredParticipant:
                                 updateRole.event.registeredParticipant > 0
                                     ? {
-                                        decrement: 1,
-                                    }
+                                          decrement: 1,
+                                      }
                                     : 0,
                         },
                     });
@@ -735,8 +751,8 @@ export async function updateEventRole(data: UpdateRole) {
                             registeredAccompanist:
                                 updateRole.event.registeredAccompanist > 0
                                     ? {
-                                        decrement: 1,
-                                    }
+                                          decrement: 1,
+                                      }
                                     : 0,
                         },
                     });
@@ -883,10 +899,10 @@ export async function deleteEventOfRegistrant(eventId: string) {
                 },
                 data: {
                     registrants: {
-                        disconnect: { id: deleteQuery.registrantId }
-                    }
-                }
-            })
+                        disconnect: { id: deleteQuery.registrantId },
+                    },
+                },
+            });
         });
     } catch (err: unknown) {
         if (err instanceof Prisma.PrismaClientKnownRequestError) {
@@ -992,3 +1008,43 @@ export async function AddEvent(arg: AddEvent) {
     }
 }
 
+const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET as string);
+
+const loginSchema = z.object({
+    email: z
+        .string()
+        .email("Please enter a valid email address")
+        .min(1, "Email is required"),
+    password: z
+        .string()
+        .min(8, "Password must be at least 8 characters")
+        .max(100, "Password must be less than 12 characters"),
+});
+
+export async function loginUser(email: string, password: string) {
+    try {
+        const result = loginSchema.safeParse({ email, password });
+
+        if (!result.success) {
+            throw new Error("Invalid email or password");
+        }
+
+        const user = await prisma.users.findUnique({
+            where: { email },
+        });
+
+        if (!user || !(await bcrypt.compare(password, user.password))) {
+            throw new Error("Invalid email or password");
+        }
+
+        const token = await new SignJWT({ id: user.id, email: user.email })
+            .setProtectedHeader({ alg: "HS256" })
+            .setIssuedAt()
+            .setExpirationTime("1h")
+            .sign(JWT_SECRET);
+
+        return { success: true, token };
+    } catch (error) {
+        throw new Error("Login failed");
+    }
+}
