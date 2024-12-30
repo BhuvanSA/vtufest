@@ -808,7 +808,12 @@ export async function updateFile(
             console.log("???????????", FileUpload[0].data);
 
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const FileTobeDeletedURL: string = registrant[field] as string;
+            if (!registrant) {
+                throw new Error("Registrant not found");
+            }
+            const FileTobeDeletedURL: string = (registrant as any)[
+                field
+            ] as string;
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const updatedRegistrant = await prisma.registrants.update({
                 where: {
@@ -1045,6 +1050,7 @@ export async function loginUser(email: string, password: string) {
 
         return { success: true, token };
     } catch (error) {
+        console.error(error);
         throw new Error("Login failed");
     }
 }

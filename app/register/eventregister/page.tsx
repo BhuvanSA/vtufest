@@ -24,7 +24,7 @@ export default function EventRegister() {
             },
             body: JSON.stringify({ eventId: id }),
         });
-        const data = await response.json();
+        // const data = await response.json();
         setRegisteredEvents((prev) => prev.filter((event) => event.id !== id));
     };
 
@@ -78,7 +78,7 @@ export default function EventRegister() {
                         maxAccompanist: event.maxAccompanist,
                     })),
             });
-            let config = {
+            const config = {
                 method: "post",
                 maxBodyLength: Infinity,
                 url: "http://localhost:3000/api/eventsregister",

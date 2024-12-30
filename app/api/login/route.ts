@@ -22,6 +22,7 @@ export async function POST(request: Request) {
         response.cookies.set(COOKIE_NAME, token, COOKIE_OPTIONS);
         return response;
     } catch (error) {
+        console.error(error);
         return NextResponse.json(
             {
                 success: false,

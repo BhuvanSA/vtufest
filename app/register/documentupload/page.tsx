@@ -1,13 +1,8 @@
 "use client";
 
-import { Toast, ToastProvider } from "@radix-ui/react-toast";
+import { ToastProvider } from "@radix-ui/react-toast";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-
-enum type {
-    PARTICIPANT = "PARTICIPANT",
-    ACCOMPANIST = "ACCOMPANIST",
-}
 
 interface FormData {
     name: string;
@@ -41,7 +36,9 @@ const Register = () => {
     });
 
     const [eventCategories, setEventCategories] = useState([]);
-    const [selectedEvents, setSelectedEvents] = useState([]);
+    const [selectedEvents, setSelectedEvents] = useState<
+        { eventNo: number; eventName: string; type: string }[]
+    >([]);
     const [responseToast, SetresponseToast] = useState("");
 
     const router = useRouter();
@@ -56,7 +53,12 @@ const Register = () => {
             if (!formData.teamManager) {
                 console.log("filtering");
                 userEvents = userEvents.filter(
-                    (x) =>
+                    (x: {
+                        registeredParticipant: number;
+                        maxParticipant: number;
+                        registeredAccompanist: number;
+                        maxAccompanist: number;
+                    }) =>
                         x.registeredParticipant < x.maxParticipant ||
                         x.registeredAccompanist < x.maxAccompanist
                 );
@@ -68,7 +70,7 @@ const Register = () => {
         getEvents();
     }, [formData.teamManager]);
 
-    const [errors, setErrors] = useState<null | object>({});
+    const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
     const validate = () => {
         const newErrors: { [key: string]: string } = {};
@@ -227,14 +229,20 @@ const Register = () => {
         }
     };
 
-    const groupEventsByCategory = (events) => {
-        return events.reduce((acc, event) => {
-            if (!acc[event.category]) {
-                acc[event.category] = [];
-            }
-            acc[event.category].push(event);
-            return acc;
-        }, {});
+    const groupEventsByCategory = (events: any[]) => {
+        return events.reduce(
+            (
+                acc: { [x: string]: any[] },
+                event: { category: string | number }
+            ) => {
+                if (!acc[event.category]) {
+                    acc[event.category] = [];
+                }
+                acc[event.category].push(event);
+                return acc;
+            },
+            {}
+        );
     };
 
     const groupedEvents = groupEventsByCategory(eventCategories);
@@ -323,14 +331,14 @@ const Register = () => {
                                     onChange={handleChange}
                                     required
                                     className={`w-full px-4 py-2 border ${
-                                        errors.phone
+                                        errors?.phone
                                             ? "border-red-500"
                                             : "border-[#333333]"
                                     } rounded-lg text-sm bg-white-600 text-black focus:outline-none focus:border-yellow-500`}
                                 />
-                                {errors.phone && (
+                                {errors?.phone && (
                                     <p className="text-red-500 text-xs mt-1">
-                                        {errors.phone}
+                                        {errors?.phone}
                                     </p>
                                 )}
                             </div>
@@ -396,7 +404,17 @@ const Register = () => {
                                                 </h2>
                                                 <div className="grid grid-cols-2 gap-4">
                                                     {events.map(
-                                                        (event, index) => (
+                                                        (
+                                                            event: {
+                                                                eventNo: number;
+                                                                eventName: string;
+                                                                registeredParticipant: number;
+                                                                maxParticipant: number;
+                                                                registeredAccompanist: number;
+                                                                maxAccompanist: number;
+                                                            },
+                                                            index: number
+                                                        ) => (
                                                             <fieldset
                                                                 key={index}
                                                                 className="mb-4 border-2 border-black p-2 rounded-lg hover:scale-105 transform transition-all"

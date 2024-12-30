@@ -6,8 +6,6 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
-
-
 const fileSchema = z
     .instanceof(File)
     .refine((file) => file.size <= 150 * 1024, {
@@ -21,35 +19,42 @@ const fileSchema = z
         }
     );
 
-const eventSchema = z.object({
-    eventName: z.string().min(1, { message: "Event name cannot be empty" }),
-    eventNo: z.number(),
-    type: z.enum(["PARTICIPANT", "ACCOMPANIST"]),
-}).strict();
+const eventSchema = z
+    .object({
+        eventName: z.string().min(1, { message: "Event name cannot be empty" }),
+        eventNo: z.number(),
+        type: z.enum(["PARTICIPANT", "ACCOMPANIST"]),
+    })
+    .strict();
 
-const registrantSchema = z.object({
-    name: z.string().min(1, { message: "Name cannot be empty" }),
-    usn: z.string().min(1, { message: "Usn cannot be empty" }),
-    phone: z.string().min(10, "Invalid phone Number must be of 10 digits")
-        .refine((value) => /^\d+$/.test(value), {
-            message: "Phone number must contain only digits",
-        })
-    ,
-    teamManager: z.boolean(),
-    events: z.array(eventSchema),
-    photo: fileSchema,
-    aadhar: fileSchema,
-    sslc: fileSchema,
-    puc: fileSchema,
-    admission1: fileSchema,
-    admission2: fileSchema,
-    idcard: fileSchema,
-}).strict();
+const registrantSchema = z
+    .object({
+        name: z.string().min(1, { message: "Name cannot be empty" }),
+        usn: z.string().min(1, { message: "Usn cannot be empty" }),
+        phone: z
+            .string()
+            .min(10, "Invalid phone Number must be of 10 digits")
+            .refine((value) => /^\d+$/.test(value), {
+                message: "Phone number must contain only digits",
+            }),
+        teamManager: z.boolean(),
+        events: z.array(eventSchema),
+        photo: fileSchema,
+        aadhar: fileSchema,
+        sslc: fileSchema,
+        puc: fileSchema,
+        admission1: fileSchema,
+        admission2: fileSchema,
+        idcard: fileSchema,
+    })
+    .strict();
 
 const TeamMangerRegistrantSchema = z.object({
     name: z.string().min(1, { message: "Name cannot be empty" }),
     usn: z.string().min(1, { message: "Usn/Id Number cannot be empty" }),
-    phone: z.string().min(10, "Invalid phone Number must be of 10 digits")
+    phone: z
+        .string()
+        .min(10, "Invalid phone Number must be of 10 digits")
         .refine((value) => /^\d+$/.test(value), {
             message: "Phone number must contain only digits",
         }),
@@ -120,10 +125,17 @@ export async function POST(request: Request) {
         );
     }
 
-    if (user.registrants.some((reg) => reg.usn === registrant.usn || reg.phone === registrant.phone)) {
-        return NextResponse.json({ success: false, message: "Registrant already exists" }, { status: 400 });
+    if (
+        user.registrants.some(
+            (reg) =>
+                reg.usn === registrant.usn || reg.phone === registrant.phone
+        )
+    ) {
+        return NextResponse.json(
+            { success: false, message: "Registrant already exists" },
+            { status: 400 }
+        );
     }
-
 
     let result = null;
 
@@ -131,7 +143,9 @@ export async function POST(request: Request) {
         result = TeamMangerRegistrantSchema.safeParse(registrant);
         console.log(result);
         if (!result.success) {
-            const errorMessages = result.error.errors.map((err) => err.message).join(", ");
+            const errorMessages = result.error.errors
+                .map((err) => err.message)
+                .join(", ");
             return NextResponse.json(
                 { success: false, message: errorMessages },
                 { status: 400 }
@@ -160,12 +174,13 @@ export async function POST(request: Request) {
                 { success: true, message: "Registered Successful" },
                 { status: 200 }
             );
-        } catch (err) {
-            return NextResponse.json({ success: false, message: err.message }, { status: 400 });
+        } catch (err: any) {
+            return NextResponse.json(
+                { success: false, message: err.message },
+                { status: 400 }
+            );
         }
-    }
-    else {
-
+    } else {
         result = registrantSchema.safeParse(registrant);
         console.log(result.error?.message);
         if (!result.success) {
@@ -176,9 +191,13 @@ export async function POST(request: Request) {
         }
 
         if (result.data.events.length == 0) {
-            return NextResponse.json({
-                success: false, message: "Atleast one event must registered"
-            }, { status: 400 })
+            return NextResponse.json(
+                {
+                    success: false,
+                    message: "Atleast one event must registered",
+                },
+                { status: 400 }
+            );
         }
 
         const files: File[] = [
@@ -215,10 +234,11 @@ export async function POST(request: Request) {
                 { success: true, message: "registered successful" },
                 { status: 200 }
             );
-        } catch (error) {
-            return NextResponse.json({ success: false, message: error.message }, { status: 400 });
+        } catch (error: any) {
+            return NextResponse.json(
+                { success: false, message: error.message },
+                { status: 400 }
+            );
         }
     }
-
 }
-
