@@ -8,17 +8,15 @@ import {
     AccordionTrigger,
 } from "@/components/ui/accordion";
 import { eventCategories } from "@/data/eventCategories";
+import { useRouter } from "next/navigation";
 
 export default function EventRegister() {
+    const router = useRouter();
     const [selectedEvents, setSelectedEvents] = useState<number[]>([]);
     const [responseBody, setResponseBody] = useState<object | null>(null);
     const [registeredEvents, setRegisteredEvents] = useState<any[]>([]);
 
     const handleDelete = async (id: number) => {
-        const confirmDelete = window.confirm(
-            "Are you sure you want to delete this event?"
-        );
-        if (!confirmDelete) return; // Exit if the user cancels
         const response = await fetch("/api/deleteeventregister", {
             method: "DELETE",
             headers: {
@@ -28,7 +26,6 @@ export default function EventRegister() {
         });
         const data = await response.json();
         setRegisteredEvents((prev) => prev.filter((event) => event.id !== id));
-        alert(data.message);
     };
 
     useEffect(() => {
@@ -48,7 +45,7 @@ export default function EventRegister() {
     }, [selectedEvents]);
     const availableEvents = eventCategories.filter(
         (event) =>
-            !registeredEvents.some(
+            !registeredEvents?.some(
                 (regEvent) => regEvent.eventNo === event.eventNo
             )
     );
@@ -91,7 +88,8 @@ export default function EventRegister() {
             const response = await axios.request(config);
             if (response.status === 200 || response.status === 201) {
                 console.log("Response successfully sent:", response.data);
-                alert("Response sent successfully!");
+                // alert("Response sent successfully!");
+                router.push("/register/getallregister");
                 setSelectedEvents([]);
             } else {
                 console.error("Unexpected response status:", response.status);
@@ -193,14 +191,14 @@ export default function EventRegister() {
                         <h2 className="text-lg sm:text-xl  font-semibold ">
                             Already Registered Events
                         </h2>
-                        {registeredEvents.length > 0 && (
+                        {registeredEvents?.length > 0 && (
                             <span className="bg-blue-100 text-blue-700 rounded-full w-6 h-6 flex items-center justify-center text-sm">
                                 {registeredEvents.length}
                             </span>
                         )}
                     </div>
                     <ul className=" flex flex-col gap-2 ">
-                        {registeredEvents.length > 0 ? (
+                        {registeredEvents?.length > 0 ? (
                             registeredEvents.map((event, index) => (
                                 <li
                                     key={event.eventNo}

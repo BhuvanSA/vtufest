@@ -25,7 +25,7 @@ const StudentTable = () => {
             const resData = data.registrant;
             console.log(resData);
 
-            const ListData = resData.map((registrant, index) => ({
+            const ListData = resData?.map((registrant, index) => ({
                 slno: index + 1,
                 name: registrant.name,
                 usn: registrant.usn,
@@ -40,7 +40,7 @@ const StudentTable = () => {
     }, []);
 
     const handleUpdate = async (id) => {
-        router.push(`/updateregister/${id}`);
+        router.push(`/register/updateregister/${id}`);
     };
     const handleRemove = async (id) => {
         const updatedRows = rows.filter((row) => row.id !== id);
@@ -73,10 +73,12 @@ const StudentTable = () => {
                             <Button
                                 label={"ADD Events"}
                                 className=""
-                                onClick={() => router.push("/eventregister")}
+                                onClick={() =>
+                                    router.push("/register/eventregister")
+                                }
                             />
                             <span className="bg-primary-100 text-primary-950 text-sm rounded-full px-4 py-2 font-medium">
-                                {rows.length}/45
+                                {rows?.length}/45
                             </span>
                         </div>
                     </div>
@@ -106,7 +108,7 @@ const StudentTable = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {rows.map((student, index) => {
+                                    {rows?.map((student, index) => {
                                         const colors = [
                                             "text-neutral-900",
                                             "text-neutral-800",
@@ -180,10 +182,10 @@ const StudentTable = () => {
                         <Button
                             label="Add"
                             onClick={() =>
-                                router.push("/register/eventregister")
+                                router.push("/register/documentupload")
                             }
                             className="bg-yellow-600 hover:bg-yellow-600 hover:scale-105"
-                            disabled={rows.length > 45}
+                            disabled={rows?.length > 45}
                         />
                         <Button
                             label="Submit"
