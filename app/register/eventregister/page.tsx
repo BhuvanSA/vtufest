@@ -21,12 +21,21 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { eventCategories } from "@/data/eventCategories";
+import { LoadingButton } from "@/components/LoadingButton";
+type RegisteredEvent = {
+    id: number;
+    eventNo: number;
+    eventName: string;
+};
 
 export default function EventRegister() {
     const router = useRouter();
     const [selectedEvents, setSelectedEvents] = useState<number[]>([]);
-    const [responseBody, setResponseBody] = useState<object | null>(null);
-    const [registeredEvents, setRegisteredEvents] = useState<any[]>([]);
+    // const [responseBody, setResponseBody] = useState<object | null>(null);
+
+    const [registeredEvents, setRegisteredEvents] = useState<RegisteredEvent[]>(
+        []
+    );
     const [isLoading, setIsLoading] = useState(false);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [eventToDelete, setEventToDelete] = useState<{
@@ -124,7 +133,7 @@ export default function EventRegister() {
                         maxAccompanist: event.maxAccompanist,
                     })),
             });
-            let config = {
+            const config = {
                 method: "post",
                 maxBodyLength: Infinity,
                 url: "/api/eventsregister",
@@ -358,58 +367,16 @@ export default function EventRegister() {
                                         </p>
                                     )}
                                 </ul>
-                                <button
+                                <LoadingButton
+                                    className=""
+                                    disabled={selectedEvents.length === 0}
+                                    loading={isLoading}
                                     onClick={generateResponse}
-                                    disabled={
-                                        selectedEvents.length === 0 || isLoading
-                                    }
-                                    className={`w-full px-6 py-3 text-white font-medium rounded-md shadow-sm transition-all duration-200 ${
-                                        selectedEvents.length === 0 || isLoading
-                                            ? "bg-indigo-300 cursor-not-allowed"
-                                            : "bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                    }`}
                                 >
-                                    {isLoading ? (
-                                        <div className="flex items-center justify-center">
-                                            <svg
-                                                className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                fill="none"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <circle
-                                                    className="opacity-25"
-                                                    cx="12"
-                                                    cy="12"
-                                                    r="10"
-                                                    stroke="currentColor"
-                                                    strokeWidth="4"
-                                                ></circle>
-                                                <path
-                                                    className="opacity-75"
-                                                    fill="currentColor"
-                                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                                ></path>
-                                            </svg>
-                                            Submitting...
-                                        </div>
-                                    ) : (
-                                        "Submit"
-                                    )}
-                                </button>
+                                    Submit
+                                </LoadingButton>
                             </div>
                         </div>
-
-                        {responseBody && (
-                            <div className="mt-4 p-4 bg-white border border-indigo-200 rounded-lg shadow-md">
-                                <h3 className="text-lg font-semibold text-indigo-800 mb-2">
-                                    Response:
-                                </h3>
-                                <pre className="text-sm text-gray-700 overflow-x-auto bg-indigo-50 p-2 rounded">
-                                    {JSON.stringify(responseBody, null, 2)}
-                                </pre>
-                            </div>
-                        )}
                     </div>
                 </div>
             </div>
@@ -419,8 +386,8 @@ export default function EventRegister() {
                     <DialogHeader>
                         <DialogTitle>Confirm Deletion</DialogTitle>
                         <DialogDescription>
-                            Are you sure you want to delete the event "
-                            {eventToDelete?.name}"?
+                            Are you sure you want to delete the event `
+                            {eventToDelete?.name}`?
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>

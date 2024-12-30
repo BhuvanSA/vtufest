@@ -103,7 +103,7 @@ export default function ResetPassword() {
                         "Failed to send OTP. Please try again."
                 );
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             form.setError("email", {
                 message: "Failed to send OTP. Please try again.",
             });
@@ -141,16 +141,16 @@ export default function ResetPassword() {
                     );
                 }
             }
-        } catch (error: any) {
-            toast.error("An error occurred during password reset.", error);
+        } catch {
+            toast.error("An error occurred during password reset.");
         } finally {
             setIsLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center p-4">
-            <Card className="w-full max-w-md">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-secondary p-4">
+            <Card className="w-full max-w-md bg-card text-card-foreground">
                 <CardHeader className="space-y-1">
                     <div className="flex items-center justify-center mb-6">
                         <Image
@@ -162,10 +162,10 @@ export default function ResetPassword() {
                             className="object-contain"
                         />
                     </div>
-                    <CardTitle className="text-2xl text-center font-bold">
+                    <CardTitle className="text-2xl text-center font-bold text-foreground">
                         Reset Password
                     </CardTitle>
-                    <CardDescription className="text-center">
+                    <CardDescription className="text-center text-muted-foreground">
                         Enter your email to reset your password
                     </CardDescription>
                 </CardHeader>
@@ -180,10 +180,13 @@ export default function ResetPassword() {
                                 name="email"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Email</FormLabel>
+                                        <FormLabel className="text-foreground">
+                                            Email
+                                        </FormLabel>
                                         <FormControl>
                                             <div className="relative">
                                                 <Input
+                                                    className="bg-background border-input pr-24"
                                                     placeholder="example@domain.com"
                                                     {...field}
                                                     disabled={isSendingOTP}
@@ -195,31 +198,35 @@ export default function ResetPassword() {
                                                         isSendingOTP ||
                                                         resendTimer > 0
                                                     }
-                                                    className="absolute right-2 top-1/2 transform -translate-y-1/2"
+                                                    className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-primary text-primary-foreground hover:bg-primary/90"
                                                 >
                                                     {isSendingOTP
                                                         ? "Sending..."
                                                         : resendTimer > 0
-                                                        ? `Resend OTP (${resendTimer}s)`
+                                                        ? `Resend (${resendTimer}s)`
                                                         : "Send OTP"}
                                                 </Button>
                                             </div>
                                         </FormControl>
-                                        <FormMessage />
+                                        <FormMessage className="text-destructive" />
                                     </FormItem>
                                 )}
                             />
+
                             <FormField
                                 control={form.control}
                                 name="otp"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Enter OTP</FormLabel>
+                                        <FormLabel className="text-foreground">
+                                            Enter OTP
+                                        </FormLabel>
                                         <FormControl>
                                             <InputOTP
                                                 maxLength={6}
                                                 value={field.value}
                                                 onChange={field.onChange}
+                                                className="bg-background"
                                             >
                                                 <InputOTPGroup>
                                                     <InputOTPSlot index={0} />
@@ -231,45 +238,58 @@ export default function ResetPassword() {
                                                 </InputOTPGroup>
                                             </InputOTP>
                                         </FormControl>
-                                        <FormMessage />
+                                        <FormMessage className="text-destructive" />
                                     </FormItem>
                                 )}
                             />
+
                             <FormField
                                 control={form.control}
                                 name="newPassword"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>New Password</FormLabel>
+                                        <FormLabel className="text-foreground">
+                                            New Password
+                                        </FormLabel>
                                         <FormControl>
                                             <Input
                                                 type="password"
+                                                className="bg-background border-input"
                                                 placeholder="Enter your new password"
                                                 {...field}
                                             />
                                         </FormControl>
-                                        <FormMessage />
+                                        <FormMessage className="text-destructive" />
                                     </FormItem>
                                 )}
                             />
+
                             <FormField
                                 control={form.control}
                                 name="confirmPassword"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Confirm Password</FormLabel>
+                                        <FormLabel className="text-foreground">
+                                            Confirm Password
+                                        </FormLabel>
                                         <FormControl>
                                             <Input
                                                 type="password"
+                                                className="bg-background border-input"
                                                 placeholder="Confirm your new password"
                                                 {...field}
                                             />
                                         </FormControl>
-                                        <FormMessage />
+                                        <FormMessage className="text-destructive" />
                                     </FormItem>
                                 )}
                             />
-                            <LoadingButton type="submit" loading={isLoading}>
+
+                            <LoadingButton
+                                type="submit"
+                                loading={isLoading}
+                                className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+                            >
                                 Reset Password
                             </LoadingButton>
                         </form>
@@ -278,7 +298,7 @@ export default function ResetPassword() {
                 <CardFooter className="flex flex-col space-y-4">
                     <Button
                         variant="outline"
-                        className="w-full"
+                        className="w-full border-border hover:bg-secondary"
                         onClick={() => router.push("/auth/signin")}
                     >
                         Back to Sign In

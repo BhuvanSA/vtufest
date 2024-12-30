@@ -100,7 +100,7 @@ export default function SignUp() {
                         "Failed to send OTP. Please try again."
                 );
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Failed to send OTP:", error);
             form.setError("email", {
                 message: "Failed to send OTP. Please try again.",
@@ -139,7 +139,7 @@ export default function SignUp() {
                     );
                 }
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Signup failed:", error);
             toast.error("An error occurred during signup.");
         } finally {
@@ -148,8 +148,8 @@ export default function SignUp() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center p-4">
-            <Card className="w-full max-w-md">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-secondary p-4">
+            <Card className="w-full max-w-md bg-card text-card-foreground">
                 <CardHeader className="space-y-1">
                     <div className="flex items-center justify-center mb-6">
                         <Image
@@ -161,10 +161,10 @@ export default function SignUp() {
                             className="object-contain"
                         />
                     </div>
-                    <CardTitle className="text-2xl text-center font-bold">
+                    <CardTitle className="text-2xl text-center font-bold text-foreground">
                         Sign Up
                     </CardTitle>
-                    <CardDescription className="text-center">
+                    <CardDescription className="text-center text-muted-foreground">
                         Enter your details to create an account
                     </CardDescription>
                 </CardHeader>
@@ -179,14 +179,17 @@ export default function SignUp() {
                                 name="college"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>College Name</FormLabel>
+                                        <FormLabel className="text-foreground">
+                                            College Name
+                                        </FormLabel>
                                         <FormControl>
                                             <Input
+                                                className="bg-background border-input"
                                                 placeholder="Enter your college name"
                                                 {...field}
                                             />
                                         </FormControl>
-                                        <FormMessage />
+                                        <FormMessage className="text-destructive" />
                                     </FormItem>
                                 )}
                             />
@@ -195,14 +198,17 @@ export default function SignUp() {
                                 name="phone"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Phone Number</FormLabel>
+                                        <FormLabel className="text-foreground">
+                                            Phone Number
+                                        </FormLabel>
                                         <FormControl>
                                             <Input
+                                                className="bg-background border-input"
                                                 placeholder="Enter your phone number"
                                                 {...field}
                                             />
                                         </FormControl>
-                                        <FormMessage />
+                                        <FormMessage className="text-destructive" />
                                     </FormItem>
                                 )}
                             />
@@ -211,10 +217,13 @@ export default function SignUp() {
                                 name="email"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Email</FormLabel>
+                                        <FormLabel className="text-foreground">
+                                            Email
+                                        </FormLabel>
                                         <FormControl>
                                             <div className="relative">
                                                 <Input
+                                                    className="bg-background border-input"
                                                     placeholder="example@domain.com"
                                                     {...field}
                                                     disabled={isSendingOTP}
@@ -226,7 +235,7 @@ export default function SignUp() {
                                                         isSendingOTP ||
                                                         resendTimer > 0
                                                     }
-                                                    className="absolute right-2 top-1/2 transform -translate-y-1/2"
+                                                    className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-primary text-primary-foreground hover:bg-primary/90"
                                                 >
                                                     {isSendingOTP
                                                         ? "Sending..."
@@ -236,7 +245,7 @@ export default function SignUp() {
                                                 </Button>
                                             </div>
                                         </FormControl>
-                                        <FormMessage />
+                                        <FormMessage className="text-destructive" />
                                     </FormItem>
                                 )}
                             />
@@ -245,12 +254,15 @@ export default function SignUp() {
                                 name="otp"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Enter OTP</FormLabel>
+                                        <FormLabel className="text-foreground">
+                                            Enter OTP
+                                        </FormLabel>
                                         <FormControl>
                                             <InputOTP
                                                 maxLength={6}
                                                 value={field.value}
                                                 onChange={field.onChange}
+                                                className="bg-background"
                                             >
                                                 <InputOTPGroup>
                                                     <InputOTPSlot index={0} />
@@ -262,12 +274,16 @@ export default function SignUp() {
                                                 </InputOTPGroup>
                                             </InputOTP>
                                         </FormControl>
-                                        <FormMessage />
+                                        <FormMessage className="text-destructive" />
                                     </FormItem>
                                 )}
                             />
 
-                            <LoadingButton type="submit" loading={isLoading}>
+                            <LoadingButton
+                                type="submit"
+                                loading={isLoading}
+                                className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+                            >
                                 Sign Up
                             </LoadingButton>
                         </form>
@@ -276,17 +292,17 @@ export default function SignUp() {
                 <CardFooter className="flex flex-col space-y-4">
                     <div className="relative w-full">
                         <div className="absolute inset-0 flex items-center">
-                            <span className="w-full border-t" />
+                            <span className="w-full border-t border-border" />
                         </div>
                         <div className="relative flex justify-center text-xs uppercase">
-                            <span className="bg-white px-2 text-muted-foreground">
+                            <span className="bg-card px-2 text-muted-foreground">
                                 Already Registered?
                             </span>
                         </div>
                     </div>
                     <Button
                         variant="outline"
-                        className="w-full"
+                        className="w-full border-border hover:bg-secondary"
                         onClick={() => router.push("/auth/signin")}
                     >
                         Sign In

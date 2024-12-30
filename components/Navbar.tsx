@@ -3,12 +3,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import MobileMenu from "./MobileMenu";
 import NavItem from "./NavItem";
-import {
-    Dialog,
-    // DialogContent,
-    // DialogHeader,
-    DialogOverlay,
-} from "./ui/dialog";
+import { Dialog, DialogOverlay } from "./ui/dialog";
+import { useAuthContext } from "@/contexts/auth-context";
+import Image from "next/image";
+import { ThemeToggler } from "@/contexts/theme-provider";
 
 export const navItems = [
     { href: "/", text: "Home" },
@@ -17,7 +15,6 @@ export const navItems = [
     { href: "/schedule", text: "Schedule" },
     { href: "/register", text: "Register" },
 ];
-import { useAuthContext } from "@/contexts/auth-context";
 
 const NavBar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -33,11 +30,19 @@ const NavBar = () => {
     }, [pathname]);
 
     return (
-        <header className="fixed top-0 left-0 right-0 w-full bg-slate-900/75 backdrop-blur-sm shadow-lg z-50 text-white">
+        <header className="fixed top-0 left-0 right-0 w-full bg-background/80 backdrop-blur-sm border-b border-border shadow-sm z-50">
             <div className="flex items-center justify-between max-w-6xl lg:max-w-[72rem] xl:max-w-6xl px-4 py-6 mx-auto sm:px-6">
                 <div className="flex items-center">
-                    <Link href="/" passHref>
-                        <span className="opacity-3000 hover:text-lightGreen dark:hover:text-white mr-8">
+                    <Link href="/" passHref className="flex items-center gap-3">
+                        <Image
+                            src="/images/college-logo.png"
+                            alt="College Logo"
+                            width={40}
+                            height={40}
+                            priority
+                            className=""
+                        />
+                        <span className="text-foreground hover:text-primary transition-colors">
                             Global Academy of Technology
                         </span>
                     </Link>
@@ -71,22 +76,19 @@ const NavBar = () => {
                         )}
                     </nav>
                 </div>
+                <ThemeToggler />
                 <div className="-my-2 -mr-2 lg:hidden" onClick={handleClick}>
                     <MobileMenu />
                 </div>
             </div>
 
             {isOpen && (
-                <Dialog
-                    open={isOpen}
-                    // onClose={() => setIsOpen(false)}
-                    // className="fixed inset-0 z-50 lg:hidden"
-                >
-                    <DialogOverlay className="fixed inset-0 bg-black/20 backdrop-blur-sm dark:bg-gray-900/80" />
-                    <div className="fixed w-full max-w-xs p-6 text-base font-semibold text-gray-900 bg-white rounded-lg shadow-lg right-4 dark:bg-gray-800 dark:text-gray-400 dark:highlight-white/5">
+                <Dialog open={isOpen}>
+                    <DialogOverlay className="fixed inset-0 bg-background/80 backdrop-blur-sm" />
+                    <div className="fixed w-full max-w-xs p-6 text-base font-semibold bg-card text-card-foreground rounded-lg shadow-lg right-4">
                         <button
                             onClick={() => setIsOpen(false)}
-                            className="absolute flex items-center justify-center w-8 h-8 text-gray-500 top-5 right-5 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300"
+                            className="absolute flex items-center justify-center w-8 h-8 text-muted-foreground hover:text-foreground transition-colors top-5 right-5"
                         >
                             <span className="sr-only">Close navigation</span>
                             <svg
@@ -110,7 +112,7 @@ const NavBar = () => {
                                         href={href}
                                         onClick={() => setIsOpen(false)}
                                     >
-                                        <p className="hover:text-lightGreen dark:hover:text-emerald-500">
+                                        <p className="text-foreground hover:text-primary transition-colors">
                                             {text}
                                         </p>
                                     </Link>
