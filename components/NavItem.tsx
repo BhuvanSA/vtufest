@@ -20,7 +20,7 @@ const NavItem: React.FC<NavItemProps> = ({ href, text, isActive }) => {
         >
             <span
                 className={`${
-                    isActive ? "py-1 border-b-2 border-accent" : "capsize"
+                    isActive ? "py-1 border-b-2 border-primary" : "capsize"
                 }`}
             >
                 {text}
