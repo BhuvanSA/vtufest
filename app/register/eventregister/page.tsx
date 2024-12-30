@@ -4,6 +4,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Toaster, toast } from "react-hot-toast";
+import { useRouter } from "next/navigation";
 import {
     Accordion,
     AccordionContent,
@@ -22,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { eventCategories } from "@/data/eventCategories";
 
 export default function EventRegister() {
+    const router = useRouter();
     const [selectedEvents, setSelectedEvents] = useState<number[]>([]);
     const [responseBody, setResponseBody] = useState<object | null>(null);
     const [registeredEvents, setRegisteredEvents] = useState<any[]>([]);
@@ -125,7 +127,6 @@ export default function EventRegister() {
             let config = {
                 method: "post",
                 maxBodyLength: Infinity,
-                // url: "http://localhost:3000/api/eventsregister",
                 url: "/api/eventsregister",
                 data: { events: body },
             };
@@ -146,6 +147,7 @@ export default function EventRegister() {
             );
         } finally {
             setIsLoading(false);
+            router.push("/register/getallregister");
         }
     };
 
