@@ -17,7 +17,6 @@ export default function AuthContextProvider({
     children,
 }: AuthContextProviderProps) {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
 
     const checkAuth = async () => {
         try {
@@ -27,17 +26,12 @@ export default function AuthContextProvider({
             console.error("Auth check failed:", error);
             setIsLoggedIn(false);
         } finally {
-            setIsLoading(false);
         }
     };
 
     useEffect(() => {
         checkAuth();
     }, []);
-
-    if (isLoading) {
-        return <p>Loading...</p>;
-    }
 
     return (
         <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn, checkAuth }}>
