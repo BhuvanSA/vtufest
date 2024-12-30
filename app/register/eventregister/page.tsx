@@ -165,26 +165,26 @@ export default function EventRegister() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
-            className="min-h-screen py-16 px-4 bg-gradient-to-br from-blue-50 to-indigo-100 flex justify-center items-center"
+            className="min-h-screen py-16 px-4 bg-gradient-to-br from-background to-secondary flex justify-center items-center"
         >
             <Toaster
                 position="top-right"
                 toastOptions={{
                     style: {
-                        background: "#4338ca",
-                        color: "#ffffff",
+                        background: "hsl(var(--primary))",
+                        color: "hsl(var(--primary-foreground))",
                     },
                 }}
             />
-            <div className="w-full max-w-7xl">
-                <h1 className="text-3xl font-bold mb-8 text-indigo-800 text-center">
+            <div className="w-full px-4">
+                <h1 className="text-3xl font-bold mb-8 text-foreground text-center">
                     Event Registration
                 </h1>
                 <div className="flex flex-col lg:flex-row gap-8">
                     {/* Event Selection Section */}
-                    <div className="lg:w-2/3 w-full bg-white shadow-2xl rounded-2xl overflow-hidden">
+                    <div className="lg:w-2/3 w-full bg-card text-card-foreground shadow-2xl rounded-2xl">
                         <div className="p-6 space-y-6">
-                            <h2 className="text-2xl font-semibold text-indigo-800 mb-4">
+                            <h2 className="text-2xl font-semibold text-foreground mb-4">
                                 Select Your Events
                             </h2>
                             <Accordion
@@ -206,18 +206,18 @@ export default function EventRegister() {
                                             key={category}
                                             value={category}
                                         >
-                                            <AccordionTrigger className="flex justify-between items-center w-full px-4 py-2 text-left text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-all duration-200">
+                                            <AccordionTrigger className="flex justify-between items-center w-full px-4 py-2 text-left text-foreground hover:bg-secondary/80 rounded-lg transition-all duration-200">
                                                 <span className="text-lg font-medium">
                                                     {category} ({totalEvents})
                                                 </span>
                                                 {selectedCount > 0 && (
-                                                    <span className="bg-indigo-200 text-indigo-800 rounded-full w-6 h-6 flex items-center justify-center text-sm">
+                                                    <span className="bg-primary/20 text-primary rounded-full w-6 h-6 flex items-center justify-center text-sm">
                                                         {selectedCount}
                                                     </span>
                                                 )}
                                             </AccordionTrigger>
                                             <AccordionContent>
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 m-4">
                                                     {groupedEvents[
                                                         category
                                                     ].map((event) => (
@@ -232,8 +232,8 @@ export default function EventRegister() {
                                                                 selectedEvents.includes(
                                                                     event.eventNo
                                                                 )
-                                                                    ? "border-indigo-500 bg-indigo-50"
-                                                                    : "border-gray-300 bg-white hover:border-indigo-300"
+                                                                    ? "border-primary bg-primary/10"
+                                                                    : "border-border bg-card hover:border-primary/50"
                                                             }`}
                                                             whileHover={{
                                                                 scale: 1.03,
@@ -242,24 +242,24 @@ export default function EventRegister() {
                                                                 scale: 0.98,
                                                             }}
                                                         >
-                                                            <h3 className="text-lg font-semibold text-indigo-700 mb-2">
+                                                            <h3 className="text-lg font-semibold text-foreground mb-2">
                                                                 {
                                                                     event.eventName
                                                                 }
                                                             </h3>
-                                                            <p className="text-sm text-gray-600">
+                                                            <p className="text-sm text-muted-foreground">
                                                                 Max
                                                                 Participants:{" "}
-                                                                <span className="font-medium text-indigo-600">
+                                                                <span className="font-medium text-foreground">
                                                                     {
                                                                         event.maxParticipant
                                                                     }
                                                                 </span>
                                                             </p>
-                                                            <p className="text-sm text-gray-600">
+                                                            <p className="text-sm text-muted-foreground">
                                                                 Max
                                                                 Accompanists:{" "}
-                                                                <span className="font-medium text-indigo-600">
+                                                                <span className="font-medium text-foreground">
                                                                     {
                                                                         event.maxAccompanist
                                                                     }
@@ -279,14 +279,14 @@ export default function EventRegister() {
                     {/* Selected and Registered Events Section */}
                     <div className="lg:w-1/3 w-full space-y-6">
                         {/* Registered Events */}
-                        <div className="bg-white shadow-2xl rounded-2xl overflow-hidden">
+                        <div className="bg-card text-card-foreground shadow-2xl rounded-2xl overflow-hidden">
                             <div className="p-6 space-y-4">
                                 <div className="flex items-center justify-between">
-                                    <h2 className="text-xl font-semibold text-indigo-800">
+                                    <h2 className="text-xl font-semibold text-foreground">
                                         Registered Events
                                     </h2>
                                     {registeredEvents.length > 0 && (
-                                        <span className="bg-indigo-100 text-indigo-800 rounded-full w-6 h-6 flex items-center justify-center text-sm">
+                                        <span className="bg-primary/20 text-primary rounded-full w-6 h-6 flex items-center justify-center text-sm">
                                             {registeredEvents.length}
                                         </span>
                                     )}
@@ -296,9 +296,9 @@ export default function EventRegister() {
                                         registeredEvents.map((event, index) => (
                                             <li
                                                 key={event.eventNo}
-                                                className="flex items-center justify-between p-2 rounded-md hover:bg-indigo-50 transition-colors duration-200"
+                                                className="flex items-center justify-between p-2 rounded-md hover:bg-secondary/80 transition-colors duration-200"
                                             >
-                                                <span className="text-gray-800">
+                                                <span className="">
                                                     <span className="font-medium">
                                                         {index + 1}.{" "}
                                                     </span>
@@ -328,14 +328,14 @@ export default function EventRegister() {
                         </div>
 
                         {/* Selected Events */}
-                        <div className="bg-white shadow-2xl rounded-2xl overflow-hidden">
+                        <div className="bg-card text-card-foreground shadow-2xl rounded-2xl overflow-hidden">
                             <div className="p-6 space-y-4">
                                 <div className="flex items-center justify-between">
-                                    <h2 className="text-xl font-semibold text-indigo-800">
+                                    <h2 className="text-xl font-semibold text-foreground">
                                         Selected Events
                                     </h2>
                                     {selectedEvents.length > 0 && (
-                                        <span className="bg-indigo-100 text-indigo-800 rounded-full w-6 h-6 flex items-center justify-center text-sm">
+                                        <span className="bg-primary/20 text-primary rounded-full w-6 h-6 flex items-center justify-center text-sm">
                                             {selectedEvents.length}
                                         </span>
                                     )}
@@ -351,9 +351,9 @@ export default function EventRegister() {
                                             .map((event, index) => (
                                                 <li
                                                     key={event.eventNo}
-                                                    className="p-2 rounded-md hover:bg-indigo-50 transition-colors duration-200"
+                                                    className="p-2 rounded-md hover:bg-secondary/80 transition-colors duration-200"
                                                 >
-                                                    <span className="text-gray-800">
+                                                    <span className="">
                                                         <span className="font-medium">
                                                             {index + 1}.{" "}
                                                         </span>
@@ -368,10 +368,9 @@ export default function EventRegister() {
                                     )}
                                 </ul>
                                 <LoadingButton
-                                    className=""
-                                    disabled={selectedEvents.length === 0}
                                     loading={isLoading}
                                     onClick={generateResponse}
+                                    disabled={selectedEvents.length === 0}
                                 >
                                     Submit
                                 </LoadingButton>
@@ -379,30 +378,39 @@ export default function EventRegister() {
                         </div>
                     </div>
                 </div>
+                <Dialog
+                    open={deleteDialogOpen}
+                    onOpenChange={setDeleteDialogOpen}
+                >
+                    <DialogContent className="bg-card text-card-foreground">
+                        <DialogHeader>
+                            <DialogTitle className="text-foreground">
+                                Confirm Deletion
+                            </DialogTitle>
+                            <DialogDescription className="text-muted-foreground">
+                                Are you sure you want to delete the event `
+                                {eventToDelete?.name}`?
+                            </DialogDescription>
+                        </DialogHeader>
+                        <DialogFooter>
+                            <Button
+                                variant="outline"
+                                onClick={() => setDeleteDialogOpen(false)}
+                                className="border-border hover:bg-secondary"
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                variant="destructive"
+                                onClick={confirmDelete}
+                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                                Delete
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </div>
-
-            <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Confirm Deletion</DialogTitle>
-                        <DialogDescription>
-                            Are you sure you want to delete the event `
-                            {eventToDelete?.name}`?
-                        </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter>
-                        <Button
-                            variant="outline"
-                            onClick={() => setDeleteDialogOpen(false)}
-                        >
-                            Cancel
-                        </Button>
-                        <Button variant="destructive" onClick={confirmDelete}>
-                            Delete
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
         </motion.div>
     );
 }

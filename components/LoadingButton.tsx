@@ -6,15 +6,16 @@ import { Loader2 } from "lucide-react";
 interface LoadingButtonProps
     extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     loading?: boolean;
+    disabled?: boolean;
 }
 
 const LoadingButton = React.forwardRef<HTMLButtonElement, LoadingButtonProps>(
-    ({ loading, children, className, ...props }, ref) => {
+    ({ loading, children, className, disabled, ...props }, ref) => {
         return (
             <Button
                 ref={ref}
                 className={cn("w-full", className)}
-                disabled={loading}
+                disabled={loading || disabled}
                 {...props}
             >
                 {loading ? (
