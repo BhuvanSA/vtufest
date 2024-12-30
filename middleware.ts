@@ -19,10 +19,12 @@ const protectedRoutes: string[] = [
 ];
 // what sholuld be the type for protectedPages
 const protectedPages: string[] = [
-    "/getallregister",
     "/register",
-    "/getregister",
-    "/eventregister",
+    "/register/documentupload",
+    "/register/eventregister",
+    "/register/getallregister",
+    "/register/getregister",
+    "/register/updateregister",
 ];
 
 export async function middleware(request: NextRequest) {
@@ -138,8 +140,10 @@ export const config = {
         "/api/sendEmailOtp",
         "/api/eventsregister",
         "/register",
-        "/getregister",
-        "/getallregister",
-        "/eventregister",
+        "/register/documentupload",
+        "/register/eventregister",
+        "/register/getallregister",
+        "/register/getregister",
+        "/register/updateregister",
     ],
 };
