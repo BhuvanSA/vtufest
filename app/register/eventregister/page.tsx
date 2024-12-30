@@ -125,7 +125,8 @@ export default function EventRegister() {
             let config = {
                 method: "post",
                 maxBodyLength: Infinity,
-                url: "http://localhost:3000/api/eventsregister",
+                // url: "http://localhost:3000/api/eventsregister",
+                url: "/api/eventsregister",
                 data: { events: body },
             };
 

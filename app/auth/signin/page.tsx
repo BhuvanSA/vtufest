@@ -60,7 +60,7 @@ export default function SignIn() {
             });
             if (response.data.success) {
                 setIsLoggedIn(true);
-                router.push("/register/getallregister");
+                router.push("/register/eventregister");
             } else {
                 form.setError("email", {
                     type: "manual",
