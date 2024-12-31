@@ -1,5 +1,4 @@
-"use client";
-import React, { useEffect } from "react";
+import React from "react";
 import Navbar from "../components/Navbar";
 import Footer from ".././components/Footer";
 import "./globals.css";
@@ -8,12 +7,6 @@ import { ThemeProvider } from "@/contexts/theme-provider";
 
 // Global layout for pages
 const Layout = ({ children }: { children: React.ReactNode }) => {
-    useEffect(() => {
-        // Remove unwanted attributes injected by browser extensions
-        document.body.removeAttribute("data-gr-ext-installed");
-        document.body.removeAttribute("data-new-gr-c-s-check-loaded");
-    }, []);
-
     return (
         <html lang="en" suppressHydrationWarning>
             <head>
@@ -23,9 +16,9 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                 <ThemeProvider>
                     <AuthContextProvider>
                         <Navbar />
-                        <main className="pt-20">{children}</main>
-                        <Footer />
                     </AuthContextProvider>
+                    <main className="pt-20">{children}</main>
+                    <Footer />
                 </ThemeProvider>
             </body>
         </html>
