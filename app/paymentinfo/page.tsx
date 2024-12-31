@@ -53,7 +53,7 @@ export default function EventsPage() {
             </ul>
             <div className="mt-4 text-center font-semibold">
                 <button className="bg-yellow-400 w-full p-2 rounded-sm  hover:scale-105 transition-all text-white font-semibold">
-                    Pay ₹ {events.length > 10 ? 110000 : 8000}
+                    Pay ₹ {events.length > 10 ? 8000 : 4000}
                 </button>
             </div>
         </div>
