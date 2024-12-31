@@ -374,6 +374,15 @@ export default function EventRegister() {
                                 >
                                     Submit
                                 </LoadingButton>
+                                <Button
+                                    variant="outline"
+                                    onClick={() =>
+                                        router.push("/register/getallregister")
+                                    }
+                                    className="w-full mt-2"
+                                >
+                                    View All Registrations
+                                </Button>
                             </div>
                         </div>
                     </div>
