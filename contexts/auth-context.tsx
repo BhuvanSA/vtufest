@@ -17,6 +17,7 @@ export default function AuthContextProvider({
     children,
 }: AuthContextProviderProps) {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    console.log(isLoggedIn);
 
     const checkAuth = async () => {
         try {

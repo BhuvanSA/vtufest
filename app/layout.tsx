@@ -16,9 +16,9 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                 <ThemeProvider>
                     <AuthContextProvider>
                         <Navbar />
+                        <main className="pt-20">{children}</main>
+                        <Footer />
                     </AuthContextProvider>
-                    <main className="pt-20">{children}</main>
-                    <Footer />
                 </ThemeProvider>
             </body>
         </html>
