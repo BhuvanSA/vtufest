@@ -1,5 +1,6 @@
 import { utapi } from "@/utils/uploadthing";
-import { Prisma, PrismaClient } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import prisma from "@/lib/db";
 import { EventCreate } from "../api/eventsregister/route";
 import { RegistrantDetailUpdate } from "../api/updateregisterdetails/route";
 import { UpdateRole } from "../api/updateroleinevent/route";
@@ -8,7 +9,6 @@ import bcrypt from "bcrypt";
 import { SignJWT } from "jose";
 import { z } from "zod";
 
-const prisma = new PrismaClient();
 interface Registrant {
     name: string;
     usn: string;
