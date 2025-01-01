@@ -1,48 +1,51 @@
 "use client";
+
+import { useEffect, useState } from "react";
+import { DataTable, Data } from "@/components/register/data-table";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
-// Custom Button Component
-const Button = ({ label, onClick, className }) => (
-    <button
-        className={`bg-gray-500 text-white text-sm px-6 py-2 rounded-md transition-transform duration-300 hover:scale-105 hover:bg-gray-600 ${className}`}
-        onClick={onClick}
-    >
-        {label}
-    </button>
-);
+// TODO: convert this to a Server Side Rendered page by direclty fetching data from the database
+// Create better UI to display all selected events
+// better ui for the Add and submit button, maybe use a loading button if required
+// convert any types to proper types
+// seperate out the columns from data-table
 
-const StudentTable = () => {
-    const [rows, setRows] = useState([]);
+export default function Page() {
+    const [rows, setRows] = useState<Data[]>([]);
     const router = useRouter();
+
     useEffect(() => {
         async function getAllregistrant() {
             const res = await fetch("/api/getallregister", {
                 method: "GET",
+                credentials: "include", // Ensure cookies are included
             });
+            const { registrant = [] } = await res.json();
 
-            const data = await res.json();
-            const resData = data.registrant;
-            console.log(resData);
-
-            const ListData = resData?.map((registrant, index) => ({
-                slno: index + 1,
-                name: registrant.name,
-                usn: registrant.usn,
-                phone: registrant.phone,
-                totalEvents: registrant.events.length,
-                id: registrant.id,
+            // Convert backend response to Data array
+            const listData: Data[] = registrant.map((item: any) => ({
+                id: item.id,
+                photo: item.photoUrl ?? "https://via.placeholder.com/150",
+                name: item.name || "N/A",
+                usn: item.usn || "N/A",
+                type: item.teamManager ? "Team Manager" : "Participant",
+                events: item.events?.map((e: any) => e.eventName) ?? [],
+                status: "pending", // or any default logic
             }));
 
-            setRows(ListData);
+            setRows(listData);
+            console.log(listData);
         }
         getAllregistrant();
     }, []);
 
-    const handleUpdate = async (id) => {
+    const handleUpdate = (id: string) => {
         router.push(`/register/updateregister/${id}`);
     };
-    const handleRemove = async (id) => {
+
+    const handleRemove = async (id: string) => {
         const updatedRows = rows.filter((row) => row.id !== id);
         try {
             const response = await fetch("/api/deleteregister", {
@@ -51,152 +54,68 @@ const StudentTable = () => {
                 headers: {
                     "Content-Type": "application/json",
                 },
+                credentials: "include", // Ensure cookies are included
             });
 
             const data = await response.json();
             alert(data.message);
-        } catch (err) {
-            alert(err);
+            setRows(updatedRows);
+        } catch (err: unknown) {
+            alert("An error occurred while removing the registrant.");
+            console.error(err);
         }
-        setRows(updatedRows);
     };
 
     return (
-        <div id="webcrumbs">
-            <div className="w-full bg-gradient-to-br from-white via-blue-50 to-white shadow-2xl rounded-lg overflow-hidden border border-neutral-300">
-                <div className="p-5 ">
-                    <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-xl font-title font-semibold text-neutral-950 uppercase tracking-wide">
-                            List of students registered for the event
-                        </h2>
-                        <div className="flex gap-4">
-                            <Button
-                                label={"ADD Events"}
-                                className=""
-                                onClick={() =>
-                                    router.push("/register/eventregister")
-                                }
-                            />
-                            <span className="bg-primary-100 text-primary-950 text-sm rounded-full px-4 py-2 font-medium">
-                                {rows?.length}/45
-                            </span>
-                        </div>
-                    </div>
-                    <div className="overflow-x-auto">
-                        <div className="max-h-[300px] overflow-y-scroll">
-                            <table className="min-w-full border-t border-neutral-300">
-                                <thead className="sticky top-0">
-                                    <tr className="bg-neutral-950 shadow-sm">
-                                        <th className="text-left py-4 px-6 text-white font-semibold uppercase tracking-wide">
-                                            Sl. No
-                                        </th>
-                                        <th className="text-left py-4 px-6 text-white font-semibold uppercase tracking-wide">
-                                            Name
-                                        </th>
-                                        <th className="text-left py-4 px-6 text-white font-semibold uppercase tracking-wide">
-                                            USN
-                                        </th>
-                                        <th className="text-left py-4 px-6 text-white font-semibold uppercase tracking-wide">
-                                            Phone
-                                        </th>
-                                        <th className="text-left py-4 px-6 text-white font-semibold uppercase tracking-wide">
-                                            Events Registered
-                                        </th>
-                                        <th className="text-left py-4 px-6 text-white font-semibold uppercase tracking-wide">
-                                            Actions
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {rows?.map((student, index) => {
-                                        const colors = [
-                                            "text-neutral-900",
-                                            "text-neutral-800",
-                                            "text-neutral-700",
-                                            "text-neutral-600",
-                                            "text-neutral-500",
-                                        ];
-                                        const rowColor =
-                                            colors[index % colors.length];
-                                        return (
-                                            <tr
-                                                key={student.slno}
-                                                className={`${
-                                                    index % 2 === 0
-                                                        ? "bg-blue-50"
-                                                        : "bg-white"
-                                                } hover:bg-gray-200 transition-all duration-300`}
-                                            >
-                                                <td
-                                                    className={`border-t border-neutral-300 py-4 px-6 ${rowColor}`}
-                                                >
-                                                    {student.slno}
-                                                </td>
-                                                <td
-                                                    className={`border-t border-neutral-300 py-4 px-6 ${rowColor}`}
-                                                >
-                                                    {student.name}
-                                                </td>
-                                                <td
-                                                    className={`border-t border-neutral-300 py-4 px-6 ${rowColor}`}
-                                                >
-                                                    {student.usn}
-                                                </td>
-                                                <td
-                                                    className={`border-t border-neutral-300 py-4 px-6 ${rowColor}`}
-                                                >
-                                                    {student.phone}
-                                                </td>
-                                                <td
-                                                    className={`border-t border-neutral-300 py-4 px-6 ${rowColor}`}
-                                                >
-                                                    {student.totalEvents}
-                                                </td>
-                                                <td className="border-t border-neutral-300 py-4 px-6 flex items-center gap-2">
-                                                    <Button
-                                                        label="Update"
-                                                        onClick={() =>
-                                                            handleUpdate(
-                                                                student.id
-                                                            )
-                                                        }
-                                                    />
-                                                    <Button
-                                                        label="Remove"
-                                                        onClick={() =>
-                                                            handleRemove(
-                                                                student.id
-                                                            )
-                                                        }
-                                                        className="bg-red-500 hover:bg-red-600"
-                                                    />
-                                                </td>
-                                            </tr>
-                                        );
-                                    })}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div className="flex justify-center mt-4 gap-4">
-                        <Button
-                            label="Add"
-                            onClick={() =>
-                                router.push("/register/documentupload")
-                            }
-                            className="bg-yellow-600 hover:bg-yellow-600 hover:scale-105"
-                            disabled={rows?.length > 45}
-                        />
-                        <Button
-                            label="Submit"
-                            className="bg-yellow-600 hover:bg-yellow-600 hover:scale-105"
-                            onClick={() => router.push("/paymentinfo")}
-                        />
-                    </div>
+        <div>
+            <div className="mt-4 justify-center flex flex-col gap-4">
+                <h1 className="flex justify-center">Registrants</h1>
+                <div className="flex justify-center">
+                    Events registered from all registrants
                 </div>
+                {/* map all the events in the list data */}
+                <div className="justify-center flex flex-wrap gap-4">
+                    {rows.map((item) => {
+                        return (
+                            <div className="flex gap-4" key={item.id}>
+                                {item.events.map((event) => {
+                                    return (
+                                        <Badge className="" key={event}>
+                                            {event}
+                                        </Badge>
+                                    );
+                                })}
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+            <Button
+                onClick={() => router.push("/register/addevent")}
+                className="mt-4"
+            >
+                Add Events
+            </Button>
+            <DataTable
+                data={rows}
+                onUpdate={handleUpdate}
+                onRemove={handleRemove}
+            />
+            <div className="flex justify-center mt-4 gap-4">
+                <Button
+                    onClick={() => router.push("/register/documentupload")}
+                    className=""
+                    disabled={rows?.length > 45}
+                >
+                    Add
+                </Button>
+                <Button
+                    className=""
+                    onClick={() => router.push("/paymentinfo")}
+                >
+                    Submit
+                </Button>
             </div>
         </div>
     );
-};
-
-export default StudentTable;
+}
