@@ -5,7 +5,9 @@ const Footer = () => {
         <footer aria-label="Site Footer" className="bg-background">
             <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
                 <div className="flex justify-center text-foreground">
-                    <h1 className="text-4xl">Global Academy of Technology</h1>
+                    <h1 className="text-4xl text-center">
+                        Global Academy of Technology
+                    </h1>
                 </div>
                 <p className="mx-auto mt-4 max-w-md text-center leading-relaxed text-muted-foreground">
                     Autonomous Institute, Affiliated to VTU Belagavi
@@ -45,7 +47,7 @@ const Footer = () => {
                 <div className="mt-12 border-t border-border pt-6 flex justify-center">
                     <div className="text-center sm:flex sm:justify-between sm:text-left">
                         <p className="mt-4 text-sm text-muted-foreground hover:text-primary transition-colors sm:order-first sm:mt-0">
-                            <a href="ourteam/">&copy; 2025 VOID</a>
+                            <a href="ourteam/">&copy; 2025</a>
                         </p>
                     </div>
                 </div>
