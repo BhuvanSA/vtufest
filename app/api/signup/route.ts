@@ -1,12 +1,9 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/db";
 import bcrypt from "bcrypt";
 import { z } from "zod";
 import { Redis } from "@upstash/redis";
 import nodemailer from "nodemailer";
-
-// Initialize Prisma Client
-const prisma = new PrismaClient();
 
 // Initialize Upstash Redis client
 const redis = new Redis({
@@ -113,24 +110,24 @@ export async function POST(request: Request) {
     try {
         const body = await request.json();
         // Validate input with Zod schema
-        
+
         const validation = formSchema.safeParse(body);
         console.log(validation);
-        if (validation.success===false) {
+        if (validation.success === false) {
             return NextResponse.json(
                 { success: false, errors: validation.error.errors },
                 { status: 400 }
             );
         }
         const { college, email, phone, otp } = validation.data;
-    
+
         // Check if the user already exists in the database (by email or phone)
         const existingUser = await prisma.users.findFirst({
             where: {
                 OR: [{ email }, { phone }],
             },
         });
-        
+
         if (existingUser) {
             return NextResponse.json(
                 { success: false, error: "User already exists" },
