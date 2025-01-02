@@ -3,7 +3,6 @@ import prisma from "@/lib/db";
 import bcrypt from "bcrypt";
 import { z } from "zod";
 import { Redis } from "@upstash/redis";
-import nodemailer from "nodemailer";
 
 // Initialize Upstash Redis client
 const redis = new Redis({
@@ -12,27 +11,39 @@ const redis = new Redis({
 });
 
 // Define Zod schema for validation
-const formSchema = z.object({
-    college: z
-        .string()
-        .min(3, "College name must be at least 3 characters")
-        .max(100, "College name should not exceed 100 characters"),
-    phone: z
-        .string()
-        .regex(/^\d{10,15}$/, "Phone number must be between 10 to 15 digits"),
-    email: z.string().email("Invalid email address"),
-    otp: z.string().regex(/^\d{6}$/, "OTP must be a 6-digit number"),
-});
+const formSchema = z
+    .object({
+        college: z
+            .string()
+            .min(3, "College name must be at least 3 characters")
+            .max(100, "College name should not exceed 100 characters"),
+        phone: z
+            .string()
+            .regex(
+                /^\d{10,15}$/,
+                "Phone number must be between 10 to 15 digits"
+            ),
+        email: z.string().email("Invalid email address"),
+        otp: z.string().regex(/^\d{6}$/, "OTP must be a 6-digit number"),
+        password: z.string().min(8, "Password must be at least 8 characters"),
+        confirmPassword: z.string(),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+        message: "Passwords do not match",
+        path: ["confirmPassword"],
+    });
 
-// Utility function to generate a random password
-const generatePassword = (length: number) => {
-    const chars =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$!";
-    return Array.from(
-        { length },
-        () => chars[Math.floor(Math.random() * chars.length)]
-    ).join("");
-};
+// Function to map Zod errors to field-level error object
+function mapZodErrors(zodError: z.ZodError): Record<string, string> {
+    const fieldErrors: Record<string, string> = {};
+    zodError.errors.forEach((err) => {
+        const fieldName = err.path[0];
+        if (fieldName && !fieldErrors[fieldName]) {
+            fieldErrors[fieldName] = err.message;
+        }
+    });
+    return fieldErrors;
+}
 
 // Function to verify OTP internally
 async function verifyOtp(
@@ -78,48 +89,18 @@ async function verifyOtp(
     }
 }
 
-// Function to send password via email
-async function sendPasswordEmail(email: string, password: string) {
-    try {
-        // Configure Nodemailer
-        const transporter = nodemailer.createTransport({
-            service: "gmail", // Use your email provider
-            auth: {
-                user: process.env.EMAIL_USER as string, // Your email address
-                pass: process.env.EMAIL_PASSWORD as string, // Your email password or app password
-            },
-        });
-
-        // Email content
-        const mailOptions = {
-            from: process.env.EMAIL_USER, // Sender email address
-            to: email, // Receiver email address
-            subject: "Your Account Password",
-            text: `Your account has been created successfully. Your password is: ${password}. Please change it after logging in.`,
-        };
-
-        // Send email
-        await transporter.sendMail(mailOptions);
-    } catch (error: any) {
-        console.error("Error sending password email:", error);
-        // Optionally, handle email sending failures (e.g., delete the created user, retry, etc.)
-    }
-}
-
 export async function POST(request: Request) {
     try {
         const body = await request.json();
         // Validate input with Zod schema
-
         const validation = formSchema.safeParse(body);
-        console.log(validation);
+
         if (validation.success === false) {
-            return NextResponse.json(
-                { success: false, errors: validation.error.errors },
-                { status: 400 }
-            );
+            const fieldErrors = mapZodErrors(validation.error);
+            return NextResponse.json({ success: false, errors: fieldErrors });
         }
-        const { college, email, phone, otp } = validation.data;
+
+        const { college, email, phone, otp, password } = validation.data;
 
         // Check if the user already exists in the database (by email or phone)
         const existingUser = await prisma.users.findFirst({
@@ -129,24 +110,27 @@ export async function POST(request: Request) {
         });
 
         if (existingUser) {
-            return NextResponse.json(
-                { success: false, error: "User already exists" },
-                { status: 400 }
-            );
+            return NextResponse.json({
+                success: false,
+                errors: {
+                    email: "A user with this email or phone number already exists.",
+                },
+            });
         }
 
         // Verify OTP entered by the user
         const otpValidation = await verifyOtp(email, otp);
         if (!otpValidation.success) {
-            return NextResponse.json(
-                { success: false, error: otpValidation.message },
-                { status: 401 }
-            );
+            return NextResponse.json({
+                success: false,
+                errors: {
+                    otp: otpValidation.message,
+                },
+            });
         }
 
-        // Generate random password for the user
-        const password = generatePassword(8 + Math.floor(Math.random() * 5)); // Length between 8-12
-        const hashedPassword = await bcrypt.hash(password, 13); // Hash the password
+        // Hash the user's provided password
+        const hashedPassword = await bcrypt.hash(password, 13);
 
         // Create the user in the database
         const newUser = await prisma.users.create({
@@ -157,11 +141,6 @@ export async function POST(request: Request) {
                 password: hashedPassword, // Store the hashed password
             },
         });
-
-        if (newUser) {
-            // Send password to user's email
-            await sendPasswordEmail(email, password);
-        }
 
         // Return successful response
         return NextResponse.json(
@@ -180,7 +159,7 @@ export async function POST(request: Request) {
     } catch (error: any) {
         console.error("Error in registration process:", error);
         return NextResponse.json(
-            { success: false, error: "Internal Server Error" },
+            { success: false, errors: { general: "Internal Server Error" } },
             { status: 500 }
         );
     }

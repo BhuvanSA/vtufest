@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-// import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
@@ -31,22 +30,32 @@ import { LoadingButton } from "@/components/LoadingButton";
 import {
     InputOTP,
     InputOTPGroup,
+    InputOTPSeparator,
     InputOTPSlot,
 } from "@/components/ui/input-otp";
 import Image from "next/image";
 
-const signupSchema = z.object({
-    college: z.string().min(3, "College name must be at least 3 characters"),
-    phone: z
-        .string()
-        .min(10, "Phone number must be at least 10 digits")
-        .max(15, "Phone number must be at most 15 digits"),
-    email: z.string().email("Invalid email address"),
-    otp: z
-        .string()
-        .length(6, "OTP must be 6 digits")
-        .regex(/^\d{6}$/, "OTP must be numeric"),
-});
+const signupSchema = z
+    .object({
+        college: z
+            .string()
+            .min(3, "College name must be at least 3 characters"),
+        phone: z
+            .string()
+            .min(10, "Phone number must be at least 10 digits")
+            .max(15, "Phone number must be at most 15 digits"),
+        email: z.string().email("Invalid email address"),
+        otp: z
+            .string()
+            .length(6, "OTP must be 6 digits")
+            .regex(/^\d{6}$/, "OTP must be numeric"),
+        password: z.string().min(8, "Password must be at least 8 characters"),
+        confirmPassword: z.string(),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+        message: "Passwords do not match",
+        path: ["confirmPassword"],
+    });
 
 export default function SignUp() {
     const router = useRouter();
@@ -61,6 +70,8 @@ export default function SignUp() {
             phone: "",
             email: "",
             otp: "",
+            password: "",
+            confirmPassword: "",
         },
     });
 
@@ -119,24 +130,20 @@ export default function SignUp() {
                 toast.success("Signup successful! Redirecting to login...");
                 router.push("/auth/signin");
             } else {
-                if (
-                    response.data.error === "Invalid OTP" ||
-                    response.data.error === "Invalid OTP provided."
-                ) {
-                    form.setError("otp", {
-                        message: "Invalid OTP. Please try again.",
-                    });
-                    toast.error("Invalid OTP. Please try again.");
-                } else if (response.data.error === "User already exists") {
-                    form.setError("email", {
-                        message: "A user with this email already exists.",
-                    });
-                    toast.error("A user with this email already exists.");
+                const { errors } = response.data;
+                if (errors) {
+                    for (const field in errors) {
+                        if (field === "general") {
+                            toast.error(errors[field]);
+                        } else {
+                            form.setError(field as keyof typeof form.control, {
+                                message: errors[field],
+                            });
+                            toast.error(errors[field]);
+                        }
+                    }
                 } else {
-                    toast.error(
-                        response.data.message ||
-                            "Signup failed. Please try again."
-                    );
+                    toast.error("Signup failed. Please try again.");
                 }
             }
         } catch (error: unknown) {
@@ -177,7 +184,7 @@ export default function SignUp() {
                             <FormField
                                 control={form.control}
                                 name="college"
-                                render={({ field }) => (
+                                render={({ field, fieldState }) => (
                                     <FormItem>
                                         <FormLabel className="text-foreground">
                                             College Name
@@ -196,7 +203,7 @@ export default function SignUp() {
                             <FormField
                                 control={form.control}
                                 name="phone"
-                                render={({ field }) => (
+                                render={({ field, fieldState }) => (
                                     <FormItem>
                                         <FormLabel className="text-foreground">
                                             Phone Number
@@ -215,7 +222,7 @@ export default function SignUp() {
                             <FormField
                                 control={form.control}
                                 name="email"
-                                render={({ field }) => (
+                                render={({ field, fieldState }) => (
                                     <FormItem>
                                         <FormLabel className="text-foreground">
                                             Email
@@ -252,27 +259,87 @@ export default function SignUp() {
                             <FormField
                                 control={form.control}
                                 name="otp"
-                                render={({ field }) => (
+                                render={({ field, fieldState }) => (
                                     <FormItem>
                                         <FormLabel className="text-foreground">
                                             Enter OTP
                                         </FormLabel>
                                         <FormControl>
-                                            <InputOTP
-                                                maxLength={6}
-                                                value={field.value}
-                                                onChange={field.onChange}
-                                                className="bg-background"
-                                            >
-                                                <InputOTPGroup>
-                                                    <InputOTPSlot index={0} />
-                                                    <InputOTPSlot index={1} />
-                                                    <InputOTPSlot index={2} />
-                                                    <InputOTPSlot index={3} />
-                                                    <InputOTPSlot index={4} />
-                                                    <InputOTPSlot index={5} />
-                                                </InputOTPGroup>
-                                            </InputOTP>
+                                            <div className="flex justify-center">
+                                                <InputOTP
+                                                    maxLength={6}
+                                                    value={field.value}
+                                                    onChange={field.onChange}
+                                                    className="bg-background"
+                                                >
+                                                    <InputOTPGroup>
+                                                        <InputOTPSlot
+                                                            index={0}
+                                                        />
+                                                        <InputOTPSlot
+                                                            index={1}
+                                                        />
+                                                    </InputOTPGroup>
+                                                    <InputOTPSeparator />
+                                                    <InputOTPGroup>
+                                                        <InputOTPSlot
+                                                            index={2}
+                                                        />
+                                                        <InputOTPSlot
+                                                            index={3}
+                                                        />
+                                                    </InputOTPGroup>
+                                                    <InputOTPSeparator />
+                                                    <InputOTPGroup>
+                                                        <InputOTPSlot
+                                                            index={4}
+                                                        />
+                                                        <InputOTPSlot
+                                                            index={5}
+                                                        />
+                                                    </InputOTPGroup>
+                                                </InputOTP>
+                                            </div>
+                                        </FormControl>
+                                        <FormMessage className="text-destructive" />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="password"
+                                render={({ field, fieldState }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-foreground">
+                                            Password
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type="password"
+                                                className="bg-background border-input"
+                                                placeholder="Enter your password"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage className="text-destructive" />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="confirmPassword"
+                                render={({ field, fieldState }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-foreground">
+                                            Confirm Password
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type="password"
+                                                className="bg-background border-input"
+                                                placeholder="Confirm your password"
+                                                {...field}
+                                            />
                                         </FormControl>
                                         <FormMessage className="text-destructive" />
                                     </FormItem>
@@ -295,9 +362,7 @@ export default function SignUp() {
                             <span className="w-full border-t border-border" />
                         </div>
                         <div className="relative flex justify-center text-xs uppercase">
-                            <span className="bg-card px-2 text-muted-foreground">
-                                Already Registered?
-                            </span>
+                            {/* Optional Divider Text */}
                         </div>
                     </div>
                     <Button

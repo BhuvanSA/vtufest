@@ -1,11 +1,8 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/db";
 import bcrypt from "bcrypt";
 import { z } from "zod";
 import { Redis } from "@upstash/redis";
-
-// Initialize Prisma Client
-const prisma = new PrismaClient();
 
 // Initialize Upstash Redis client
 const redis = new Redis({
@@ -86,7 +83,6 @@ async function verifyOtp(
         return { success: false, message: "Internal Server Error" };
     }
 }
-
 
 export async function POST(request: Request) {
     try {

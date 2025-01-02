@@ -39,6 +39,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
+import { useRouter } from "next/navigation";
 
 export type Data = {
     id: string;
@@ -50,13 +51,35 @@ export type Data = {
     status: "pending" | "processing" | "success" | "failed";
 };
 
-interface DataTableProps {
-    data: Data[];
-    onUpdate: (id: string) => void;
-    onRemove: (id: string) => void;
-}
+export function DataTable({ data }: { data: Data[] }) {
+    const router = useRouter();
+    const [rows, setRows] = React.useState<Data[]>(data);
 
-export function DataTable({ data, onUpdate, onRemove }: DataTableProps) {
+    const handleUpdate = (id: string) => {
+        router.push(`/register/updateregister/${id}`);
+    };
+
+    const handleRemove = async (id: string) => {
+        const updatedRows = rows.filter((row) => row.id !== id);
+        try {
+            const response = await fetch("/api/deleteregister", {
+                method: "DELETE",
+                body: JSON.stringify({ registrantId: id }),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include", // Ensure cookies are included
+            });
+
+            const data = await response.json();
+            alert(data.message);
+            setRows(updatedRows);
+        } catch (err: unknown) {
+            alert("An error occurred while removing the registrant.");
+            console.error(err);
+        }
+    };
+
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnFilters, setColumnFilters] =
         React.useState<ColumnFiltersState>([]);
@@ -273,14 +296,6 @@ export function DataTable({ data, onUpdate, onRemove }: DataTableProps) {
                 cell: ({ row }) => {
                     const data = row.original;
 
-                    const handleUpdateClick = () => {
-                        onUpdate(data.id);
-                    };
-
-                    const handleRemoveClick = () => {
-                        onRemove(data.id);
-                    };
-
                     return (
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -290,11 +305,18 @@ export function DataTable({ data, onUpdate, onRemove }: DataTableProps) {
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                <DropdownMenuItem onClick={handleUpdateClick}>
+                                <DropdownMenuLabel className="text-primary text-l">
+                                    Actions
+                                </DropdownMenuLabel>
+                                <DropdownMenuItem
+                                    onClick={() => handleUpdate(data.id)}
+                                >
                                     Update
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={handleRemoveClick}>
+                                <DropdownMenuItem
+                                    onClick={() => handleRemove(data.id)}
+                                    className="text-red-500"
+                                >
                                     Remove
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -303,7 +325,7 @@ export function DataTable({ data, onUpdate, onRemove }: DataTableProps) {
                 },
             },
         ],
-        [onUpdate, onRemove]
+        [handleUpdate, handleRemove]
     );
 
     const table = useReactTable({
@@ -341,9 +363,12 @@ export function DataTable({ data, onUpdate, onRemove }: DataTableProps) {
                     }
                     className="max-w-sm"
                 />
+                <Button variant="outline" className="ml-auto hover:bg-red-500">
+                    Delete Selected
+                </Button>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="ml-auto">
+                        <Button variant="outline" className="ml-2">
                             Columns <ChevronDown />
                         </Button>
                     </DropdownMenuTrigger>
