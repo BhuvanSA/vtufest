@@ -48,11 +48,11 @@ model Events {
 }
 
 model Registrants {
-  id                 String               @id @default(uuid())
+  id                 String                     @id @default(uuid())
   name               String
-  usn                String               @unique
-  phone              String               @unique
-  teamManager        Boolean              @default(false)
+  usn                String                     @unique
+  phone              String                     @unique
+  teamManager        Boolean                    @default(false)
   photoUrl           String
   aadharUrl          String?
   sslcUrl            String?
@@ -61,10 +61,10 @@ model Registrants {
   admission2Url      String?
   idcardUrl          String?
   userId             String
-  verified           Boolean              @default(false)
-  user               Users                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  events             Events[]             @relation("EventRegistrations")
+  user               Users                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  events             Events[]                   @relation("EventRegistrations")
   eventRegistrations EventRegistrations[]
+  docStatus          DocumentVerificationStatus @default(PENDING)
 }
 
 model EventRegistrations {
@@ -83,4 +83,11 @@ model EventRegistrations {
 enum Type {
   PARTICIPANT
   ACCOMPANIST
+}
+
+enum DocumentVerificationStatus {
+  PENDING
+  PROCESSING
+  APPROVED
+  REJECTED
 }
