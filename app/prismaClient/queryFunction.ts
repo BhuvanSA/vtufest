@@ -5,9 +5,6 @@ import { EventCreate } from "../api/eventsregister/route";
 import { RegistrantDetailUpdate } from "../api/updateregisterdetails/route";
 import { UpdateRole } from "../api/updateroleinevent/route";
 import type { AddEvent } from "../api/addeventregister/route";
-import bcrypt from "bcrypt";
-import { SignJWT } from "jose";
-import { z } from "zod";
 
 interface Registrant {
     name: string;
@@ -1010,47 +1007,5 @@ export async function AddEvent(arg: AddEvent) {
                 throw new Error("An unexpected error occurred");
             }
         }
-    }
-}
-
-const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET as string);
-
-const loginSchema = z.object({
-    email: z
-        .string()
-        .email("Please enter a valid email address")
-        .min(1, "Email is required"),
-    password: z
-        .string()
-        .min(8, "Password must be at least 8 characters")
-        .max(100, "Password must be less than 12 characters"),
-});
-
-export async function loginUser(email: string, password: string) {
-    try {
-        const result = loginSchema.safeParse({ email, password });
-
-        if (!result.success) {
-            throw new Error("Invalid email or password");
-        }
-
-        const user = await prisma.users.findUnique({
-            where: { email },
-        });
-
-        if (!user || !(await bcrypt.compare(password, user.password))) {
-            throw new Error("Invalid email or password");
-        }
-
-        const token = await new SignJWT({ id: user.id, email: user.email })
-            .setProtectedHeader({ alg: "HS256" })
-            .setIssuedAt()
-            .setExpirationTime("1h")
-            .sign(JWT_SECRET);
-
-        return { success: true, token };
-    } catch (error) {
-        console.error(error);
-        throw new Error("Login failed");
     }
 }

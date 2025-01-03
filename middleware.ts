@@ -1,14 +1,11 @@
-import { NextResponse, type NextRequest } from "next/server";
-import { jwtVerify } from "jose";
+import { NextResponse, NextRequest } from "next/server";
+import { verifySession } from "@/lib/session";
 import { Redis } from "@upstash/redis"; // Use Upstash Redis
 
 const redis = Redis.fromEnv(); // Upstash Redis, reads credentials from environment variables
 
-const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET as string);
-
 const GLOBAL_RATE_LIMIT_WINDOW = 60; // Time window in seconds
 const GLOBAL_RATE_LIMIT_MAX = 100; // Maximum requests allowed per window
-
 const OTP_RATE_LIMIT_WINDOW = 60; // Time window in seconds for OTP
 const OTP_RATE_LIMIT_MAX = 5; // Maximum OTP requests per window
 
@@ -16,9 +13,6 @@ const protectedRoutes: string[] = [
     "/api/register",
     "/api/getallregister",
     "/api/eventsregister",
-];
-// what sholuld be the type for protectedPages
-const protectedPages: string[] = [
     "/register",
     "/register/documentupload",
     "/register/eventregister",
@@ -28,7 +22,7 @@ const protectedPages: string[] = [
 ];
 
 export async function middleware(request: NextRequest) {
-    const { pathname } = request.nextUrl;
+    const path = request.nextUrl.pathname;
 
     // Extract IP address
     const ip =
@@ -38,7 +32,7 @@ export async function middleware(request: NextRequest) {
         "unknown";
 
     // Apply OTP-specific rate limiting
-    if (pathname === "/api/sendOtp") {
+    if (path === "/api/sendOtp") {
         const otpRedisKey = `otp-rate-limit:${ip}`;
         const currentOtpRequests = await redis.incr(otpRedisKey);
         if (currentOtpRequests === 1) {
@@ -57,7 +51,7 @@ export async function middleware(request: NextRequest) {
     }
 
     // Apply global rate limiting for all routes
-    const globalRedisKey = `rate-limit:${ip}:${pathname}`;
+    const globalRedisKey = `rate-limit:${ip}:${path}`;
     const currentGlobalRequests = await redis.incr(globalRedisKey);
     if (currentGlobalRequests === 1) {
         await redis.expire(globalRedisKey, GLOBAL_RATE_LIMIT_WINDOW);
@@ -73,61 +67,13 @@ export async function middleware(request: NextRequest) {
         );
     }
 
-    // Verify JWT for protected routes
-    if (protectedRoutes.includes(pathname)) {
-        const token = request.cookies.get("auth_token")?.value;
-
-        if (!token) {
-            return NextResponse.json(
-                { success: false, message: "Unauthorized access" },
-                { status: 401 }
-            );
-        }
-
-        try {
-            const verify = await jwtVerify(token, JWT_SECRET);
-            console.log("json middleware", verify);
-
-            if (!verify) {
-                return NextResponse.json(
-                    { success: false, message: "Unauthorized access" },
-                    { status: 401 }
-                );
-            }
-
-            return NextResponse.next();
-        } catch (err) {
-            console.error("Invalid or expired token:", err);
-            return NextResponse.json(
-                { success: false, message: "Invalid or expired token" },
-                { status: 401 }
-            );
-        }
+    const session = await verifySession();
+    if (protectedRoutes.includes(path) && !session) {
+        return NextResponse.redirect(new URL("/auth/signin", request.nextUrl));
     }
 
-    // Redirect to login page for protected pages
-    if (protectedPages.includes(pathname)) {
-        const token = request.cookies.get("auth_token")?.value;
-
-        if (!token) {
-            return NextResponse.redirect(new URL("/auth/signin", request.url));
-        }
-
-        try {
-            const verify = await jwtVerify(token, JWT_SECRET);
-            console.log("json middleware", verify);
-
-            if (!verify) {
-                return NextResponse.redirect(
-                    new URL("/auth/sigin", request.url)
-                );
-            }
-
-            return NextResponse.next();
-        } catch (err) {
-            console.error("Invalid or expired token:", err);
-            return NextResponse.redirect(new URL("/auth/signin", request.url));
-        }
+    if (session && !request.nextUrl.pathname.startsWith("/register")) {
+        return NextResponse.redirect(new URL("/register", request.nextUrl));
     }
 
     return NextResponse.next();

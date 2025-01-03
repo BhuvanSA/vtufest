@@ -1,11 +1,11 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { loginSchema } from "@/lib/schemas/auth";
 import prisma from "@/lib/db";
 import bcrypt from "bcrypt";
-import { createSession } from "@/lib/session";
+import { createSession, SessionPayload } from "@/lib/session";
 
-export async function POST(request: Request) {
-    const JWT_TOKEN_EXPIRY = new Date(Date.now() + 60 * 60 * 1);
+export async function POST(request: NextRequest) {
+    const JWT_TOKEN_EXPIRY = new Date(Date.now() + 1000 * 60 * 60 * 24);
 
     try {
         const body = await request.json();
@@ -40,7 +40,7 @@ export async function POST(request: Request) {
         }
 
         // create a stateless session
-        const token = {
+        const token: SessionPayload = {
             id: db.id,
             email: db.email,
             role: db.role,
@@ -51,7 +51,7 @@ export async function POST(request: Request) {
         // all good return success
         return NextResponse.json({
             success: true,
-            message: "Authentication successful",
+            message: "Login successful",
         });
 
         // Unexpected error
