@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/db";
 import bcrypt from "bcrypt";
-import { z } from "zod";
 import { Redis } from "@upstash/redis";
+import { resetPasswordSchema } from "@/lib/schemas/auth";
 
 // Initialize Upstash Redis client
 const redis = new Redis({
@@ -10,37 +10,6 @@ const redis = new Redis({
     token: process.env.UPSTASH_REDIS_REST_TOKEN as string,
 });
 
-// Define Zod schema for validation
-const resetPasswordSchema = z.object({
-    email: z.string().email("Invalid email address"),
-    otp: z.string().regex(/^\d{6}$/, "OTP must be a 6-digit number"),
-    newPassword: z
-        .string()
-        .min(8, "Password must be at least 8 characters")
-        .max(100, "Password should not exceed 100 characters"),
-});
-
-// Function to verify OTP internally
-// async function verifyOtp(email: string, otp: string): Promise<boolean> {
-//     try {
-//         const storedOtp = await redis.get<string>(`otp:${email}`);
-
-//         if (!storedOtp) {
-//             return false; // OTP expired or not found
-//         }
-
-//         if (storedOtp !== otp) {
-//             return false; // Invalid OTP
-//         }
-
-//         // OTP is valid, delete it from Redis
-//         await redis.del(`otp:${email}`);
-//         return true;
-//     } catch (error) {
-//         console.error("Error verifying OTP:", error);
-//         return false;
-//     }
-// }
 async function verifyOtp(
     email: string,
     otp: string
@@ -73,12 +42,12 @@ async function verifyOtp(
         // OTP is valid, delete it from Redis
         try {
             await redis.del(`otp:${email}`);
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Error deleting OTP from Redis:", error);
         }
 
         return { success: true, message: "OTP verified successfully." };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Error verifying OTP internally:", error);
         return { success: false, message: "Internal Server Error" };
     }
@@ -102,10 +71,10 @@ export async function POST(request: Request) {
         // Verify OTP
         const isOtpValid = await verifyOtp(email, otp);
         if (!isOtpValid) {
-            return NextResponse.json(
-                { success: false, error: "Invalid or expired OTP" },
-                { status: 401 }
-            );
+            return NextResponse.json({
+                success: false,
+                error: "Invalid or expired OTP",
+            });
         }
 
         // Check if the user exists
@@ -114,10 +83,10 @@ export async function POST(request: Request) {
         });
 
         if (!user) {
-            return NextResponse.json(
-                { success: false, error: "User not found" },
-                { status: 404 }
-            );
+            return NextResponse.json({
+                success: false,
+                error: "User not found",
+            });
         }
 
         // Hash the new password
@@ -141,11 +110,11 @@ export async function POST(request: Request) {
             },
             { status: 200 }
         );
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Error resetting password:", error);
-        return NextResponse.json(
-            { success: false, error: "Internal Server Error" },
-            { status: 500 }
-        );
+        return NextResponse.json({
+            success: false,
+            error: "Internal Server Error",
+        });
     }
 }

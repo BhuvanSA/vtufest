@@ -3,35 +3,13 @@ import prisma from "@/lib/db";
 import bcrypt from "bcrypt";
 import { z } from "zod";
 import { Redis } from "@upstash/redis";
+import { signupSchema } from "@/lib/schemas/auth";
 
 // Initialize Upstash Redis client
 const redis = new Redis({
     url: process.env.UPSTASH_REDIS_REST_URL as string, // Upstash Redis URL
     token: process.env.UPSTASH_REDIS_REST_TOKEN as string, // Upstash Redis Token
 });
-
-// Define Zod schema for validation
-const formSchema = z
-    .object({
-        college: z
-            .string()
-            .min(3, "College name must be at least 3 characters")
-            .max(100, "College name should not exceed 100 characters"),
-        phone: z
-            .string()
-            .regex(
-                /^\d{10,15}$/,
-                "Phone number must be between 10 to 15 digits"
-            ),
-        email: z.string().email("Invalid email address"),
-        otp: z.string().regex(/^\d{6}$/, "OTP must be a 6-digit number"),
-        password: z.string().min(8, "Password must be at least 8 characters"),
-        confirmPassword: z.string(),
-    })
-    .refine((data) => data.password === data.confirmPassword, {
-        message: "Passwords do not match",
-        path: ["confirmPassword"],
-    });
 
 // Function to map Zod errors to field-level error object
 function mapZodErrors(zodError: z.ZodError): Record<string, string> {
@@ -78,12 +56,12 @@ async function verifyOtp(
         // OTP is valid, delete it from Redis
         try {
             await redis.del(`otp:${email}`);
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Error deleting OTP from Redis:", error);
         }
 
         return { success: true, message: "OTP verified successfully." };
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Error verifying OTP internally:", error);
         return { success: false, message: "Internal Server Error" };
     }
@@ -93,7 +71,7 @@ export async function POST(request: Request) {
     try {
         const body = await request.json();
         // Validate input with Zod schema
-        const validation = formSchema.safeParse(body);
+        const validation = signupSchema.safeParse(body);
 
         if (validation.success === false) {
             const fieldErrors = mapZodErrors(validation.error);
@@ -156,7 +134,7 @@ export async function POST(request: Request) {
             },
             { status: 200 }
         );
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Error in registration process:", error);
         return NextResponse.json(
             { success: false, errors: { general: "Internal Server Error" } },

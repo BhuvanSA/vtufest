@@ -100,7 +100,7 @@ export default function EventRegister() {
 
     const availableEvents = eventCategories.filter(
         (event) =>
-            !registeredEvents.some(
+            !registeredEvents?.some(
                 (regEvent) => regEvent.eventNo === event.eventNo
             )
     );
@@ -285,39 +285,41 @@ export default function EventRegister() {
                                     <h2 className="text-xl font-semibold text-foreground">
                                         Registered Events
                                     </h2>
-                                    {registeredEvents.length > 0 && (
+                                    {registeredEvents?.length > 0 && (
                                         <span className="bg-primary/20 text-primary rounded-full w-6 h-6 flex items-center justify-center text-sm">
-                                            {registeredEvents.length}
+                                            {registeredEvents?.length}
                                         </span>
                                     )}
                                 </div>
                                 <ul className="space-y-2">
-                                    {registeredEvents.length > 0 ? (
-                                        registeredEvents.map((event, index) => (
-                                            <li
-                                                key={event.eventNo}
-                                                className="flex items-center justify-between p-2 rounded-md hover:bg-secondary/80 transition-colors duration-200"
-                                            >
-                                                <span className="">
-                                                    <span className="font-medium">
-                                                        {index + 1}.{" "}
-                                                    </span>
-                                                    {event.eventName}
-                                                </span>
-                                                <button
-                                                    onClick={() =>
-                                                        handleDelete(
-                                                            event.id,
-                                                            event.eventName
-                                                        )
-                                                    }
-                                                    className="text-red-500 hover:text-red-700 transition-colors duration-200"
-                                                    disabled={isLoading}
+                                    {registeredEvents?.length > 0 ? (
+                                        registeredEvents?.map(
+                                            (event, index) => (
+                                                <li
+                                                    key={event.eventNo}
+                                                    className="flex items-center justify-between p-2 rounded-md hover:bg-secondary/80 transition-colors duration-200"
                                                 >
-                                                    &times;
-                                                </button>
-                                            </li>
-                                        ))
+                                                    <span className="">
+                                                        <span className="font-medium">
+                                                            {index + 1}.{" "}
+                                                        </span>
+                                                        {event.eventName}
+                                                    </span>
+                                                    <button
+                                                        onClick={() =>
+                                                            handleDelete(
+                                                                event.id,
+                                                                event.eventName
+                                                            )
+                                                        }
+                                                        className="text-red-500 hover:text-red-700 transition-colors duration-200"
+                                                        disabled={isLoading}
+                                                    >
+                                                        &times;
+                                                    </button>
+                                                </li>
+                                            )
+                                        )
                                     ) : (
                                         <p className="text-gray-500">
                                             No events registered

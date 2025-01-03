@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import * as z from "zod";
+import { resetPasswordSchema } from "@/lib/schemas/auth";
 import axios from "axios";
 import { toast } from "react-toastify";
 
@@ -30,26 +31,10 @@ import { LoadingButton } from "@/components/LoadingButton";
 import {
     InputOTP,
     InputOTPGroup,
+    InputOTPSeparator,
     InputOTPSlot,
 } from "@/components/ui/input-otp";
 import Image from "next/image";
-
-const resetPasswordSchema = z
-    .object({
-        email: z.string().email("Invalid email address"),
-        otp: z
-            .string()
-            .length(6, "OTP must be 6 digits")
-            .regex(/^\d{6}$/, "OTP must be numeric"),
-        newPassword: z
-            .string()
-            .min(8, "Password must be at least 8 characters"),
-        confirmPassword: z.string(),
-    })
-    .refine((data) => data.newPassword === data.confirmPassword, {
-        message: "Passwords must match",
-        path: ["confirmPassword"], // Error will show under `confirmPassword` field
-    });
 
 export default function ResetPassword() {
     const router = useRouter();
@@ -222,21 +207,41 @@ export default function ResetPassword() {
                                             Enter OTP
                                         </FormLabel>
                                         <FormControl>
-                                            <InputOTP
-                                                maxLength={6}
-                                                value={field.value}
-                                                onChange={field.onChange}
-                                                className="bg-background"
-                                            >
-                                                <InputOTPGroup>
-                                                    <InputOTPSlot index={0} />
-                                                    <InputOTPSlot index={1} />
-                                                    <InputOTPSlot index={2} />
-                                                    <InputOTPSlot index={3} />
-                                                    <InputOTPSlot index={4} />
-                                                    <InputOTPSlot index={5} />
-                                                </InputOTPGroup>
-                                            </InputOTP>
+                                            <div className="flex justify-center">
+                                                <InputOTP
+                                                    maxLength={6}
+                                                    value={field.value}
+                                                    onChange={field.onChange}
+                                                    className="bg-background"
+                                                >
+                                                    <InputOTPGroup>
+                                                        <InputOTPSlot
+                                                            index={0}
+                                                        />
+                                                        <InputOTPSlot
+                                                            index={1}
+                                                        />
+                                                    </InputOTPGroup>
+                                                    <InputOTPSeparator />
+                                                    <InputOTPGroup>
+                                                        <InputOTPSlot
+                                                            index={2}
+                                                        />
+                                                        <InputOTPSlot
+                                                            index={3}
+                                                        />
+                                                    </InputOTPGroup>
+                                                    <InputOTPSeparator />
+                                                    <InputOTPGroup>
+                                                        <InputOTPSlot
+                                                            index={4}
+                                                        />
+                                                        <InputOTPSlot
+                                                            index={5}
+                                                        />
+                                                    </InputOTPGroup>
+                                                </InputOTP>
+                                            </div>
                                         </FormControl>
                                         <FormMessage className="text-destructive" />
                                     </FormItem>
