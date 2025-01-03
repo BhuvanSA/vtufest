@@ -1,22 +1,32 @@
 import { Youtube, Instagram } from "lucide-react";
+import Image from "next/image";
 
 const Footer = () => {
     return (
         <footer aria-label="Site Footer" className="bg-background">
             <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
-                <div className="flex justify-center text-foreground">
-                    <h1 className="text-4xl text-center">
+                <div className="flex justify-center mb-10">
+                    <Image
+                        src="/images/college-logo.png"
+                        alt="global logo"
+                        width={100}
+                        height={100}
+                    />
+                </div>
+                <div className="flex flex-col justify-center text-foreground gap-y-2">
+                    <h1 className="text-4xl text-center uppercase font-bold">
                         Global Academy of Technology
                     </h1>
+                    <h2 className="text-2xl text-center font-bold text-primary">
+                        Growing Ahead of Time ....
+                    </h2>
+                    <p className="text-lg text-center">
+                        Autonomous Institute, Affiliated to VTU
+                    </p>
+                    <h2 className="text-2xl text-center font-bold text-primary">
+                        A Unit of National Education Foundation
+                    </h2>
                 </div>
-                <p className="mx-auto mt-4 max-w-md text-center leading-relaxed text-muted-foreground">
-                    Autonomous Institute, Affiliated to VTU Belagavi
-                </p>
-
-                <p className="mx-auto mt-4 max-w-md text-center leading-relaxed text-muted-foreground">
-                    Aditya Layout, Rajarajeshwari Nagar, Bengaluru, Karnataka
-                    560098
-                </p>
 
                 <ul className="mt-12 flex justify-center gap-6 md:gap-8">
                     <li>
