@@ -4,7 +4,6 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -17,67 +16,68 @@ datasource db {
 // added the collegeCode to nullable as optional and unique
 // add the email for the unique key
 
-
 model Users {
-  id           String          @id @default(uuid())
-  collegeCode  String?         @unique
-  collegeName  String
-  phone        String          @unique
-  email        String          @unique
-  password     String
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
-  events       Events[]        
-  registrants  Registrants[]    
+  id          String        @id @default(uuid())
+  collegeCode String?       @unique
+  collegeName String
+  phone       String        @unique
+  email       String        @unique
+  password    String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  role        String        @default("USER")
+  events      Events[]
+  registrants Registrants[]
 }
 
 model Events {
-  id                   String                  @id @default(uuid())
-  eventNo              Int                     
-  eventName            String
+  id                    String               @id @default(uuid())
+  eventNo               Int
+  eventName             String
   userId                String
-  registrants          Registrants[]           @relation("EventRegistrations")
-  user                  Users                  @relation(fields: [userId], references: [id],onDelete: Cascade)
-  eventRegistrations   EventRegistrations[]     
-  maxParticipant        Int    
-  registeredParticipant     Int @default(0)
-  maxAccompanist          Int
-  registeredAccompanist     Int @default(0) 
-  category                  String
-  @@unique([userId,eventNo])
+  registrants           Registrants[]        @relation("EventRegistrations")
+  user                  Users                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eventRegistrations    EventRegistrations[]
+  maxParticipant        Int
+  registeredParticipant Int                  @default(0)
+  maxAccompanist        Int
+  registeredAccompanist Int                  @default(0)
+  category              String
 
+  @@unique([userId, eventNo])
 }
 
 model Registrants {
-  id           String                 @id @default(uuid())
-  name         String
-  usn          String                 @unique
-  phone        String                 @unique
-  teamManager Boolean                  @default(false)
-  photoUrl     String
-  aadharUrl    String?
-  sslcUrl      String?
-  pucUrl       String?
-  admission1Url String?
-  admission2Url String?
-  idcardUrl    String?
-  userId       String
-  verified     Boolean                @default(false)
-  user         Users                  @relation(fields: [userId], references: [id],onDelete: Cascade)
-  events       Events[]               @relation("EventRegistrations")
+  id                 String               @id @default(uuid())
+  name               String
+  usn                String               @unique
+  phone              String               @unique
+  teamManager        Boolean              @default(false)
+  photoUrl           String
+  aadharUrl          String?
+  sslcUrl            String?
+  pucUrl             String?
+  admission1Url      String?
+  admission2Url      String?
+  idcardUrl          String?
+  userId             String
+  verified           Boolean              @default(false)
+  user               Users                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  events             Events[]             @relation("EventRegistrations")
   eventRegistrations EventRegistrations[]
 }
 
 model EventRegistrations {
-  id               String        @id @default(uuid())
+  id               String      @id @default(uuid())
   registrantId     String
-  eventId          String 
-  type              Type
-  attendanceStatus Boolean       @default(false)
-  prize            Int           @default(0)
-  registrant       Registrants   @relation(fields: [registrantId], references: [id],onDelete: Cascade)
-  event            Events        @relation(fields: [eventId], references: [id],onDelete: Cascade)
-  @@unique([registrantId,eventId])
+  eventId          String
+  type             Type
+  attendanceStatus Boolean     @default(false)
+  prize            Int         @default(0)
+  registrant       Registrants @relation(fields: [registrantId], references: [id], onDelete: Cascade)
+  event            Events      @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([registrantId, eventId])
 }
 
 enum Type {

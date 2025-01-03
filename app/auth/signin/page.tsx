@@ -27,15 +27,7 @@ import {
 } from "@/components/ui/form";
 import { LoadingButton } from "@/components/LoadingButton";
 import { useAuthContext } from "@/contexts/auth-context";
-// import { set } from "date-fns";
-
-const loginSchema = z.object({
-    email: z
-        .string()
-        .email("Invalid email address")
-        .min(1, "Email is required"),
-    password: z.string().min(8, "Password must be at least 8 characters"),
-});
+import { loginSchema } from "@/lib/schemas/auth";
 
 export default function SignIn() {
     const router = useRouter();
