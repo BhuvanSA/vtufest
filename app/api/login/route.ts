@@ -5,8 +5,6 @@ import bcrypt from "bcrypt";
 import { createSession, SessionPayload } from "@/lib/session";
 
 export async function POST(request: NextRequest) {
-    const JWT_TOKEN_EXPIRY = new Date(Date.now() + 1000 * 60 * 60 * 24);
-
     try {
         const body = await request.json();
 
@@ -44,7 +42,6 @@ export async function POST(request: NextRequest) {
             id: db.id,
             email: db.email,
             role: db.role,
-            expiresAt: JWT_TOKEN_EXPIRY,
         };
         await createSession(token);
 

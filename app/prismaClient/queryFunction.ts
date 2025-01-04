@@ -402,8 +402,7 @@ export async function registerUserEvents(
 ) {
     try {
         const userEvents = await prisma.events.createMany({
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            data: events.map((event: any) => ({
+            data: events.map((event: EventCreate) => ({
                 userId,
                 eventName: event.eventName,
                 eventNo: event.eventNo,

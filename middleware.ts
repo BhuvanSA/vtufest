@@ -68,14 +68,9 @@ export async function middleware(request: NextRequest) {
     }
 
     const session = await verifySession();
-    if (protectedRoutes.includes(path) && !session) {
+    if (protectedRoutes.includes(path) && !session?.id) {
         return NextResponse.redirect(new URL("/auth/signin", request.nextUrl));
     }
-
-    if (session && !request.nextUrl.pathname.startsWith("/register")) {
-        return NextResponse.redirect(new URL("/register", request.nextUrl));
-    }
-
     return NextResponse.next();
 }
 

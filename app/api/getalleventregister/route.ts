@@ -1,30 +1,21 @@
 import { getAllEventsByUser } from "@/app/prismaClient/queryFunction";
-import { jwtVerify } from "jose";
-import { cookies } from "next/headers";
+import { verifySession } from "@/lib/session";
+// import { NextApiRequest, NextApiResponse } from "next";
 import { NextResponse } from "next/server";
-const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || "default_secret");
+import { redirect } from "next/navigation";
 
 export async function GET() {
-
-    const token:string = (await cookies()).get('auth_token')?.value as string;
-
-    if (!token) {
-        return NextResponse.json({ success: false, message: 'token not found' }, { status: 401 })
+    // do i need to decrypt the cookie?
+    const session = await verifySession();
+    if (!session) {
+        redirect("/auth/signin");
     }
-
-    const verify = await jwtVerify(token, JWT_SECRET);
-
-    if (!verify) {
-        return NextResponse.json({ success: false, message: 'unauthorized' }, { status: 401 })
-    }
-
-    const userId:string = verify.payload.id as string;
-
+    const userId: string = session.id as string;
     try {
         const userEvents = await getAllEventsByUser(userId);
-        return NextResponse.json({ success: true, userEvents }, { status: 200 })
+        return NextResponse.json({ success: true, userEvents });
     } catch (err) {
-        return NextResponse.json({ success: false, message: err }, { status: 400 })
+        console.log(err);
+        return NextResponse.json({ success: false, message: err });
     }
-
 }
