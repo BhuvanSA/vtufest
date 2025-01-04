@@ -26,8 +26,8 @@ export async function decrypt(session: string | undefined = "") {
             algorithms: ["HS256"],
         });
         return payload;
-    } catch (error) {
-        console.log("Failed to verify session");
+    } catch (error: unknown) {
+        console.log("Failed to verify session", error);
         return null;
     }
 }
@@ -62,9 +62,7 @@ export async function updateSession() {
         console.log("Could not update session");
         return null;
     }
-
-    const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-
+    const expires = new Date(Date.now() + 60 * 60 * 1000);
     const cookieStore = await cookies();
     cookieStore.set("session", session, {
         httpOnly: true,
