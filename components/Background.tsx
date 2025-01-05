@@ -1,9 +1,9 @@
 import Image from "next/image";
-import  logo from "@/components/images/logo.png"
+import logo from "@/components/images/logo.png";
 const Background = () => {
     return (
         <>
-            <div >
+            <div className="pt-24">
                 <div className="relative inset-x-0 overflow-hidden">
                     <video
                         autoPlay

@@ -4,6 +4,7 @@ import Footer from ".././components/Footer";
 import "./globals.css";
 import AuthContextProvider from "@/contexts/auth-context";
 import { ThemeProvider } from "@/contexts/theme-provider";
+import { Toaster } from "sonner";
 
 // Global layout for pages
 const Layout = ({ children }: { children: React.ReactNode }) => {
@@ -16,7 +17,8 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                 <ThemeProvider>
                     <AuthContextProvider>
                         <Navbar />
-                        <main className="pt-20">{children}</main>
+                        <main>{children}</main>
+                        <Toaster className=" bg-primary-foreground" />
                         <Footer />
                     </AuthContextProvider>
                 </ThemeProvider>

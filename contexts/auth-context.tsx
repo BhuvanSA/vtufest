@@ -17,12 +17,11 @@ export default function AuthContextProvider({
     children,
 }: AuthContextProviderProps) {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    console.log(isLoggedIn);
-
     const checkAuth = async () => {
         try {
             const response = await fetch("/api/checkAuth");
-            setIsLoggedIn(response.ok);
+            const data = await response.json();
+            setIsLoggedIn(data.success);
         } catch (error) {
             console.error("Auth check failed:", error);
             setIsLoggedIn(false);

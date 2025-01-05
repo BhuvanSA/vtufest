@@ -14,7 +14,6 @@ export const navItems = [
     { href: "/about", text: "About Us" },
     { href: "/events", text: "Events" },
     { href: "/schedule", text: "Schedule" },
-    { href: "/register", text: "Register" },
 ];
 
 const NavBar = () => {
@@ -52,24 +51,36 @@ const NavBar = () => {
                                 href={href}
                                 text={text}
                                 isActive={
-                                    (pathname.startsWith(href) &&
-                                        href !== "/") ||
-                                    pathname === href
+                                    pathname === href ||
+                                    (pathname.startsWith(
+                                        "/" + href.split("/")[1]
+                                    ) &&
+                                        href !== "/")
                                 }
                             />
                         ))}
                         {isLoggedIn ? (
-                            <NavItem
-                                href="/auth/logout"
-                                text="Logout"
-                                isActive={pathname.startsWith("/auth")}
-                            />
+                            <>
+                                <NavItem
+                                    href="/register/getallregister"
+                                    text="Register"
+                                    isActive={pathname.startsWith("/register")}
+                                />
+                                <NavItem
+                                    href="/auth/logout"
+                                    text="Logout"
+                                    isActive={pathname.startsWith("/auth")}
+                                    className="hover:bg-red-500"
+                                />
+                            </>
                         ) : (
-                            <NavItem
-                                href="/auth/signin"
-                                text="Login"
-                                isActive={pathname.startsWith("/auth")}
-                            />
+                            <>
+                                <NavItem
+                                    href="/auth/signin"
+                                    text="Login"
+                                    isActive={pathname.startsWith("/auth")}
+                                />
+                            </>
                         )}
                     </nav>
                 </div>
