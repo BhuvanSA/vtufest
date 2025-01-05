@@ -71,7 +71,6 @@ export async function middleware(request: NextRequest) {
     if (protectedRoutes.includes(path) && !session?.id) {
         return NextResponse.redirect(new URL("/auth/signin", request.nextUrl));
     }
-    return NextResponse.next();
 }
 
 export const config = {

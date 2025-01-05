@@ -1,12 +1,12 @@
 import { deleteSession } from "@/lib/session";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-export async function POST(request: NextRequest) {
+export async function POST() {
     try {
         await deleteSession();
     } catch (error) {
         console.error(error);
         return NextResponse.error();
     }
-    return NextResponse.redirect(new URL("/auth/sigin", request.nextUrl));
+    return NextResponse.json({ success: true });
 }
