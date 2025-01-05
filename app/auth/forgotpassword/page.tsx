@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import * as z from "zod";
 import { resetPasswordSchema } from "@/lib/schemas/auth";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

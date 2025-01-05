@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import * as z from "zod";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -75,18 +75,6 @@ export default function SignUp() {
         },
     });
 
-    useEffect(() => {
-        let interval: NodeJS.Timeout;
-        if (resendTimer > 0) {
-            interval = setInterval(() => {
-                setResendTimer((prev) => prev - 1);
-            }, 1000);
-        }
-        return () => {
-            if (interval) clearInterval(interval);
-        };
-    }, [resendTimer]);
-
     const sendOTP = async () => {
         const email = form.getValues("email");
         if (!email) {
@@ -127,7 +115,7 @@ export default function SignUp() {
         try {
             const response = await axios.post("/api/signup", values);
             if (response.data.success) {
-                toast.success("Signup successful! Redirecting to login...");
+                toast("Signup successful! Redirecting to login...");
                 router.push("/auth/signin");
             } else {
                 const { errors } = response.data;
@@ -155,7 +143,7 @@ export default function SignUp() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-secondary p-4">
+        <div className="pt-24 min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-secondary p-4">
             <Card className="w-full max-w-md bg-card text-card-foreground">
                 <CardHeader className="space-y-1">
                     <div className="flex items-center justify-center mb-6">

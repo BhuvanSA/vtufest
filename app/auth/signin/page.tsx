@@ -28,6 +28,7 @@ import {
 import { LoadingButton } from "@/components/LoadingButton";
 import { useAuthContext } from "@/contexts/auth-context";
 import { loginSchema } from "@/lib/schemas/auth";
+import { toast } from "sonner";
 
 export default function SignIn() {
     const router = useRouter();
@@ -52,6 +53,9 @@ export default function SignIn() {
             });
             if (response.data.success) {
                 setIsLoggedIn(true);
+                toast.success("Login successful!", {
+                    description: "You have been logged in successfully",
+                });
                 router.push("/register/eventregister");
             } else {
                 form.setError("email", {
