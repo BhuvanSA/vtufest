@@ -14,7 +14,7 @@ export const docStatusMap = {
 } as const;
 
 interface AggregatedRow {
-    registrantid: string;
+    registrantId: string;
     name: string;
     usn: string;
     photoUrl: string;
@@ -66,7 +66,7 @@ export default async function Page() {
         // If Team Manager => single "Team Manager" row
         if (row.teamManager) {
             results.push({
-                id: `${row.registrantid}-TEAMMANAGER`,
+                id: `${row.registrantId}#TEAMMANAGER`,
                 name: row.name,
                 usn: row.usn,
                 photo: row.photoUrl,
@@ -74,6 +74,7 @@ export default async function Page() {
                 events: [],
                 status: docStatusMap[row.docStatus],
             });
+            console.log(row.registrantId, "is a team manager");
             continue;
         }
 
@@ -89,7 +90,7 @@ export default async function Page() {
         // If no events at all, push a single blank record
         if (!hasEvents) {
             results.push({
-                id: row.registrantid,
+                id: row.registrantId,
                 name: row.name,
                 usn: row.usn,
                 photo: row.photoUrl,
@@ -103,7 +104,7 @@ export default async function Page() {
         // If participant
         if (participantEvents.length > 0) {
             results.push({
-                id: `${row.registrantid}-PARTICIPANT`,
+                id: `${row.registrantId}#PARTICIPANT`,
                 name: row.name,
                 usn: row.usn,
                 photo: row.photoUrl,
@@ -116,7 +117,7 @@ export default async function Page() {
         // If accompanist
         if (accompanistEvents.length > 0) {
             results.push({
-                id: `${row.registrantid}-ACCOMPANIST`,
+                id: `${row.registrantId}#ACCOMPANIST`,
                 name: row.name,
                 usn: row.usn,
                 photo: row.photoUrl,

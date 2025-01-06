@@ -56,15 +56,17 @@ export function DataTable({ data }: { data: Data[] }) {
     const [rows, setRows] = React.useState<Data[]>(data);
 
     const handleUpdate = (id: string) => {
-        router.push(`/register/updateregister/${id}`);
+        const originId = id.split("#")[0];
+        router.push(`/register/updateregister/${originId}`);
     };
 
     const handleRemove = async (id: string) => {
+        const originId = id.split("#")[0];
         const updatedRows = rows.filter((row) => row.id !== id);
         try {
             const response = await fetch("/api/deleteregister", {
                 method: "DELETE",
-                body: JSON.stringify({ registrantId: id }),
+                body: JSON.stringify({ registrantId: originId }),
                 headers: {
                     "Content-Type": "application/json",
                 },
