@@ -1,5 +1,6 @@
 "use client";
 
+import { FileDown, Trash2 } from "lucide-react";
 import * as React from "react";
 import {
     ColumnDef,
@@ -404,12 +405,14 @@ export function DataTable({ data }: { data: Data[] }) {
                 />
                 <Button
                     variant="outline"
-                    className="ml-auto"
+                    className="ml-auto hover:bg-[#00B140]"
                     onClick={handleExport}
                 >
-                    Export current view to Excel
+                    <FileDown className="mr-2 h-4 w-4" />
+                    Download current view as Excel
                 </Button>
                 <Button variant="outline" className="ml-2 hover:bg-red-500">
+                    <Trash2 className="mr-2 h-4 w-4" />
                     Delete Selected
                 </Button>
                 <DropdownMenu>
