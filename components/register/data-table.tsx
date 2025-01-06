@@ -47,7 +47,7 @@ export type Data = {
     name: string;
     usn: string;
     type: "Participant" | "Team Manager" | "Accompanist";
-    events: string[];
+    events: { eventName: string }[];
     status: "pending" | "processing" | "success" | "failed";
 };
 
@@ -162,12 +162,7 @@ export function DataTable({ data }: { data: Data[] }) {
             {
                 accessorKey: "type",
                 header: ({ column }) => {
-                    const filterCycle = [
-                        "ALL",
-                        "Participant",
-                        "Team Manager",
-                        "Accompanist",
-                    ];
+                    const filterCycle = ["ALL", "Participant", "Team Manager"];
                     const currentFilter =
                         (column.getFilterValue() as string) ?? "ALL";
                     const currentIndex = filterCycle.indexOf(currentFilter);
@@ -204,8 +199,8 @@ export function DataTable({ data }: { data: Data[] }) {
                 accessorKey: "events",
                 header: ({ column, table }) => {
                     const allRows = table.getPreFilteredRowModel().rows;
-                    const allEvents = allRows.flatMap(
-                        (row) => row.original.events
+                    const allEvents = allRows.flatMap((row) =>
+                        row.original.events.map((e) => e.eventName)
                     );
                     const uniqueEvents = Array.from(new Set(allEvents));
                     const filterCycle = ["ALL", ...uniqueEvents];
@@ -233,15 +228,21 @@ export function DataTable({ data }: { data: Data[] }) {
                     );
                 },
                 cell: ({ row }) => {
-                    const eventList = row.getValue("events") as string[];
+                    const events = row.getValue("events") as {
+                        eventName: string;
+                    }[];
                     return (
-                        <div className="capitalize">{eventList.join(", ")}</div>
+                        <div className="capitalize">
+                            {events.map((e) => e.eventName).join(", ")}
+                        </div>
                     );
                 },
                 filterFn: (row, columnId, filterValue) => {
                     if (!filterValue || filterValue === "ALL") return true;
-                    const events: string[] = row.getValue(columnId);
-                    return events.includes(filterValue);
+                    const events = row.getValue(columnId) as {
+                        eventName: string;
+                    }[];
+                    return events.some((e) => e.eventName === filterValue);
                 },
             },
             {
@@ -251,8 +252,8 @@ export function DataTable({ data }: { data: Data[] }) {
                         "ALL",
                         "pending",
                         "processing",
-                        "success",
-                        "failed",
+                        "approved",
+                        "rejected",
                     ];
                     const currentFilter =
                         (column.getFilterValue() as string) ?? "ALL";
@@ -287,7 +288,7 @@ export function DataTable({ data }: { data: Data[] }) {
                 filterFn: (row, columnId, filterValue) => {
                     if (!filterValue || filterValue === "ALL") return true;
                     const status = row.getValue(columnId);
-                    return status === filterValue;
+                    return status == filterValue;
                 },
             },
             {

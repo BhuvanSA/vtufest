@@ -1,120 +1,84 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { DataTable, Data } from "@/components/register/data-table";
-import { useRouter } from "next/navigation";
+import prisma from "@/lib/db";
+import { DataTable } from "@/components/register/data-table";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
 
-// TODO: convert this to a Server Side Rendered page by direclty fetching data from the database
-// Create better UI to display all selected events
-// better ui for the Add and submit button, maybe use a loading button if required
-// convert any types to proper types
-// seperate out the columns from data-table
+const docStatusMap: Record<
+    string,
+    "pending" | "processing" | "success" | "failed"
+> = {
+    PENDING: "pending",
+    PROCESSING: "processing",
+    APPROVED: "success",
+    REJECTED: "failed",
+};
 
-export default function Page() {
-    const [rows, setRows] = useState<Data[]>([]);
-    const router = useRouter();
-
-    useEffect(() => {
-        async function getAllregistrant() {
-            const res = await fetch("/api/getallregister", {
-                method: "GET",
-                credentials: "include", // Ensure cookies are included
-            });
-            const { registrant = [] } = await res.json();
-
-            // Convert backend response to Data array
-            const listData: Data[] = registrant.map((item: any) => ({
-                id: item.id,
-                photo: item.photoUrl ?? "https://via.placeholder.com/150",
-                name: item.name || "N/A",
-                usn: item.usn || "N/A",
-                type: item.teamManager ? "Team Manager" : "Participant",
-                events: item.events?.map((e: any) => e.eventName) ?? [],
-                status: "pending", // or any default logic
-            }));
-
-            setRows(listData);
-            console.log(listData);
-        }
-        getAllregistrant();
-    }, []);
-
-    const handleUpdate = (id: string) => {
-        router.push(`/register/updateregister/${id}`);
-    };
-
-    const handleRemove = async (id: string) => {
-        const updatedRows = rows.filter((row) => row.id !== id);
-        try {
-            const response = await fetch("/api/deleteregister", {
-                method: "DELETE",
-                body: JSON.stringify({ registrantId: id }),
-                headers: {
-                    "Content-Type": "application/json",
+export default async function Page() {
+    // Single-query fetch
+    const registrants = await prisma.registrants.findMany({
+        include: {
+            eventRegistrations: {
+                include: {
+                    event: {
+                        select: {
+                            eventName: true,
+                        },
+                    },
                 },
-                credentials: "include", // Ensure cookies are included
-            });
+            },
+        },
+    });
 
-            const data = await response.json();
-            alert(data.message);
-            setRows(updatedRows);
-        } catch (err: unknown) {
-            alert("An error occurred while removing the registrant.");
-            console.error(err);
-        }
-    };
+    // Transform into DataTable format
+    const results = registrants.flatMap((r) => {
+        // Group by type
+        const mapByType: Record<string, { eventName: string }[]> = {};
+        r.eventRegistrations.forEach((er) => {
+            const t =
+                er.type === "PARTICIPANT"
+                    ? r.teamManager
+                        ? "Team Manager"
+                        : "Participant"
+                    : "Accompanist";
+            mapByType[t] = mapByType[t] || [];
+            mapByType[t].push({ eventName: er.event.eventName });
+        });
+
+        // Build each row
+        return Object.keys(mapByType).map((typeKey) => ({
+            id: r.id + "-" + typeKey,
+            photo: r.photoUrl,
+            name: r.name,
+            usn: r.usn,
+            type: typeKey as "Participant" | "Accompanist",
+            events: mapByType[typeKey],
+            status: docStatusMap[r.docStatus],
+        }));
+    });
 
     return (
-        <div>
+        <div className="bg-background min-h-screen pt-24">
             <div className="mt-4 justify-center flex flex-col gap-4">
-                <h1 className="flex justify-center">Registrants</h1>
+                <div className="max-w-4xl mx-auto p-4">
+                    <h1 className="text-primary font-bold text-4xl md:text-6xl xl:text-7xl mb-6">
+                        Registrants
+                    </h1>
+                </div>
                 <div className="flex justify-center">
                     Events registered from all registrants
                 </div>
-                {/* map all the events in the list data */}
-                <div className="justify-center flex flex-wrap gap-4">
-                    {rows.map((item) => {
-                        return (
-                            <div className="flex gap-4" key={item.id}>
-                                {item.events.map((event) => {
-                                    return (
-                                        <Badge className="" key={event}>
-                                            {event}
-                                        </Badge>
-                                    );
-                                })}
-                            </div>
-                        );
-                    })}
-                </div>
             </div>
-            <Button
-                onClick={() => router.push("/register/addevent")}
-                className="mt-4"
-            >
-                Add Events
-            </Button>
-            <DataTable
-                data={rows}
-                onUpdate={handleUpdate}
-                onRemove={handleRemove}
-            />
+            <Link href="/register/eventregister">
+                <Button className="mt-4">Add Events</Button>
+            </Link>
+            <DataTable data={results} />
             <div className="flex justify-center mt-4 gap-4">
-                <Button
-                    onClick={() => router.push("/register/documentupload")}
-                    className=""
-                    disabled={rows?.length > 45}
-                >
-                    Add
-                </Button>
-                <Button
-                    className=""
-                    onClick={() => router.push("/paymentinfo")}
-                >
-                    Submit
-                </Button>
+                <Link href="/register/documentupload">
+                    <Button>add</Button>
+                </Link>
+                <Link href="/register/paymentinfo">
+                    <Button>Submit</Button>
+                </Link>
             </div>
         </div>
     );
