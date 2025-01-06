@@ -46,7 +46,7 @@ export type Data = {
     photo: string;
     name: string;
     usn: string;
-    type: "Participant" | "Team Manager" | "Accompanist";
+    type: "Participant" | "Accompanist" | "Team Manager" | "";
     events: { eventName: string }[];
     status: "pending" | "processing" | "success" | "failed";
 };
@@ -162,7 +162,12 @@ export function DataTable({ data }: { data: Data[] }) {
             {
                 accessorKey: "type",
                 header: ({ column }) => {
-                    const filterCycle = ["ALL", "Participant", "Team Manager"];
+                    const filterCycle = [
+                        "ALL",
+                        "Participant",
+                        "Accompanist",
+                        "Team Manager",
+                    ];
                     const currentFilter =
                         (column.getFilterValue() as string) ?? "ALL";
                     const currentIndex = filterCycle.indexOf(currentFilter);
