@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/db";
+import { verifySession } from "@/lib/session";
 
 interface RegisterEvent {
     eventNo: number;
@@ -15,8 +16,13 @@ interface ReplaceRegistrationsRequest {
 }
 
 export async function PUT(request: Request) {
+    const session = await verifySession();
+    if (!session) {
+        return NextResponse.redirect("/auth/signin");
+    }
     const body: ReplaceRegistrationsRequest = await request.json();
-    const { userId, events } = body;
+    const { events } = body;
+    const userId = session.id as string;
 
     if (!userId || !Array.isArray(events)) {
         return NextResponse.json(
