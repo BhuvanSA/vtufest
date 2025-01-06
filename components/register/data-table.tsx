@@ -19,6 +19,8 @@ import {
     MoreHorizontal,
     ListFilterIcon,
 } from "lucide-react";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -355,6 +357,35 @@ export function DataTable({ data }: { data: Data[] }) {
         },
     });
 
+    // Use the final row model to get the filtered + sorted data
+    const handleExport = () => {
+        // Pull final rows from the table’s computed row model:
+        const filteredSortedRows = table
+            .getRowModel()
+            .rows.map((row) => row.original);
+
+        // Prepare data for Excel
+        const exportData = filteredSortedRows.map((row) => ({
+            Name: row.name,
+            USN: row.usn,
+            Type: row.type,
+            Events: row.events.map((event) => event.eventName).join(", "),
+            Status: row.status,
+        }));
+
+        // Create a worksheet
+        const worksheet = XLSX.utils.json_to_sheet(exportData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Registrants");
+
+        // Generate buffer
+        const wbout = XLSX.write(workbook, { type: "array", bookType: "xlsx" });
+
+        // Create a Blob and trigger download
+        const blob = new Blob([wbout], { type: "application/octet-stream" });
+        saveAs(blob, "registrants.xlsx");
+    };
+
     return (
         <div className="w-full px-5">
             <div className="flex items-center py-4">
@@ -371,7 +402,14 @@ export function DataTable({ data }: { data: Data[] }) {
                     }
                     className="max-w-sm"
                 />
-                <Button variant="outline" className="ml-auto hover:bg-red-500">
+                <Button
+                    variant="outline"
+                    className="ml-auto"
+                    onClick={handleExport}
+                >
+                    Export current view to Excel
+                </Button>
+                <Button variant="outline" className="ml-2 hover:bg-red-500">
                     Delete Selected
                 </Button>
                 <DropdownMenu>
