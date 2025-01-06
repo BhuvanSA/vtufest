@@ -1,6 +1,6 @@
 "use client";
 
-import { FileDown, Trash2 } from "lucide-react";
+import { Columns, FileDown, Pencil, Search, Trash2 } from "lucide-react";
 import * as React from "react";
 import {
     ColumnDef,
@@ -322,13 +322,15 @@ export function DataTable({ data }: { data: Data[] }) {
                                 <DropdownMenuItem
                                     onClick={() => handleUpdate(data.id)}
                                 >
+                                    <Pencil className="mr-2 h-4 w-4" />
                                     Update
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                     onClick={() => handleRemove(data.id)}
                                     className="text-red-500"
                                 >
-                                    Remove
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    Delete
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
@@ -390,34 +392,42 @@ export function DataTable({ data }: { data: Data[] }) {
     return (
         <div className="w-full px-5">
             <div className="flex items-center py-4">
-                <Input
-                    placeholder="Search name..."
-                    value={
-                        (table.getColumn("name")?.getFilterValue() as string) ??
-                        ""
-                    }
-                    onChange={(event) =>
-                        table
-                            .getColumn("name")
-                            ?.setFilterValue(event.target.value)
-                    }
-                    className="max-w-sm"
-                />
+                <div className="relative max-w-sm">
+                    <Search className="absolute left-2 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                        placeholder="Search name..."
+                        value={
+                            (table
+                                .getColumn("name")
+                                ?.getFilterValue() as string) ?? ""
+                        }
+                        onChange={(event) =>
+                            table
+                                .getColumn("name")
+                                ?.setFilterValue(event.target.value)
+                        }
+                        className="pl-8"
+                    />
+                </div>
                 <Button
                     variant="outline"
-                    className="ml-auto hover:bg-[#00B140]"
+                    className="ml-auto hover:bg-[#00B140] hover:text-primary-foreground border hover:border-green-500"
                     onClick={handleExport}
                 >
                     <FileDown className="mr-2 h-4 w-4" />
                     Download current view as Excel
                 </Button>
-                <Button variant="outline" className="ml-2 hover:bg-red-500">
+                <Button
+                    variant="outline"
+                    className="ml-2 hover:bg-red-500 hover:text-primary-foreground"
+                >
                     <Trash2 className="mr-2 h-4 w-4" />
                     Delete Selected
                 </Button>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="outline" className="ml-2">
+                            <Columns className="mr-2 h-4 w-4" />
                             Columns <ChevronDown />
                         </Button>
                     </DropdownMenuTrigger>

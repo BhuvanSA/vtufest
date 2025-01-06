@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Type } from "@prisma/client";
 import { verifySession } from "@/lib/session";
 import { redirect } from "next/navigation";
+import { PenSquare, UserPlus, CreditCard } from "lucide-react";
 
 export const docStatusMap = {
     PENDING: "pending",
@@ -140,13 +141,28 @@ export default async function Page() {
             <DataTable data={results} />
             <div className="flex justify-center mt-4 gap-4">
                 <Link href="/register/modifyevents">
-                    <Button>Modify Events</Button>
+                    <Button
+                        variant="outline"
+                        className="border hover:border-primary"
+                    >
+                        <PenSquare className="mr-2 h-4 w-4" />
+                        Modify Events
+                    </Button>
                 </Link>
                 <Link href="/register/documentupload">
-                    <Button>Add Registrant</Button>
+                    <Button
+                        variant="outline"
+                        className="border hover:border-primary"
+                    >
+                        <UserPlus className="mr-2 h-4 w-4" />
+                        Add Registrant
+                    </Button>
                 </Link>
                 <Link href="/register/paymentinfo">
-                    <Button>Submit</Button>
+                    <Button variant="default">
+                        <CreditCard className="mr-2 h-4 w-4" />
+                        Go to payments
+                    </Button>
                 </Link>
             </div>
         </div>
