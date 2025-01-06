@@ -1,9 +1,13 @@
 export interface EventCategory {
+    id: string;
     eventNo: number;
     eventName: string;
-    category: string;
+    userId: string;
     maxParticipant: number;
+    registeredParticipant: number;
     maxAccompanist: number;
+    registeredAccompanist: number;
+    category: string;
 }
 
 export const eventCategories: EventCategory[] = [
@@ -13,6 +17,10 @@ export const eventCategories: EventCategory[] = [
         category: "MUSIC",
         maxParticipant: 1,
         maxAccompanist: 2,
+        id: "",
+        userId: "",
+        registeredParticipant: 0,
+        registeredAccompanist: 0,
     },
     {
         eventNo: 2,
@@ -20,6 +28,10 @@ export const eventCategories: EventCategory[] = [
         category: "MUSIC",
         maxParticipant: 1,
         maxAccompanist: 2,
+        id: "",
+        userId: "",
+        registeredParticipant: 0,
+        registeredAccompanist: 0,
     },
     {
         eventNo: 3,
@@ -27,6 +39,10 @@ export const eventCategories: EventCategory[] = [
         category: "MUSIC",
         maxParticipant: 1,
         maxAccompanist: 2,
+        id: "",
+        userId: "",
+        registeredParticipant: 0,
+        registeredAccompanist: 0,
     },
     {
         eventNo: 4,
@@ -34,6 +50,10 @@ export const eventCategories: EventCategory[] = [
         category: "MUSIC",
         maxParticipant: 1,
         maxAccompanist: 2,
+        id: "",
+        userId: "",
+        registeredParticipant: 0,
+        registeredAccompanist: 0,
     },
     {
         eventNo: 5,
@@ -41,6 +61,10 @@ export const eventCategories: EventCategory[] = [
         category: "MUSIC",
         maxParticipant: 1,
         maxAccompanist: 2,
+        id: "",
+        userId: "",
+        registeredParticipant: 0,
+        registeredAccompanist: 0,
     },
     {
         eventNo: 6,
@@ -48,6 +72,10 @@ export const eventCategories: EventCategory[] = [
         category: "MUSIC",
         maxParticipant: 6,
         maxAccompanist: 3,
+        id: "",
+        userId: "",
+        registeredParticipant: 0,
+        registeredAccompanist: 0,
     },
     {
         eventNo: 7,
@@ -55,6 +83,10 @@ export const eventCategories: EventCategory[] = [
         category: "MUSIC",
         maxParticipant: 6,
         maxAccompanist: 3,
+        id: "",
+        userId: "",
+        registeredParticipant: 0,
+        registeredAccompanist: 0,
     },
     {
         eventNo: 8,
@@ -62,6 +94,10 @@ export const eventCategories: EventCategory[] = [
         category: "MUSIC",
         maxParticipant: 12,
         maxAccompanist: 3,
+        id: "",
+        userId: "",
+        registeredParticipant: 0,
+        registeredAccompanist: 0,
     },
     {
         eventNo: 9,
@@ -69,6 +105,10 @@ export const eventCategories: EventCategory[] = [
         category: "DANCE",
         maxParticipant: 10,
         maxAccompanist: 5,
+        id: "",
+        userId: "",
+        registeredParticipant: 0,
+        registeredAccompanist: 0,
     },
     {
         eventNo: 10,
@@ -76,6 +116,10 @@ export const eventCategories: EventCategory[] = [
         category: "DANCE",
         maxParticipant: 1,
         maxAccompanist: 3,
+        id: "",
+        userId: "",
+        registeredParticipant: 0,
+        registeredAccompanist: 0,
     },
     {
         eventNo: 11,
@@ -83,6 +127,10 @@ export const eventCategories: EventCategory[] = [
         category: "THEATRE",
         maxParticipant: 6,
         maxAccompanist: 3,
+        id: "",
+        userId: "",
+        registeredParticipant: 0,
+        registeredAccompanist: 0,
     },
     {
         eventNo: 12,
@@ -90,6 +138,10 @@ export const eventCategories: EventCategory[] = [
         category: "THEATRE",
         maxParticipant: 6,
         maxAccompanist: 2,
+        id: "",
+        userId: "",
+        registeredParticipant: 0,
+        registeredAccompanist: 0,
     },
     {
         eventNo: 13,
@@ -97,6 +149,10 @@ export const eventCategories: EventCategory[] = [
         category: "THEATRE",
         maxParticipant: 1,
         maxAccompanist: 0,
+        id: "",
+        userId: "",
+        registeredParticipant: 0,
+        registeredAccompanist: 0,
     },
     {
         eventNo: 14,
@@ -104,6 +160,10 @@ export const eventCategories: EventCategory[] = [
         category: "THEATRE",
         maxParticipant: 9,
         maxAccompanist: 5,
+        id: "",
+        userId: "",
+        registeredParticipant: 0,
+        registeredAccompanist: 0,
     },
     {
         eventNo: 15,
@@ -111,6 +171,10 @@ export const eventCategories: EventCategory[] = [
         category: "LITERARY",
         maxParticipant: 3,
         maxAccompanist: 0,
+        id: "",
+        userId: "",
+        registeredParticipant: 0,
+        registeredAccompanist: 0,
     },
     {
         eventNo: 16,
@@ -118,6 +182,10 @@ export const eventCategories: EventCategory[] = [
         category: "LITERARY",
         maxParticipant: 2,
         maxAccompanist: 0,
+        id: "",
+        userId: "",
+        registeredParticipant: 0,
+        registeredAccompanist: 0,
     },
     {
         eventNo: 17,
@@ -125,6 +193,10 @@ export const eventCategories: EventCategory[] = [
         category: "LITERARY",
         maxParticipant: 1,
         maxAccompanist: 0,
+        id: "",
+        userId: "",
+        registeredParticipant: 0,
+        registeredAccompanist: 0,
     },
     {
         eventNo: 18,
@@ -132,6 +204,10 @@ export const eventCategories: EventCategory[] = [
         category: "FINE-ARTS",
         maxParticipant: 1,
         maxAccompanist: 0,
+        id: "",
+        userId: "",
+        registeredParticipant: 0,
+        registeredAccompanist: 0,
     },
     {
         eventNo: 19,
@@ -139,6 +215,10 @@ export const eventCategories: EventCategory[] = [
         category: "FINE-ARTS",
         maxParticipant: 1,
         maxAccompanist: 0,
+        id: "",
+        userId: "",
+        registeredParticipant: 0,
+        registeredAccompanist: 0,
     },
     {
         eventNo: 20,
@@ -146,6 +226,10 @@ export const eventCategories: EventCategory[] = [
         category: "FINE-ARTS",
         maxParticipant: 1,
         maxAccompanist: 0,
+        id: "",
+        userId: "",
+        registeredParticipant: 0,
+        registeredAccompanist: 0,
     },
     {
         eventNo: 21,
@@ -153,6 +237,10 @@ export const eventCategories: EventCategory[] = [
         category: "FINE-ARTS",
         maxParticipant: 4,
         maxAccompanist: 0,
+        id: "",
+        userId: "",
+        registeredParticipant: 0,
+        registeredAccompanist: 0,
     },
     {
         eventNo: 22,
@@ -160,6 +248,10 @@ export const eventCategories: EventCategory[] = [
         category: "FINE-ARTS",
         maxParticipant: 1,
         maxAccompanist: 0,
+        id: "",
+        userId: "",
+        registeredParticipant: 0,
+        registeredAccompanist: 0,
     },
     {
         eventNo: 23,
@@ -167,6 +259,10 @@ export const eventCategories: EventCategory[] = [
         category: "FINE-ARTS",
         maxParticipant: 1,
         maxAccompanist: 0,
+        id: "",
+        userId: "",
+        registeredParticipant: 0,
+        registeredAccompanist: 0,
     },
     {
         eventNo: 24,
@@ -174,6 +270,10 @@ export const eventCategories: EventCategory[] = [
         category: "FINE-ARTS",
         maxParticipant: 1,
         maxAccompanist: 0,
+        id: "",
+        userId: "",
+        registeredParticipant: 0,
+        registeredAccompanist: 0,
     },
     {
         eventNo: 25,
@@ -181,5 +281,9 @@ export const eventCategories: EventCategory[] = [
         category: "FINE-ARTS",
         maxParticipant: 1,
         maxAccompanist: 0,
+        id: "",
+        userId: "",
+        registeredParticipant: 0,
+        registeredAccompanist: 0,
     },
 ];

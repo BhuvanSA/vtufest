@@ -56,7 +56,7 @@ export default function SignIn() {
                 toast.success("Login successful!", {
                     description: "You have been logged in successfully",
                 });
-                router.push("/register/eventregister");
+                router.push("/register/firstEventSelection");
             } else {
                 form.setError("email", {
                     type: "manual",
