@@ -3,6 +3,8 @@ import { DataTable } from "@/components/register/data-table";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Type } from "@prisma/client";
+import { verifySession } from "@/lib/session";
+import { redirect } from "next/navigation";
 
 export const docStatusMap = {
     PENDING: "pending",
@@ -12,7 +14,7 @@ export const docStatusMap = {
 } as const;
 
 interface AggregatedRow {
-    registrantid: string; // from the SELECT
+    registrantid: string;
     name: string;
     usn: string;
     photoUrl: string;
@@ -25,7 +27,13 @@ interface AggregatedRow {
 }
 
 export default async function Page() {
-    // Single query with JSON aggregation
+    const session = await verifySession();
+    if (!session) {
+        redirect("/auth/signin");
+    }
+    const userIdFromSession = session.id as string;
+
+    // Single query with JSON aggregation + user filtering
     const aggregatedData: AggregatedRow[] = await prisma.$queryRaw`
     SELECT
       r.id AS "registrantId",
@@ -44,8 +52,9 @@ export default async function Page() {
     FROM "Registrants" r
     LEFT JOIN "EventRegistrations" er ON r.id = er."registrantId"
     LEFT JOIN "Events" e ON er."eventId" = e.id
+    WHERE r."userId" = ${userIdFromSession}
     GROUP BY r.id
-    ORDER BY r.usn; 
+    ORDER BY r.usn
   `;
 
     // Build final rows for table
@@ -68,7 +77,7 @@ export default async function Page() {
             continue;
         }
 
-        // If not a team manager, we gather participant + accompanist events
+        // Otherwise gather participant + accompanist events
         const participantEvents = row.registrations
             .filter((r) => r.type === "PARTICIPANT" && r.eventName)
             .map((r) => ({ eventName: r.eventName! }));
@@ -77,8 +86,8 @@ export default async function Page() {
             .filter((r) => r.type === "ACCOMPANIST" && r.eventName)
             .map((r) => ({ eventName: r.eventName! }));
 
+        // If no events at all, push a single blank record
         if (!hasEvents) {
-            // Has no events
             results.push({
                 id: row.registrantid,
                 name: row.name,
@@ -88,30 +97,33 @@ export default async function Page() {
                 events: [],
                 status: docStatusMap[row.docStatus],
             });
-        } else {
-            // Possibly multiple rows: one for participant, one for accompanist
-            if (participantEvents.length > 0) {
-                results.push({
-                    id: `${row.registrantid}-PARTICIPANT`,
-                    name: row.name,
-                    usn: row.usn,
-                    photo: row.photoUrl,
-                    type: "Participant",
-                    events: participantEvents,
-                    status: docStatusMap[row.docStatus],
-                });
-            }
-            if (accompanistEvents.length > 0) {
-                results.push({
-                    id: `${row.registrantid}-ACCOMPANIST`,
-                    name: row.name,
-                    usn: row.usn,
-                    photo: row.photoUrl,
-                    type: "Accompanist",
-                    events: accompanistEvents,
-                    status: docStatusMap[row.docStatus],
-                });
-            }
+            continue;
+        }
+
+        // If participant
+        if (participantEvents.length > 0) {
+            results.push({
+                id: `${row.registrantid}-PARTICIPANT`,
+                name: row.name,
+                usn: row.usn,
+                photo: row.photoUrl,
+                type: "Participant",
+                events: participantEvents,
+                status: docStatusMap[row.docStatus],
+            });
+        }
+
+        // If accompanist
+        if (accompanistEvents.length > 0) {
+            results.push({
+                id: `${row.registrantid}-ACCOMPANIST`,
+                name: row.name,
+                usn: row.usn,
+                photo: row.photoUrl,
+                type: "Accompanist",
+                events: accompanistEvents,
+                status: docStatusMap[row.docStatus],
+            });
         }
     }
 
