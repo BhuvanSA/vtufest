@@ -1,5 +1,5 @@
 import prisma from "@/lib/db";
-import { DataTable } from "@/components/register/data-table";
+import { DataTable, Data } from "@/components/register/data-table";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Type } from "@prisma/client";
@@ -59,7 +59,7 @@ export default async function Page() {
   `;
 
     // Build final rows for table
-    const results = [];
+    const results: Data[] = [];
 
     for (const row of aggregatedData) {
         const hasEvents = row.registrations && row.registrations.length > 0;
