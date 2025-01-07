@@ -8,10 +8,10 @@ import { redirect } from "next/navigation";
 import { PenSquare, UserPlus, CreditCard } from "lucide-react";
 
 export const docStatusMap = {
-    PENDING: "pending",
-    PROCESSING: "processing",
-    APPROVED: "success",
-    REJECTED: "failed",
+    PENDING: "Pending",
+    PROCESSING: "Processing",
+    APPROVED: "Success",
+    REJECTED: "Failed",
 } as const;
 
 interface AggregatedRow {

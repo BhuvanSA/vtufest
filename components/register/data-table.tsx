@@ -51,7 +51,7 @@ export type Data = {
     usn: string;
     type: "Participant" | "Accompanist" | "Team Manager" | "";
     events: { eventName: string }[];
-    status: "pending" | "processing" | "success" | "failed";
+    status: "Pending" | "Processing" | "Success" | "Failed";
 };
 
 export function DataTable({ data }: { data: Data[] }) {
@@ -260,10 +260,10 @@ export function DataTable({ data }: { data: Data[] }) {
                 header: ({ column }) => {
                     const filterCycle = [
                         "ALL",
-                        "pending",
-                        "processing",
-                        "approved",
-                        "rejected",
+                        "Pending",
+                        "Processing",
+                        "Approved",
+                        "Rejected",
                     ];
                     const currentFilter =
                         (column.getFilterValue() as string) ?? "ALL";
