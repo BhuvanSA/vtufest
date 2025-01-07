@@ -1,6 +1,6 @@
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { Button } from "@/components/ui/button";
-import { Sun } from "lucide-react";
+import { SunIcon, MoonIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 
 type ThemeProviderProps = {
@@ -30,8 +30,11 @@ export function ThemeToggler() {
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
                 className="relative h-9 w-9"
             >
-                <Sun className="" />
-                <span className="sr-only">Toggle theme</span>{" "}
+                {theme === "dark" ? (
+                    <MoonIcon className="h-[1.2rem] w-[1.2rem] transition-all" />
+                ) : (
+                    <SunIcon className="h-[1.2rem] w-[1.2rem] transition-all" />
+                )}
             </Button>
         </div>
     );
