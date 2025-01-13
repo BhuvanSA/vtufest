@@ -43,6 +43,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export type Data = {
     id: string;
@@ -58,32 +59,39 @@ export function DataTable({ data }: { data: Data[] }) {
     const router = useRouter();
     const [rows, setRows] = React.useState<Data[]>(data);
 
-    const handleUpdate = (id: string) => {
-        const originId = id.split("#")[0];
-        router.push(`/register/updateregister/${originId}`);
-    };
+    const handleUpdate = React.useCallback(
+        (id: string) => {
+            const originId = id.split("#")[0];
+            router.push(`/register/updateregister/${originId}`);
+        },
+        [router]
+    );
 
-    const handleRemove = async (id: string) => {
-        const originId = id.split("#")[0];
-        const updatedRows = rows.filter((row) => row.id !== id);
-        try {
-            const response = await fetch("/api/deleteregister", {
-                method: "DELETE",
-                body: JSON.stringify({ registrantId: originId }),
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                credentials: "include", // Ensure cookies are included
-            });
+    const handleRemove = React.useCallback(
+        async (id: string) => {
+            const originId = id.split("#")[0];
+            const updatedRows = rows.filter((row) => row.id !== id);
+            try {
+                const response = await fetch("/api/deleteregister", {
+                    method: "DELETE",
+                    body: JSON.stringify({ registrantId: originId }),
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    credentials: "include", // Ensure cookies are included
+                });
 
-            const data = await response.json();
-            alert(data.message);
-            setRows(updatedRows);
-        } catch (err: unknown) {
-            alert("An error occurred while removing the registrant.");
-            console.error(err);
-        }
-    };
+                const data = await response.json();
+                toast.success(data.message);
+                //                table.resetData(updatedRows)
+                setRows(updatedRows);
+            } catch (err: unknown) {
+                toast.error("Failed to delete registrant");
+                console.error(err);
+            }
+        },
+        [rows]
+    );
 
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnFilters, setColumnFilters] =
@@ -342,7 +350,7 @@ export function DataTable({ data }: { data: Data[] }) {
     );
 
     const table = useReactTable({
-        data,
+        data: rows,
         columns,
         onSortingChange: setSorting,
         onColumnFiltersChange: setColumnFilters,

@@ -1,8 +1,7 @@
 import { getUser, insertRegistrant } from "@/app/prismaClient/queryFunction";
-import { utapi } from "@/utils/uploadthing";
-
-import { jwtVerify } from "jose";
-import { cookies } from "next/headers";
+import { verifySession } from "@/lib/session";
+import { utapi } from "../uploadthing/uploadthing";
+import { redirect } from "next/navigation";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -63,10 +62,6 @@ const TeamMangerRegistrantSchema = z.object({
     idcard: fileSchema,
 });
 
-const JWT_SECRET = new TextEncoder().encode(
-    process.env.JWT_SECRET || "default_secret"
-);
-
 export async function POST(request: Request) {
     const formData = await request.formData();
 
@@ -96,18 +91,12 @@ export async function POST(request: Request) {
         idcard: formData.get("idcard"),
     };
 
-    const token: string = (await cookies()).get("auth_token")?.value as string;
-
-    if (!token) {
-        return NextResponse.json(
-            { success: false, message: "Your are Unauthorized" },
-            { status: 401 }
-        );
+    const session = await verifySession();
+    if (!session) {
+        redirect("/auth/signin");
     }
 
-    const verify = await jwtVerify(token, JWT_SECRET);
-
-    const userId: string = verify.payload.id as string;
+    const userId: string = session.id as string;
     const user = await getUser(userId);
 
     if (!user) {
