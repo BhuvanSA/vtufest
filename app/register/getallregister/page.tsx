@@ -149,7 +149,7 @@ export default async function Page() {
                         Modify Events
                     </Button>
                 </Link>
-                <Link href="/register/documentupload">
+                <Link href="/register/addRegistrant">
                     <Button
                         variant="outline"
                         className="border hover:border-primary"

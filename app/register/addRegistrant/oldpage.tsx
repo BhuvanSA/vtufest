@@ -1,8 +1,13 @@
 "use client";
 
-import { ToastProvider } from "@radix-ui/react-toast";
+import { Toast, ToastProvider } from "@radix-ui/react-toast";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+
+enum type {
+    PARTICIPANT = "PARTICIPANT",
+    ACCOMPANIST = "ACCOMPANIST",
+}
 
 interface FormData {
     name: string;
@@ -36,9 +41,7 @@ const Register = () => {
     });
 
     const [eventCategories, setEventCategories] = useState([]);
-    const [selectedEvents, setSelectedEvents] = useState<
-        { eventNo: number; eventName: string; type: string }[]
-    >([]);
+    const [selectedEvents, setSelectedEvents] = useState([]);
     const [responseToast, SetresponseToast] = useState("");
 
     const router = useRouter();
@@ -53,12 +56,7 @@ const Register = () => {
             if (!formData.teamManager) {
                 console.log("filtering");
                 userEvents = userEvents.filter(
-                    (x: {
-                        registeredParticipant: number;
-                        maxParticipant: number;
-                        registeredAccompanist: number;
-                        maxAccompanist: number;
-                    }) =>
+                    (x) =>
                         x.registeredParticipant < x.maxParticipant ||
                         x.registeredAccompanist < x.maxAccompanist
                 );
@@ -70,7 +68,7 @@ const Register = () => {
         getEvents();
     }, [formData.teamManager]);
 
-    const [errors, setErrors] = useState<{ [key: string]: string }>({});
+    const [errors, setErrors] = useState<null | object>({});
 
     const validate = () => {
         const newErrors: { [key: string]: string } = {};
@@ -193,7 +191,7 @@ const Register = () => {
         if (selectedEvents.length == 0) {
             alert("aleast one event must be selected");
         }
-        if (validate()) {
+        if (true) {
             const formDataToSend = new FormData();
             console.log("validated hit");
             Object.entries(formData).forEach(([key, value]) => {
@@ -204,23 +202,22 @@ const Register = () => {
                 }
             });
 
-            console.log(formDataToSend.get("events"));
+            console.log(formDataToSend.getAll("events"));
             try {
-                const response = await fetch("/api/register", {
-                    method: "POST",
-                    body: formDataToSend,
-                });
-                const data = await response.json();
-
-                if (data.success) {
-                    SetresponseToast(data.message);
-                    alert(data.message);
-                    router.push("/register/getallregister");
-                } else {
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    alert(data.message);
-                    SetresponseToast(data.message);
-                }
+                // const response = await fetch("/api/register", {
+                //     method: "POST",
+                //     body: formDataToSend,
+                // });
+                // const data = await response.json();
+                // if (data.success) {
+                //     SetresponseToast(data.message);
+                //     alert(data.message);
+                //     // router.push("/getallregister");
+                // } else {
+                //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                //     alert(data.message);
+                //     SetresponseToast(data.message);
+                // }
             } catch (err) {
                 alert("Failed to register. Please try again later.");
                 SetresponseToast("Failed to register. Please try again later.");
@@ -229,20 +226,14 @@ const Register = () => {
         }
     };
 
-    const groupEventsByCategory = (events: any[]) => {
-        return events.reduce(
-            (
-                acc: { [x: string]: any[] },
-                event: { category: string | number }
-            ) => {
-                if (!acc[event.category]) {
-                    acc[event.category] = [];
-                }
-                acc[event.category].push(event);
-                return acc;
-            },
-            {}
-        );
+    const groupEventsByCategory = (events) => {
+        return events.reduce((acc, event) => {
+            if (!acc[event.category]) {
+                acc[event.category] = [];
+            }
+            acc[event.category].push(event);
+            return acc;
+        }, {});
     };
 
     const groupedEvents = groupEventsByCategory(eventCategories);
@@ -273,7 +264,6 @@ const Register = () => {
                                     placeholder="Enter your name"
                                     value={formData.name}
                                     onChange={handleChange}
-                                    required
                                     className={`w-full px-4 py-2 border ${
                                         errors.name
                                             ? "border-red-500"
@@ -299,7 +289,6 @@ const Register = () => {
                                     placeholder="Enter your USN"
                                     value={formData.usn}
                                     onChange={handleChange}
-                                    required
                                     className={`w-full px-4 py-2 border ${
                                         errors.usn
                                             ? "border-red-500"
@@ -329,16 +318,15 @@ const Register = () => {
                                     placeholder="Enter your Phone Number"
                                     value={formData.phone}
                                     onChange={handleChange}
-                                    required
                                     className={`w-full px-4 py-2 border ${
-                                        errors?.phone
+                                        errors.phone
                                             ? "border-red-500"
                                             : "border-[#333333]"
                                     } rounded-lg text-sm bg-white-600 text-black focus:outline-none focus:border-yellow-500`}
                                 />
-                                {errors?.phone && (
+                                {errors.phone && (
                                     <p className="text-red-500 text-xs mt-1">
-                                        {errors?.phone}
+                                        {errors.phone}
                                     </p>
                                 )}
                             </div>
@@ -359,7 +347,6 @@ const Register = () => {
                                                 formData.teamManager === true
                                             }
                                             onChange={handleChange}
-                                            required
                                             className="mr-2"
                                         />
                                         Yes
@@ -373,7 +360,6 @@ const Register = () => {
                                                 formData.teamManager === false
                                             }
                                             onChange={handleChange}
-                                            required
                                             className="mr-2"
                                         />
                                         No
@@ -404,17 +390,7 @@ const Register = () => {
                                                 </h2>
                                                 <div className="grid grid-cols-2 gap-4">
                                                     {events.map(
-                                                        (
-                                                            event: {
-                                                                eventNo: number;
-                                                                eventName: string;
-                                                                registeredParticipant: number;
-                                                                maxParticipant: number;
-                                                                registeredAccompanist: number;
-                                                                maxAccompanist: number;
-                                                            },
-                                                            index: number
-                                                        ) => (
+                                                        (event, index) => (
                                                             <fieldset
                                                                 key={index}
                                                                 className="mb-4 border-2 border-black p-2 rounded-lg hover:scale-105 transform transition-all"
@@ -468,7 +444,6 @@ const Register = () => {
                                                                                             selectedEvent.eventNo
                                                                                         )
                                                                                     }
-                                                                                    required
                                                                                     className="w-full px-4 py-2 border rounded-lg text-sm bg-white-600 text-black focus:outline-none focus:border-yellow-500"
                                                                                 >
                                                                                     <option value="">
@@ -527,7 +502,6 @@ const Register = () => {
                                                 id="photo"
                                                 name="photo"
                                                 onChange={handleFileChange}
-                                                required
                                                 className="w-full text-sm text-black bg-white-600 p-0 rounded-lg focus:outline-white hover:bg-gray-200"
                                             />
                                             {errors.photo && (
@@ -551,7 +525,6 @@ const Register = () => {
                                                 id="idcard"
                                                 name="idcard"
                                                 onChange={handleFileChange}
-                                                required
                                                 className="w-full text-sm text-black bg-white-600 p-0 rounded-lg focus:outline-white hover:bg-gray-200"
                                             />
                                             {errors.idcard && (
@@ -586,7 +559,6 @@ const Register = () => {
                                                 id={fileField}
                                                 name={fileField}
                                                 onChange={handleFileChange}
-                                                required
                                                 className="w-full text-sm text-black bg-white-600 p-0 rounded-lg focus:outline-white hover:bg-gray-200"
                                             />
                                             {errors[fileField] && (

@@ -8,6 +8,15 @@ const nextConfig: NextConfig = {
     typescript: {
         ignoreBuildErrors: true,
     },
+    images: {
+        remotePatterns: [
+            {
+                protocol: "https",
+                hostname: `${process.env.UPLOADTHING_APP_ID}.ufs.sh`,
+                pathname: "/f/*",
+            },
+        ],
+    },
 };
 
 export default nextConfig;

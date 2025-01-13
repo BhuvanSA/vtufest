@@ -1,6 +1,8 @@
-import { UTApi } from "uploadthing/server";
+import {
+    generateUploadButton,
+    generateUploadDropzone,
+} from "@uploadthing/react";
+import type { OurFileRouter } from "@/app/api/uploadthing/core";
 
-export const utapi = new UTApi({
-  // ...options,
-  token: process.env.UPLOADTHING_TOKEN
-});
+export const UploadButton = generateUploadButton<OurFileRouter>();
+export const UploadDropzone = generateUploadDropzone<OurFileRouter>();
