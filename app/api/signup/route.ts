@@ -79,6 +79,7 @@ export async function POST(request: Request) {
         }
 
         const { college, email, phone, otp, password } = validation.data;
+        console.log(college,email,password,otp,phone);
 
         // Check if the user already exists in the database (by email or phone)
         const existingUser = await prisma.users.findFirst({
@@ -86,6 +87,7 @@ export async function POST(request: Request) {
                 OR: [{ email }, { phone }],
             },
         });
+        console.log("the existing user",existingUser);
 
         if (existingUser) {
             return NextResponse.json({
@@ -106,9 +108,11 @@ export async function POST(request: Request) {
                 },
             });
         }
-
+        console.log("the otp is success",otpValidation.success);
         // Hash the user's provided password
         const hashedPassword = await bcrypt.hash(password, 13);
+
+        console.log("hashed password",hashedPassword);
 
         // Create the user in the database
         const newUser = await prisma.users.create({
