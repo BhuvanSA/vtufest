@@ -1,17 +1,34 @@
 "use client"; // Enable client-side data fetching
-
+import image1 from '@/components/images/4000.jpg'
+import image2 from '@/components/images/8000.jpg'
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { UploadDropzone } from '@/utils/uploadthing';
+import Image, { StaticImageData } from "next/image";
+import { useRouter } from "next/navigation";
+
 import React, { useEffect, useState } from "react";
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+
+
+interface MyCustomEvent {
+    id: number;
+    eventName: string;
+}
+
+interface PaymentInput {
+    txnNumber: string;
+    Amount: number;
+    paymentUrl: string;
+}
 
 export default function EventsPage() {
-    interface Event {
-        id: number;
-        eventName: string;
-    }
+    const router = useRouter();
+    const [events, setEvents] = useState<MyCustomEvent[]>([]);
 
-    const [events, setEvents] = useState<Event[]>([]);
-  
     // Fetch events from backend
     useEffect(() => {
         const fetchEvents = async () => {
@@ -22,53 +39,148 @@ export default function EventsPage() {
                 setEvents(data.userEvents);
             } catch (error) {
                 console.error("Failed to fetch events:", error);
-            } 
+            }
         };
 
         fetchEvents();
     }, []);
 
 
-    return (
-        <div className="min-h-screen mt-10 flex items-center justify-center bg-gradient-to-br from-background to-secondary p-4">
-            <Card className="w-1/3 flex  flex-col  bg-card text-card-foreground">
-                <CardHeader className="text-2xl text-yellow-500 text-center font-semibold hover:scale-105 transition-all">
-                    Total No of Events : {events.length} events
-                </CardHeader>
-                <CardContent className="min-h-[500px] ">
-                    <ul className="">
-                        {events.map((event, index) => (
-                            <li key={event.id} className="py-2 font-medium hover:scale-105 transition-all">
-                                {index}. {event.eventName}
-                            </li>
-                        ))}
-                    </ul>
-                </CardContent>
-                <CardFooter className="w-full">
-                    <Button className="w-full">Pay {events.length > 10 ? 8000 : 4000} INR</Button>
-                </CardFooter>
-            </Card>
+    const paymentAmount = events.length > 10 ? 8000 : 4000
+    const imageSrc = events.length > 10 ? image2 : image1;
 
+    const { control, handleSubmit, setValue, formState: { errors } } = useForm({
+        defaultValues: {
+            txnNumber: "",
+            Amount: paymentAmount,
+            paymentUrl: ""
+        },
+    })
+    const onSubmit: SubmitHandler<PaymentInput> = async(data) => {
+        
+        const response = await fetch('/api/paymentGateway',{
+            body: JSON.stringify(data),
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+
+        const responseData = await response.json();
+
+        if(responseData.success){
+            toast.success('Submitted')
+        }
+        else{
+            toast.error('Internal Server Error')
+        }
+        
+    }
+
+    return (
+        <div className="min-h-screen mt-16 py-10 flex items-center justify-center bg-gradient-to-br from-background to-secondary p-4">
+            <Card className="w-full max-w-4xl bg-card text-card-foreground">
+                <CardHeader className="text-center">
+                    <CardTitle className="text-2xl text-yellow-500 font-semibold">
+                        Total No of Events: {events.length} events
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    <div className="grid md:grid-cols-2 gap-6">
+                        <EventsList events={events} />
+                        <PaymentDetails paymentAmount={paymentAmount} imageSrc={imageSrc} />
+                    </div>
+                    <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+                        <div className="space-y-2">
+                            <Label htmlFor='txnNumber'>Transaction Number / ID <span className='text-red-700'>*</span></Label>
+                            <Controller
+                                control={control}
+                                name="txnNumber"
+                                rules={{ required: true }}
+                                render={({ field }) => (
+                                    <Input
+                                        id="txnNumber"
+                                        type="text"
+                                        {...field}
+                                        placeholder="Enter your transaction ID"
+                                    />
+                                )}
+                            />
+                            {errors.txnNumber && <small className='text-red-700 mt-6 font-semibold'>The Transaction Number / ID is required </small>}
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="paymentScreenshot">Payment Screenshot <span className='text-red-700'>*</span></Label>
+                            <Controller
+                                control={control}
+                                name='paymentUrl'
+                                rules={{ required: true }}
+                                render={() => (
+                                    <UploadDropzone
+                                        endpoint="imageUploader"
+                                        onClientUploadComplete={(res) => {
+                                            const url = res[0].url;
+                                            setValue('paymentUrl', url);
+                                            toast.success('payment screenshot uploaded');
+                                        }}
+                                        onUploadError={(error: Error) => {
+                                            // Do something with the error.
+                                            toast.error('payment screenshot Error')
+                                        }}
+                                    />
+                                )}
+                            />
+                            {errors.paymentUrl && <small className='text-red-700 mt-6 font-semibold'>Payment Screenshot File is required</small>}
+                        </div>
+                        <Button className='w-full' type='submit'>Submit</Button>
+                    </form>
+                </CardContent>
+            </Card>
         </div>
-    );
+    )
 }
 
-{/* <div className="max-w-2xl mx-auto p-6 bg-white shadow-md rounded-lg">
-            <h1 className="text-2xl font-bold text-center mb-4">
-                Event List <pre></pre>
-                <small>Total Events : {events.length} </small>
-            </h1>
-            {/* <ul className="divide-y divide-gray-300">
+function EventsList({ events }: { events: MyCustomEvent[] }) {
+    return (
+        <div className="border rounded-lg p-4">
+            <h2 className="text-xl font-semibold mb-4">Events List</h2>
+            <ul className="space-y-2 max-h-[300px] overflow-y-auto">
                 {events.map((event, index) => (
-                    <li key={event.id} className="py-2">
-                        <span className="font-medium">{index + 1}. </span>
-                        {event.eventName}
+                    <li key={index} className="py-2 font-medium hover:bg-secondary transition-all rounded px-2">
+                        {index + 1}. {event.eventName}
                     </li>
                 ))}
             </ul>
-            <div className="mt-4 text-center font-semibold">
-                <button className="bg-yellow-400 w-full p-2 rounded-sm  hover:scale-105 transition-all text-white font-semibold">
-                    Pay ₹ {events.length > 10 ? 8000 : 4000}
-                </button>
-            </div> */}
-// </div> */}
+        </div>
+    )
+}
+
+function PaymentDetails({ paymentAmount, imageSrc }: { paymentAmount: number, imageSrc: StaticImageData }) {
+    return (
+        <div className="border rounded-lg p-4 space-y-4">
+            <h2 className="text-xl font-semibold">Payment Details</h2>
+            <p className="text-lg">Amount To Be Paid: ₹{paymentAmount}</p>
+            <div className="flex justify-center">
+                <Image
+                    src={imageSrc}
+                    alt="Payment illustration"
+                    className="rounded-lg border border-border"
+                    width={200}
+                    height={200}
+                />
+            </div>
+            <BankDetails />
+        </div>
+    )
+}
+
+function BankDetails() {
+    return (
+        <div className="space-y-2">
+            <h3 className="text-lg font-semibold">Bank Details</h3>
+            <p><span className="font-medium">Bank Name:</span> Union Bank</p>
+            <p><span className="font-medium">Account Number:</span> 1234567891021</p>
+            <p><span className="font-medium">IFSC Code:</span> AB565652</p>
+        </div>
+    )
+}
+

@@ -1007,3 +1007,44 @@ export async function AddEvent(arg: AddEvent) {
         }
     }
 }
+
+
+export async function savePayment(userId:string,txnNumber:string,paymentUrl:string,Amount:number){
+    try{
+        await prisma.users.update({
+            where:{
+                id:userId
+            },
+            data:{
+                txnNumber,
+                paymentUrl,
+                Amount,
+            }
+        });
+    } catch (err: unknown) {
+        if (err instanceof Prisma.PrismaClientKnownRequestError) {
+            // Handle specific Prisma error codes
+            switch (err.code) {
+                case "P2002":
+                    throw new Error(
+                        `Unique constraint failed on the field: ${err.meta?.target}`
+                    );
+                case "P2025":
+                    throw new Error("Record not found");
+                default:
+                    throw new Error(`Prisma error: ${err.message}`);
+            }
+        } else if (err instanceof Prisma.PrismaClientValidationError) {
+            throw new Error(`Validation error: ${err.message}`);
+        } else {
+            // Generic error handling
+            console.error("Unexpected error:", err);
+            if (err instanceof Error) {
+                throw new Error(err.message || "An unexpected error occurred");
+            } else {
+                throw new Error("An unexpected error occurred");
+            }
+        }
+    }
+    
+}
