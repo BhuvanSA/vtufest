@@ -78,6 +78,11 @@ const Dignitaries = () => {
                     image: ""
                 },
                 {
+                    name: "_____",
+                    role: "DEAN ( STUDENT AFFAIRS ), GAT",
+                    image: ""
+                },
+                {
                     name: "LT.SARAVANAN R",
                     role: "PHYSICAL EDUCATION DIRECTOR, GAT",
                     image: organize2
@@ -131,38 +136,40 @@ const Dignitaries = () => {
                     name: "MR MUNIKRISHNA M",
                     role: "ADMIN OFFICE, GAT",
                     image: ""
-                }
+                },
+                
             ]
         }
     }
+
 
     return (
         <div>
             <div className="flex flex-col min-h-screen pt-20 pb-12 lg:pt-[120px] bg-gradient-to-br from-background to-secondary">
                 <div className="container  px-4">
-                    <h1 className="text-4xl font-bold text-center text-blue-600 text-center mb-16">DIGNITARIES AND CHEIF GUESTS</h1>
+                    
 
                     {Object.entries(committee).map(([key, section]) => (
-                        <div key={key} className="mb-16">
-                            <h2 className="text-2xl font-semibold mb-8 text-center">
+                        <div key={key} className="mb-16 ">
+                            <h2 className="text-4xl font-semibold mb-8 text-center">
                                 {section.title}
                             </h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                                 {section.members.map((member, index) => (
-                                    <Card key={index} className="overflow-hidden hover:shadow-lg transition-shadow">
-                                        <CardHeader className="p-0">
-                                            <div className="relative h-48 bg-gray-200">
+                                    <Card key={index} className=" overflow-hidden hover:shadow-lg transition-shadow">
+                                        <CardHeader className="p-0 ">
+                                            <div className="relative  h-80 bg-gray-200">
                                                 <Image
                                                     src={member.image || "/placeholder.svg?height=192&width=384"}
                                                     alt={`Photo of ${member.name}`}
                                                     fill
-                                                    className="object-contain"
+                                                    className="object-fill"
                                                 />
                                             </div>
                                         </CardHeader>
-                                        <CardContent className="p-6">
-                                            <h3 className="font-semibold text-lg mb-2">{member.name}</h3>
-                                            <p className="text-sm text-muted-foreground">{member.role}</p>
+                                        <CardContent className="p-6 text-center">
+                                            <h3 className="font-semibold text-xl mb-2">{member.name}</h3>
+                                            <p className="text-xl text-muted-foreground">{member.role}</p>
                                         </CardContent>
                                     </Card>
                                 ))}
