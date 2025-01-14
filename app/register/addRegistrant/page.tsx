@@ -48,24 +48,13 @@ export default async function Page() {
             </div>
             <SelectRolesAndEvents allEvents={userEvents} />
             <div className="flex justify-center mt-4 gap-4">
-                <Link href="/register/modifyevents">
+                <Link href="/register/getallregister">
                     <Button
                         variant="outline"
                         className="border hover:border-primary"
                     >
-                        Modify Events
+                        Back to Registrants
                     </Button>
-                </Link>
-                <Link href="/register/addRegistrant">
-                    <Button
-                        variant="outline"
-                        className="border hover:border-primary"
-                    >
-                        Add Registrant
-                    </Button>
-                </Link>
-                <Link href="/register/paymentinfo">
-                    <Button variant="default">Go to payments</Button>
                 </Link>
             </div>
         </div>

@@ -44,20 +44,36 @@ import {
 
 // Required Documents
 const REQUIRED_DOCUMENTS = [
-    { id: "photo", label: "Photo", hint: "Upload passport size photo" },
-    { id: "idCard", label: "College ID Card", hint: "Upload college ID card" },
-    { id: "aadhar", label: "Aadhar Card", hint: "Upload Aadhar card" },
-    { id: "sslc", label: "SSLC Marks Card", hint: "Upload SSLC marks card" },
-    { id: "puc", label: "PUC Marks Card", hint: "Upload PUC marks card" },
+    { id: "photo", label: "Photo", hint: "Passport size photo of the student" },
+    {
+        id: "idCard",
+        label: "College ID Card",
+        hint: "College Identification Card of the student",
+    },
+    {
+        id: "aadhar",
+        label: "Aadhar Card",
+        hint: "Please ensure to upload in a way 12-digit Aadhaar Number must be clearly visible",
+    },
+    {
+        id: "sslc",
+        label: "SSLC Marks Card",
+        hint: "SSLC/10th or any equivalent marks card",
+    },
+    {
+        id: "puc",
+        label: "PUC Marks Card",
+        hint: "2nd PUC/ 12th Diploma or any equivalent marks card",
+    },
     {
         id: "admission1",
-        label: "Admission Document 1",
-        hint: "Upload first admission document",
+        label: "Free Receipt",
+        hint: "Recent Fee Receipt from the college you are studying in",
     },
     {
         id: "admission2",
-        label: "Admission Document 2",
-        hint: "Upload second admission document",
+        label: "Latest semester marks card",
+        hint: "Marks card of the latest semester you have completed from the college you are studying in",
     },
 ];
 
@@ -208,7 +224,7 @@ export default function SelectRolesAndEvents({
                 throw new Error(result.message || "Failed to register");
             }
             toast.success("Registered Successfully.");
-            // router.push("/register/getallregister");
+            router.push("/register/getallregister");
         } catch (error: unknown) {
             if (error instanceof Error) {
                 console.error("Error registering:", error.message);
@@ -288,7 +304,7 @@ export default function SelectRolesAndEvents({
             }
             toast.success("Manager Registered Successfully.");
             // Optionally redirect or reset the form
-            // router.push("/register/getallregister");
+            router.push("/register/getallregister");
         } catch (error: unknown) {
             if (error instanceof Error) {
                 console.error("Error registering manager:", error.message);
@@ -327,7 +343,10 @@ export default function SelectRolesAndEvents({
                             {/* Basic Information Fields */}
                             <div className="flex flex-col md:flex-row gap-4 md:gap-6 mb-6">
                                 <div className="w-full md:w-1/3 space-y-1.5">
-                                    <Label htmlFor="name">Name</Label>
+                                    <Label htmlFor="name">
+                                        Name of the student (As mentioned on
+                                        10th or any equivalent marks card)
+                                    </Label>
                                     <Input
                                         {...register("name")}
                                         id="name"
@@ -340,7 +359,9 @@ export default function SelectRolesAndEvents({
                                     )}
                                 </div>
                                 <div className="w-full md:w-1/3 space-y-1.5">
-                                    <Label htmlFor="username">USN</Label>
+                                    <Label htmlFor="username">
+                                        USN of the student
+                                    </Label>
                                     <Input
                                         {...register("usn")}
                                         id="usn"
@@ -353,7 +374,9 @@ export default function SelectRolesAndEvents({
                                     )}
                                 </div>
                                 <div className="w-full md:w-1/3 space-y-1.5">
-                                    <Label htmlFor="phone">Phone Number</Label>
+                                    <Label htmlFor="phone">
+                                        Phone number of the student
+                                    </Label>
                                     <Input
                                         id="phoneno"
                                         placeholder="Phone Number"
@@ -374,7 +397,8 @@ export default function SelectRolesAndEvents({
                                     aria-label="Available events"
                                     tabIndex={0}
                                 >
-                                    Select Your Events
+                                    Select the events that you are Participating
+                                    / Accompanying in
                                 </h2>
 
                                 {allEvents.length === 0 ? (
@@ -546,6 +570,15 @@ export default function SelectRolesAndEvents({
                                 <h2 className="text-2xl font-semibold mb-4">
                                     Upload Documents
                                 </h2>
+                                <p className="mb-4 text-muted-foreground">
+                                    Students are required to submit valid
+                                    documents for verification. In case any
+                                    document/documents fail the verification
+                                    process, participants will be asked to
+                                    reupload the documents. Failure to meet the
+                                    requirements after re-uploading may result
+                                    in disqualification.
+                                </p>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                     {REQUIRED_DOCUMENTS.map((doc) => {
                                         const isUploaded =
