@@ -1,5 +1,4 @@
 import React from "react";
-import Register from "./oldpage";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { verifySession } from "@/lib/session";
@@ -48,7 +47,6 @@ export default async function Page() {
                 </div>
             </div>
             <SelectRolesAndEvents allEvents={userEvents} />
-            <Register />
             <div className="flex justify-center mt-4 gap-4">
                 <Link href="/register/modifyevents">
                     <Button

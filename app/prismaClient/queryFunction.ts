@@ -4,158 +4,108 @@ import { EventCreate } from "../api/eventsregister/route";
 import { RegistrantDetailUpdate } from "../api/updateregisterdetails/route";
 import { UpdateRole } from "../api/updateroleinevent/route";
 import type { AddEvent } from "../api/addeventregister/route";
-
-interface Registrant {
-    name: string;
-    usn: string;
-    teamManager: boolean;
-    phone: string;
-    photoUrl: string;
-    aadharUrl?: string;
-    sslcUrl?: string;
-    pucUrl?: string;
-    admission1Url?: string;
-    admission2Url?: string;
-    idcardUrl: string;
-    userId: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    events?: any[];
-}
+import { Registrant, UserEventsType } from "../api/register/route";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function insertRegistrant(arg: Registrant, userEvents: any) {
+export async function insertRegistrant(
+    arg: Registrant,
+    userEvents: UserEventsType[]
+) {
     try {
         if (arg.teamManager === true) {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             try {
                 const registrant = await prisma.registrants.create({
                     data: {
-                        name: arg.name as string,
-                        usn: arg.usn as string,
+                        name: arg.name,
+                        usn: arg.usn,
                         teamManager: true,
-                        phone: arg.phone as string,
-                        photoUrl: arg.photoUrl as string,
-                        idcardUrl: arg.idcardUrl as string,
+                        phone: arg.phone,
+                        photoUrl: arg.photoUrl,
+                        idcardUrl: arg.idcardUrl,
                         userId: arg.userId,
                     },
                 });
                 return registrant;
             } catch (err: unknown) {
-                if (err instanceof Prisma.PrismaClientKnownRequestError) {
-                    // Handle specific Prisma error codes
-                    console.log(err);
-                    switch (err.code) {
-                        case "P2002":
-                            console.log(
-                                `Unique constraint failed on the field: ${err.meta?.target}`
-                            );
-                            throw new Error(
-                                `Unique constraint failed on the field: ${err.meta?.target}`
-                            );
-                        case "P2025":
-                            console.log("Record not found");
-                            throw new Error("Record not found");
-                        default:
-                            console.log(`Prisma error: ${err.message}`);
-                            throw new Error(`Prisma error: ${err.message}`);
-                    }
-                } else if (err instanceof Prisma.PrismaClientValidationError) {
-                    console.log(err.message);
-                    throw new Error(`Validation error: ${err.message}`);
-                } else {
-                    // Generic error handling
-                    console.log("Unexpected error:", err);
-                    if (err instanceof Error) {
-                        console.log(err.message);
-                        throw new Error(
-                            err.message || "An unexpected error occurred"
-                        );
-                    } else {
-                        throw new Error("An unexpected error occurred");
-                    }
-                }
+                handlePrismaError(err);
             }
         }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
         const eventList: any[] = [];
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        arg?.events?.forEach((x: any) => {
+        arg.events.forEach((x) => {
             const selectedEvent = userEvents.find(
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                (y: any) => parseInt(y.eventNo) === parseInt(x.eventNo)
+                (y) => y.eventNo === x.eventNo
             );
 
-            if (x.type === "PARTICIPANT") {
-                if (
-                    selectedEvent.registeredParticipant + 1 <=
-                    selectedEvent.maxParticipant
-                ) {
-                    selectedEvent.registeredParticipant += 1;
-                    eventList.push({ ...selectedEvent, type: x.type });
-                }
-            } else if (x.type === "ACCOMPANIST") {
-                if (
-                    selectedEvent.registeredAccompanist + 1 <=
-                    selectedEvent.maxAccompanist
-                ) {
-                    selectedEvent.registeredAccompanist += 1;
-                    eventList.push({ ...selectedEvent, type: x.type });
+            if (selectedEvent) {
+                if (x.type === "PARTICIPANT") {
+                    if (
+                        selectedEvent.registeredParticipant + 1 <=
+                        selectedEvent.maxParticipant
+                    ) {
+                        selectedEvent.registeredParticipant += 1;
+                        eventList.push({ ...selectedEvent, type: x.type });
+                    }
+                } else if (x.type === "ACCOMPANIST") {
+                    if (
+                        selectedEvent.registeredAccompanist + 1 <=
+                        selectedEvent.maxAccompanist
+                    ) {
+                        selectedEvent.registeredAccompanist += 1;
+                        eventList.push({ ...selectedEvent, type: x.type });
+                    }
                 }
             }
         });
+        console.log(eventList);
 
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const result = await prisma.$transaction(async (prisma) => {
             const registrant = await prisma.registrants.create({
                 data: {
-                    name: arg.name as string,
-                    usn: arg.usn as string,
+                    name: arg.name,
+                    usn: arg.usn,
                     teamManager: false,
-                    phone: arg.phone as string,
-                    photoUrl: arg.photoUrl as string,
-                    sslcUrl: arg.sslcUrl as string,
-                    pucUrl: arg.pucUrl as string,
-                    aadharUrl: arg.aadharUrl as string,
-                    admission1Url: arg.admission1Url as string,
-                    admission2Url: arg.admission2Url as string,
-                    idcardUrl: arg.idcardUrl as string,
+                    phone: arg.phone,
+                    photoUrl: arg.photoUrl,
+                    sslcUrl: arg.sslcUrl || "",
+                    pucUrl: arg.pucUrl || "",
+                    aadharUrl: arg.aadharUrl || "",
+                    admission1Url: arg.admission1Url || "",
+                    admission2Url: arg.admission2Url || "",
+                    idcardUrl: arg.idcardUrl,
                     userId: arg.userId,
                 },
             });
 
             const events = await Promise.all(
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 eventList.map((event: any) =>
                     prisma.events.update({
                         where: {
                             userId_eventNo: {
                                 userId: arg.userId,
-                                eventNo: parseInt(event.eventNo), // Make sure this matches the correct event number
+                                eventNo: event.eventNo,
                             },
                         },
                         data: {
                             registrants: {
-                                connect: { id: registrant.id }, // Connect registrant by their ID
+                                connect: { id: registrant.id },
                             },
-                            registeredParticipant: parseInt(
-                                event.registeredParticipant
-                            ),
-                            registeredAccompanist: parseInt(
-                                event.registeredAccompanist
-                            ),
+                            registeredParticipant: event.registeredParticipant,
+                            registeredAccompanist: event.registeredAccompanist,
                         },
                     })
                 )
             );
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
             const updatedEvents = events.map((x: any) => {
-                const findEvent = eventList.find((y) => y.id === x.id);
+                const findEvent = eventList.find(
+                    (y) => y.eventNo === x.eventNo
+                );
                 return { ...x, type: findEvent.type };
             });
 
             const eventRegistrant = await Promise.all(
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 updatedEvents.map((event: any) =>
                     prisma.eventRegistrations.create({
                         data: {
@@ -168,38 +118,39 @@ export async function insertRegistrant(arg: Registrant, userEvents: any) {
             );
             return { registrant, events, eventRegistrant };
         });
+        return result;
     } catch (err: unknown) {
-        if (err instanceof Prisma.PrismaClientKnownRequestError) {
-            // Handle specific Prisma error codes
-            console.log(err);
-            switch (err.code) {
-                case "P2002":
-                    console.log(
-                        `Unique constraint failed on the field: ${err.meta?.target}`
-                    );
-                    throw new Error(
-                        `Unique constraint failed on the field: ${err.meta?.target}`
-                    );
-                case "P2025":
-                    console.log("Record not found");
-                    throw new Error("Record not found");
-                default:
-                    console.log(`Prisma error: ${err.message}`);
-                    throw new Error(`Prisma error: ${err.message}`);
-            }
-        } else if (err instanceof Prisma.PrismaClientValidationError) {
-            console.log(err.message);
-            throw new Error(`Validation error: ${err.message}`);
-        } else {
-            // Generic error handling
-            console.log("Unexpected error:", err);
-            if (err instanceof Error) {
-                console.log(err.message);
-                throw new Error(err.message || "An unexpected error occurred");
-            } else {
-                throw new Error("An unexpected error occurred");
-            }
+        handlePrismaError(err);
+    }
+}
+
+function handlePrismaError(err: unknown): never {
+    if (err instanceof Prisma.PrismaClientKnownRequestError) {
+        console.error(err);
+        switch (err.code) {
+            case "P2002":
+                console.error(
+                    `Unique constraint failed on the field: ${err.meta?.target}`
+                );
+                throw new Error(
+                    `Unique constraint failed on the field: ${err.meta?.target}`
+                );
+            case "P2025":
+                console.error("Record not found");
+                throw new Error("Record not found");
+            default:
+                console.error(`Prisma error: ${err.message}`);
+                throw new Error(`Prisma error: ${err.message}`);
         }
+    } else if (err instanceof Prisma.PrismaClientValidationError) {
+        console.error(err.message);
+        throw new Error(`Validation error: ${err.message}`);
+    } else if (err instanceof Error) {
+        console.error("Unexpected error:", err.message);
+        throw new Error(err.message || "An unexpected error occurred");
+    } else {
+        console.error("Unexpected error:", err);
+        throw new Error("An unexpected error occurred");
     }
 }
 
