@@ -139,8 +139,8 @@ const Dignitaries = () => {
     return (
         <div>
             <div className="flex flex-col min-h-screen pt-20 pb-12 lg:pt-[120px] bg-gradient-to-br from-background to-secondary">
-                <div className="container mx-auto px-4">
-                    <h1 className="text-4xl font-bold text-center mb-16">Committee Members</h1>
+                <div className="container  px-4">
+                    <h1 className="text-4xl font-bold text-center text-blue-600 text-center mb-16">DIGNITARIES AND CHEIF GUESTS</h1>
 
                     {Object.entries(committee).map(([key, section]) => (
                         <div key={key} className="mb-16">
