@@ -1,233 +1,404 @@
 "use client";
-import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
+
+import React, { useState, useEffect } from "react";
+import { useForm, FieldErrors } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
     Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
     CardHeader,
     CardTitle,
+    CardDescription,
+    CardContent,
+    CardFooter,
 } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
     Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
     SelectTrigger,
     SelectValue,
+    SelectContent,
+    SelectGroup,
+    SelectLabel,
+    SelectItem,
 } from "@/components/ui/select";
-
 import {
     Accordion,
     AccordionItem,
     AccordionTrigger,
     AccordionContent,
 } from "@/components/ui/accordion";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { LoadingButton } from "../LoadingButton";
 import { UploadDropzone } from "@/utils/uploadthing";
-import { toast } from "sonner";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import { VerifiedIcon } from "lucide-react";
 import { Event } from "@/app/register/addRegistrant/page";
+import {
+    participantFormSchema,
+    managerFormSchema,
+} from "@/lib/schemas/register";
 
+// Required Documents
 const REQUIRED_DOCUMENTS = [
-    { id: "photo", label: "Photo", hint: "Upload passport size photo" },
-    { id: "idCard", label: "College ID Card", hint: "Upload college ID card" },
-    { id: "aadhar", label: "Aadhar Card", hint: "Upload Aadhar card" },
-    { id: "sslc", label: "SSLC Marks Card", hint: "Upload SSLC marks card" },
-    { id: "puc", label: "PUC Marks Card", hint: "Upload PUC marks card" },
+    { id: "photo", label: "Photo", hint: "Passport size photo of the student" },
+    {
+        id: "idCard",
+        label: "College ID Card",
+        hint: "College Identification Card of the student",
+    },
+    {
+        id: "aadhar",
+        label: "Aadhar Card",
+        hint: "Please ensure to upload in a way 12-digit Aadhaar Number must be clearly visible",
+    },
+    {
+        id: "sslc",
+        label: "SSLC Marks Card",
+        hint: "SSLC/10th or any equivalent marks card",
+    },
+    {
+        id: "puc",
+        label: "PUC Marks Card",
+        hint: "2nd PUC/ 12th Diploma or any equivalent marks card",
+    },
     {
         id: "admission1",
-        label: "Admission Document 1",
-        hint: "Upload first admission document",
+        label: "Free Receipt",
+        hint: "Recent Fee Receipt from the college you are studying in",
     },
     {
         id: "admission2",
-        label: "Admission Document 2",
-        hint: "Upload second admission document",
+        label: "Latest semester marks card",
+        hint: "Marks card of the latest semester you have completed from the college you are studying in",
     },
 ];
-
-type DocumentUrls = {
-    photo: string;
-    idCard: string;
-    aadhar: string;
-    sslc: string;
-    puc: string;
-    admission1: string;
-    admission2: string;
-};
 
 type SelectRolesAndEventsProps = {
     allEvents: Event[];
 };
 
-const participantSchema = z.object({
-    name: z.string().min(1, "Required"),
-    username: z.string().min(1, "Required"),
-    phoneno: z.string().min(10, "Enter valid phone number"),
-    documents: z.object({
-        photo: z.string().url().optional(),
-        idCard: z.string().url().optional(),
-        aadhar: z.string().url().optional(),
-        sslc: z.string().url().optional(),
-        puc: z.string().url().optional(),
-        admission1: z.string().url().optional(),
-        admission2: z.string().url().optional(),
-    }),
-});
-
-const managerSchema = z.object({
-    managerName: z.string().min(1, "Required"),
-    managerPhone: z.string().min(10, "Enter valid phone number"),
-    // ... any manager-specific fields ...
-});
-
-const SelectRolesAndEvents: React.FC<SelectRolesAndEventsProps> = ({
+export default function SelectRolesAndEvents({
     allEvents,
-}) => {
-    const groupedEvents = allEvents.reduce((acc, event) => {
-        if (!acc[event.category]) {
-            acc[event.category] = [];
-        }
-        acc[event.category].push(event);
-        return acc;
-    }, {} as Record<string, Event[]>);
-    const isDisabled = allEvents.length === 0;
+}: SelectRolesAndEventsProps) {
+    const router = useRouter();
+    const [selectedEvents, setSelectedEvents] = useState<
+        { eventNo: number; type: "PARTICIPANT" | "ACCOMPANIST" }[]
+    >([]);
     const [documentUrls, setDocumentUrls] = useState<Record<string, string>>(
         {}
     );
+    // Add this below the existing documentUrls state
+    const [managerDocumentUrls, setManagerDocumentUrls] = useState<
+        Record<string, string>
+    >({});
+
     const {
         register,
         handleSubmit,
         formState: { errors },
-    } = useForm({
-        resolver: zodResolver(participantSchema),
+        setValue, // Destructure setValue
+    } = useForm<z.infer<typeof participantFormSchema>>({
+        resolver: zodResolver(participantFormSchema),
         defaultValues: {
             name: "",
-            username: "",
-            phoneno: "",
-            documents: {},
+            usn: "",
+            phone: "",
+            events: [],
+            documents: {
+                photo: "",
+                idCard: "",
+                aadhar: "",
+                sslc: "",
+                puc: "",
+                admission1: "",
+                admission2: "",
+            },
         },
     });
 
-    const onParticipantSubmit = (data: any) => {
-        console.log("Participant Data ->", data);
+    const {
+        register: registerManager,
+        handleSubmit: handleSubmitManager,
+        formState: { errors: errorsManager },
+        setValue: setValueManager,
+    } = useForm<z.infer<typeof managerFormSchema>>({
+        resolver: zodResolver(managerFormSchema),
+        defaultValues: {
+            name: "",
+            usn: "",
+            teamManager: true,
+            phone: "",
+            documents: {
+                photo: "",
+                idCard: "",
+            },
+        },
+    });
+
+    // Synchronize selectedEvents with form
+    useEffect(() => {
+        setValue("events", selectedEvents);
+        console.log("Selected Events:", selectedEvents);
+    }, [selectedEvents, setValue]);
+
+    // Synchronize documentUrls with form
+    useEffect(() => {
+        REQUIRED_DOCUMENTS.forEach((doc) => {
+            setValue(
+                `documents.${doc.id}` as const,
+                documentUrls[doc.id] || ""
+            );
+        });
+    }, [documentUrls, setValue]);
+
+    // Add this useEffect alongside the existing one
+    useEffect(() => {
+        REQUIRED_DOCUMENTS.forEach((doc) => {
+            if (doc.id === "photo" || doc.id === "idCard") {
+                setValueManager(
+                    `documents.${doc.id}` as const,
+                    managerDocumentUrls[doc.id] || ""
+                );
+            }
+        });
+    }, [managerDocumentUrls, setValueManager]);
+    // Existing useEffect for Participant & Accompanist
+    // useEffect(() => {
+    //     REQUIRED_DOCUMENTS.forEach((doc) => {
+    //         setValue(
+    //             `documents.${doc.id}` as const,
+    //             documentUrls[doc.id] || ""
+    //         );
+    //     });
+    // }, [documentUrls, setValue]);
+    // Toggle event selection on card click
+    const onToggleSelect = (eventNo: number, eventName: string) => {
+        setSelectedEvents((prev) => {
+            const idx = prev.findIndex((item) => item.eventNo === eventNo);
+            if (idx >= 0) {
+                // Remove it if clicked again
+                return prev.filter((item) => item.eventNo !== eventNo);
+            } else {
+                // Add with default type "PARTICIPANT"
+                return [...prev, { eventName, eventNo, type: "PARTICIPANT" }];
+            }
+        });
     };
 
-    const onManagerSubmit = (event: React.FormEvent) => {
-        event.preventDefault();
-        const result = managerSchema.safeParse({
-            managerName: "Fake Input",
-            managerPhone: "1234567890",
+    // Handle role changes in the Select component
+    const onChangeRole = (
+        eventNo: number,
+        newType: "PARTICIPANT" | "ACCOMPANIST"
+    ) => {
+        setSelectedEvents((prev) => {
+            return prev.map((item) =>
+                item.eventNo === eventNo ? { ...item, type: newType } : item
+            );
         });
-        if (!result.success) {
-            console.log("Manager Error:", result.error.issues);
-        } else {
-            console.log("Manager Data ->", result.data);
+    };
+
+    // Form Submission Handler
+    const onParticipantSubmit = async (
+        data: z.infer<typeof participantFormSchema>
+    ) => {
+        const payload = {
+            ...data,
+            // events and documents are already included via useEffect
+        };
+
+        console.log("Submitting:", payload);
+
+        try {
+            const res = await fetch("/api/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+            });
+            const result = await res.json();
+
+            if (!res.ok) {
+                throw new Error(result.message || "Failed to register");
+            }
+            toast.success("Registered Successfully.");
+            router.push("/register/getallregister");
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                console.error("Error registering:", error.message);
+                toast.error(error.message || "An error occurred.");
+            }
         }
     };
 
-    async function handleDeleteFromUploadThing(fileKey: string) {
+    // Form Error Handler
+    const onParticipantError = (
+        err: FieldErrors<z.infer<typeof participantFormSchema>>
+    ) => {
+        console.log("Validation Error:", err);
+        toast.error("Please fix the validation errors and try again.");
+    };
+
+    // File Delete Handler
+    async function handleDeleteFromUploadThing(fileId: string) {
         try {
-            const res = await fetch("/api/deleteFiles", {
+            await fetch("/api/deleteFiles", {
                 method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ files: [fileKey] }),
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ files: [fileId] }),
             });
-            if (res.ok) {
-                console.log("File deleted successfully");
-            } else {
-                console.error("Error deleting file");
-            }
+            setDocumentUrls((prev) => ({ ...prev, [fileId]: "" }));
         } catch (error) {
-            console.error("Error deleting file", error);
+            console.error("Error deleting file:", error);
+        }
+    }
+    // Update or create a separate delete handler for Team Manager
+    async function handleDeleteManagerDocument(fileId: string) {
+        try {
+            await fetch("/api/deleteFiles", {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ files: [fileId] }),
+            });
+            setManagerDocumentUrls((prev) => ({ ...prev, [fileId]: "" }));
+        } catch (error) {
+            console.error("Error deleting manager file:", error);
         }
     }
 
-    const [selectedEvents, setSelectedEvents] = useState<number[]>([]);
+    // Group Events by Category
+    const groupedEvents = allEvents.reduce((acc, ev) => {
+        acc[ev.category] = acc[ev.category] || [];
+        acc[ev.category].push(ev);
+        return acc;
+    }, {} as Record<string, Event[]>);
 
-    const onToggleSelect = (eventNo: number) => {
-        setSelectedEvents((prev) =>
-            prev.includes(eventNo)
-                ? prev.filter((no) => no !== eventNo)
-                : [...prev, eventNo]
-        );
+    const onManagerError = (
+        err: FieldErrors<z.infer<typeof managerFormSchema>>
+    ) => {
+        console.log("Manager Validation Error:", err);
+        toast.error("Please fix the validation errors and try again.");
+    };
+
+    const onManagerSubmit = async (data: z.infer<typeof managerFormSchema>) => {
+        const payload = {
+            ...data,
+            teamManager: true, // Ensure teamManager flag is set
+            events: [], // No events for manager
+        };
+
+        console.log("Submitting Manager:", payload);
+
+        try {
+            const res = await fetch("/api/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+            });
+            const result = await res.json();
+
+            if (!res.ok) {
+                throw new Error(result.message || "Failed to register");
+            }
+            toast.success("Manager Registered Successfully.");
+            // Optionally redirect or reset the form
+            router.push("/register/getallregister");
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                console.error("Error registering manager:", error.message);
+                toast.error(error.message || "An error occurred.");
+            }
+        }
     };
 
     return (
         <Tabs defaultValue="participant" className="w-full px-10">
             <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="participant">
-                    Participant/Accompanist
+                    Participant & Accompanist
                 </TabsTrigger>
                 <TabsTrigger value="manager">Team Manager</TabsTrigger>
             </TabsList>
 
             <TabsContent value="participant">
                 <Card>
-                    <form onSubmit={handleSubmit(onParticipantSubmit)}>
+                    <form
+                        onSubmit={handleSubmit(
+                            onParticipantSubmit,
+                            onParticipantError
+                        )}
+                    >
                         <CardHeader>
                             <CardTitle className="text-center">
-                                Participant
+                                Register (Participant/Accompanist)
                             </CardTitle>
                             <CardDescription className="text-center">
-                                Add participant details.
+                                Add details for Participant or Accompanist
+                                roles.
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
+                            {/* Basic Information Fields */}
                             <div className="flex flex-col md:flex-row gap-4 md:gap-6 mb-6">
                                 <div className="w-full md:w-1/3 space-y-1.5">
-                                    <Label htmlFor="name">Name</Label>
+                                    <Label htmlFor="name">
+                                        Name of the student (As mentioned on
+                                        10th or any equivalent marks card)
+                                    </Label>
                                     <Input
-                                        id="name"
-                                        placeholder="Bhuvan S A"
                                         {...register("name")}
+                                        id="name"
+                                        placeholder="Full Name"
                                     />
                                     {errors.name && (
-                                        <p>{errors.name.message}</p>
+                                        <p className="text-red-500 text-sm">
+                                            {errors.name.message}
+                                        </p>
                                     )}
                                 </div>
                                 <div className="w-full md:w-1/3 space-y-1.5">
-                                    <Label htmlFor="username">USN</Label>
+                                    <Label htmlFor="username">
+                                        USN of the student
+                                    </Label>
                                     <Input
-                                        id="username"
+                                        {...register("usn")}
+                                        id="usn"
                                         placeholder="1GA21AI012"
-                                        {...register("username")}
                                     />
-                                    {errors.username && (
-                                        <p>{errors.username.message}</p>
+                                    {errors.usn && (
+                                        <p className="text-red-500 text-sm">
+                                            {errors.usn.message}
+                                        </p>
                                     )}
                                 </div>
                                 <div className="w-full md:w-1/3 space-y-1.5">
-                                    <Label htmlFor="phoneno">
-                                        Phone Number
+                                    <Label htmlFor="phone">
+                                        Phone number of the student
                                     </Label>
                                     <Input
                                         id="phoneno"
-                                        placeholder="9876543210"
-                                        {...register("phoneno")}
+                                        placeholder="Phone Number"
+                                        {...register("phone")}
                                     />
-                                    {errors.phoneno && (
-                                        <p>{errors.phoneno.message}</p>
+                                    {errors.phone && (
+                                        <p className="text-red-500 text-sm">
+                                            {errors.phone.message}
+                                        </p>
                                     )}
                                 </div>
                             </div>
-                            <div className="bg-card text-card-foreground">
+
+                            {/* Event Selection */}
+                            <div className="bg-card text-card-foreground p-4 rounded-md">
                                 <h2
                                     className="text-2xl font-semibold text-foreground mb-4"
                                     aria-label="Available events"
                                     tabIndex={0}
                                 >
-                                    Select Your Events
+                                    Select the events that you are Participating
+                                    / Accompanying in
                                 </h2>
 
                                 {allEvents.length === 0 ? (
@@ -244,169 +415,170 @@ const SelectRolesAndEvents: React.FC<SelectRolesAndEventsProps> = ({
                                         className="w-full"
                                     >
                                         {Object.entries(groupedEvents).map(
-                                            ([category, events]) => {
-                                                const selectedCount =
-                                                    events.filter((evt) =>
-                                                        selectedEvents.includes(
-                                                            evt.eventNo
-                                                        )
-                                                    ).length;
-                                                return (
-                                                    <AccordionItem
-                                                        key={category}
-                                                        value={category}
-                                                    >
-                                                        <AccordionTrigger
-                                                            className="flex justify-between items-center w-full px-4 py-2 text-left rounded-lg hover:bg-secondary/80 transition-all duration-200"
-                                                            aria-label={`Show or hide events for ${category}`}
-                                                        >
-                                                            <span className="text-lg font-medium">
-                                                                {category} (
-                                                                {events.length})
-                                                            </span>
-                                                            {selectedCount >
-                                                                0 && (
-                                                                <div className="flex ml-auto mr-2">
-                                                                    <span
-                                                                        className="bg-blue-100 text-blue-600 rounded-full w-6 h-6 flex items-center justify-center text-sm"
-                                                                        aria-live="polite"
-                                                                    >
-                                                                        {
-                                                                            selectedCount
-                                                                        }
-                                                                    </span>
-                                                                </div>
-                                                            )}
-                                                        </AccordionTrigger>
-                                                        <AccordionContent>
-                                                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-1.5">
-                                                                {events.map(
-                                                                    (event) => {
-                                                                        const isSelected =
-                                                                            selectedEvents.includes(
+                                            ([category, events]) => (
+                                                <AccordionItem
+                                                    key={category}
+                                                    value={category}
+                                                >
+                                                    <AccordionTrigger>
+                                                        {category}
+                                                    </AccordionTrigger>
+                                                    <AccordionContent>
+                                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-1.5">
+                                                            {events.map(
+                                                                (event) => {
+                                                                    const selectedObj =
+                                                                        selectedEvents.find(
+                                                                            (
+                                                                                item
+                                                                            ) =>
+                                                                                item.eventNo ===
                                                                                 event.eventNo
-                                                                            );
-                                                                        return (
-                                                                            <div
-                                                                                key={
-                                                                                    event.eventNo
-                                                                                }
-                                                                                role="button"
-                                                                                tabIndex={
-                                                                                    0
-                                                                                }
-                                                                                aria-pressed={
-                                                                                    isSelected
-                                                                                }
-                                                                                aria-label={`Select or deselect ${event.eventName}`}
-                                                                                onClick={() =>
-                                                                                    !isDisabled &&
+                                                                        );
+                                                                    const isSelected =
+                                                                        !!selectedObj;
+                                                                    return (
+                                                                        <div
+                                                                            key={
+                                                                                event.eventNo
+                                                                            }
+                                                                            role="button"
+                                                                            tabIndex={
+                                                                                0
+                                                                            }
+                                                                            aria-pressed={
+                                                                                isSelected
+                                                                            }
+                                                                            onClick={() =>
+                                                                                onToggleSelect(
+                                                                                    event.eventNo,
+                                                                                    event.eventName
+                                                                                )
+                                                                            }
+                                                                            onKeyDown={(
+                                                                                e
+                                                                            ) => {
+                                                                                if (
+                                                                                    e.key ===
+                                                                                        "Enter" ||
+                                                                                    e.key ===
+                                                                                        " "
+                                                                                ) {
                                                                                     onToggleSelect(
-                                                                                        event.eventNo
-                                                                                    )
-                                                                                }
-                                                                                onKeyDown={(
-                                                                                    e
-                                                                                ) => {
-                                                                                    if (
-                                                                                        !isDisabled &&
-                                                                                        (e.key ===
-                                                                                            "Enter" ||
-                                                                                            e.key ===
-                                                                                                " ")
-                                                                                    ) {
-                                                                                        onToggleSelect(
-                                                                                            event.eventNo
-                                                                                        );
-                                                                                    }
-                                                                                }}
-                                                                                className={`p-4 border-2 rounded-lg cursor-pointer transition duration-300 outline-none focus:ring-2 focus:ring-blue-500 flex flex-col h-full ${
-                                                                                    isSelected
-                                                                                        ? "border-primary bg-primary/10"
-                                                                                        : "border-border bg-card hover:border-blue-200"
-                                                                                } ${
-                                                                                    isDisabled
-                                                                                        ? "opacity-50 cursor-not-allowed"
-                                                                                        : ""
-                                                                                }`}
-                                                                            >
-                                                                                <h3 className="text-lg font-semibold text-foreground mb-2">
-                                                                                    {
+                                                                                        event.eventNo,
                                                                                         event.eventName
-                                                                                    }
-                                                                                </h3>
-                                                                                <div className="mt-auto">
-                                                                                    <div className="flex items-end">
-                                                                                        <div className="w-1/2">
-                                                                                            <p className="text-sm text-muted-foreground">
-                                                                                                Max
-                                                                                                Participants:{" "}
-                                                                                                <span className="font-medium text-foreground">
-                                                                                                    {
-                                                                                                        event.maxParticipant
-                                                                                                    }
-                                                                                                </span>
-                                                                                            </p>
-                                                                                            <p className="text-sm text-muted-foreground">
-                                                                                                Max
-                                                                                                Accompanists:{" "}
-                                                                                                <span className="font-medium text-foreground">
-                                                                                                    {
-                                                                                                        event.maxAccompanist
-                                                                                                    }
-                                                                                                </span>
-                                                                                            </p>
-                                                                                        </div>
-                                                                                        <div className="w-1/2">
-                                                                                            <Select>
-                                                                                                <SelectTrigger>
-                                                                                                    <SelectValue placeholder="Select a role" />
-                                                                                                </SelectTrigger>
-                                                                                                <SelectContent>
-                                                                                                    <SelectGroup>
-                                                                                                        <SelectLabel>
-                                                                                                            as
-                                                                                                        </SelectLabel>
-                                                                                                        {event.registeredParticipant <
-                                                                                                            event.maxParticipant && (
-                                                                                                            <SelectItem value="Participant">
-                                                                                                                Participant
-                                                                                                            </SelectItem>
-                                                                                                        )}
-                                                                                                        {event.registeredAccompanist <
-                                                                                                            event.maxAccompanist && (
-                                                                                                            <SelectItem value="Accompanist">
-                                                                                                                Accompanist
-                                                                                                            </SelectItem>
-                                                                                                        )}
-                                                                                                    </SelectGroup>
-                                                                                                </SelectContent>
-                                                                                            </Select>
-                                                                                        </div>
-                                                                                    </div>
+                                                                                    );
+                                                                                }
+                                                                            }}
+                                                                            className={`p-4 border-2 rounded-lg cursor-pointer transition duration-300 flex flex-col h-full ${
+                                                                                isSelected
+                                                                                    ? "border-primary bg-primary/10"
+                                                                                    : "border-border bg-card"
+                                                                            }`}
+                                                                        >
+                                                                            <h3 className="text-lg font-semibold mb-2">
+                                                                                {
+                                                                                    event.eventName
+                                                                                }
+                                                                            </h3>
+                                                                            <div className="mt-auto flex items-end justify-between">
+                                                                                <div>
+                                                                                    <p className="text-sm">
+                                                                                        Max
+                                                                                        Participants:{" "}
+                                                                                        {
+                                                                                            event.maxParticipant
+                                                                                        }
+                                                                                    </p>
+                                                                                    <p className="text-sm">
+                                                                                        Max
+                                                                                        Accompanists:{" "}
+                                                                                        {
+                                                                                            event.maxAccompanist
+                                                                                        }
+                                                                                    </p>
+                                                                                </div>
+                                                                                <div
+                                                                                    onClick={(
+                                                                                        e
+                                                                                    ) => {
+                                                                                        // Prevent card click from toggling selection
+                                                                                        e.stopPropagation();
+                                                                                    }}
+                                                                                >
+                                                                                    <Select
+                                                                                        value={
+                                                                                            selectedObj?.type ||
+                                                                                            "PARTICIPANT"
+                                                                                        }
+                                                                                        onValueChange={(
+                                                                                            val
+                                                                                        ) =>
+                                                                                            onChangeRole(
+                                                                                                event.eventNo,
+                                                                                                val as
+                                                                                                    | "PARTICIPANT"
+                                                                                                    | "ACCOMPANIST"
+                                                                                            )
+                                                                                        }
+                                                                                    >
+                                                                                        <SelectTrigger>
+                                                                                            <SelectValue placeholder="Select a role" />
+                                                                                        </SelectTrigger>
+                                                                                        <SelectContent>
+                                                                                            <SelectGroup>
+                                                                                                <SelectLabel>
+                                                                                                    As
+                                                                                                </SelectLabel>
+                                                                                                {event.registeredParticipant <
+                                                                                                    event.maxParticipant && (
+                                                                                                    <SelectItem value="PARTICIPANT">
+                                                                                                        Participant
+                                                                                                    </SelectItem>
+                                                                                                )}
+                                                                                                {event.registeredAccompanist <
+                                                                                                    event.maxAccompanist && (
+                                                                                                    <SelectItem value="ACCOMPANIST">
+                                                                                                        Accompanist
+                                                                                                    </SelectItem>
+                                                                                                )}
+                                                                                            </SelectGroup>
+                                                                                        </SelectContent>
+                                                                                    </Select>
                                                                                 </div>
                                                                             </div>
-                                                                        );
-                                                                    }
-                                                                )}
-                                                            </div>
-                                                        </AccordionContent>
-                                                    </AccordionItem>
-                                                );
-                                            }
+                                                                        </div>
+                                                                    );
+                                                                }
+                                                            )}
+                                                        </div>
+                                                    </AccordionContent>
+                                                </AccordionItem>
+                                            )
                                         )}
                                     </Accordion>
                                 )}
+                                {errors.events && (
+                                    <p className="text-red-500 text-sm">
+                                        {errors.events.message}
+                                    </p>
+                                )}
                             </div>
 
-                            <div className="mt-3">
-                                <h2
-                                    className="text-2xl font-semibold text-foreground mb-4"
-                                    aria-label="Available events"
-                                    tabIndex={0}
-                                >
+                            {/* Documents Upload */}
+                            <div className="mt-6">
+                                <h2 className="text-2xl font-semibold mb-4">
                                     Upload Documents
                                 </h2>
+                                <p className="mb-4 text-muted-foreground">
+                                    Students are required to submit valid
+                                    documents for verification. In case any
+                                    document/documents fail the verification
+                                    process, participants will be asked to
+                                    reupload the documents. Failure to meet the
+                                    requirements after re-uploading may result
+                                    in disqualification.
+                                </p>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                     {REQUIRED_DOCUMENTS.map((doc) => {
                                         const isUploaded =
@@ -427,30 +599,21 @@ const SelectRolesAndEvents: React.FC<SelectRolesAndEventsProps> = ({
                                                     {doc.hint}
                                                 </p>
                                                 {isUploaded ? (
-                                                    <div className="w-full h-[244px] flex flex-col rounded-[var(--radius)] items-center justify-end p-12 space-y-2 bg-gradient-to-t from-green-50 dark:from-green-950 to-transparent">
+                                                    <div className="w-full h-[244px] flex flex-col rounded-[var(--radius)] items-center justify-end p-12 space-y-2 bg-gradient-to-t from-green-50 to-transparent">
                                                         <p className="text-green-500 flex items-center gap-1 pb-10">
                                                             Upload Complete
                                                             <VerifiedIcon />
                                                         </p>
-                                                        <Button
-                                                            variant="outline"
+                                                        <LoadingButton
+                                                            type="button"
                                                             onClick={async () => {
                                                                 await handleDeleteFromUploadThing(
-                                                                    documentUrls[
-                                                                        doc.id
-                                                                    ]
-                                                                );
-                                                                setDocumentUrls(
-                                                                    (prev) => ({
-                                                                        ...prev,
-                                                                        [doc.id]:
-                                                                            "",
-                                                                    })
+                                                                    doc.id
                                                                 );
                                                             }}
                                                         >
                                                             Edit (Re-upload)
-                                                        </Button>
+                                                        </LoadingButton>
                                                     </div>
                                                 ) : (
                                                     <UploadDropzone
@@ -467,10 +630,10 @@ const SelectRolesAndEvents: React.FC<SelectRolesAndEventsProps> = ({
                                                                                 .key,
                                                                     })
                                                                 );
+                                                                toast.success(
+                                                                    `${doc.label} Upload Completed`
+                                                                );
                                                             }
-                                                            toast.success(
-                                                                `${doc.label} Upload Completed`
-                                                            );
                                                         }}
                                                         onUploadError={(
                                                             error: Error
@@ -480,6 +643,17 @@ const SelectRolesAndEvents: React.FC<SelectRolesAndEventsProps> = ({
                                                             );
                                                         }}
                                                     />
+                                                )}
+                                                {errors.documents?.[
+                                                    doc.id as keyof typeof errors.documents
+                                                ] && (
+                                                    <p className="text-red-500 text-sm">
+                                                        {
+                                                            errors.documents[
+                                                                doc.id as keyof typeof errors.documents
+                                                            ]?.message
+                                                        }
+                                                    </p>
                                                 )}
                                             </div>
                                         );
@@ -496,42 +670,166 @@ const SelectRolesAndEvents: React.FC<SelectRolesAndEventsProps> = ({
 
             <TabsContent value="manager">
                 <Card>
-                    <CardHeader>
-                        <CardTitle className="text-center">
-                            Team Manager
-                        </CardTitle>
-                        <CardDescription className="text-center">
-                            Manager details here.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <form onSubmit={onManagerSubmit}>
-                            <div className="flex flex-col gap-4 mb-6">
-                                {/* Example manager fields */}
-                                <div className="space-y-1.5">
-                                    <Label htmlFor="managerName">
-                                        Manager Name
+                    <form
+                        onSubmit={handleSubmitManager(
+                            onManagerSubmit,
+                            onManagerError
+                        )}
+                    >
+                        <CardHeader>
+                            <CardTitle className="text-center">
+                                Team Manager
+                            </CardTitle>
+                            <CardDescription className="text-center">
+                                Manager details here.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            {/* Basic Information Fields */}
+                            <div className="flex flex-col md:flex-row gap-4 md:gap-6 mb-6">
+                                <div className="w-full md:w-1/3 space-y-1.5">
+                                    <Label htmlFor="managerName">Name</Label>
+                                    <Input
+                                        {...registerManager("name")}
+                                        id="managerName"
+                                        placeholder="Full Name"
+                                    />
+                                    {errorsManager.name && (
+                                        <p className="text-red-500 text-sm">
+                                            {errorsManager.name.message}
+                                        </p>
+                                    )}
+                                </div>
+                                <div className="w-full md:w-1/3 space-y-1.5">
+                                    <Label htmlFor="managerUsn">USN</Label>
+                                    <Input
+                                        {...registerManager("usn")}
+                                        id="managerUsn"
+                                        placeholder="1GA21AI012"
+                                    />
+                                    {errorsManager.usn && (
+                                        <p className="text-red-500 text-sm">
+                                            {errorsManager.usn.message}
+                                        </p>
+                                    )}
+                                </div>
+                                <div className="w-full md:w-1/3 space-y-1.5">
+                                    <Label htmlFor="managerPhone">
+                                        Phone Number
                                     </Label>
                                     <Input
-                                        id="managerName"
-                                        placeholder="John Doe"
-                                    />
-                                </div>
-                                <div className="space-y-1.5">
-                                    <Label htmlFor="managerPhone">Phone</Label>
-                                    <Input
+                                        {...registerManager("phone")}
                                         id="managerPhone"
-                                        placeholder="9876543210"
+                                        placeholder="Phone Number"
                                     />
+                                    {errorsManager.phone && (
+                                        <p className="text-red-500 text-sm">
+                                            {errorsManager.phone.message}
+                                        </p>
+                                    )}
                                 </div>
                             </div>
+
+                            {/* Documents Upload */}
+                            <div className="mt-6">
+                                <h2 className="text-2xl font-semibold mb-4">
+                                    Upload Documents
+                                </h2>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    {/* Only include photo and idCard */}
+                                    {REQUIRED_DOCUMENTS.filter(
+                                        (doc) =>
+                                            doc.id === "photo" ||
+                                            doc.id === "idCard"
+                                    ).map((doc) => {
+                                        const isUploaded =
+                                            !!managerDocumentUrls[doc.id];
+                                        return (
+                                            <div
+                                                key={doc.id}
+                                                className={`space-y-1.5 border rounded-[var(--radius)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 p-2 ${
+                                                    isUploaded
+                                                        ? "border-green-500 border-2"
+                                                        : "border-gray-300"
+                                                }`}
+                                            >
+                                                <Label htmlFor={doc.id}>
+                                                    {doc.label}
+                                                </Label>
+                                                <p className="text-sm text-muted-foreground mb-2">
+                                                    {doc.hint}
+                                                </p>
+                                                {isUploaded ? (
+                                                    <div className="w-full h-[244px] flex flex-col rounded-[var(--radius)] items-center justify-end p-12 space-y-2 bg-gradient-to-t from-green-50 to-transparent">
+                                                        <p className="text-green-500 flex items-center gap-1 pb-10">
+                                                            Upload Complete
+                                                            <VerifiedIcon />
+                                                        </p>
+                                                        <Button
+                                                            type="button"
+                                                            variant="outline"
+                                                            onClick={async () => {
+                                                                await handleDeleteManagerDocument(
+                                                                    doc.id
+                                                                );
+                                                            }}
+                                                        >
+                                                            Edit (Re-upload)
+                                                        </Button>
+                                                    </div>
+                                                ) : (
+                                                    <UploadDropzone
+                                                        endpoint="imageUploader"
+                                                        onClientUploadComplete={(
+                                                            res
+                                                        ) => {
+                                                            if (res && res[0]) {
+                                                                setManagerDocumentUrls(
+                                                                    (prev) => ({
+                                                                        ...prev,
+                                                                        [doc.id]:
+                                                                            res[0]
+                                                                                .key,
+                                                                    })
+                                                                );
+                                                                toast.success(
+                                                                    `${doc.label} Upload Completed`
+                                                                );
+                                                            }
+                                                        }}
+                                                        onUploadError={(
+                                                            error: Error
+                                                        ) => {
+                                                            toast.error(
+                                                                `Error: ${error.message} Uploading ${doc.label}`
+                                                            );
+                                                        }}
+                                                    />
+                                                )}
+                                                {errorsManager.documents?.[
+                                                    doc.id as keyof typeof errorsManager.documents
+                                                ] && (
+                                                    <p className="text-red-500 text-sm">
+                                                        {
+                                                            errorsManager
+                                                                .documents[
+                                                                doc.id as keyof typeof errorsManager.documents
+                                                            ]?.message
+                                                        }
+                                                    </p>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        </CardContent>
+                        <CardFooter>
                             <Button type="submit">Save Manager</Button>
-                        </form>
-                    </CardContent>
+                        </CardFooter>
+                    </form>
                 </Card>
             </TabsContent>
         </Tabs>
     );
-};
-
-export default SelectRolesAndEvents;
+}

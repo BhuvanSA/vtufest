@@ -29,6 +29,7 @@ import { LoadingButton } from "@/components/LoadingButton";
 import { useAuthContext } from "@/contexts/auth-context";
 import { loginSchema } from "@/lib/schemas/auth";
 import { toast } from "sonner";
+import Link from "next/link";
 
 export default function SignIn() {
     const router = useRouter();
@@ -77,10 +78,24 @@ export default function SignIn() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-secondary p-4">
+        <div className=" mt-28 min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-secondary p-4">
             <Card className="w-full max-w-md bg-card text-card-foreground">
                 <CardHeader>
                     <div className="flex items-center justify-center mb-6">
+                        <h1>Global Academy of Technology</h1>
+                    </div>
+                    <div className="flex items-center justify-between pb-16">
+                        <Image
+                            src="/images/college-logo.png"
+                            alt="College Logo"
+                            width={80}
+                            height={80}
+                            priority
+                            className="object-contain"
+                        />
+                        <h1 className="text-3xl font-bold text-foreground">
+                            Interact
+                        </h1>
                         <Image
                             src="/images/college-logo.png"
                             alt="College Logo"
@@ -91,10 +106,10 @@ export default function SignIn() {
                         />
                     </div>
                     <CardTitle className="text-2xl text-center font-bold text-foreground">
-                        Sign In
+                        Login
                     </CardTitle>
                     <CardDescription className="text-center text-muted-foreground">
-                        Enter your credentials to access the platform
+                        Use your registered email-id and password.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -109,7 +124,7 @@ export default function SignIn() {
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel className="text-foreground">
-                                            Email
+                                            Registered Email ID
                                         </FormLabel>
                                         <FormControl>
                                             <Input
@@ -180,6 +195,11 @@ export default function SignIn() {
                     >
                         Sign Up
                     </Button>
+                    <Link className="w-full" href="/link/to/how/to/register">
+                        <Button className="w-full" variant="outline">
+                            Link for registration instructions
+                        </Button>
+                    </Link>
                 </CardFooter>
             </Card>
         </div>

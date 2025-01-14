@@ -13,12 +13,12 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             <head>
                 {/* You can add custom head tags here, like meta tags, link to styles, etc. */}
             </head>
-            <body className="bg-background text-foreground dark:bg-background dark:text-foreground">
+            <body>
                 <ThemeProvider>
                     <AuthContextProvider>
                         <Navbar />
                         <main>{children}</main>
-                        <Toaster className=" bg-primary-foreground" />
+                        <Toaster />
                         <Footer />
                     </AuthContextProvider>
                 </ThemeProvider>

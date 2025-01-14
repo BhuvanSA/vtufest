@@ -43,6 +43,8 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import Image from "next/image";
 
 export type Data = {
     id: string;
@@ -58,32 +60,89 @@ export function DataTable({ data }: { data: Data[] }) {
     const router = useRouter();
     const [rows, setRows] = React.useState<Data[]>(data);
 
-    const handleUpdate = (id: string) => {
-        const originId = id.split("#")[0];
-        router.push(`/register/updateregister/${originId}`);
-    };
+    const handleUpdate = React.useCallback(
+        (id: string) => {
+            const originId = id.split("#")[0];
+            router.push(`/register/updateregister/${originId}`);
+        },
+        [router]
+    );
 
-    const handleRemove = async (id: string) => {
-        const originId = id.split("#")[0];
-        const updatedRows = rows.filter((row) => row.id !== id);
-        try {
-            const response = await fetch("/api/deleteregister", {
-                method: "DELETE",
-                body: JSON.stringify({ registrantId: originId }),
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                credentials: "include", // Ensure cookies are included
-            });
+    const handleRemove = React.useCallback(
+        async (id: string) => {
+            const originId = id.split("#")[0];
+            const updatedRows = rows.filter((row) => row.id !== id);
+            try {
+                const response = await fetch("/api/deleteregister", {
+                    method: "DELETE",
+                    body: JSON.stringify({ registrantId: originId }),
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    credentials: "include", // Ensure cookies are included
+                });
 
-            const data = await response.json();
-            alert(data.message);
-            setRows(updatedRows);
-        } catch (err: unknown) {
-            alert("An error occurred while removing the registrant.");
-            console.error(err);
-        }
-    };
+                const data = await response.json();
+                toast.success(data.message);
+                //                table.resetData(updatedRows)
+                setRows(updatedRows);
+            } catch (err: unknown) {
+                toast.error("Failed to delete registrant");
+                console.error(err);
+            }
+        },
+        [rows]
+    );
+
+    const handleDeleteSelected = React.useCallback(
+        async (providedRegistrants?: string[]) => {
+            let registrantIds: string[] = [];
+
+            if (providedRegistrants && providedRegistrants.length > 0) {
+                // If called with an argument, use that
+                registrantIds = providedRegistrants;
+            } else {
+                // Otherwise, use selected rows from the table
+                const selectedRows = table.getSelectedRowModel().rows;
+                registrantIds = Array.from(
+                    new Set(
+                        selectedRows.map((r) => r.original.id.split("#")[0])
+                    )
+                );
+            }
+
+            if (!registrantIds.length) {
+                toast.error("No rows selected");
+                return;
+            }
+
+            try {
+                const response = await fetch("/api/deleteregister", {
+                    method: "DELETE",
+                    body: JSON.stringify({ registrantIds }),
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                });
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.message);
+                }
+                toast.success(data.message);
+
+                // Remove deleted rows from UI state
+                setRows((prev) =>
+                    prev.filter(
+                        (row) => !registrantIds.includes(row.id.split("#")[0])
+                    )
+                );
+            } catch (error) {
+                toast.error("Failed to delete registrants");
+                console.error(error);
+            }
+        },
+        [rows]
+    );
 
     const [sorting, setSorting] = React.useState<SortingState>([]);
     const [columnFilters, setColumnFilters] =
@@ -109,26 +168,57 @@ export function DataTable({ data }: { data: Data[] }) {
                         aria-label="Select all"
                     />
                 ),
-                cell: ({ row }) => (
-                    <Checkbox
-                        checked={row.getIsSelected()}
-                        onCheckedChange={(value) => row.toggleSelected(!!value)}
-                        aria-label="Select row"
-                    />
-                ),
+                cell: ({ row, table }) => {
+                    const rowRegistrantId = row.original.id.split("#")[0];
+
+                    const handleCheck = (checked: boolean) => {
+                        // Find all rows with the same base registrant ID
+                        const matchingRows = table
+                            .getRowModel()
+                            .rows.filter(
+                                (r) =>
+                                    r.original.id.split("#")[0] ===
+                                    rowRegistrantId
+                            )
+                            .map((r) => r.id);
+
+                        // Update selection state for all matching rows
+                        table.setRowSelection((prev) => {
+                            const newSelection = { ...prev };
+                            matchingRows.forEach((idx) => {
+                                newSelection[idx] = checked;
+                            });
+                            return newSelection;
+                        });
+                    };
+
+                    return (
+                        <Checkbox
+                            checked={row.getIsSelected()}
+                            onCheckedChange={handleCheck}
+                            aria-label="Select row"
+                        />
+                    );
+                },
                 enableSorting: false,
                 enableHiding: false,
             },
             {
                 accessorKey: "photo",
                 header: "Photo",
-                cell: ({ row }) => (
-                    <img
-                        src={row.getValue("photo")}
-                        alt="Profile"
-                        className="w-10 h-10 rounded-full"
-                    />
-                ),
+                cell: ({ row }) => {
+                    const photoUrl = row.getValue("photo");
+                    const imageUrl = `https://${process.env.UPLOADTHING_APP_ID}.ufs.sh/f/${photoUrl}`;
+                    return (
+                        <Image
+                            src={imageUrl}
+                            alt="Profile"
+                            width={80}
+                            height={80}
+                            className="rounded-full"
+                        />
+                    );
+                },
             },
             {
                 accessorKey: "name",
@@ -326,7 +416,11 @@ export function DataTable({ data }: { data: Data[] }) {
                                     Update
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
-                                    onClick={() => handleRemove(data.id)}
+                                    onClick={() =>
+                                        handleDeleteSelected([
+                                            data.id.split("#")[0],
+                                        ])
+                                    }
                                     className="text-red-500"
                                 >
                                     <Trash2 className="mr-2 h-4 w-4" />
@@ -342,7 +436,7 @@ export function DataTable({ data }: { data: Data[] }) {
     );
 
     const table = useReactTable({
-        data,
+        data: rows,
         columns,
         onSortingChange: setSorting,
         onColumnFiltersChange: setColumnFilters,
@@ -420,6 +514,7 @@ export function DataTable({ data }: { data: Data[] }) {
                 <Button
                     variant="outline"
                     className="ml-2 hover:bg-red-500 hover:text-primary-foreground"
+                    onClick={() => handleDeleteSelected()}
                 >
                     <Trash2 className="mr-2 h-4 w-4" />
                     Delete Selected

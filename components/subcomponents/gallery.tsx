@@ -1,6 +1,25 @@
-"use client"
-import React, { useEffect, useState } from 'react'
-import { image1, image2, image12, image14, image15, image3, image4, image5, image6, image7, image8, image9, image16, image17, image18, image19, image20, image21,image22,
+"use client";
+import React, { useEffect, useState } from "react";
+import {
+    image1,
+    image2,
+    image12,
+    image14,
+    image15,
+    image3,
+    image4,
+    image5,
+    image6,
+    image7,
+    image8,
+    image9,
+    image16,
+    image17,
+    image18,
+    image19,
+    image20,
+    image21,
+    image22,
     image23,
     image24,
     image25,
@@ -29,210 +48,212 @@ import { image1, image2, image12, image14, image15, image3, image4, image5, imag
     image48,
     image49,
     image50,
-    image51 } from '@/components/images/gallery'
-import { useRouter } from 'next/navigation'
-import Image from 'next/image'
+    image51,
+} from "@/components/images/gallery";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const images = [
     {
         image: image1,
-        className: 'big'
+        className: "big",
     },
     {
         image: image49,
-        className: 'wide'
+        className: "wide",
     },
     {
         image: image5,
-        className: 'tall'
+        className: "tall",
     },
     {
         image: image2,
-        className: ''
+        className: "",
     },
     {
         image: image50,
-        className: ''
+        className: "",
     },
     {
         image: image6,
-        className: 'tall'
+        className: "tall",
     },
     {
         image: image9,
-        className: 'big'
+        className: "big",
     },
     {
         image: image8,
-        className: ''
+        className: "",
     },
     {
         image: image20,
-        className: 'wide',
+        className: "wide",
     },
     {
         image: image15,
-        className: 'big'
+        className: "big",
     },
     {
         image: image25,
-        className: 'tall'
+        className: "tall",
     },
     {
         image: image3,
-        className: ''
+        className: "",
     },
     {
         image: image46,
-        className: ''
+        className: "",
     },
     {
         image: image22,
-        className: ''
+        className: "",
     },
     {
         image: image18,
-        className: ''
+        className: "",
     },
     {
         image: image21,
-        className: ''
+        className: "",
     },
     {
         image: image12,
-        className: ''
+        className: "",
     },
     {
         image: image40,
-        className: ''
+        className: "",
     },
     {
         image: image24,
-        className: 'big'
+        className: "big",
     },
     {
         image: image17,
-        className: ''
+        className: "",
     },
     {
         image: image34,
-        className: 'tall'
+        className: "tall",
     },
     {
         image: image43,
-        className: 'wide'
+        className: "wide",
     },
     {
         image: image26,
-        className: ''
+        className: "",
     },
     {
         image: image27,
-        className: 'tall'
+        className: "tall",
     },
     {
         image: image29,
-        className: 'big'
+        className: "big",
     },
     {
         image: image28,
-        className: ''
+        className: "",
     },
     {
         image: image30,
-        className: '',
+        className: "",
     },
     {
         image: image31,
-        className: 'big'
+        className: "big",
     },
     {
         image: image32,
-        className: 'tall'
+        className: "tall",
     },
     {
         image: image33,
-        className: ''
+        className: "",
     },
     {
         image: image23,
-        className: ''
+        className: "",
     },
     {
         image: image35,
-        className: ''
+        className: "",
     },
     {
         image: image36,
-        className: ''
+        className: "",
     },
     {
         image: image38,
-        className: ''
+        className: "",
     },
     {
         image: image39,
-        className: ''
+        className: "",
     },
     {
         image: image42,
-        className: 'big'
+        className: "big",
     },
     {
         image: image48,
-        className: 'tall'
+        className: "tall",
     },
     {
         image: image19,
-        className: ''
+        className: "",
     },
     {
         image: image14,
-        className: ''
+        className: "",
     },
     {
         image: image44,
-        className: ''
+        className: "",
     },
     {
         image: image45,
-        className: ''
+        className: "",
     },
     {
         image: image47,
-        className: ''
+        className: "",
     },
     {
         image: image41,
-        className: 'wide'
+        className: "wide",
     },
-]
+];
 
 const Gallery = () => {
     const router = useRouter();
-  
+
     return (
         <>
-            
-            <section className='p-10 md:p-20'>
-                <div className="   md:px-12 xl:px-6">          <div className="relative pt-36 ">
-                    <div className="lg:w-2/3 md:text-center  mx-auto">
-                        <h1 className="text-[#bbc5c6] font-bold text-4xl md:text-6xl xl:text-7xl">GLIMPSE OF <span className="text-[#e2af3e] text-[#bd9867]-700">VTU Youth Festival</span></h1>
-
+            <section className="p-10 md:p-20">
+                <div className="md:px-12 xl:px-6">
+                    <div className="relative pt-36 ">
+                        <div className="lg:w-2/3 md:text-center  mx-auto">
+                            <h1 className="text-secondary font-bold text-4xl md:text-6xl xl:text-7xl">
+                                GLIMPSE OF{" "}
+                                <span className="">VTU Youth Festival</span>
+                            </h1>
+                        </div>
                     </div>
                 </div>
-                </div>
-                <div className="grid-wrapper  mt-10" >
-                    {images.map((item,index) => (
+                <div className="grid-wrapper  mt-10">
+                    {images.map((item, index) => (
                         <div key={index} className={item.className}>
                             <Image src={item.image} alt="" />
                         </div>
                     ))}
-
                 </div>
             </section>
         </>
-    )
-}
+    );
+};
 
-export default Gallery
+export default Gallery;

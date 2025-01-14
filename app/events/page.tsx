@@ -9,23 +9,16 @@ const eventData = [
         headerImage: "/events/danceheader.jpeg",
         details: [
             {
-                title: "Time & Date",
-                icon: "🕒",
-                content: "10:00 AM - 5:00 PM, March 25, 2024",
+                title: "Folk/Tribal Dance",
+                icon: "💃",
+                content: "TBD",
             },
             {
-                title: "Location",
-                icon: "📍",
-                content: "Main Auditorium",
-            },
-            {
-                title: "Registration",
-                icon: "📝",
-                content: "Limited to 50 participants",
+                title: "Classical Dance Solo",
+                icon: "💃",
+                content: "TBD",
             },
         ],
-        description:
-            "Experience the rhythm of life through various dance forms...",
     },
     {
         id: 2,
@@ -33,23 +26,46 @@ const eventData = [
         headerImage: "/events/musicheader.jpeg",
         details: [
             {
-                title: "Time & Date",
-                icon: "🕒",
-                content: "11:00 AM - 6:00 PM, March 26, 2024",
+                title: "Classical Vocal Solo (Hindustani/Carnatic)",
+                icon: "🎼",
+                content: "TBD",
             },
             {
-                title: "Location",
-                icon: "📍",
-                content: "Open Air Theatre",
+                title: "Classical Instrumental Solo (Percussion Tala Vadya)",
+                icon: "🎼",
+                content: "TBD",
             },
             {
-                title: "Registration",
-                icon: "📝",
-                content: "Open for all college students",
+                title: "Classical Instrumental Solo (Non-Percussion Swara Vadya)",
+                icon: "🎼",
+                content: "TBD",
+            },
+            {
+                title: "Light Vocal Solo (Indian)",
+                icon: "🎼",
+                content: "TBD",
+            },
+            {
+                title: "Western Vocal Solo",
+                icon: "🎼",
+                content: "TBD",
+            },
+            {
+                title: "Group Song (Indian)",
+                icon: "🎼",
+                content: "TBD",
+            },
+            {
+                title: "Group Song (Western)",
+                icon: "🎼",
+                content: "TBD",
+            },
+            {
+                title: "Folk Orchestra",
+                icon: "🎼",
+                content: "TBD",
             },
         ],
-        description:
-            "Unleash your musical talent in solo and group performances...",
     },
     {
         id: 3,
@@ -57,23 +73,21 @@ const eventData = [
         headerImage: "/events/literaryheader.jpeg",
         details: [
             {
-                title: "Time & Date",
-                icon: "🕒",
-                content: "9:00 AM - 4:00 PM, March 27, 2024",
+                title: "Quiz",
+                icon: "✍️",
+                content: "TBD",
             },
             {
-                title: "Location",
-                icon: "📍",
-                content: "College Library",
+                title: "Debate",
+                icon: "✍️",
+                content: "TBD",
             },
             {
-                title: "Registration",
-                icon: "📝",
-                content: "Individual participation only",
+                title: "Elocution",
+                icon: "✍️",
+                content: "TBD",
             },
         ],
-        description:
-            "Showcase your literary prowess through debate and poetry...",
     },
     {
         id: 4,
@@ -81,22 +95,73 @@ const eventData = [
         headerImage: "/events/theatreheader.jpeg",
         details: [
             {
-                title: "Time & Date",
-                icon: "🕒",
-                content: "2:00 PM - 8:00 PM, March 28, 2024",
+                title: "Skit",
+                icon: "🎭",
+                content: "TBD",
             },
             {
-                title: "Location",
-                icon: "📍",
-                content: "Cultural Complex",
+                title: "Mime",
+                icon: "🎭",
+                content: "TBD",
             },
             {
-                title: "Registration",
-                icon: "📝",
-                content: "Group registration required",
+                title: "Mimicry",
+                icon: "🎭",
+                content: "TBD",
+            },
+            {
+                title: "One-Act Play",
+                icon: "🎭",
+                content: "TBD",
             },
         ],
-        description: "Bring stories to life through theatrical performances...",
+    },
+    {
+        id: 5,
+        title: "Fine-Arts",
+        headerImage: "/events/fineartsHeader.jpg",
+        details: [
+            {
+                title: "Collage",
+                icon: "🖼️",
+                content: "TBD",
+            },
+            {
+                title: "Rangoli",
+                icon: "🎨",
+                content: "TBD",
+            },
+            {
+                title: "Cartooning",
+                icon: "😁",
+                content: "TBD",
+            },
+            {
+                title: "Installation",
+                icon: "😂",
+                content: "TBD",
+            },
+            {
+                title: "Poster Making",
+                icon: "😂",
+                content: "TBD",
+            },
+            {
+                title: "Clay-Modelling",
+                icon: "😂",
+                content: "TBD",
+            },
+            {
+                title: "On Spot Painting",
+                icon: "🖌️",
+                content: "TBD",
+            },
+            {
+                title: "On Spot Photography",
+                icon: "📷",
+                content: "TBD",
+            },
+        ],
     },
 ];
 
@@ -164,13 +229,6 @@ const EventPage = () => {
                                         </p>
                                     </div>
                                 ))}
-                            </div>
-
-                            {/* Description */}
-                            <div className="mt-8 p-6 md:p-8 bg-card rounded-xl border border-border">
-                                <p className="text-muted-foreground text-base md:text-lg leading-relaxed">
-                                    {event.description}
-                                </p>
                             </div>
                         </div>
                     </section>
