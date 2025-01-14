@@ -26,6 +26,10 @@ model Users {
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   role        String        @default("USER")
+  paymentUrl  String?
+  txnNumber   String?
+  Amount      Int?
+  PaymentVerified Boolean @default(false) 
   events      Events[]
   registrants Registrants[]
 }
