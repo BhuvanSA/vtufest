@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import NavItem from "./NavItem";
+// import NavItem from "./NavItem";
 import { Dialog, DialogOverlay } from "./ui/dialog";
 import { useAuthContext } from "@/contexts/auth-context";
 import Image from "next/image";
