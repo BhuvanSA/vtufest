@@ -1,13 +1,12 @@
 "use client"; // Enable client-side data fetching
-import image1 from '@/components/images/4000.jpg'
-import image2 from '@/components/images/8000.jpg'
+import image1 from '@/public/images/4000.jpg'
+import image2 from '@/public/images/8000.jpg'
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { UploadDropzone } from '@/utils/uploadthing';
 import Image, { StaticImageData } from "next/image";
-import { useRouter } from "next/navigation";
 
 import React, { useEffect, useState } from "react";
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
@@ -26,7 +25,7 @@ interface PaymentInput {
 }
 
 export default function EventsPage() {
-    const router = useRouter();
+    
     const [events, setEvents] = useState<MyCustomEvent[]>([]);
 
     // Fetch events from backend
@@ -118,10 +117,11 @@ export default function EventsPage() {
                                     <UploadDropzone
                                         endpoint="imageUploader"
                                         onClientUploadComplete={(res) => {
-                                            const url = res[0].url;
-                                            setValue('paymentUrl', url);
+                                            const urlKey = res[0].key;
+                                            setValue('paymentUrl', urlKey);
                                             toast.success('payment screenshot uploaded');
                                         }}
+                                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
                                         onUploadError={(error: Error) => {
                                             // Do something with the error.
                                             toast.error('payment screenshot Error')
