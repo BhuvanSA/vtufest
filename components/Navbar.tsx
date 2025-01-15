@@ -80,26 +80,29 @@ const NavBar = () => {
     };
 
     return (
-        <header className="fixed top-0 left-0 right-0 w-full bg-background/80 backdrop-blur-sm border-b border-border shadow-sm z-50">
-            <div className="flex items-center justify-between text-2xl">
+        <header className="fixed top-0 left-0 right-0 w-full bg-gradient-to-bl
+from-[#0f172a]
+via-[#1e1a78]
+to-[#0f172a] backdrop-blur-sm border-none shadow-sm z-50 ">
+            <div className="flex items-center justify-between text-2xl mt-4">
                 <Image
                     src="/images/college-logo.png"
                     alt="College Logo"
-                    width={40}
-                    height={40}
+                    width={80}
+                    height={80}
                     priority
-                    className=""
+                    className="fixed top-6 left-10"
                 />
-                <h1 className="text-foreground hover:text-primary transition-colors">
+                <h1 className="mx-auto text-blue-300 text-4xl font-semibold  transition-colors">
                     Global Academy of Technology
                 </h1>
                 <Image
                     src="/images/college-logo.png"
                     alt="College Logo"
-                    width={40}
-                    height={40}
+                    width={80}
+                    height={80}
                     priority
-                    className=""
+                    className="fixed right-10 top-6"
                 />
             </div>
             <div className="flex items-center justify-center max-w-6xl lg:max-w-[72rem] xl:max-w-6xl px-4 mx-auto sm:px-6">
@@ -157,9 +160,9 @@ const NavBar = () => {
                 </div> */}
             </div>
             {/* new navigation menu */}
-            <div className="flex items-center justify-center max-w-6xl lg:max-w-[72rem] xl:max-w-6xl px-4 py-6 mx-auto sm:px-6">
+            <div className="flex items-center mt-4 justify-center max-w-6xl lg:max-w-[72rem] xl:max-w-6xl px-4 py-6 mx-auto sm:px-6">
                 <NavigationMenu>
-                    <NavigationMenuList>
+                    <NavigationMenuList className="flex gap-3">
                         <NavigationMenuItem>
                             <Link href="/" legacyBehavior passHref>
                                 <NavigationMenuLink
@@ -176,7 +179,7 @@ const NavBar = () => {
                                     <li className="row-span-3">
                                         <NavigationMenuLink asChild>
                                             <a
-                                                className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                                                className="flex h-full w-full select-none flex-col justify-end bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
                                                 href="/about"
                                             >
                                                 <div className="flex justify-center items-center">

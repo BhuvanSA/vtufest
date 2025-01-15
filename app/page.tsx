@@ -8,7 +8,7 @@ import Gallery from "@/components/subcomponents/gallery";
 
 const Home = () => {
     return (
-        <div className="bg-background">
+        <div className="bg-background pt-16">
             <Header />
 
             <div className="relative z-10">
@@ -21,7 +21,7 @@ const Home = () => {
                                     VTU Youth Festival
                                 </span>
                             </h1>
-                            <h4 className="mt-8 text-secondary">
+                            <h4 className="mt-8 text-black">
                                 The 24th VTU Youth Festival, organized by
                                 Visvesvaraya Technological University, is a
                                 prestigious platform that celebrates the spirit
@@ -43,7 +43,7 @@ const Home = () => {
                                 fabric of the student community, while nurturing
                                 the growth of future leaders in various fields.
                             </h4>
-                            <div className="flex justify-between mt-10">
+                            <div className="flex justify-between">
                                 <div className="flex  space-x-2">
                                     <svg
                                         className="w-6 h-6 text-[#bbc5c6]"
