@@ -145,7 +145,7 @@ const Dignitaries = () => {
 
     return (
         <div>
-            <div className="flex flex-col min-h-screen pt-20 pb-12 lg:pt-[120px] bg-gradient-to-br from-background to-secondary">
+            <div className="flex flex-col min-h-screen pt-20 px-28 mt-24 pb-12 lg:pt-[120px] bg-gradient-to-br from-background to-secondary">
                 <div className="container  px-4">
                     
 

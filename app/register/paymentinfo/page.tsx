@@ -11,6 +11,7 @@ import Image, { StaticImageData } from "next/image";
 import React, { useEffect, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
+import Link from 'next/link';
 
 interface MyCustomEvent {
     id: number;
