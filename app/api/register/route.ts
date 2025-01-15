@@ -1,243 +1,225 @@
+import { verifySession } from "@/lib/session";
+import { redirect } from "next/navigation";
+import {
+    participantFormSchema,
+    managerFormSchema,
+} from "@/lib/schemas/register";
 import { getUser, insertRegistrant } from "@/app/prismaClient/queryFunction";
-import { utapi } from "@/utils/uploadthing";
 
-import { jwtVerify } from "jose";
-import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
-import { z } from "zod";
-
-const fileSchema = z
-    .instanceof(File)
-    .refine((file) => file.size <= 150 * 1024, {
-        message: "File size should be less than 300KB",
-    })
-    .refine(
-        (file) =>
-            ["image/jpeg", "image/png", "application/pdf"].includes(file.type),
-        {
-            message: "Invalid file type. Only JPEG, PNG, and PDF are allowed.",
-        }
-    );
-
-const eventSchema = z
-    .object({
-        eventName: z.string().min(1, { message: "Event name cannot be empty" }),
-        eventNo: z.number(),
-        type: z.enum(["PARTICIPANT", "ACCOMPANIST"]),
-    })
-    .strict();
-
-const registrantSchema = z
-    .object({
-        name: z.string().min(1, { message: "Name cannot be empty" }),
-        usn: z.string().min(1, { message: "Usn cannot be empty" }),
-        phone: z
-            .string()
-            .min(10, "Invalid phone Number must be of 10 digits")
-            .refine((value) => /^\d+$/.test(value), {
-                message: "Phone number must contain only digits",
-            }),
-        teamManager: z.boolean(),
-        events: z.array(eventSchema),
-        photo: fileSchema,
-        aadhar: fileSchema,
-        sslc: fileSchema,
-        puc: fileSchema,
-        admission1: fileSchema,
-        admission2: fileSchema,
-        idcard: fileSchema,
-    })
-    .strict();
-
-const TeamMangerRegistrantSchema = z.object({
-    name: z.string().min(1, { message: "Name cannot be empty" }),
-    usn: z.string().min(1, { message: "Usn/Id Number cannot be empty" }),
-    phone: z
-        .string()
-        .min(10, "Invalid phone Number must be of 10 digits")
-        .refine((value) => /^\d+$/.test(value), {
-            message: "Phone number must contain only digits",
-        }),
-    teamManager: z.boolean(),
-    photo: fileSchema,
-    idcard: fileSchema,
-});
-
-const JWT_SECRET = new TextEncoder().encode(
-    process.env.JWT_SECRET || "default_secret"
-);
+// Define the Registrant type if not already defined
+export type Registrant = {
+    name: string;
+    usn: string;
+    phone: string;
+    teamManager: boolean;
+    photoUrl: string;
+    idcardUrl: string;
+    aadharUrl?: string;
+    sslcUrl?: string;
+    pucUrl?: string;
+    admission1Url?: string;
+    admission2Url?: string;
+    userId: string;
+    events: {
+        eventNo: number;
+        eventName: string;
+        type: "PARTICIPANT" | "ACCOMPANIST";
+    }[];
+};
+// filepath: /Users/bhuvansa/Desktop/new/types/UserEventsType.ts
+export interface UserEventsType {
+    eventNo: number;
+    maxParticipant: number;
+    maxAccompanist: number;
+    registeredParticipant: number;
+    registeredAccompanist: number;
+}
 
 export async function POST(request: Request) {
-    const formData = await request.formData();
-
-    const events = formData.get("events");
-
-    if (!events) {
-        return NextResponse.json(
-            { success: false, message: "Events data is missing" },
-            { status: 400 }
-        );
+    const session = await verifySession();
+    if (!session?.id) {
+        redirect("/auth/signin");
     }
-
-    const dataEvent = JSON.parse(events as string);
-
-    const registrant = {
-        name: formData.get("name"),
-        usn: formData.get("usn"),
-        teamManager: formData.get("teamManager") === "true" ? true : false,
-        events: dataEvent,
-        phone: formData.get("phone"),
-        photo: formData.get("photo"),
-        sslc: formData.get("sslc"),
-        aadhar: formData.get("aadhar"),
-        puc: formData.get("puc"),
-        admission1: formData.get("admission1"),
-        admission2: formData.get("admission2"),
-        idcard: formData.get("idcard"),
-    };
-
-    const token: string = (await cookies()).get("auth_token")?.value as string;
-
-    if (!token) {
-        return NextResponse.json(
-            { success: false, message: "Your are Unauthorized" },
-            { status: 401 }
-        );
-    }
-
-    const verify = await jwtVerify(token, JWT_SECRET);
-
-    const userId: string = verify.payload.id as string;
+    const data = await request.json();
+    // Fetch user events from db
+    const userId = session.id as string;
     const user = await getUser(userId);
-
     if (!user) {
-        return NextResponse.json(
-            { success: false, message: "user not found" },
-            { status: 400 }
+        return new Response(JSON.stringify({ message: "User not found" }), {
+            status: 404,
+        });
+    }
+    if (user.registrants.length >= 45) {
+        return new Response(
+            JSON.stringify({
+                message:
+                    "You have reached the maximum limit of 45 registrations",
+            }),
+            {
+                status: 400,
+                headers: { "Content-Type": "application/json" },
+            }
         );
     }
+    if (data.teamManager === false) {
+        const validation = participantFormSchema.safeParse(data);
+        if (!validation.success) {
+            // Extract error messages
+            const errors = validation.error.errors.map((err) => ({
+                path: err.path.join("."),
+                message: err.message,
+            }));
+            console.log(errors);
 
-    // limit to the 45 registerants
-    if (user.registrants.length > 45) {
-        return NextResponse.json(
-            { success: false, message: "registrant limit exceeded" },
-            { status: 400 }
-        );
-    }
-
-    if (
-        user.registrants.some(
-            (reg) =>
-                reg.usn === registrant.usn || reg.phone === registrant.phone
-        )
-    ) {
-        return NextResponse.json(
-            { success: false, message: "Registrant already exists" },
-            { status: 400 }
-        );
-    }
-
-    let result = null;
-
-    if (registrant.teamManager === true) {
-        result = TeamMangerRegistrantSchema.safeParse(registrant);
-        console.log(result);
-        if (!result.success) {
-            const errorMessages = result.error.errors
-                .map((err) => err.message)
-                .join(", ");
-            return NextResponse.json(
-                { success: false, message: errorMessages },
-                { status: 400 }
-            );
+            return new Response(JSON.stringify({ errors }), {
+                status: 400,
+                headers: { "Content-Type": "application/json" },
+            });
         }
 
-        const files: File[] = [result.data.photo, result.data.idcard];
-        try {
-            const response = await utapi.uploadFiles(files);
+        // Map incoming data to include all required Registrant fields
+        const registrantData: Registrant = {
+            name: validation.data.name,
+            usn: validation.data.usn,
+            phone: validation.data.phone,
+            teamManager: validation.data.teamManager,
+            photoUrl: validation.data.documents.photo, // Map from documents
+            idcardUrl: validation.data.documents.idCard,
+            aadharUrl: validation.data.documents.aadhar || "",
+            sslcUrl: validation.data.documents.sslc || "",
+            pucUrl: validation.data.documents.puc || "",
+            admission1Url: validation.data.documents.admission1 || "",
+            admission2Url: validation.data.documents.admission2 || "",
+            userId: session.id as string, // Type assertion to string
+            events: validation.data.events, // Ensure events are included
+        };
 
-            const registrantDB = {
-                name: result.data.name,
-                usn: result.data.usn,
-                teamManager: result.data.teamManager,
-                phone: result.data.phone,
-                photoUrl: response[0].data?.url as string,
-                idcardUrl: response[1].data?.url as string,
-                userId: userId,
-            };
-
-            // save the registrant into the DB
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const dataDB = await insertRegistrant(registrantDB, null);
-
-            return NextResponse.json(
-                { success: true, message: "Registered Successful" },
-                { status: 200 }
-            );
-        } catch (err: any) {
-            return NextResponse.json(
-                { success: false, message: err.message },
-                { status: 400 }
-            );
-        }
-    } else {
-        result = registrantSchema.safeParse(registrant);
-        console.log(result.error?.message);
-        if (!result.success) {
-            return NextResponse.json(
-                { success: false, message: result.error.message },
-                { status: 400 }
-            );
-        }
-
-        if (result.data.events.length == 0) {
-            return NextResponse.json(
+        if (
+            user.registrants.some(
+                (reg) =>
+                    reg.usn === registrantData.usn ||
+                    reg.phone === registrantData.phone
+            )
+        ) {
+            return new Response(
+                JSON.stringify({
+                    message:
+                        "User with same USN or phone number already exists",
+                }),
                 {
-                    success: false,
-                    message: "Atleast one event must registered",
-                },
-                { status: 400 }
+                    status: 400,
+                    headers: { "Content-Type": "application/json" },
+                }
             );
         }
 
-        const files: File[] = [
-            result.data.sslc,
-            result.data.puc,
-            result.data.admission1,
-            result.data.idcard,
-            result.data.photo,
-            result.data.aadhar,
-            result.data.admission2,
-        ];
         try {
-            const response = await utapi.uploadFiles(files);
-            const registrantDB = {
-                name: result.data.name,
-                usn: result.data.usn,
-                teamManager: result.data.teamManager,
-                events: result.data.events,
-                phone: result.data.phone,
-                photoUrl: response[4].data?.url as string,
-                aadharUrl: response[5].data?.url as string,
-                sslcUrl: response[0].data?.url as string,
-                pucUrl: response[1].data?.url as string,
-                admission1Url: response[2].data?.url as string,
-                admission2Url: response[6].data?.url as string,
-                idcardUrl: response[3].data?.url as string,
-                userId: userId,
-            };
-
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const dataDB = await insertRegistrant(registrantDB, user.events);
-
-            return NextResponse.json(
-                { success: true, message: "registered successful" },
-                { status: 200 }
+            await insertRegistrant(registrantData, user.events);
+            return new Response(
+                JSON.stringify({ message: "Registered successfully" }),
+                {
+                    status: 200,
+                    headers: { "Content-Type": "application/json" },
+                }
             );
-        } catch (error: any) {
-            return NextResponse.json(
-                { success: false, message: error.message },
-                { status: 400 }
+        } catch (error: unknown) {
+            console.error("Error during registration:", error);
+            if (error instanceof Error) {
+                return new Response(
+                    JSON.stringify({ message: error.message }),
+                    {
+                        status: 500,
+                        headers: { "Content-Type": "application/json" },
+                    }
+                );
+            }
+            return new Response(
+                JSON.stringify({ message: "An unexpected error occurred" }),
+                {
+                    status: 500,
+                    headers: { "Content-Type": "application/json" },
+                }
+            );
+        }
+    } else if (data.teamManager === true) {
+        const validation = managerFormSchema.safeParse(data);
+        if (!validation.success) {
+            // Extract error messages
+            const errors = validation.error.errors.map((err) => ({
+                path: err.path.join("."),
+                message: err.message,
+            }));
+            console.log("Manager Validation Errors:", errors);
+
+            return new Response(JSON.stringify({ errors }), {
+                status: 400,
+                headers: { "Content-Type": "application/json" },
+            });
+        }
+
+        // Map incoming data to include all required Registrant fields
+        const registrantData: Registrant = {
+            name: validation.data.name,
+            usn: validation.data.usn,
+            phone: validation.data.phone,
+            teamManager: validation.data.teamManager,
+            photoUrl: validation.data.documents.photo, // Map from documents
+            idcardUrl: validation.data.documents.idCard,
+            aadharUrl: "", // Not required for Team Manager
+            sslcUrl: "", // Not required for Team Manager
+            pucUrl: "", // Not required for Team Manager
+            admission1Url: "", // Not required for Team Manager
+            admission2Url: "", // Not required for Team Manager
+            userId: session.id as string, // Type assertion to string
+            events: [], // Team Managers do not select events
+        };
+
+        // Check for existing registrant with same USN or phone
+        if (
+            user.registrants.some(
+                (reg) =>
+                    reg.usn === registrantData.usn ||
+                    reg.phone === registrantData.phone
+            )
+        ) {
+            return new Response(
+                JSON.stringify({
+                    message:
+                        "User with same USN or phone number already exists",
+                }),
+                {
+                    status: 400,
+                    headers: { "Content-Type": "application/json" },
+                }
+            );
+        }
+
+        try {
+            await insertRegistrant(registrantData, user.events); // Pass empty events array
+            return new Response(
+                JSON.stringify({ message: "Registered successfully" }),
+                {
+                    status: 200,
+                    headers: { "Content-Type": "application/json" },
+                }
+            );
+        } catch (error: unknown) {
+            console.error("Error during Team Manager registration:", error);
+            if (error instanceof Error) {
+                return new Response(
+                    JSON.stringify({ message: error.message }),
+                    {
+                        status: 500,
+                        headers: { "Content-Type": "application/json" },
+                    }
+                );
+            }
+            return new Response(
+                JSON.stringify({ message: "An unexpected error occurred" }),
+                {
+                    status: 500,
+                    headers: { "Content-Type": "application/json" },
+                }
             );
         }
     }

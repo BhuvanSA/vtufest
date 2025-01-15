@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import NavItem from "./NavItem";
@@ -8,6 +8,7 @@ import { useAuthContext } from "@/contexts/auth-context";
 import Image from "next/image";
 import { ThemeToggler } from "@/contexts/theme-provider";
 import { X, Menu } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export const navItems = [
     { href: "/", text: "Home" },
@@ -15,6 +16,59 @@ export const navItems = [
     { href: "/events", text: "Events" },
     { href: "/schedule", text: "Schedule" },
 ];
+
+import {
+    NavigationMenu,
+    NavigationMenuContent,
+    NavigationMenuItem,
+    NavigationMenuLink,
+    NavigationMenuList,
+    NavigationMenuTrigger,
+    navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu";
+
+const components: { title: string; href: string; description: string }[] = [
+    {
+        title: "Schedule",
+        href: "/schedule",
+        description:
+            "A list of events, talks, and workshops happening during the event.",
+    },
+    {
+        title: "Summary",
+        href: "/summary",
+        description:
+            " A summary of the event, including the theme, date, and location.",
+    },
+];
+
+const ListItem = React.forwardRef<
+    React.ElementRef<"a">,
+    React.ComponentPropsWithoutRef<"a">
+>(({ className, title, children, ...props }, ref) => {
+    return (
+        <li>
+            <NavigationMenuLink asChild>
+                <a
+                    ref={ref}
+                    className={cn(
+                        "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+                        className
+                    )}
+                    {...props}
+                >
+                    <div className="text-sm font-medium leading-none">
+                        {title}
+                    </div>
+                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                        {children}
+                    </p>
+                </a>
+            </NavigationMenuLink>
+        </li>
+    );
+});
+ListItem.displayName = "ListItem";
 
 const NavBar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -27,23 +81,29 @@ const NavBar = () => {
 
     return (
         <header className="fixed top-0 left-0 right-0 w-full bg-background/80 backdrop-blur-sm border-b border-border shadow-sm z-50">
-            <div className="flex items-center justify-between max-w-6xl lg:max-w-[72rem] xl:max-w-6xl px-4 py-6 mx-auto sm:px-6">
-                <div className="flex items-center">
-                    <Link href="/" passHref className="flex items-center gap-3">
-                        <Image
-                            src="/images/college-logo.png"
-                            alt="College Logo"
-                            width={40}
-                            height={40}
-                            priority
-                            className=""
-                        />
-                        <span className="text-foreground hover:text-primary transition-colors">
-                            Global Academy of Technology
-                        </span>
-                    </Link>
-                </div>
-                <div className="hidden lg:block overflow-x-auto whitespace-nowrap">
+            <div className="flex items-center justify-between text-2xl">
+                <Image
+                    src="/images/college-logo.png"
+                    alt="College Logo"
+                    width={40}
+                    height={40}
+                    priority
+                    className=""
+                />
+                <h1 className="text-foreground hover:text-primary transition-colors">
+                    Global Academy of Technology
+                </h1>
+                <Image
+                    src="/images/college-logo.png"
+                    alt="College Logo"
+                    width={40}
+                    height={40}
+                    priority
+                    className=""
+                />
+            </div>
+            <div className="flex items-center justify-center max-w-6xl lg:max-w-[72rem] xl:max-w-6xl px-4 mx-auto sm:px-6">
+                {/* <div className="hidden lg:block overflow-x-auto whitespace-nowrap">
                     <nav className="flex space-x-3 text-lg">
                         {navItems.map(({ href, text }, index) => (
                             <NavItem
@@ -83,8 +143,8 @@ const NavBar = () => {
                             </>
                         )}
                     </nav>
-                </div>
-                <div className="flex items-center space-x-4">
+                </div> */}
+                {/* <div className="flex items-center space-x-4">
                     <div className="flex items-center">
                         <ThemeToggler />
                     </div>
@@ -94,7 +154,147 @@ const NavBar = () => {
                     >
                         <Menu />
                     </div>
-                </div>
+                </div> */}
+            </div>
+            {/* new navigation menu */}
+            <div className="flex items-center justify-center max-w-6xl lg:max-w-[72rem] xl:max-w-6xl px-4 py-6 mx-auto sm:px-6">
+                <NavigationMenu>
+                    <NavigationMenuList>
+                        <NavigationMenuItem>
+                            <Link href="/" legacyBehavior passHref>
+                                <NavigationMenuLink
+                                    className={navigationMenuTriggerStyle()}
+                                >
+                                    Home
+                                </NavigationMenuLink>
+                            </Link>
+                        </NavigationMenuItem>
+                        <NavigationMenuItem>
+                            <NavigationMenuTrigger>About</NavigationMenuTrigger>
+                            <NavigationMenuContent>
+                                <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
+                                    <li className="row-span-3">
+                                        <NavigationMenuLink asChild>
+                                            <a
+                                                className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                                                href="/about"
+                                            >
+                                                <div className="flex justify-center items-center">
+                                                    <Image
+                                                        src="/images/college-logo.png"
+                                                        height={40}
+                                                        width={40}
+                                                        alt="Global Academy of Technology"
+                                                    />
+                                                </div>
+                                                <div className="mb-2 mt-4 text-lg font-medium">
+                                                    Global Academy of
+                                                    Techonology
+                                                </div>
+                                                <p className="text-sm leading-tight text-muted-foreground">
+                                                    Growing Ahead of time..{" "}
+                                                    <br />
+                                                    Autonomous Institute, <br />
+                                                    Affiliated to VTU A Unit of
+                                                    National Education
+                                                    Foundation
+                                                </p>
+                                            </a>
+                                        </NavigationMenuLink>
+                                    </li>
+                                    <ListItem href="/about" title="About GAT">
+                                        Information about the college and its
+                                        history.
+                                    </ListItem>
+                                    <ListItem
+                                        href="/about/vtu"
+                                        title="About VTU"
+                                    >
+                                        Information about VTU and its history.
+                                    </ListItem>
+                                    <ListItem
+                                        href="/about/youthfest"
+                                        title="About Youth Fest"
+                                    >
+                                        About the Youth Fest and its history.
+                                    </ListItem>
+                                </ul>
+                            </NavigationMenuContent>
+                        </NavigationMenuItem>
+                        <NavigationMenuItem>
+                            <NavigationMenuTrigger>Event</NavigationMenuTrigger>
+                            <NavigationMenuContent className="">
+                                <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+                                    {components.map((component) => (
+                                        <ListItem
+                                            key={component.title}
+                                            title={component.title}
+                                            href={component.href}
+                                        >
+                                            {component.description}
+                                        </ListItem>
+                                    ))}
+                                </ul>
+                            </NavigationMenuContent>
+                        </NavigationMenuItem>
+                        <NavigationMenuItem>
+                            <Link href="/Dignitaries" legacyBehavior passHref>
+                                <NavigationMenuLink
+                                    className={navigationMenuTriggerStyle()}
+                                >
+                                    Organising Committe
+                                </NavigationMenuLink>
+                            </Link>
+                        </NavigationMenuItem>
+                        <NavigationMenuItem>
+                            <Link
+                                href="/generalinstructions"
+                                legacyBehavior
+                                passHref
+                            >
+                                <NavigationMenuLink
+                                    className={navigationMenuTriggerStyle()}
+                                >
+                                    General Instructions
+                                </NavigationMenuLink>
+                            </Link>
+                        </NavigationMenuItem>
+                        <NavigationMenuItem>
+                            <Link
+                                href="/rulesandregulations"
+                                legacyBehavior
+                                passHref
+                            >
+                                <NavigationMenuLink
+                                    className={navigationMenuTriggerStyle()}
+                                >
+                                    Rules and Regulations
+                                </NavigationMenuLink>
+                            </Link>
+                        </NavigationMenuItem>
+                        <NavigationMenuItem>
+                            <Link href="/contactus" legacyBehavior passHref>
+                                <NavigationMenuLink
+                                    className={navigationMenuTriggerStyle()}
+                                >
+                                    Contact Us
+                                </NavigationMenuLink>
+                            </Link>
+                        </NavigationMenuItem>
+                        <NavigationMenuItem>
+                            <Link href="/auth/signin" legacyBehavior passHref>
+                                <NavigationMenuLink
+                                    className={navigationMenuTriggerStyle()}
+                                >
+                                    Login
+                                </NavigationMenuLink>
+                            </Link>
+                        </NavigationMenuItem>
+                        <NavigationMenuItem>
+                            <ThemeToggler />
+                        </NavigationMenuItem>
+                    </NavigationMenuList>
+                </NavigationMenu>
             </div>
 
             {isOpen && (

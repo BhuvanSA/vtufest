@@ -9,9 +9,8 @@ import { UploadDropzone } from '@/utils/uploadthing';
 import Image, { StaticImageData } from "next/image";
 
 import React, { useEffect, useState } from "react";
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { toast } from 'sonner';
-
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 interface MyCustomEvent {
     id: number;
@@ -44,37 +43,38 @@ export default function EventsPage() {
         fetchEvents();
     }, []);
 
-
-    const paymentAmount = events.length > 10 ? 8000 : 4000
+    const paymentAmount = events.length > 10 ? 8000 : 4000;
     const imageSrc = events.length > 10 ? image2 : image1;
 
-    const { control, handleSubmit, setValue, formState: { errors } } = useForm({
+    const {
+        control,
+        handleSubmit,
+        setValue,
+        formState: { errors },
+    } = useForm({
         defaultValues: {
             txnNumber: "",
             Amount: paymentAmount,
-            paymentUrl: ""
+            paymentUrl: "",
         },
-    })
-    const onSubmit: SubmitHandler<PaymentInput> = async(data) => {
-        
-        const response = await fetch('/api/paymentGateway',{
+    });
+    const onSubmit: SubmitHandler<PaymentInput> = async (data) => {
+        const response = await fetch("/api/paymentGateway", {
             body: JSON.stringify(data),
-            method: 'POST',
+            method: "POST",
             headers: {
-                'Content-Type': 'application/json'
+                "Content-Type": "application/json",
             },
         });
 
         const responseData = await response.json();
 
-        if(responseData.success){
-            toast.success('Submitted')
+        if (responseData.success) {
+            toast.success("Submitted");
+        } else {
+            toast.error("Internal Server Error");
         }
-        else{
-            toast.error('Internal Server Error')
-        }
-        
-    }
+    };
 
     return (
         <div className="min-h-screen mt-16 py-10 flex items-center justify-center bg-gradient-to-br from-background to-secondary p-4">
@@ -87,11 +87,20 @@ export default function EventsPage() {
                 <CardContent className="space-y-6">
                     <div className="grid md:grid-cols-2 gap-6">
                         <EventsList events={events} />
-                        <PaymentDetails paymentAmount={paymentAmount} imageSrc={imageSrc} />
+                        <PaymentDetails
+                            paymentAmount={paymentAmount}
+                            imageSrc={imageSrc}
+                        />
                     </div>
-                    <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+                    <form
+                        className="space-y-4"
+                        onSubmit={handleSubmit(onSubmit)}
+                    >
                         <div className="space-y-2">
-                            <Label htmlFor='txnNumber'>Transaction Number / ID <span className='text-red-700'>*</span></Label>
+                            <Label htmlFor="txnNumber">
+                                Transaction Number / ID{" "}
+                                <span className="text-red-700">*</span>
+                            </Label>
                             <Controller
                                 control={control}
                                 name="txnNumber"
@@ -105,13 +114,20 @@ export default function EventsPage() {
                                     />
                                 )}
                             />
-                            {errors.txnNumber && <small className='text-red-700 mt-6 font-semibold'>The Transaction Number / ID is required </small>}
+                            {errors.txnNumber && (
+                                <small className="text-red-700 mt-6 font-semibold">
+                                    The Transaction Number / ID is required{" "}
+                                </small>
+                            )}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="paymentScreenshot">Payment Screenshot <span className='text-red-700'>*</span></Label>
+                            <Label htmlFor="paymentScreenshot">
+                                Payment Screenshot{" "}
+                                <span className="text-red-700">*</span>
+                            </Label>
                             <Controller
                                 control={control}
-                                name='paymentUrl'
+                                name="paymentUrl"
                                 rules={{ required: true }}
                                 render={() => (
                                     <UploadDropzone
@@ -124,19 +140,36 @@ export default function EventsPage() {
                                         // eslint-disable-next-line @typescript-eslint/no-unused-vars
                                         onUploadError={(error: Error) => {
                                             // Do something with the error.
-                                            toast.error('payment screenshot Error')
+                                            toast.error(
+                                                "payment screenshot Error"
+                                            );
                                         }}
                                     />
                                 )}
                             />
-                            {errors.paymentUrl && <small className='text-red-700 mt-6 font-semibold'>Payment Screenshot File is required</small>}
+                            {errors.paymentUrl && (
+                                <small className="text-red-700 mt-6 font-semibold">
+                                    Payment Screenshot File is required
+                                </small>
+                            )}
                         </div>
-                        <Button className='w-full' type='submit'>Submit</Button>
+                        <Button className="w-full my-2" type="submit">
+                            Submit
+                        </Button>
+                        <Link href="getallregister">
+                            <Button
+                                type="button"
+                                variant="outline"
+                                className="w-full my-2"
+                            >
+                                Go Back
+                            </Button>
+                        </Link>
                     </form>
                 </CardContent>
             </Card>
         </div>
-    )
+    );
 }
 
 function EventsList({ events }: { events: MyCustomEvent[] }) {
@@ -145,16 +178,25 @@ function EventsList({ events }: { events: MyCustomEvent[] }) {
             <h2 className="text-xl font-semibold mb-4">Events List</h2>
             <ul className="space-y-2 max-h-[300px] overflow-y-auto">
                 {events.map((event, index) => (
-                    <li key={index} className="py-2 font-medium hover:bg-secondary transition-all rounded px-2">
+                    <li
+                        key={index}
+                        className="py-2 font-medium hover:bg-secondary transition-all rounded px-2"
+                    >
                         {index + 1}. {event.eventName}
                     </li>
                 ))}
             </ul>
         </div>
-    )
+    );
 }
 
-function PaymentDetails({ paymentAmount, imageSrc }: { paymentAmount: number, imageSrc: StaticImageData }) {
+function PaymentDetails({
+    paymentAmount,
+    imageSrc,
+}: {
+    paymentAmount: number;
+    imageSrc: StaticImageData;
+}) {
     return (
         <div className="border rounded-lg p-4 space-y-4">
             <h2 className="text-xl font-semibold">Payment Details</h2>
@@ -170,17 +212,23 @@ function PaymentDetails({ paymentAmount, imageSrc }: { paymentAmount: number, im
             </div>
             <BankDetails />
         </div>
-    )
+    );
 }
 
 function BankDetails() {
     return (
         <div className="space-y-2">
             <h3 className="text-lg font-semibold">Bank Details</h3>
-            <p><span className="font-medium">Bank Name:</span> Union Bank</p>
-            <p><span className="font-medium">Account Number:</span> 1234567891021</p>
-            <p><span className="font-medium">IFSC Code:</span> AB565652</p>
+            <p>
+                <span className="font-medium">Bank Name:</span> Union Bank
+            </p>
+            <p>
+                <span className="font-medium">Account Number:</span>{" "}
+                1234567891021
+            </p>
+            <p>
+                <span className="font-medium">IFSC Code:</span> AB565652
+            </p>
         </div>
-    )
+    );
 }
-

@@ -204,20 +204,21 @@ const Register = () => {
 
             console.log(formDataToSend.getAll("events"));
             try {
-                // const response = await fetch("/api/register", {
-                //     method: "POST",
-                //     body: formDataToSend,
-                // });
-                // const data = await response.json();
-                // if (data.success) {
-                //     SetresponseToast(data.message);
-                //     alert(data.message);
-                //     // router.push("/getallregister");
-                // } else {
-                //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                //     alert(data.message);
-                //     SetresponseToast(data.message);
-                // }
+                const response = await fetch("/api/register", {
+                    method: "POST",
+                    body: formDataToSend,
+                });
+                console.log("register");
+                const data = await response.json();
+                if (data.success) {
+                    SetresponseToast(data.message);
+                    alert(data.message);
+                    router.push("/getallregister");
+                } else {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    alert(data.message);
+                    SetresponseToast(data.message);
+                }
             } catch (err) {
                 alert("Failed to register. Please try again later.");
                 SetresponseToast("Failed to register. Please try again later.");
