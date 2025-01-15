@@ -1,43 +1,57 @@
-import { Youtube, Instagram } from "lucide-react";
 import Image from "next/image";
+import insta from "@/public/images/instalogo.png";
+import yt from "@/public/images/youtube_1384060.png";
+import facebook from "@/public/images/facebook_logo_icon_147291.png";
 
 const Footer = () => {
     return (
         <footer aria-label="Site Footer" className="bg-background">
-            <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
-                <div className="flex justify-center mb-10">
-                    <Image
-                        src="/images/college-logo.png"
-                        alt="global logo"
-                        width={100}
-                        height={100}
-                    />
-                </div>
-                <div className="flex flex-col justify-center text-foreground gap-y-2">
-                    <h1 className="text-4xl text-center uppercase font-bold">
-                        Global Academy of Technology
-                    </h1>
-                    <h2 className="text-2xl text-center font-bold text-primary">
-                        Growing Ahead of Time ....
-                    </h2>
-                    <p className="text-lg text-center">
-                        Autonomous Institute, Affiliated to VTU
-                    </p>
-                    <h2 className="text-2xl text-center font-bold text-primary">
-                        A Unit of National Education Foundation
-                    </h2>
+            <div className="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
+                {/* Logo and Header Section */}
+                <div className="flex flex-col items-center gap-5 lg:flex-row lg:justify-center lg:items-center">
+                    {/* College Logo */}
+                    <div className="w-full lg:w-1/3 flex justify-center lg:justify-center">
+                        <Image
+                            src="/images/college-logo.png"
+                            alt="Global Academy of Technology logo"
+                            width={150}
+                            height={150}
+                            className="object-contain"
+                        />
+                    </div>
+
+                    {/* Text Content */}
+                    <div className="w-full lg:w-2/3 text-center lg:text-left">
+                        <h1 className="text-2xl sm:text-3xl lg:text-4xl uppercase font-bold leading-tight text-blue-900 mb-2">
+                            Global Academy of Technology
+                        </h1>
+                        <h2 className="text-xl sm:text-2xl font-bold text-red-500 mb-2">
+                            Growing Ahead of Time ....
+                        </h2>
+                        <p className="text-lg font-bold mb-2">Autonomous Institute, Affiliated to VTU</p>
+                        <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-primary">
+                            A Unit of National Education Foundation
+                        </h2>
+                    </div>
                 </div>
 
-                <ul className="mt-12 flex justify-center gap-6 md:gap-8">
+                {/* Social Media Links */}
+                <ul className="mt-12 flex justify-center gap-6">
                     <li>
                         <a
                             href="https://www.youtube.com/@GATINTERACT"
                             rel="noreferrer"
                             target="_blank"
-                            className="text-muted-foreground transition hover:text-primary"
+                            className="transition hover:scale-110 inline-block"
+                            aria-label="YouTube Channel"
                         >
-                            <span className="sr-only">Youtube</span>
-                            <Youtube className="h-6 w-6" />
+                            <Image
+                                src={yt || "/placeholder.svg"}
+                                width={40}
+                                height={40}
+                                alt=""
+                                className="object-contain"
+                            />
                         </a>
                     </li>
 
@@ -46,20 +60,45 @@ const Footer = () => {
                             href="https://www.instagram.com/gatbengaluru/"
                             rel="noreferrer"
                             target="_blank"
-                            className="text-muted-foreground transition hover:text-primary"
+                            className="transition hover:scale-110 inline-block"
+                            aria-label="Instagram Profile"
                         >
-                            <span className="sr-only">Instagram</span>
-                            <Instagram className="h-6 w-6" />
+                            <Image
+                                src={insta || "/placeholder.svg"}
+                                width={40}
+                                height={40}
+                                alt=""
+                                className="object-contain"
+                            />
+                        </a>
+                    </li>
+
+                    <li>
+                        <a
+                            href="https://www.facebook.com/globalacademyoftech/"
+                            rel="noreferrer"
+                            target="_blank"
+                            className="transition hover:scale-110 inline-block"
+                            aria-label="Facebook Page"
+                        >
+                            <Image
+                                src={facebook || "/placeholder.svg"}
+                                width={40}
+                                height={40}
+                                alt=""
+                                className="object-contain"
+                            />
                         </a>
                     </li>
                 </ul>
 
-                <div className="mt-12 border-t border-border pt-6 flex justify-center">
-                    <div className="text-center sm:flex sm:justify-between sm:text-left">
-                        <p className="mt-4 text-sm text-muted-foreground hover:text-primary transition-colors sm:order-first sm:mt-0">
-                            <a href="ourteam/">&copy; 2025</a>
-                        </p>
-                    </div>
+                {/* Footer Bottom Section */}
+                <div className="mt-12 border-t border-border pt-6">
+                    <p className="text-center text-sm text-muted-foreground">
+                        <a href="/ourteam" className="hover:text-primary transition">
+                            &copy; {new Date().getFullYear()} Global Academy of Technology
+                        </a>
+                    </p>
                 </div>
             </div>
         </footer>
@@ -67,3 +106,4 @@ const Footer = () => {
 };
 
 export default Footer;
+

@@ -92,14 +92,14 @@ const NavBar = () => {
                     priority
                     className="relative left-10 top-6"
                 />
-                <h1 className="text-foreground text-6xl font-extrabold text-blue-900 transition-colors">
+                <h1 className="text-foreground text-6xl font-extrabold text-blue-800 ">
                     Global Academy of Technology
                 </h1>
                 <Image
                     src={vtulogo}
                     alt="College Logo"
-                    width={120}
-                    height={120}
+                    width={150}
+                    height={150}
                     priority
                     className=""
                 />

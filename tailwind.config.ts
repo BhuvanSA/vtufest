@@ -14,6 +14,7 @@ export default withUt({
                 "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
                 "gradient-conic":
                     "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+                    'matte-blue': 'linear-gradient(135deg, hsl(220, 50%, 70%), hsl(220, 60%, 50%))',
             },
             borderRadius: {
                 lg: "var(--radius)",
