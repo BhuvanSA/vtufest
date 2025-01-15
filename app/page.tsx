@@ -9,7 +9,7 @@ import Gallery from "@/components/subcomponents/gallery";
 const Home = () => {
     return (
         <div className="bg-background">
-            <Header />
+            <Header  />
 
             <div className="relative z-10">
                 <section className="bg-background">
