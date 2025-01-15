@@ -10,6 +10,8 @@ import { ThemeToggler } from "@/contexts/theme-provider";
 import { X, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+import vtulogo from '@/public/images/vtulogo.png'
+
 export const navItems = [
     { href: "/", text: "Home" },
     { href: "/about", text: "About Us" },
@@ -81,23 +83,23 @@ const NavBar = () => {
 
     return (
         <header className="fixed top-0 left-0 right-0 w-full bg-background/80 backdrop-blur-sm border-b border-border shadow-sm z-50">
-            <div className="flex items-center justify-between text-2xl">
+            <div className="flex items-center justify-between  text-2xl">
                 <Image
                     src="/images/college-logo.png"
                     alt="College Logo"
-                    width={40}
-                    height={40}
+                    width={120}
+                    height={120}
                     priority
-                    className=""
+                    className="relative left-10 top-6"
                 />
-                <h1 className="text-foreground hover:text-primary transition-colors">
+                <h1 className="text-foreground text-6xl font-extrabold text-blue-800 ">
                     Global Academy of Technology
                 </h1>
                 <Image
-                    src="/images/college-logo.png"
+                    src={vtulogo}
                     alt="College Logo"
-                    width={40}
-                    height={40}
+                    width={150}
+                    height={150}
                     priority
                     className=""
                 />
@@ -187,7 +189,7 @@ const NavBar = () => {
                                                         alt="Global Academy of Technology"
                                                     />
                                                 </div>
-                                                <div className="mb-2 mt-4 text-lg font-medium">
+                                                <div className="mb-0 mt-4 text-lg font-medium">
                                                     Global Academy of
                                                     Techonology
                                                 </div>

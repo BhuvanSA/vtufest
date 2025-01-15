@@ -133,6 +133,7 @@ export default function EventsPage() {
                                 render={() => (
                                     <UploadDropzone
                                         endpoint="imageUploader"
+                
                                         onClientUploadComplete={(res) => {
                                             const urlKey = res[0].key;
                                             setValue('paymentUrl', urlKey);
@@ -222,6 +223,10 @@ function BankDetails() {
             <h3 className="text-lg font-semibold">Bank Details</h3>
             <p>
                 <span className="font-medium">Bank Name:</span> Union Bank
+            </p>
+            <p>
+                <span className="font-medium">Account Holder Name:</span>{" "}
+                Global Academy Of Technology
             </p>
             <p>
                 <span className="font-medium">Account Number:</span>{" "}

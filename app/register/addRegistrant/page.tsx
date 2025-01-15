@@ -41,22 +41,13 @@ export default async function Page() {
         <div className="bg-background min-h-screen pt-24">
             <div className="mt-4 justify-center flex flex-col gap-4">
                 <div className="max-w-4xl mx-auto p-4">
-                    <h1 className="text-primary font-bold text-4xl md:text-6xl xl:text-7xl mb-6">
+                    <h1 className="text-primary font-bold text-4xl md:text-4xl xl:text-4xl mb-6">
                         Add Registrant
                     </h1>
                 </div>
             </div>
             <SelectRolesAndEvents allEvents={userEvents} />
-            <div className="flex justify-center mt-4 gap-4">
-                <Link href="/register/getallregister">
-                    <Button
-                        variant="outline"
-                        className="border hover:border-primary"
-                    >
-                        Back to Registrants
-                    </Button>
-                </Link>
-            </div>
+            
         </div>
     );
 }
