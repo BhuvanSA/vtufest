@@ -8,9 +8,10 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import axios from "axios";
-import vtulogo from "@/public/images/vtulogo.png"
+import vtulogo from "@/public/images/vtulogo.png";
 import Image from "next/image";
-import interactLogo from "@/public/images/INTERACT-4.png"
+import interactLogo from "@/public/images/INTERACT-4.png";
+import bgImage from "../../../components/images/GATBGIMG.png"; // Your background image import
 
 import {
     Card,
@@ -33,8 +34,6 @@ import { useAuthContext } from "@/contexts/auth-context";
 import { loginSchema } from "@/lib/schemas/auth";
 import { toast } from "sonner";
 import Link from "next/link";
-
-import bgImage from "@/public/images/GAT IMAGE.png"
 
 export default function SignIn() {
     const router = useRouter();
@@ -83,13 +82,16 @@ export default function SignIn() {
     }
 
     return (
-        <div className=" mt-28 min-h-screen flex items-center justify-center  p-4 " style={{
-            backgroundImage: `url(${bgImage})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-            backgroundAttachment: 'fixed'
-        }}>
+        <div
+            className="mt-28 min-h-screen flex items-center justify-center p-4"
+            style={{
+                backgroundImage: `url(${bgImage.src})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+                backgroundAttachment: "fixed",
+            }}
+        >
             <Card className="w-full max-w-md bg-card text-card-foreground">
                 <CardHeader>
                     <div className="flex items-center text-blue-800 justify-center mb-6 font-bold text-2xl leading-6 tracking-wider">
@@ -112,7 +114,6 @@ export default function SignIn() {
                             priority
                             className="object-contain relative left-4"
                         />
-                     
                         <Image
                             src={vtulogo}
                             alt="College Logo"

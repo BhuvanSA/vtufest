@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import * as z from "zod";
 import axios from "axios";
 import { toast } from "sonner";
-
+import bgImage from "../../../components/images/GATBGIMG.png"; 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -143,7 +143,15 @@ export default function SignUp() {
     };
     // from-background
     return (
-        <div className="pt-24 min-h-screen flex items-center justify-center bg-gradient-to-br  to-secondary p-4">
+        <div className="pt-24 min-h-screen flex items-center justify-center bg-gradient-to-br  to-secondary p-4"
+        style={{
+            backgroundImage: `url(${bgImage.src})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+            backgroundAttachment: "fixed",
+        }}
+        >
             <Card className="w-full max-w-md bg-card text-card-foreground">
                 <CardHeader className="space-y-1">
                     <div className="flex items-center justify-center mb-6">
