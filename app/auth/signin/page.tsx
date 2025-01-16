@@ -83,7 +83,7 @@ export default function SignIn() {
     }
 
     return (
-        <div className=" mt-28 min-h-screen flex items-center justify-center  p-4" style={{
+        <div className=" mt-28 min-h-screen flex items-center justify-center  p-4 " style={{
             backgroundImage: `url(${bgImage})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
