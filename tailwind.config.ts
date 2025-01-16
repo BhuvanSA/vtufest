@@ -22,6 +22,8 @@ export default withUt({
                 sm: "calc(var(--radius) - 4px)",
             },
             colors: {
+               
+                primary_heading: "hsl(var(--primary-heading))",
                 background: "hsl(var(--background))",
                 foreground: "hsl(var(--foreground))",
                 card: {
@@ -62,6 +64,7 @@ export default withUt({
                     "4": "hsl(var(--chart-4))",
                     "5": "hsl(var(--chart-5))",
                 },
+                
             },
             keyframes: {
                 "accordion-down": {

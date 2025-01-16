@@ -92,9 +92,13 @@ const NavBar = () => {
                     priority
                     className="relative left-10 top-6"
                 />
-                <h1 className="text-foreground text-6xl font-extrabold text-blue-800 ">
-                    Global Academy of Technology
-                </h1>
+                <div className="text-foreground  text-center font-sans mt-2  text-5xl font-bold tracking-widest text-primary_heading">
+                    GLOBAL ACADEMY OF TECHNOLOGY
+                    <div className="text-red-500 text-xl font-semibold mt-2 text-left">
+                       An Autonomus Institute, Affiliated to VTU
+                    </div>
+                </div>
+
                 <Image
                     src={vtulogo}
                     alt="College Logo"
