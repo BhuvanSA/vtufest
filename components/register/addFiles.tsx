@@ -118,6 +118,8 @@ export default function SelectRolesAndEvents({
                 admission1: "",
                 admission2: "",
             },
+            gender: "",
+            accomodation: false,
         },
     });
 
@@ -137,6 +139,8 @@ export default function SelectRolesAndEvents({
                 photo: "",
                 idCard: "",
             },
+            gender: "",
+            accomodation: false,
         },
     });
 
@@ -342,52 +346,101 @@ export default function SelectRolesAndEvents({
                         </CardHeader>
                         <CardContent>
                             {/* Basic Information Fields */}
-                            <div className="flex flex-col md:flex-row gap-4 md:gap-10 mb-6">
-                                <div className="w-full md:w-1/3 space-y-1.5">
-                                    <Label htmlFor="name">
-                                        Name of the student (As mentioned on
-                                        10th or any equivalent marks card)
-                                    </Label>
-                                    <Input
-                                        {...register("name")}
-                                        id="name"
-                                        placeholder="Full Name - will be printed in your certificate"
-                                    />
-                                    {errors.name && (
-                                        <p className="text-red-500 text-sm">
-                                            {errors.name.message}
-                                        </p>
-                                    )}
+                            <div className="flex flex-col gap-4 mb-6">
+                                <div className="flex flex-col md:flex-row gap-4 md:gap-10">
+                                    <div className="w-full md:w-1/3 space-y-1.5">
+                                        <Label htmlFor="name">
+                                            Name of the student (As mentioned on
+                                            10th or any equivalent marks card)
+                                        </Label>
+                                        <Input
+                                            {...register("name")}
+                                            id="name"
+                                            placeholder="Full Name - will be printed in your certificate"
+                                        />
+                                        {errors.name && (
+                                            <p className="text-red-500 text-sm">
+                                                {errors.name.message}
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="w-full md:w-1/3 space-y-1.5 mt-6">
+                                        <Label htmlFor="username" className="">
+                                            USN of the student
+                                        </Label>
+                                        <Input
+                                            {...register("usn")}
+                                            id="usn"
+                                            placeholder="1GA21AI012"
+                                        />
+                                        {errors.usn && (
+                                            <p className="text-red-500 text-sm">
+                                                {errors.usn.message}
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="w-full md:w-1/3 space-y-1.5 m-6">
+                                        <Label htmlFor="phone">
+                                            Phone number of the student
+                                        </Label>
+                                        <Input
+                                            id="phoneno"
+                                            placeholder="Phone Number"
+                                            {...register("phone")}
+                                        />
+                                        {errors.phone && (
+                                            <p className="text-red-500 text-sm">
+                                                {errors.phone.message}
+                                            </p>
+                                        )}
+                                    </div>
                                 </div>
-                                <div className="w-full md:w-1/3 space-y-1.5 mt-6">
-                                    <Label htmlFor="username" className="" >
-                                        USN of the student
-                                    </Label>
-                                    <Input
-                                        {...register("usn")}
-                                        id="usn"
-                                        placeholder="1GA21AI012"
-                                    />
-                                    {errors.usn && (
-                                        <p className="text-red-500 text-sm">
-                                            {errors.usn.message}
-                                        </p>
-                                    )}
-                                </div>
-                                <div className="w-full md:w-1/3 space-y-1.5 m-6">
-                                    <Label htmlFor="phone">
-                                        Phone number of the student
-                                    </Label>
-                                    <Input
-                                        id="phoneno"
-                                        placeholder="Phone Number"
-                                        {...register("phone")}
-                                    />
-                                    {errors.phone && (
-                                        <p className="text-red-500 text-sm">
-                                            {errors.phone.message}
-                                        </p>
-                                    )}
+
+                                <div className="flex flex-col md:flex-row gap-4 md:gap-10">
+                                    <div className="w-full md:w-1/3 space-y-1.5 m-6">
+                                        <Label htmlFor="gender">Gender of the student</Label>
+                                        <Select
+                                            {...register("gender")}
+                                            onValueChange={(value) => setValue("gender", value)}
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select Gender" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectGroup>
+                                                    <SelectLabel>Gender</SelectLabel>
+                                                    <SelectItem value="male">Male</SelectItem>
+                                                    <SelectItem value="female">Female</SelectItem>
+                                                    <SelectItem value="other">Other</SelectItem>
+                                                </SelectGroup>
+                                            </SelectContent>
+                                        </Select>
+                                        {errors.gender && (
+                                            <p className="text-red-500 text-sm">{errors.gender.message}</p>
+                                        )}
+                                    </div>
+
+                                    <div className="w-full md:w-1/3 space-y-1.5 m-6">
+                                        <Label htmlFor="accommodation">Need Accommodation</Label>
+                                        <Select
+                                            {...register("accomodation")}
+                                            onValueChange={(value) => setValue("accomodation", value === "yes")}
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select Accommodation" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectGroup>
+                                                    <SelectLabel>Accommodation</SelectLabel>
+                                                    <SelectItem value="yes">Yes</SelectItem>
+                                                    <SelectItem value="no">No</SelectItem>
+                                                </SelectGroup>
+                                            </SelectContent>
+                                        </Select>
+                                        {errors.accomodation && (
+                                            <p className="text-red-500 text-sm">{errors.accomodation.message}</p>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 
@@ -694,49 +747,100 @@ export default function SelectRolesAndEvents({
                         </CardHeader>
                         <CardContent>
                             {/* Basic Information Fields */}
-                            <div className="flex flex-col md:flex-row gap-4 md:gap-6 mb-6">
-                                <div className="w-full md:w-1/3 space-y-1.5">
-                                    <Label htmlFor="managerName">Name</Label>
-                                    <Input
-                                        {...registerManager("name")}
-                                        id="managerName"
-                                        placeholder="Full Name - will be printed in your certificate"
-                                    />
-                                    {errorsManager.name && (
-                                        <p className="text-red-500 text-sm">
-                                            {errorsManager.name.message}
-                                        </p>
-                                    )}
+                            <div className="flex flex-col gap-4 mb-6">
+                                <div className="flex flex-col md:flex-row gap-4 md:gap-6">
+                                    <div className="w-full md:w-1/3 space-y-1.5">
+                                        <Label htmlFor="managerName">Name</Label>
+                                        <Input
+                                            {...registerManager("name")}
+                                            id="managerName"
+                                            placeholder="Full Name - will be printed in your certificate"
+                                        />
+                                        {errorsManager.name && (
+                                            <p className="text-red-500 text-sm">
+                                                {errorsManager.name.message}
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="w-full md:w-1/3 space-y-1.5">
+                                        <Label htmlFor="managerUsn">USN</Label>
+                                        <Input
+                                            {...registerManager("usn")}
+                                            id="managerUsn"
+                                            placeholder="1GA21AI012"
+                                        />
+                                        {errorsManager.usn && (
+                                            <p className="text-red-500 text-sm">
+                                                {errorsManager.usn.message}
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="w-full md:w-1/3 space-y-1.5">
+                                        <Label htmlFor="managerPhone">
+                                            Phone Number
+                                        </Label>
+                                        <Input
+                                            {...registerManager("phone")}
+                                            id="managerPhone"
+                                            placeholder="Phone Number"
+                                        />
+                                        {errorsManager.phone && (
+                                            <p className="text-red-500 text-sm">
+                                                {errorsManager.phone.message}
+                                            </p>
+                                        )}
+                                    </div>
                                 </div>
-                                <div className="w-full md:w-1/3 space-y-1.5">
-                                    <Label htmlFor="managerUsn">USN</Label>
-                                    <Input
-                                        {...registerManager("usn")}
-                                        id="managerUsn"
-                                        placeholder="1GA21AI012"
-                                    />
-                                    {errorsManager.usn && (
-                                        <p className="text-red-500 text-sm">
-                                            {errorsManager.usn.message}
-                                        </p>
-                                    )}
-                                </div>
-                                <div className="w-full md:w-1/3 space-y-1.5">
-                                    <Label htmlFor="managerPhone">
-                                        Phone Number
-                                    </Label>
-                                    <Input
-                                        {...registerManager("phone")}
-                                        id="managerPhone"
-                                        placeholder="Phone Number"
-                                    />
-                                    {errorsManager.phone && (
-                                        <p className="text-red-500 text-sm">
-                                            {errorsManager.phone.message}
-                                        </p>
-                                    )}
+
+                                <div className="flex flex-col md:flex-row gap-4 md:gap-6">
+                                    <div className="w-full md:w-1/3 space-y-1.5 m-6">
+                                        <Label htmlFor="Managergender">Gender of the Manager</Label>
+                                        <Select
+                                            {...register("gender")}
+                                            onValueChange={(value) => setValue("gender", value)}
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select Gender" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectGroup>
+                                                    <SelectLabel>Gender</SelectLabel>
+                                                    <SelectItem value="male">Male</SelectItem>
+                                                    <SelectItem value="female">Female</SelectItem>
+                                                    <SelectItem value="other">Other</SelectItem>
+                                                </SelectGroup>
+                                            </SelectContent>
+                                        </Select>
+                                        {errors.gender && (
+                                            <p className="text-red-500 text-sm">{errors.gender.message}</p>
+                                        )}
+                                    </div>
+
+                                    <div className="w-full md:w-1/3 space-y-1.5 m-6">
+                                        <Label htmlFor="Manageraccommodation">Need Accommodation</Label>
+                                        <Select
+                                            {...register("accomodation")}
+                                            onValueChange={(value) => setValue("accomodation", value === "yes")}
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select Accommodation" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectGroup>
+                                                    <SelectLabel>Accommodation</SelectLabel>
+                                                    <SelectItem value="yes">Yes</SelectItem>
+                                                    <SelectItem value="no">No</SelectItem>
+                                                </SelectGroup>
+                                            </SelectContent>
+                                        </Select>
+                                        {errors.accomodation && (
+                                            <p className="text-red-500 text-sm">{errors.accomodation.message}</p>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
+
+
 
                             {/* Documents Upload */}
                             <div className="mt-6">
