@@ -139,7 +139,7 @@ export default async function Page() {
                 </div>
             </div>
             <DataTable data={results} />
-            <div className="flex justify-center mt-4 gap-4">
+            <div className="flex justify-center mt-4 gap-4 pb-36">
                 <Link href="/register/modifyevents">
                     <Button
                         variant="outline"
