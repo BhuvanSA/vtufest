@@ -41,6 +41,7 @@ import {
     participantFormSchema,
     managerFormSchema,
 } from "@/lib/schemas/register";
+import Link from "next/link";
 
 // Required Documents
 const REQUIRED_DOCUMENTS = [
@@ -67,13 +68,13 @@ const REQUIRED_DOCUMENTS = [
     },
     {
         id: "admission1",
-        label: "Free Receipt",
-        hint: "Recent Fee Receipt from the college you are studying in",
+        label: "Fee Receipt",
+        hint: "First Semester Fee Receipt taken during Admission",
     },
     {
         id: "admission2",
-        label: "Latest semester marks card",
-        hint: "Marks card of the latest semester you have completed from the college you are studying in",
+        label: "Fee Reciept 2",
+        hint: "Current Semester/Previous Semester Fee Receipt ",
     },
 ];
 
@@ -117,6 +118,8 @@ export default function SelectRolesAndEvents({
                 admission1: "",
                 admission2: "",
             },
+            gender: "",
+            accomodation: false,
         },
     });
 
@@ -136,6 +139,8 @@ export default function SelectRolesAndEvents({
                 photo: "",
                 idCard: "",
             },
+            gender: "",
+            accomodation: false,
         },
     });
 
@@ -341,52 +346,101 @@ export default function SelectRolesAndEvents({
                         </CardHeader>
                         <CardContent>
                             {/* Basic Information Fields */}
-                            <div className="flex flex-col md:flex-row gap-4 md:gap-6 mb-6">
-                                <div className="w-full md:w-1/3 space-y-1.5">
-                                    <Label htmlFor="name">
-                                        Name of the student (As mentioned on
-                                        10th or any equivalent marks card)
-                                    </Label>
-                                    <Input
-                                        {...register("name")}
-                                        id="name"
-                                        placeholder="Full Name"
-                                    />
-                                    {errors.name && (
-                                        <p className="text-red-500 text-sm">
-                                            {errors.name.message}
-                                        </p>
-                                    )}
+                            <div className="flex flex-col gap-4 mb-6">
+                                <div className="flex flex-col md:flex-row gap-4 md:gap-10">
+                                    <div className="w-full md:w-1/3 space-y-1.5">
+                                        <Label htmlFor="name">
+                                            Name of the student (As mentioned on
+                                            10th or any equivalent marks card)
+                                        </Label>
+                                        <Input
+                                            {...register("name")}
+                                            id="name"
+                                            placeholder="Full Name - will be printed in your certificate"
+                                        />
+                                        {errors.name && (
+                                            <p className="text-red-500 text-sm">
+                                                {errors.name.message}
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="w-full md:w-1/3 space-y-1.5 mt-6">
+                                        <Label htmlFor="username" className="">
+                                            USN of the student
+                                        </Label>
+                                        <Input
+                                            {...register("usn")}
+                                            id="usn"
+                                            placeholder="1GA21AI012"
+                                        />
+                                        {errors.usn && (
+                                            <p className="text-red-500 text-sm">
+                                                {errors.usn.message}
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="w-full md:w-1/3 space-y-1.5 m-6">
+                                        <Label htmlFor="phone">
+                                            Phone number of the student
+                                        </Label>
+                                        <Input
+                                            id="phoneno"
+                                            placeholder="Phone Number"
+                                            {...register("phone")}
+                                        />
+                                        {errors.phone && (
+                                            <p className="text-red-500 text-sm">
+                                                {errors.phone.message}
+                                            </p>
+                                        )}
+                                    </div>
                                 </div>
-                                <div className="w-full md:w-1/3 space-y-1.5">
-                                    <Label htmlFor="username">
-                                        USN of the student
-                                    </Label>
-                                    <Input
-                                        {...register("usn")}
-                                        id="usn"
-                                        placeholder="1GA21AI012"
-                                    />
-                                    {errors.usn && (
-                                        <p className="text-red-500 text-sm">
-                                            {errors.usn.message}
-                                        </p>
-                                    )}
-                                </div>
-                                <div className="w-full md:w-1/3 space-y-1.5">
-                                    <Label htmlFor="phone">
-                                        Phone number of the student
-                                    </Label>
-                                    <Input
-                                        id="phoneno"
-                                        placeholder="Phone Number"
-                                        {...register("phone")}
-                                    />
-                                    {errors.phone && (
-                                        <p className="text-red-500 text-sm">
-                                            {errors.phone.message}
-                                        </p>
-                                    )}
+
+                                <div className="flex flex-col md:flex-row gap-4 md:gap-10">
+                                    <div className="w-1/3 md:w-1/3 space-y-1.5 m-6">
+                                        <Label htmlFor="gender">Gender of the student</Label>
+                                        <Select
+                                            {...register("gender")}
+                                            onValueChange={(value) => setValue("gender", value)}
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select Gender" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectGroup>
+                                                    <SelectLabel>Gender</SelectLabel>
+                                                    <SelectItem value="male">Male</SelectItem>
+                                                    <SelectItem value="female">Female</SelectItem>
+                                                    <SelectItem value="other">Other</SelectItem>
+                                                </SelectGroup>
+                                            </SelectContent>
+                                        </Select>
+                                        {errors.gender && (
+                                            <p className="text-red-500 text-sm">{errors.gender.message}</p>
+                                        )}
+                                    </div>
+
+                                    <div className="w-full md:w-1/3 space-y-1.5 m-6">
+                                        <Label htmlFor="accommodation">Need Accommodation</Label>
+                                        <Select
+                                            {...register("accomodation")}
+                                            onValueChange={(value) => setValue("accomodation", value === "yes")}
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select Accommodation" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectGroup>
+                                                    <SelectLabel>Accommodation</SelectLabel>
+                                                    <SelectItem value="yes">Yes</SelectItem>
+                                                    <SelectItem value="no">No</SelectItem>
+                                                </SelectGroup>
+                                            </SelectContent>
+                                        </Select>
+                                        {errors.accomodation && (
+                                            <p className="text-red-500 text-sm">{errors.accomodation.message}</p>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 
@@ -460,9 +514,9 @@ export default function SelectRolesAndEvents({
                                                                             ) => {
                                                                                 if (
                                                                                     e.key ===
-                                                                                        "Enter" ||
+                                                                                    "Enter" ||
                                                                                     e.key ===
-                                                                                        " "
+                                                                                    " "
                                                                                 ) {
                                                                                     onToggleSelect(
                                                                                         event.eventNo,
@@ -470,11 +524,10 @@ export default function SelectRolesAndEvents({
                                                                                     );
                                                                                 }
                                                                             }}
-                                                                            className={`p-4 border-2 rounded-lg cursor-pointer transition duration-300 flex flex-col h-full ${
-                                                                                isSelected
-                                                                                    ? "border-primary bg-primary/10"
-                                                                                    : "border-border bg-card"
-                                                                            }`}
+                                                                            className={`p-4 border-2 rounded-lg cursor-pointer transition duration-300 flex flex-col h-full ${isSelected
+                                                                                ? "border-primary bg-primary/10"
+                                                                                : "border-border bg-card"
+                                                                                }`}
                                                                         >
                                                                             <h3 className="text-lg font-semibold mb-2">
                                                                                 {
@@ -517,8 +570,8 @@ export default function SelectRolesAndEvents({
                                                                                             onChangeRole(
                                                                                                 event.eventNo,
                                                                                                 val as
-                                                                                                    | "PARTICIPANT"
-                                                                                                    | "ACCOMPANIST"
+                                                                                                | "PARTICIPANT"
+                                                                                                | "ACCOMPANIST"
                                                                                             )
                                                                                         }
                                                                                     >
@@ -532,16 +585,16 @@ export default function SelectRolesAndEvents({
                                                                                                 </SelectLabel>
                                                                                                 {event.registeredParticipant <
                                                                                                     event.maxParticipant && (
-                                                                                                    <SelectItem value="PARTICIPANT">
-                                                                                                        Participant
-                                                                                                    </SelectItem>
-                                                                                                )}
+                                                                                                        <SelectItem value="PARTICIPANT">
+                                                                                                            Participant
+                                                                                                        </SelectItem>
+                                                                                                    )}
                                                                                                 {event.registeredAccompanist <
                                                                                                     event.maxAccompanist && (
-                                                                                                    <SelectItem value="ACCOMPANIST">
-                                                                                                        Accompanist
-                                                                                                    </SelectItem>
-                                                                                                )}
+                                                                                                        <SelectItem value="ACCOMPANIST">
+                                                                                                            Accompanist
+                                                                                                        </SelectItem>
+                                                                                                    )}
                                                                                             </SelectGroup>
                                                                                         </SelectContent>
                                                                                     </Select>
@@ -570,8 +623,8 @@ export default function SelectRolesAndEvents({
                                 <h2 className="text-2xl font-semibold mb-4">
                                     Upload Documents
                                 </h2>
-                                <p className="mb-4 text-muted-foreground">
-                                    Students are required to submit valid
+                                <p className="mb-4 text-muted-foreground text-red-600">
+                                    Note : Students are required to submit valid
                                     documents for verification. In case any
                                     document/documents fail the verification
                                     process, participants will be asked to
@@ -586,11 +639,10 @@ export default function SelectRolesAndEvents({
                                         return (
                                             <div
                                                 key={doc.id}
-                                                className={`space-y-1.5 border rounded-[var(--radius)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 p-2 ${
-                                                    isUploaded
-                                                        ? "border-green-500 border-2"
-                                                        : "border-gray-300"
-                                                }`}
+                                                className={`space-y-1.5 border rounded-[var(--radius)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 p-2 ${isUploaded
+                                                    ? "border-green-500 border-2"
+                                                    : "border-gray-300"
+                                                    }`}
                                             >
                                                 <Label htmlFor={doc.id}>
                                                     {doc.label}
@@ -647,22 +699,31 @@ export default function SelectRolesAndEvents({
                                                 {errors.documents?.[
                                                     doc.id as keyof typeof errors.documents
                                                 ] && (
-                                                    <p className="text-red-500 text-sm">
-                                                        {
-                                                            errors.documents[
-                                                                doc.id as keyof typeof errors.documents
-                                                            ]?.message
-                                                        }
-                                                    </p>
-                                                )}
+                                                        <p className="text-red-500 text-sm">
+                                                            {
+                                                                errors.documents[
+                                                                    doc.id as keyof typeof errors.documents
+                                                                ]?.message
+                                                            }
+                                                        </p>
+                                                    )}
                                             </div>
                                         );
                                     })}
                                 </div>
                             </div>
                         </CardContent>
-                        <CardFooter>
-                            <Button type="submit">Save changes</Button>
+                        <CardFooter className="flex justify-center gap-5">
+                            <Button className="px-8 text-xl" type="submit"> Save </Button>
+
+                            <Link href="/register/getallregister">
+                                <Button
+                                    variant="outline"
+                                    className="border hover:border-primary px-8 text-xl"
+                                >
+                                    Back
+                                </Button>
+                            </Link>
                         </CardFooter>
                     </form>
                 </Card>
@@ -686,49 +747,99 @@ export default function SelectRolesAndEvents({
                         </CardHeader>
                         <CardContent>
                             {/* Basic Information Fields */}
-                            <div className="flex flex-col md:flex-row gap-4 md:gap-6 mb-6">
-                                <div className="w-full md:w-1/3 space-y-1.5">
-                                    <Label htmlFor="managerName">Name</Label>
-                                    <Input
-                                        {...registerManager("name")}
-                                        id="managerName"
-                                        placeholder="Full Name"
-                                    />
-                                    {errorsManager.name && (
-                                        <p className="text-red-500 text-sm">
-                                            {errorsManager.name.message}
-                                        </p>
-                                    )}
+                            <div className="flex flex-col gap-4 mb-6">
+                                <div className="flex flex-col md:flex-row gap-4 md:gap-6">
+                                    <div className="w-full md:w-1/3 space-y-1.5">
+                                        <Label htmlFor="managerName">Name</Label>
+                                        <Input
+                                            {...registerManager("name")}
+                                            id="managerName"
+                                            placeholder="Full Name - will be printed in your certificate"
+                                        />
+                                        {errorsManager.name && (
+                                            <p className="text-red-500 text-sm">
+                                                {errorsManager.name.message}
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="w-full md:w-1/3 space-y-1.5">
+                                        <Label htmlFor="managerUsn">USN</Label>
+                                        <Input
+                                            {...registerManager("usn")}
+                                            id="managerUsn"
+                                            placeholder="1GA21AI012"
+                                        />
+                                        {errorsManager.usn && (
+                                            <p className="text-red-500 text-sm">
+                                                {errorsManager.usn.message}
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="w-full md:w-1/3 space-y-1.5">
+                                        <Label htmlFor="managerPhone">
+                                            Phone Number
+                                        </Label>
+                                        <Input
+                                            {...registerManager("phone")}
+                                            id="managerPhone"
+                                            placeholder="Phone Number"
+                                        />
+                                        {errorsManager.phone && (
+                                            <p className="text-red-500 text-sm">
+                                                {errorsManager.phone.message}
+                                            </p>
+                                        )}
+                                    </div>
                                 </div>
-                                <div className="w-full md:w-1/3 space-y-1.5">
-                                    <Label htmlFor="managerUsn">USN</Label>
-                                    <Input
-                                        {...registerManager("usn")}
-                                        id="managerUsn"
-                                        placeholder="1GA21AI012"
-                                    />
-                                    {errorsManager.usn && (
-                                        <p className="text-red-500 text-sm">
-                                            {errorsManager.usn.message}
-                                        </p>
-                                    )}
-                                </div>
-                                <div className="w-full md:w-1/3 space-y-1.5">
-                                    <Label htmlFor="managerPhone">
-                                        Phone Number
-                                    </Label>
-                                    <Input
-                                        {...registerManager("phone")}
-                                        id="managerPhone"
-                                        placeholder="Phone Number"
-                                    />
-                                    {errorsManager.phone && (
-                                        <p className="text-red-500 text-sm">
-                                            {errorsManager.phone.message}
-                                        </p>
-                                    )}
+
+                                <div className="flex flex-col md:flex-row gap-4 md:gap-6">
+                                    <div className="w-full md:w-1/3 space-y-1.5 m-6">
+                                        <Label htmlFor="managerGender">Gender of the student</Label>
+                                        <Select
+                                            {...registerManager("gender")}
+                                            onValueChange={(value) => setValueManager("gender", value)}
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select Gender" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectGroup>
+                                                    <SelectLabel>Gender</SelectLabel>
+                                                    <SelectItem value="male">Male</SelectItem>
+                                                    <SelectItem value="female">Female</SelectItem>
+                                                    <SelectItem value="other">Other</SelectItem>
+                                                </SelectGroup>
+                                            </SelectContent>
+                                        </Select>
+                                        {errorsManager.gender && (
+                                            <p className="text-red-500 text-sm">{errorsManager.gender.message}</p>
+                                        )}
+                                    </div>
+                                    <div className="w-full md:w-1/3 space-y-1.5 m-6">
+                                        <Label htmlFor="Manageraccommodation">Need Accommodation</Label>
+                                        <Select
+                                            {...register("accomodation")}
+                                            onValueChange={(value) => setValue("accomodation", value === "yes")}
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Select Accommodation" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectGroup>
+                                                    <SelectLabel>Accommodation</SelectLabel>
+                                                    <SelectItem value="yes">Yes</SelectItem>
+                                                    <SelectItem value="no">No</SelectItem>
+                                                </SelectGroup>
+                                            </SelectContent>
+                                        </Select>
+                                        {errors.accomodation && (
+                                            <p className="text-red-500 text-sm">{errors.accomodation.message}</p>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
+
+
 
                             {/* Documents Upload */}
                             <div className="mt-6">
@@ -747,11 +858,10 @@ export default function SelectRolesAndEvents({
                                         return (
                                             <div
                                                 key={doc.id}
-                                                className={`space-y-1.5 border rounded-[var(--radius)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 p-2 ${
-                                                    isUploaded
-                                                        ? "border-green-500 border-2"
-                                                        : "border-gray-300"
-                                                }`}
+                                                className={`space-y-1.5 border rounded-[var(--radius)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 p-2 ${isUploaded
+                                                    ? "border-green-500 border-2"
+                                                    : "border-gray-300"
+                                                    }`}
                                             >
                                                 <Label htmlFor={doc.id}>
                                                     {doc.label}
@@ -809,23 +919,32 @@ export default function SelectRolesAndEvents({
                                                 {errorsManager.documents?.[
                                                     doc.id as keyof typeof errorsManager.documents
                                                 ] && (
-                                                    <p className="text-red-500 text-sm">
-                                                        {
-                                                            errorsManager
-                                                                .documents[
-                                                                doc.id as keyof typeof errorsManager.documents
-                                                            ]?.message
-                                                        }
-                                                    </p>
-                                                )}
+                                                        <p className="text-red-500 text-sm">
+                                                            {
+                                                                errorsManager
+                                                                    .documents[
+                                                                    doc.id as keyof typeof errorsManager.documents
+                                                                ]?.message
+                                                            }
+                                                        </p>
+                                                    )}
                                             </div>
                                         );
                                     })}
                                 </div>
                             </div>
                         </CardContent>
-                        <CardFooter>
-                            <Button type="submit">Save Manager</Button>
+                        <CardFooter className="w-full text-center flex gap-3 justify-center">
+                            <Button className="px-8 text-xl" type="submit"> Save </Button>
+
+                            <Link href="/register/getallregister">
+                                <Button
+                                    variant="outline"
+                                    className="border hover:border-primary px-8 text-xl"
+                                >
+                                    Back
+                                </Button>
+                            </Link>
                         </CardFooter>
                     </form>
                 </Card>

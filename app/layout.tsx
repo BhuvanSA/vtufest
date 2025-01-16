@@ -17,7 +17,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                 <ThemeProvider>
                     <AuthContextProvider>
                         <Navbar />
-                        <main>{children}</main>
+                        <main className="mt-10 my-10 py-[5rem] ">{children}</main>
                         <Toaster />
                         <Footer />
                     </AuthContextProvider>

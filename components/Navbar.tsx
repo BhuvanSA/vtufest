@@ -10,6 +10,8 @@ import { ThemeToggler } from "@/contexts/theme-provider";
 import { X, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+import vtulogo from '@/public/images/vtulogo.png'
+
 export const navItems = [
     { href: "/", text: "Home" },
     { href: "/about", text: "About Us" },
@@ -80,6 +82,7 @@ const NavBar = () => {
     };
 
     return (
+
         <header className="fixed top-0 left-0 right-0 w-full bg-gradient-to-bl
 from-[#0f172a]
 via-[#1e1a78]
@@ -97,7 +100,7 @@ to-[#0f172a] backdrop-blur-sm border-none shadow-sm z-50 ">
                     Global Academy of Technology
                 </h1>
                 <Image
-                    src="/images/college-logo.png"
+                    src={vtulogo}
                     alt="College Logo"
                     width={80}
                     height={80}
@@ -190,7 +193,7 @@ to-[#0f172a] backdrop-blur-sm border-none shadow-sm z-50 ">
                                                         alt="Global Academy of Technology"
                                                     />
                                                 </div>
-                                                <div className="mb-2 mt-4 text-lg font-medium">
+                                                <div className="mb-0 mt-4 text-lg font-medium">
                                                     Global Academy of
                                                     Techonology
                                                 </div>
@@ -285,13 +288,31 @@ to-[#0f172a] backdrop-blur-sm border-none shadow-sm z-50 ">
                             </Link>
                         </NavigationMenuItem>
                         <NavigationMenuItem>
-                            <Link href="/auth/signin" legacyBehavior passHref>
-                                <NavigationMenuLink
-                                    className={navigationMenuTriggerStyle()}
-                                >
-                                    Login
-                                </NavigationMenuLink>
-                            </Link>
+                            
+                                {isLoggedIn ? (
+                                    <>
+                                        <Link href={"/register/getallregister"} legacyBehavior passHref>
+                                            <NavigationMenuLink
+                                                active={pathname.startsWith("/register")}
+                                            >Register</NavigationMenuLink>
+                                        </Link>
+                                        <Link href={"/auth/logout"} legacyBehavior passHref>
+                                        <NavigationMenuLink
+                                            active={pathname.startsWith("/auth")}
+                                            className="hover:bg-red-500"
+                                        >Logout</NavigationMenuLink>
+                                        </Link>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Link href="/auth/signin" legacyBehavior passHref>
+                                        <NavigationMenuLink
+                                            active={pathname.startsWith("/auth")}
+                                        >Login</NavigationMenuLink>
+                                        </Link>
+                                    </>
+                                )}
+            
                         </NavigationMenuItem>
                         <NavigationMenuItem>
                             <ThemeToggler />
