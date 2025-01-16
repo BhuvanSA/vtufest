@@ -23,6 +23,8 @@ export async function insertRegistrant(
                         photoUrl: arg.photoUrl,
                         idcardUrl: arg.idcardUrl,
                         userId: arg.userId,
+                        accomodation : arg.accomodation,
+                        gender:arg.gender
                     },
                 });
                 return registrant;
@@ -75,6 +77,8 @@ export async function insertRegistrant(
                     admission2Url: arg.admission2Url || "",
                     idcardUrl: arg.idcardUrl,
                     userId: arg.userId,
+                    accomodation: arg.accomodation,
+                    gender :arg.gender
                 },
             });
 

@@ -312,7 +312,7 @@ const NavBar = () => {
                                         </Link>
                                     </>
                                 )}
-                           
+            
                         </NavigationMenuItem>
                         <NavigationMenuItem>
                             <ThemeToggler />
