@@ -141,9 +141,9 @@ export default function SignUp() {
             setIsLoading(false);
         }
     };
-
+    // from-background
     return (
-        <div className="pt-24 min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-secondary p-4">
+        <div className="pt-24 min-h-screen flex items-center justify-center bg-gradient-to-br  to-secondary p-4">
             <Card className="w-full max-w-md bg-card text-card-foreground">
                 <CardHeader className="space-y-1">
                     <div className="flex items-center justify-center mb-6">
