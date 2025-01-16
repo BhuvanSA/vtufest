@@ -95,7 +95,7 @@ const NavBar = () => {
                 <div className="text-foreground  text-center font-sans mt-2  text-5xl font-bold tracking-widest text-primary_heading">
                     GLOBAL ACADEMY OF TECHNOLOGY
                     <div className="text-red-500 text-xl font-semibold mt-2 text-left">
-                       An Autonomus Institute, Affiliated to VTU
+                        An Autonomus Institute, Affiliated to VTU
                     </div>
                 </div>
 
@@ -288,13 +288,31 @@ const NavBar = () => {
                             </Link>
                         </NavigationMenuItem>
                         <NavigationMenuItem>
-                            <Link href="/auth/signin" legacyBehavior passHref>
-                                <NavigationMenuLink
-                                    className={navigationMenuTriggerStyle()}
-                                >
-                                    Login
-                                </NavigationMenuLink>
-                            </Link>
+                            
+                                {isLoggedIn ? (
+                                    <>
+                                        <Link href={"/register/getallregister"} legacyBehavior passHref>
+                                            <NavigationMenuLink
+                                                active={pathname.startsWith("/register")}
+                                            >Register</NavigationMenuLink>
+                                        </Link>
+                                        <Link href={"/auth/logout"} legacyBehavior passHref>
+                                        <NavigationMenuLink
+                                            active={pathname.startsWith("/auth")}
+                                            className="hover:bg-red-500"
+                                        >Logout</NavigationMenuLink>
+                                        </Link>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Link href="/auth/signin" legacyBehavior passHref>
+                                        <NavigationMenuLink
+                                            active={pathname.startsWith("/auth")}
+                                        >Login</NavigationMenuLink>
+                                        </Link>
+                                    </>
+                                )}
+                           
                         </NavigationMenuItem>
                         <NavigationMenuItem>
                             <ThemeToggler />
