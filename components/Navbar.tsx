@@ -91,19 +91,22 @@ to-[#0f172a] backdrop-blur-sm border-none shadow-sm z-50 ">
                 <Image
                     src="/images/college-logo.png"
                     alt="College Logo"
-                    width={80}
-                    height={80}
+                    width={120}
+                    height={120}
                     priority
                     className="fixed top-6 left-10"
                 />
-                <h1 className="mx-auto text-blue-300 text-4xl font-semibold  transition-colors">
+                <h1 className="mx-auto text-blue-300 text-4xl font-semibold tracking-widest transition-colors">
                     Global Academy of Technology
+                    <div className="text-red-500 text-xl font-semibold mt-2 text-left">
+                        An Autonomus Institute, Affiliated to VTU
+                    </div>
                 </h1>
                 <Image
                     src={vtulogo}
                     alt="College Logo"
-                    width={80}
-                    height={80}
+                    width={150}
+                    height={150}
                     priority
                     className="fixed right-10 top-6"
                 />
@@ -165,7 +168,7 @@ to-[#0f172a] backdrop-blur-sm border-none shadow-sm z-50 ">
             {/* new navigation menu */}
             <div className="flex items-center mt-4 justify-center max-w-6xl lg:max-w-[72rem] xl:max-w-6xl px-4 py-6 mx-auto sm:px-6">
                 <NavigationMenu>
-                    <NavigationMenuList className="flex gap-3">
+                    <NavigationMenuList className="flex gap-2 ">
                         <NavigationMenuItem>
                             <Link href="/" legacyBehavior passHref>
                                 <NavigationMenuLink
@@ -287,33 +290,35 @@ to-[#0f172a] backdrop-blur-sm border-none shadow-sm z-50 ">
                                 </NavigationMenuLink>
                             </Link>
                         </NavigationMenuItem>
-                        <NavigationMenuItem>
-                            
-                                {isLoggedIn ? (
-                                    <>
-                                        <Link href={"/register/getallregister"} legacyBehavior passHref>
-                                            <NavigationMenuLink
-                                                active={pathname.startsWith("/register")}
-                                            >Register</NavigationMenuLink>
-                                        </Link>
-                                        <Link href={"/auth/logout"} legacyBehavior passHref>
+                        
+
+                            {isLoggedIn ? (
+                                <>
+                                <NavigationMenuItem>
+                                    <Link href={"/register/getallregister"} legacyBehavior passHref>
                                         <NavigationMenuLink
-                                            active={pathname.startsWith("/auth")}
-                                            className="hover:bg-red-500"
+                                            className={navigationMenuTriggerStyle()}
+
+                                        >Register</NavigationMenuLink>
+                                    </Link></NavigationMenuItem>
+                                    <NavigationMenuItem>
+                                    <Link href={"/auth/logout"} legacyBehavior passHref>
+                                        <NavigationMenuLink
+                                            className={navigationMenuTriggerStyle()}
                                         >Logout</NavigationMenuLink>
-                                        </Link>
-                                    </>
-                                ) : (
-                                    <>
-                                        <Link href="/auth/signin" legacyBehavior passHref>
+                                    </Link></NavigationMenuItem>
+                                </>
+                            ) : (
+                                <>
+                                    <Link href="/auth/signin" legacyBehavior passHref>
                                         <NavigationMenuLink
-                                            active={pathname.startsWith("/auth")}
+                                            className={navigationMenuTriggerStyle()}
+
                                         >Login</NavigationMenuLink>
-                                        </Link>
-                                    </>
-                                )}
-            
-                        </NavigationMenuItem>
+                                    </Link>
+                                </>
+                            )}
+
                         <NavigationMenuItem>
                             <ThemeToggler />
                         </NavigationMenuItem>
