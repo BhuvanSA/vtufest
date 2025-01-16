@@ -65,6 +65,8 @@
         @apply border-border;
     }
     body {
-        @apply bg-background text-foreground;
+        @apply bg-no-repeat bg-cover bg-center;
+        background-image: url('../components/images/Download Free Vectors, Images, Photos & Videos _ Vecteezy.jpg'); 
     }
 }
+    
