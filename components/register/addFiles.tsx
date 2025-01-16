@@ -397,7 +397,7 @@ export default function SelectRolesAndEvents({
                                 </div>
 
                                 <div className="flex flex-col md:flex-row gap-4 md:gap-10">
-                                    <div className="w-full md:w-1/3 space-y-1.5 m-6">
+                                    <div className="w-1/3 md:w-1/3 space-y-1.5 m-6">
                                         <Label htmlFor="gender">Gender of the student</Label>
                                         <Select
                                             {...register("gender")}
@@ -794,10 +794,10 @@ export default function SelectRolesAndEvents({
 
                                 <div className="flex flex-col md:flex-row gap-4 md:gap-6">
                                     <div className="w-full md:w-1/3 space-y-1.5 m-6">
-                                        <Label htmlFor="Managergender">Gender of the Manager</Label>
+                                        <Label htmlFor="managerGender">Gender of the student</Label>
                                         <Select
-                                            {...register("gender")}
-                                            onValueChange={(value) => setValue("gender", value)}
+                                            {...registerManager("gender")}
+                                            onValueChange={(value) => setValueManager("gender", value)}
                                         >
                                             <SelectTrigger>
                                                 <SelectValue placeholder="Select Gender" />
@@ -811,11 +811,10 @@ export default function SelectRolesAndEvents({
                                                 </SelectGroup>
                                             </SelectContent>
                                         </Select>
-                                        {errors.gender && (
-                                            <p className="text-red-500 text-sm">{errors.gender.message}</p>
+                                        {errorsManager.gender && (
+                                            <p className="text-red-500 text-sm">{errorsManager.gender.message}</p>
                                         )}
                                     </div>
-
                                     <div className="w-full md:w-1/3 space-y-1.5 m-6">
                                         <Label htmlFor="Manageraccommodation">Need Accommodation</Label>
                                         <Select

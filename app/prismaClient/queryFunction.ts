@@ -570,6 +570,8 @@ export async function updateRegisterDetails(data: RegistrantDetailUpdate) {
                 name: data.name,
                 usn: data.usn,
                 phone: data.phone,
+                gender:data.gender,
+                accomodation : data.accomodation
             },
         });
     } catch (err: unknown) {
