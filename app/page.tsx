@@ -2,7 +2,7 @@
 import React from "react";
 import "./globals.css"; // Adjust the import path as needed
 import Header from "@/components/Background";
-import Gallery from "@/components/subcomponents/gallery";
+// import Gallery from "@/components/subcomponents/gallery";
 // import Pronities from "@/components/subcomponents/pronities";
 // import Events from "@/components/subcomponents/events";
 
