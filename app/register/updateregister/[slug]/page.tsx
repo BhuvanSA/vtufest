@@ -1,4 +1,5 @@
 "use client"
+
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription } from "@/components/ui/card";
@@ -6,29 +7,66 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileUploadField } from "@/components/forms/file-upload";
 import { UploadDropzone } from "@/utils/uploadthing";
 import { toast } from "sonner";
 
-const UpdateRegister = ({ params }: { params: Promise<{ slug: string }> }) => {
-  const [id, setId] = useState("");
-  const [name, setName] = useState("");
-  const [usn, setUsn] = useState("");
-  const [phone, setPhone] = useState("");
-  const [isTeamManager, setIsTeamManager] = useState(false);
-  const [editOne, setEditOne] = useState(false);
-  const [field, setField] = useState("");
-  const [selectedEvents, setSelectedEvents] = useState([]);
-  const [events, setEvents] = useState([]);
-  const [registrant, setRegistrant] = useState(null);
-  const [fileUrl, setFileUrl] = useState("");
-  const [fileUpload, setFileUpload] = useState(null);
-  const [addEvent, setaddEvent] = useState(null);
-  const [addEventType, setaddEventType] = useState("");
-  const [allRegisteredEvents, SetallregisteredEvents] = useState([]);
-  const [gender, setGender] = useState<null | string>(null);
-  const [accomodation, setAccomodation] = useState<null | boolean>(null);
+// Define interfaces for our data structures
+interface Registrant {
+  id: string;
+  name: string;
+  usn: string;
+  phone: string;
+  teamManager: boolean;
+  gender: string | null;
+  accomodation: boolean | null;
+  events: Event[];
+  eventRegistrations: EventRegistration[];
+  [key: string]: any; // For dynamic access to file URLs
+}
 
+interface Event {
+  id: string;
+  eventNo: string;
+  eventName: string;
+  maxParticipant: number;
+  maxAccompanist: number;
+  registeredParticipant: number;
+  registeredAccompanist: number;
+}
+
+interface EventRegistration {
+  id: string;
+  eventId: string;
+  registrantId: string;
+  type: string;
+}
+
+interface MergedEvent extends Event, EventRegistration {
+  editing: boolean;
+  editRole: string;
+}
+
+interface UpdateRegisterProps {
+  params: Promise<{ slug: string }>;
+}
+
+const UpdateRegister: React.FC<UpdateRegisterProps> = ({ params }) => {
+  const [id, setId] = useState<string>("");
+  const [name, setName] = useState<string>("");
+  const [usn, setUsn] = useState<string>("");
+  const [phone, setPhone] = useState<string>("");
+  const [isTeamManager, setIsTeamManager] = useState<boolean>(false);
+  const [editOne, setEditOne] = useState<boolean>(false);
+  const [field, setField] = useState<string>("");
+  const [events, setEvents] = useState<MergedEvent[]>([]);
+  const [registrant, setRegistrant] = useState<Registrant | null>(null);
+  const [fileUrl, setFileUrl] = useState<string>("");
+  const [addEvent, setAddEvent] = useState<Event | null>(null);
+  const [addEventType, setAddEventType] = useState<string>("");
+  const [allRegisteredEvents, setAllRegisteredEvents] = useState<Event[]>([]);
+  const [gender, setGender] = useState<string | null>(null);
+  const [accomodation, setAccomodation] = useState<boolean | null>(null);
+  const [handleAddEventEffect, setHandleAddEventEffect] = useState<boolean>(false);
   // Fetch registrant details
   async function fetchRegistrant() {
     const id = (await params).slug;
@@ -43,54 +81,57 @@ const UpdateRegister = ({ params }: { params: Promise<{ slug: string }> }) => {
     const data = await response.json();
     console.log(data);
 
-    setName(data.registrant.name);
-    setUsn(data.registrant.usn);
-    setPhone(data.registrant.phone);
-    setIsTeamManager(data.registrant.teamManager);
-    setId(data.registrant.id);
-    setRegistrant(data.registrant);
-    setGender(data.registrant.gender);
-    setAccomodation(data.registrant.accomodation);
+    if (data.registrant) {
+      const registrant: Registrant = data.registrant;
+      setName(registrant.name);
+      setUsn(registrant.usn);
+      setPhone(registrant.phone);
+      setIsTeamManager(registrant.teamManager);
+      setId(registrant.id);
+      setRegistrant(registrant);
+      setGender(registrant.gender);
+      setAccomodation(registrant.accomodation);
 
-    const fetchResponse = await fetch("/api/getalleventregister", {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    });
+      const fetchResponse = await fetch("/api/getalleventregister", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
 
-    const { userEvents } = await fetchResponse.json();
+      const { userEvents } = await fetchResponse.json();
 
-    let mergedEvents = data.registrant.events.map((event) => {
-      const registration = data.registrant.eventRegistrations.find(
-        (reg) => reg.eventId === event.id
-      );
-      return {
-        ...event,
-        ...registration,
-        editing: false,
-        editRole: "",
-      };
-    });
+      let mergedEvents:MergedEvent[] = data.registrant.events.map((event:Event) => {
+        const registration = data.registrant.eventRegistrations.find(
+          (reg:Registrant) => reg.eventId === event.id
+        );
+        return {
+          ...event,
+          ...registration,
+          editing: false,
+          editRole: "",
+        };
+      });
+  
+      mergedEvents = mergedEvents.filter((event) => {
+        return event.registrantId;
+      });
+  
+      const updateUserEvent = userEvents.filter((event:Event) => {
+        return (
+          (event.registeredParticipant < event.maxParticipant ||
+          event.registeredAccompanist < event.maxAccompanist) && !mergedEvents.some((events:Event)=> events.eventNo===event.eventNo)
+        );
+      });
 
-    mergedEvents = mergedEvents.filter((event) => {
-      return event.registrantId;
-    });
-
-    const updateUserEvent = userEvents.filter((event) => {
-      return (
-        event.registeredParticipant < event.maxParticipant ||
-        event.registeredAccompanist < event.maxAccompanist
-      );
-    });
-
-    console.log(userEvents);
-    console.log(mergedEvents);
-    SetallregisteredEvents(updateUserEvent);
-    setEvents(mergedEvents);
+      console.log(userEvents);
+      console.log(mergedEvents);
+      setAllRegisteredEvents(updateUserEvent);
+      setEvents(mergedEvents);
+    }
   }
 
   useEffect(() => {
     fetchRegistrant();
-  }, [, setEvents]);
+  }, [handleAddEventEffect]);
 
   // Handle save action
   const handleSave = async () => {
@@ -102,7 +143,7 @@ const UpdateRegister = ({ params }: { params: Promise<{ slug: string }> }) => {
         phone: phone,
         name: name,
         accomodation: accomodation,
-        gender:gender
+        gender: gender
       }),
       headers: { "Content-Type": "application/json" },
     });
@@ -112,30 +153,14 @@ const UpdateRegister = ({ params }: { params: Promise<{ slug: string }> }) => {
     toast.success('Register Details updated')
     if (!data.success) {
       const errorMessage = JSON.parse(data.message);
-      errorMessage.forEach((message) => {
+      errorMessage.forEach((message: { message: string }) => {
         toast.error(message.message);
       });
     }
   };
 
-  // Handle event selection
-  const handleEventSelection = (e) => {
-    const [eventNo, eventName] = e.target.value.split("|");
-    if (e.target.checked) {
-      setSelectedEvents((prev) => [...prev, { eventNo, eventName, type: "" }]);
-    } else {
-      setSelectedEvents((prev) =>
-        prev.filter((event) => event.eventNo !== eventNo)
-      );
-    }
-  };
-
-  const AddCategories = allRegisteredEvents.filter((event) => {
-    return !events.some((e) => e.eventNo === event.eventNo);
-  });
-
   // Handle role change for selected events
-  const handleRoleChange = (e, eventNo) => {
+  const handleRoleChange = (e: React.ChangeEvent<HTMLSelectElement>, eventNo: string) => {
     setEvents((prevEvents) =>
       prevEvents.map((event) =>
         event.eventNo === eventNo ? { ...event, editRole: e.target.value } : event
@@ -144,7 +169,7 @@ const UpdateRegister = ({ params }: { params: Promise<{ slug: string }> }) => {
   };
 
   // Handle Edit button click (per event)
-  const handleEditClick = (eventNo) => {
+  const handleEditClick = (eventNo: string) => {
     setEvents((prevEvents) =>
       prevEvents.map((event) =>
         event.eventNo === eventNo ? { ...event, editing: true } : event
@@ -153,7 +178,7 @@ const UpdateRegister = ({ params }: { params: Promise<{ slug: string }> }) => {
   };
 
   // Handle Save button click (per event)
-  const handleSaveRole = async (event) => {
+  const handleSaveRole = async (event: MergedEvent) => {
     const updatedEvent = { ...event, type: event.editRole };
     setEvents((prevEvents) =>
       prevEvents.map((e) => (e.eventNo === event.eventNo ? updatedEvent : e))
@@ -184,7 +209,7 @@ const UpdateRegister = ({ params }: { params: Promise<{ slug: string }> }) => {
     }
   };
 
-  const handleEventDelete = async (event) => {
+  const handleEventDelete = async (event: MergedEvent) => {
     const response = await fetch("/api/deleteregistrantevent", {
       method: "DELETE",
       headers: {
@@ -200,50 +225,27 @@ const UpdateRegister = ({ params }: { params: Promise<{ slug: string }> }) => {
     if (data.success) {
       toast.success(`Event ${event.eventName} deleted successfully.`);
       // Update the events state by filtering out the deleted event
-      setEvents((prevEvents) =>
-        prevEvents.filter((e) => e.eventNo !== event.eventNo)
-      );
+      // setEvents((prevEvents) =>
+      //   prevEvents.filter((e) => e.eventNo !== event.eventNo)
+      // );
+      setHandleAddEventEffect((prev:boolean)=> !prev)
     } else {
       console.log(data);
       toast.error(`Failed to delete event ${event.eventName}. Please try again.`);
     }
   };
 
-  const handleSetField = (value) => {
-    setField(value); // Set the selected field
-    setFileUrl(registrant[value]);
-  };
-
-  const handleFileUpload = async (e) => {
-    e.preventDefault();
-    if (!fileUpload) {
-      alert("Please select a file to upload.");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("file", fileUpload);
-    formData.append("field", field);
-    formData.append("registrantId", registrant.id);
-
-    const response = await fetch(`/api/updateregisterfiles`, {
-      method: "PATCH",
-      body: formData,
-    });
-    console.log("the reso", response);
-
-    const data = await response.json();
-
-    if (data.success) {
-      alert("File uploaded successfully!");
-      setFileUrl(data.fileUrl); // Assuming the server returns the URL of the uploaded file
-    } else {
-      alert("File upload failed. Please try again.");
+  const handleSetField = (value: string) => {
+    setField(value);
+    if (registrant) {
+      setFileUrl(registrant[value]);
     }
   };
 
-  const handleAddEvent = async (e) => {
+  const handleAddEvent = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!addEvent || !addEventType || !registrant) return;
+
     const response = await fetch("/api/addeventregister", {
       method: "POST",
       body: JSON.stringify({
@@ -258,26 +260,26 @@ const UpdateRegister = ({ params }: { params: Promise<{ slug: string }> }) => {
 
     const data = await response.json();
     console.log(data);
-
+    setHandleAddEventEffect((prev:boolean)=> !prev)
     toast.success(data.message);
 
   };
 
   return (
-    <div className="bg-background min-h-screen pt-24 ">
-      <div className="mt-4 justify-center flex flex-col gap-4">
-        <div className="max-w-4xl mx-auto p-4">
+    <div className="bg-background min-h-screen pt-24 w-full ">
+      <div className="mt-4 justify-center w-full flex flex-col gap-4">
+        <div className="w-[90%] mx-auto p-6">
           <h1 className="text-primary font-bold text-center text-4xl md:text-4xl xl:text-4xl mb-6">
             Update Registrant
           </h1>
 
-          <Card className="">
+          <Card className="w-full">
             <CardDescription className="text-center mt-8 mb-10">
               Update details for Registrant
             </CardDescription>
             <CardContent>
               <div className="flex flex-col gap-4 mb-6">
-                <div >
+                <div>
                   <div className="flex flex-col md:flex-row gap-4 md:gap-10">
                     <div className="w-full md:w-1/3 space-y-1.5">
                       <Label htmlFor="name">Name</Label>
@@ -301,7 +303,6 @@ const UpdateRegister = ({ params }: { params: Promise<{ slug: string }> }) => {
                         placeholder="USN / ID Number "
                       />
                     </div>
-
                     <div className="w-full md:w-1/3 space-y-1.5">
                       <Label htmlFor="phone">Phone Number</Label>
                       <Input
@@ -335,7 +336,6 @@ const UpdateRegister = ({ params }: { params: Promise<{ slug: string }> }) => {
                         </SelectContent>
                       </Select>
                     </div>
-
                     <div className="w-full md:w-1/3 space-y-1.5">
                       <Label htmlFor="accommodation">Need Accommodation</Label>
                       <Select
@@ -364,12 +364,11 @@ const UpdateRegister = ({ params }: { params: Promise<{ slug: string }> }) => {
                       </span>
                     </p>
                     {editOne ? (
-                      <Button onClick={() => handleSave()}>Save</Button>
+                      <Button  onClick={() => handleSave()}>Save</Button>
                     ) : (
                       <Button onClick={() => setEditOne(true)}>Edit</Button>
                     )}
                   </div>
-
                 </div>
 
                 {!isTeamManager && (
@@ -379,14 +378,13 @@ const UpdateRegister = ({ params }: { params: Promise<{ slug: string }> }) => {
                     </h2>
                     <div className="mt-4">
                       <form onSubmit={handleAddEvent} className="flex gap-3 flex-col">
-                        {/* Event Selection */}
                         <Label className="block text-sm font-medium text-primary mb-1">Select Event to Register</Label>
-                        <Select onValueChange={(value) => setaddEvent(JSON.parse(value))}>
+                        <Select onValueChange={(value) => setAddEvent(JSON.parse(value))}>
                           <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select Event" />
                           </SelectTrigger>
                           <SelectContent>
-                            {AddCategories.map((event) => (
+                            {allRegisteredEvents.map((event) => (
                               <SelectItem key={event.eventNo} value={JSON.stringify(event)}>
                                 {event.eventName}
                               </SelectItem>
@@ -394,9 +392,8 @@ const UpdateRegister = ({ params }: { params: Promise<{ slug: string }> }) => {
                           </SelectContent>
                         </Select>
 
-                        {/* Type Selection */}
                         <Label className="block text-sm font-medium text-primary mb-1">Select Type</Label>
-                        <Select onValueChange={(value) => setaddEventType(value)}>
+                        <Select onValueChange={(value) => setAddEventType(value)}>
                           <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select Type" />
                           </SelectTrigger>
@@ -410,8 +407,7 @@ const UpdateRegister = ({ params }: { params: Promise<{ slug: string }> }) => {
                           </SelectContent>
                         </Select>
 
-                        {/* Submit Button */}
-                        <Button className="bg-primary p-2 rounded-sm px-3 mt-3 text-lg" type="submit">
+                        <Button className="bg-primary p-2 rounded-sm mx-20 mt-3 text-lg" type="submit">
                           Add Event
                         </Button>
                       </form>
@@ -429,18 +425,17 @@ const UpdateRegister = ({ params }: { params: Promise<{ slug: string }> }) => {
                                 {event.eventName}
                               </AccordionTrigger>
                               <AccordionContent>
-                                <div className="p-4 border-2 rounded-lg cursor-pointer transition duration-300 flex flex-col h-full"
-                                >
+                                <div className="p-4 border-2 rounded-lg cursor-pointer transition duration-300 flex flex-col h-full">
                                   <div className="flex justify-between items-center mb-4">
                                     <p className="text-sm text-gray-500 font-bold ">{event.eventName}</p>
                                   </div>
 
-                                  <div className="flex items-center mb-6">
+                                  <div className="flex items-center mb-3">
                                     <label className="text-lg  text-primary mr-6">Role:</label>
                                     {event.editing ? (
                                       <Select
                                         onValueChange={(value) =>
-                                          handleRoleChange({ target: { value } }, event.eventNo)
+                                          handleRoleChange({ target: { value } } as React.ChangeEvent<HTMLSelectElement>, event.eventNo)
                                         }
                                         defaultValue={event.editRole || event.type}
                                       >
@@ -495,12 +490,10 @@ const UpdateRegister = ({ params }: { params: Promise<{ slug: string }> }) => {
                   </>
                 )}
                 <div>
-                  {/* Select Field Label */}
                   <Label className="block text-sm font-medium mt-10 text-primary mb-2">
                     Select Field for Upload:
                   </Label>
 
-                  {/* Select Field Dropdown */}
                   <Select onValueChange={(value) => handleSetField(value)}>
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select Field" />
@@ -508,7 +501,6 @@ const UpdateRegister = ({ params }: { params: Promise<{ slug: string }> }) => {
                     <SelectContent>
                       {!isTeamManager && (
                         <>
-
                           <SelectItem value="sslcUrl">SSLC</SelectItem>
                           <SelectItem value="pucUrl">PUC</SelectItem>
                           <SelectItem value="idcardUrl">ID Card</SelectItem>
@@ -520,7 +512,6 @@ const UpdateRegister = ({ params }: { params: Promise<{ slug: string }> }) => {
                       )}
                       {isTeamManager && (
                         <>
-                          <SelectItem value="">Select Field</SelectItem>
                           <SelectItem value="photoUrl">Photo</SelectItem>
                           <SelectItem value="idcardUrl">ID Card</SelectItem>
                         </>
@@ -528,38 +519,33 @@ const UpdateRegister = ({ params }: { params: Promise<{ slug: string }> }) => {
                     </SelectContent>
                   </Select>
 
-                  {/* View Document and Upload Section */}
                   {field && (
                     <>
-                      {/* View Button */}
                       <a href={`https://${process.env.UPLOADTHING_APP_ID}.ufs.sh/f/${fileUrl}`} target="_blank" rel="noopener noreferrer">
-                        <Button className="mt-5  w-full ">View</Button>
+                        <Button className="mt-5 w-full">View</Button>
                       </a>
 
-                      {/* Update Document Label */}
                       <Label className="block text-sm font-medium mt-10 text-primary mb-2">
                         Update Document:
                       </Label>
 
-                      {/* File Upload Form */}
-                      <form encType="multipart/form-data" onSubmit={handleFileUpload}>
+                      <form encType="multipart/form-data" onSubmit={(e) => {
+                        e.preventDefault();
+                        // Handle file upload here
+                      }}>
                         <UploadDropzone
                           endpoint="imageUploader"
-                          onClientUploadComplete={(
-                            res
-                          ) => {
+                          onClientUploadComplete={(res) => {
                             if (res && res[0]) {
                               setFileUrl(res[0].key)
                               toast.success(
-                                `document Upload Completed`
+                                `Document Upload Completed`
                               );
                             }
                           }}
-                          onUploadError={(
-                            error: Error
-                          ) => {
+                          onUploadError={(error: Error) => {
                             toast.error(
-                              `Error: ${error.message} Uploading ${doc.label}`
+                              `Error: ${error.message} Uploading document`
                             );
                           }}
                         />
@@ -581,3 +567,4 @@ const UpdateRegister = ({ params }: { params: Promise<{ slug: string }> }) => {
 };
 
 export default UpdateRegister;
+
