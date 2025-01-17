@@ -24,7 +24,7 @@ const NavItem: React.FC<NavItemProps> = ({
                     isActive
                         ? "font-bold text-foreground"
                         : "font-normal text-muted-foreground"
-                } hidden md:inline-block p-1 sm:px-4 sm:py-2 rounded-full hover:text-primary-foreground hover:bg-primary transition-all`,
+                } hidden md:inline-block p-1 sm:px-4 sm:py-2  hover:text-primary-foreground hover:bg-primary transition-all`,
                 className
             )}
         >

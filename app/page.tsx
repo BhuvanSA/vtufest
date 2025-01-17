@@ -2,26 +2,27 @@
 import React from "react";
 import "./globals.css"; // Adjust the import path as needed
 import Header from "@/components/Background";
-import Gallery from "@/components/subcomponents/gallery";
+// import Gallery from "@/components/subcomponents/gallery";
 // import Pronities from "@/components/subcomponents/pronities";
 // import Events from "@/components/subcomponents/events";
 
 const Home = () => {
     return (
-        <div className="bg-background">
-            <Header />
 
+        <div className="bg-background pt-16">
+            <Header />
             <div className="relative z-10">
-                <section className="bg-background">
+                <section className="bg-background ">
                     <div className="ml-auto ">
-                        <div className="lg:w-2/3 text-justify mx-auto">
+                        <div className="lg:w-2/3 mt-10 text-justify mx-auto">
                             <h1 className="text-primary font-bold text-5xl md:text-6xl xl:text-7xl text-center flex flex-col">
-                                24th
                                 <span className="text-primary ">
-                                    VTU Youth Festival
+                                24th VTU Youth Festival
                                 </span>
                             </h1>
-                            <h4 className="mt-8 text-secondary">
+
+                            <h4 className="mt-8 text-black">
+
                                 The 24th VTU Youth Festival, organized by
                                 Visvesvaraya Technological University, is a
                                 prestigious platform that celebrates the spirit
@@ -43,7 +44,7 @@ const Home = () => {
                                 fabric of the student community, while nurturing
                                 the growth of future leaders in various fields.
                             </h4>
-                            <div className="flex justify-between mt-10">
+                            <div className="flex justify-between">
                                 <div className="flex  space-x-2">
                                     <svg
                                         className="w-6 h-6 text-[#bbc5c6]"
@@ -85,11 +86,11 @@ const Home = () => {
                                 </div>
                                 <div className="flex  space-x-2">
                                     <svg
-                                        className="w-6 h-6 text-[#bbc5c6]"
+                                        className="w-6 h-6 text-red-600"
                                         viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="2"
+                                        fill="red"
+                                        stroke="black"
+                                        strokeWidth="1"
                                         strokeLinecap="round"
                                         strokeLinejoin="round"
                                     >
@@ -97,7 +98,7 @@ const Home = () => {
                                         <circle cx="12" cy="11" r="4"></circle>
                                     </svg>
                                     <a href="https://maps.app.goo.gl/SQYGicDVGunvnhYc7">
-                                        <span className="text-[#bbc5c6]">
+                                        <span className="text-blue-800 font-semibold">
                                             Global Academy of Technology
                                         </span>
                                     </a>

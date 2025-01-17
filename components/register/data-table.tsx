@@ -505,7 +505,7 @@ export function DataTable({ data }: { data: Data[] }) {
                 </div>
                 <Button
                     variant="outline"
-                    className="ml-auto hover:bg-[#00B140] hover:text-primary-foreground border hover:border-green-500"
+                    className="ml-auto bg-[#00B140] text-white hover:scale-105 hover:bg-[#00B140] hover:text-white "
                     onClick={handleExport}
                 >
                     <FileDown className="mr-2 h-4 w-4" />
@@ -513,7 +513,7 @@ export function DataTable({ data }: { data: Data[] }) {
                 </Button>
                 <Button
                     variant="outline"
-                    className="ml-2 hover:bg-red-500 hover:text-primary-foreground"
+                    className="ml-2 bg-red-500 text-white hover:scale-105 hover:bg-red-500 hover:text-primary-foreground"
                     onClick={() => handleDeleteSelected()}
                 >
                     <Trash2 className="mr-2 h-4 w-4" />
@@ -545,7 +545,7 @@ export function DataTable({ data }: { data: Data[] }) {
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
-            <div className="rounded-md border">
+            <div className="rounded-md border min-h-[15rem]">
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
@@ -587,7 +587,7 @@ export function DataTable({ data }: { data: Data[] }) {
                             <TableRow>
                                 <TableCell
                                     colSpan={columns.length}
-                                    className="h-24 text-center"
+                                    className="h-24 text-center "
                                 >
                                     No results.
                                 </TableCell>

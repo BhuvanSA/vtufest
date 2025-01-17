@@ -133,17 +133,17 @@ export default async function Page() {
         <div className="bg-background min-h-screen pt-24">
             <div className="mt-4 justify-center flex flex-col gap-4">
                 <div className="max-w-4xl mx-auto p-4">
-                    <h1 className="text-primary font-bold text-4xl md:text-6xl xl:text-7xl mb-6">
-                        Registrants
+                    <h1 className="text-primary font-bold text-5xl md:text-5xl xl:text-5xl mb-6">
+                        Registrant List
                     </h1>
                 </div>
             </div>
             <DataTable data={results} />
-            <div className="flex justify-center mt-4 gap-4">
+            <div className="flex justify-center mt-4 gap-4 pb-36">
                 <Link href="/register/modifyevents">
                     <Button
                         variant="outline"
-                        className="border hover:border-primary"
+                        className="border bg-primary text-white hover:bg-primary hover:text-white hover:scale-105 transition-all"
                     >
                         <PenSquare className="mr-2 h-4 w-4" />
                         Modify Events
@@ -152,14 +152,16 @@ export default async function Page() {
                 <Link href="/register/addRegistrant">
                     <Button
                         variant="outline"
-                        className="border hover:border-primary"
+                        className="border bg-primary text-white hover:bg-primary hover:text-white hover:scale-105 transition-all"
                     >
                         <UserPlus className="mr-2 h-4 w-4" />
                         Add Registrant
                     </Button>
                 </Link>
                 <Link href="/register/paymentinfo">
-                    <Button variant="default">
+                    <Button variant="default"
+                    className="border bg-primary text-white hover:bg-primary hover:text-white hover:scale-105 transition-all"
+                    >
                         <CreditCard className="mr-2 h-4 w-4" />
                         Go to payments
                     </Button>

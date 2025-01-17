@@ -8,7 +8,11 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import axios from "axios";
+import vtulogo from "@/public/images/vtulogo.png";
 import Image from "next/image";
+import interactLogo from "@/public/images/INTERACT-4.png";
+import bgImage from "../../../components/images/GATBGIMG.png"; // Your background image import
+
 import {
     Card,
     CardContent,
@@ -78,29 +82,43 @@ export default function SignIn() {
     }
 
     return (
-        <div className=" mt-28 min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-secondary p-4">
+        <div
+            className="mt-28 min-h-screen flex items-center justify-center p-4"
+            style={{
+                backgroundImage: `url(${bgImage.src})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+                backgroundAttachment: "fixed",
+            }}
+        >
             <Card className="w-full max-w-md bg-card text-card-foreground">
                 <CardHeader>
-                    <div className="flex items-center justify-center mb-6">
+                    <div className="flex items-center text-blue-800 justify-center mb-6 font-bold text-2xl leading-6 tracking-wider">
                         <h1>Global Academy of Technology</h1>
                     </div>
-                    <div className="flex items-center justify-between pb-16">
+                    <div className="flex items-center justify-between pb-0">
                         <Image
                             src="/images/college-logo.png"
                             alt="College Logo"
-                            width={80}
+                            width={85}
                             height={80}
                             priority
                             className="object-contain"
                         />
-                        <h1 className="text-3xl font-bold text-foreground">
-                            Interact
-                        </h1>
                         <Image
-                            src="/images/college-logo.png"
+                            src={interactLogo}
                             alt="College Logo"
-                            width={80}
-                            height={80}
+                            width={170}
+                            height={90}
+                            priority
+                            className="object-contain relative left-4"
+                        />
+                        <Image
+                            src={vtulogo}
+                            alt="College Logo"
+                            width={120}
+                            height={120}
                             priority
                             className="object-contain"
                         />

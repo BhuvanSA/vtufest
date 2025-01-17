@@ -1,7 +1,7 @@
 const Background = () => {
     return (
         <>
-            <div className="bg-transparent mt-[93px]">
+            <div className="bg-transparent mt-[1git 00px]">
                 <video
                     autoPlay
                     muted

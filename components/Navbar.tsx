@@ -10,6 +10,8 @@ import { ThemeToggler } from "@/contexts/theme-provider";
 import { X, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+import vtulogo from '@/public/images/vtulogo.png'
+
 export const navItems = [
     { href: "/", text: "Home" },
     { href: "/about", text: "About Us" },
@@ -80,29 +82,36 @@ const NavBar = () => {
     };
 
     return (
-        <header className="fixed top-0 left-0 right-0 w-full bg-background/80 backdrop-blur-sm border-b border-border shadow-sm z-50">
-            <div className="flex items-center justify-between text-2xl">
+
+        <header className="fixed top-0 left-0 right-0 w-full bg-gradient-to-bl
+    from-[#6197cd]
+    via-[#fdfdff]
+    to-[#416de3] backdrop-blur-sm border-none shadow-sm z-50 ">
+            <div className="flex items-center justify-between text-2xl mt-4">
                 <Image
                     src="/images/college-logo.png"
                     alt="College Logo"
-                    width={40}
-                    height={40}
+                    width={120}
+                    height={120}
                     priority
-                    className=""
+                    className="fixed top-6 left-10"
                 />
-                <h1 className="text-foreground hover:text-primary transition-colors">
+                <h1 className="mx-auto text-primary_heading text-4xl font-semibold tracking-[0.8rem] transition-colors">
                     Global Academy of Technology
+                    <div className="text-red-500 text-xl font-semibold mt-2 text-left tracking-widest ">
+                        An Autonomus Institute, Affiliated to VTU
+                    </div>
                 </h1>
                 <Image
-                    src="/images/college-logo.png"
+                    src={vtulogo}
                     alt="College Logo"
-                    width={40}
-                    height={40}
+                    width={160}
+                    height={160}
                     priority
-                    className=""
+                    className="fixed right-10  top-1"
                 />
             </div>
-            <div className="flex items-center justify-center max-w-6xl lg:max-w-[72rem] xl:max-w-6xl px-4 mx-auto sm:px-6">
+            <div className="flex items-center mt-6 justify-center max-w-6xl lg:max-w-[72rem] xl:max-w-6xl px-4 mx-auto sm:px-6">
                 {/* <div className="hidden lg:block overflow-x-auto whitespace-nowrap">
                     <nav className="flex space-x-3 text-lg">
                         {navItems.map(({ href, text }, index) => (
@@ -157,9 +166,9 @@ const NavBar = () => {
                 </div> */}
             </div>
             {/* new navigation menu */}
-            <div className="flex items-center justify-center max-w-6xl lg:max-w-[72rem] xl:max-w-6xl px-4 py-6 mx-auto sm:px-6">
+            <div className="flex items-center mt-4 justify-center max-w-6xl lg:max-w-[72rem] xl:max-w-6xl px-3 py-6 mx-auto sm:px-6">
                 <NavigationMenu>
-                    <NavigationMenuList>
+                    <NavigationMenuList className="flex gap-0 ">
                         <NavigationMenuItem>
                             <Link href="/" legacyBehavior passHref>
                                 <NavigationMenuLink
@@ -176,7 +185,7 @@ const NavBar = () => {
                                     <li className="row-span-3">
                                         <NavigationMenuLink asChild>
                                             <a
-                                                className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                                                className="flex h-full w-full select-none flex-col justify-end bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
                                                 href="/about"
                                             >
                                                 <div className="flex justify-center items-center">
@@ -187,7 +196,7 @@ const NavBar = () => {
                                                         alt="Global Academy of Technology"
                                                     />
                                                 </div>
-                                                <div className="mb-2 mt-4 text-lg font-medium">
+                                                <div className="mb-0 mt-4 text-lg font-medium">
                                                     Global Academy of
                                                     Techonology
                                                 </div>
@@ -281,15 +290,35 @@ const NavBar = () => {
                                 </NavigationMenuLink>
                             </Link>
                         </NavigationMenuItem>
-                        <NavigationMenuItem>
-                            <Link href="/auth/signin" legacyBehavior passHref>
-                                <NavigationMenuLink
-                                    className={navigationMenuTriggerStyle()}
-                                >
-                                    Login
-                                </NavigationMenuLink>
-                            </Link>
-                        </NavigationMenuItem>
+
+
+                        {isLoggedIn ? (
+                            <>
+                                <NavigationMenuItem>
+                                    <Link href={"/register/getallregister"} legacyBehavior passHref>
+                                        <NavigationMenuLink
+                                            className={navigationMenuTriggerStyle()}
+
+                                        >Register</NavigationMenuLink>
+                                    </Link></NavigationMenuItem>
+                                <NavigationMenuItem>
+                                    <Link href={"/auth/logout"} legacyBehavior passHref>
+                                        <NavigationMenuLink
+                                            className={navigationMenuTriggerStyle()}
+                                        >Logout</NavigationMenuLink>
+                                    </Link></NavigationMenuItem>
+                            </>
+                        ) : (
+                            <>
+                                <Link href="/auth/signin" legacyBehavior passHref>
+                                    <NavigationMenuLink
+                                        className={navigationMenuTriggerStyle()}
+
+                                    >Login</NavigationMenuLink>
+                                </Link>
+                            </>
+                        )}
+
                         <NavigationMenuItem>
                             <ThemeToggler />
                         </NavigationMenuItem>

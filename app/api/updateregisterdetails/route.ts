@@ -10,6 +10,8 @@ const registerSchema = z.object({
         message: "Phone number must contain only digits",
     }),
     usn: z.string({ message: "usn is required" }),
+    gender: z.string({message:"gender is required"}),
+    accomodation : z.boolean({message:"accomodation is required"})
 }).strict();
 
 export interface RegistrantDetailUpdate {
@@ -17,6 +19,8 @@ export interface RegistrantDetailUpdate {
     name : string,
     phone : string,
     usn : string,
+    gender : string,
+    accomodation : boolean
 }
 
 export async function PATCH(request: Request) {
