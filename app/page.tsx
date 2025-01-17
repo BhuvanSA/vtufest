@@ -2,13 +2,13 @@
 import React from "react";
 import "./globals.css"; // Adjust the import path as needed
 import Header from "@/components/Background";
+import Image from "next/image";
 // import Gallery from "@/components/subcomponents/gallery";
 // import Pronities from "@/components/subcomponents/pronities";
 // import Events from "@/components/subcomponents/events";
-
+import { image5, image34, image42 } from "@/components/images/gallery";
 const Home = () => {
     return (
-
         <div className="bg-background pt-16">
             <Header />
             <div className="relative z-10">
@@ -16,36 +16,26 @@ const Home = () => {
                     <div className="ml-auto ">
                         <div className="lg:w-2/3 mt-10 text-justify mx-auto">
                             <h1 className="text-primary font-bold text-5xl md:text-6xl xl:text-7xl text-center flex flex-col">
-                                <span className="text-primary ">
-                                24th VTU Youth Festival
-                                </span>
+                                <span className="text-primary ">About GAT</span>
                             </h1>
 
                             <h4 className="mt-8 text-black">
-
-                                The 24th VTU Youth Festival, organized by
-                                Visvesvaraya Technological University, is a
-                                prestigious platform that celebrates the spirit
-                                of creativity, talent, and cultural harmony
-                                among students from across the state. Over the
-                                course of several days, the festival features an
-                                extensive lineup of events including classical
-                                and contemporary music, dance performances,
-                                drama, literary contests, photography, and fine
-                                arts exhibitions. It serves as a stage for
-                                students to showcase their skills, connect with
-                                peers, and immerse themselves in a vibrant
-                                cultural atmosphere. In addition to fostering
-                                artistic expression, the festival encourages
-                                teamwork, leadership, and healthy competition.
-                                With enthusiastic participation from colleges
-                                affiliated with VTU, this annual gathering
-                                stands as a testament to the rich cultural
-                                fabric of the student community, while nurturing
-                                the growth of future leaders in various fields.
+                                Global Academy of Technology (GAT), established in the year
+                                2001, is one of the most sought-after engineering and management
+                                colleges in Bengaluru, Karnataka. Located in a sprawling campus
+                                of 10-acre land, GAT is a campus ideal for students to hone
+                                their academics in an atmosphere of optimism. GAT provides ample
+                                opportunities for various co-curricular and extra-curricular
+                                activities for the students. The campus brims with more than
+                                3500 students and 300 experienced staff involved in effective
+                                Teaching and Learning Process. Academics is supplemented with
+                                mentoring, peer learning and counselling to ensure holistic
+                                development of students. GAT has academic alliances with various
+                                institutions, industries, and research organizations to provide
+                                industry perspective to the students.
                             </h4>
                             <div className="flex justify-between">
-                                <div className="flex  space-x-2">
+                                <div className="flex  space-x-2 mt-2">
                                     <svg
                                         className="w-6 h-6 text-[#bbc5c6]"
                                         viewBox="0 0 24 24"
@@ -63,26 +53,11 @@ const Home = () => {
                                             rx="2"
                                             ry="2"
                                         ></rect>
-                                        <line
-                                            x1="16"
-                                            y1="2"
-                                            x2="16"
-                                            y2="6"
-                                        ></line>
-                                        <line
-                                            x1="8"
-                                            y1="2"
-                                            x2="8"
-                                            y2="6"
-                                        ></line>
-                                        <line
-                                            x1="3"
-                                            y1="10"
-                                            x2="21"
-                                            y2="10"
-                                        ></line>
+                                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                                        <line x1="3" y1="10" x2="21" y2="10"></line>
                                     </svg>
-                                    <span className="text-[#bbc5c6]">TBD</span>
+                                    <span className="text-[#bbc5c6] ">TBD</span>
                                 </div>
                                 <div className="flex  space-x-2">
                                     <svg
@@ -102,6 +77,73 @@ const Home = () => {
                                             Global Academy of Technology
                                         </span>
                                     </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div className=" mt-8 mx-10  justify-between">
+                            <div className="px-0   md:px-12 xl:px-2">
+                                <div className="relative pt-36 ">
+                                    <div className="lg:w-2/3 md:text-center  mx-auto">
+                                        <h1 className="text-[#bbc5c6] font-bold text-4xl md:text-6xl xl:text-7xl">
+                                            
+                                            <span className="text-primary text-[#e2af3e]">
+                                                {" "}
+                                                VTU Youth Fest 2025
+                                            </span>
+                                        </h1>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="mt-10  flex flex-wrap items-center text-center justify-center">
+                                <div className="w-full text-justify mx-56 lg:w-full xl:w-full">
+                                    <div className="mt-10 lg:mt-0">
+                                        <p className="text-body-color text-center mb-8 text-justify text-base">
+                                            The VTU Youth Festival, a beloved annual tradition, brings
+                                            together students from affiliated institutions for a
+                                            vibrant celebration of creativity, talent, and community
+                                            spirit. This year, Global Academy of Technology,
+                                            Bengaluru, has the honor of hosting the 24th edition,
+                                            aptly titled ''Interact 2025.'' This dynamic event aims to
+                                            foster connections among young minds, provide a platform
+                                            for self-expression, and showcase the diverse skills of
+                                            participating students. ''Interact 2025'' promises to be
+                                            an unforgettable experience, featuring an exciting array
+                                            of music, dance, theater, art exhibitions, literary
+                                            competitions, and workshops.By participating in 'Interact
+                                            2025,' students can tap into invaluable opportunities for
+                                            networking, collaboration, and growth, making it an event
+                                            not to be missed.{" "}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="w-full px-4 lg:w-6/12">
+                                    <div className="-mx-3 flex items-center sm:-mx-4">
+                                        {/* <div className="w-full px-3 sm:px-4 xl:w-1/2">
+                                        <div className="py-3 sm:py-4">
+                                            <Image
+                                                src={image34}
+                                                alt=""
+                                                className="w-full rounded-2xl"
+                                            />
+                                        </div>
+                                        <div className="py-3 sm:py-4">
+                                            <Image
+                                                src={image5}
+                                                alt=""
+                                                className="w-full rounded-2xl"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="w-full px-3 sm:px-4 xl:w-1/2">
+                                        <div className="relative z-10 my-4">
+                                            <Image
+                                                src={image42}
+                                                alt=""
+                                                className="w-full rounded-2xl"
+                                            />
+                                        </div>
+                                    </div> */}
+                                    </div>
                                 </div>
                             </div>
                         </div>

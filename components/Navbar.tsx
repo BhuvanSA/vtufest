@@ -96,7 +96,7 @@ const NavBar = () => {
                     priority
                     className="fixed top-6 left-10"
                 />
-                <h1 className="mx-auto text-primary_heading text-4xl font-semibold tracking-[0.8rem] transition-colors">
+                <h1 className="mx-auto text-primary_heading text-6xl font-semibold tracking-[0.6rem] transition-colors">
                     Global Academy of Technology
                     <div className="text-red-500 text-xl font-semibold mt-2 text-left tracking-widest ">
                         An Autonomus Institute, Affiliated to VTU
