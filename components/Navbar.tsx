@@ -84,9 +84,9 @@ const NavBar = () => {
     return (
 
         <header className="fixed top-0 left-0 right-0 w-full bg-gradient-to-bl
-    from-[#696a6b]
-    via-[#f7f7f8]
-    to-[#9b8989] backdrop-blur-sm border-none shadow-sm z-50 ">
+    from-[#6197cd]
+    via-[#fdfdff]
+    to-[#416de3] backdrop-blur-sm border-none shadow-sm z-50 ">
             <div className="flex items-center justify-between text-2xl mt-4">
                 <Image
                     src="/images/college-logo.png"
@@ -105,10 +105,10 @@ const NavBar = () => {
                 <Image
                     src={vtulogo}
                     alt="College Logo"
-                    width={150}
-                    height={150}
+                    width={160}
+                    height={160}
                     priority
-                    className="fixed right-10 top-6"
+                    className="fixed right-10  top-1"
                 />
             </div>
             <div className="flex items-center mt-6 justify-center max-w-6xl lg:max-w-[72rem] xl:max-w-6xl px-4 mx-auto sm:px-6">
