@@ -28,7 +28,7 @@ const Dignitaries = () => {
                     image: cheif2
                 },
                 {
-                    name: "DR. VIDYASHANKAR S",
+                    name: "Dr VIDYASHANKAR S",
                     role: "VICE CHANCELLOR VTU, BELAGAVI",
                     image: cheif3
                 }
@@ -38,27 +38,27 @@ const Dignitaries = () => {
             title: "Patrons",
             members: [
                 {
-                    name: "DR NAGAMANI NAGARAJA",
+                    name: "Dr NAGAMANI NAGARAJA",
                     role: "CHIEF OF STRATEGY AND SYSTEMS,GAT",
                     image: ""
                 },
                 {
-                    name: "DR B E RANGASWAMY",
+                    name: "Dr B E RANGASWAMY",
                     role: "REGISTRAR VTU, BELAGAVI",
                     image: patron3
                 },
                 {
-                    name: "DR PRASHANTHA NAYAKA G",
+                    name: "Dr PRASHANTHA NAYAKA G",
                     role: "FINANCE OFFICER VTU, BELAGAVI",
                     image: patron1
                 },
                 {
-                    name: "DR T N SREENIVAS",
+                    name: "Dr T N SREENIVAS",
                     role: "REGISTRAR(EVALUATION) VTU, BELAGAVI",
                     image: patron4
                 },
                 {
-                    name: "DR P V KADAGADAKAI ",
+                    name: "Dr P V KADAGADAKAI ",
                     role: "DIRECTOR OF PHYSICAL EDUCATION I/C VTU, BELAGAVI",
                     image: patron2
                 },
@@ -68,17 +68,17 @@ const Dignitaries = () => {
             title: "ORGANIZING CHAIRS",
             members: [
                 {
-                    name: "DR H B BALAKRISHNA",
+                    name: "Dr H B BALAKRISHNA",
                     role: "PRINCIPAL , GAT",
                     image: organize1
                 },
                 {
-                    name: "DR SRIDHAR",
+                    name: "Dr SRIDHAR",
                     role: "CAMPUS DIRECTOR , GAT",
                     image: ""
                 },
                 {
-                    name: "_____",
+                    name: "Dr Ravi J",
                     role: "DEAN ( STUDENT AFFAIRS ), GAT",
                     image: ""
                 },
@@ -93,47 +93,47 @@ const Dignitaries = () => {
             title: "Advisory",
             members: [
                 {
-                    name: "DR SIVARAM REDDY",
+                    name: "Dr SIVARAM REDDY",
                     role: "VTU SPORTS COMMITTE MEMBER, VTU",
                     image: ""
                 },
                 {
-                    name: "DR RAJESH Y H",
+                    name: "Dr RAJESH Y H",
                     role: "FORMER PED DIRECTOR, VTU",
                     image: ""
                 },
                 {
-                    name: "DR KIRAN KUMAR H R",
+                    name: "Dr KIRAN KUMAR H R",
                     role: "PED DIRECTOR, MSRIT",
                     image: ""
                 },
                 {
-                    name: "MR UMESH",
+                    name: "Mr UMESH",
                     role: "REGIONAL DIRECTOR (BANGALORE SOUTH DIVISION), VTU",
                     image: ""
                 },
                 {
-                    name: "DR G R GURUNAGENDRA",
+                    name: "Dr G R GURUNAGENDRA",
                     role: "MECH DEPT, GAT",
                     image: ""
                 },
                 {
-                    name: "DR KUMARSWAMY S",
+                    name: "Dr KUMARSWAMY S",
                     role: "CSE DEPT, GAT",
                     image: ""
                 },
                 {
-                    name: "DR LEELAVATHI HP",
+                    name: "Dr LEELAVATHI HP",
                     role: "ECE DEPT, GAT",
                     image: ""
                 },
                 {
-                    name: "DR G JAYACHITRA",
+                    name: "Dr G JAYACHITRA",
                     role: "EEE DEPT, GAT",
                     image: ""
                 },
                 {
-                    name: "MR MUNIKRISHNA M",
+                    name: "Mr MUNIKRISHNA M",
                     role: "ADMIN OFFICE, GAT",
                     image: ""
                 },
