@@ -8,7 +8,7 @@ import * as z from "zod";
 import { resetPasswordSchema } from "@/lib/schemas/auth";
 import axios from "axios";
 import { toast } from "sonner";
-
+import bgImage from "../../../components/images/GATBGIMG.png"; 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -134,7 +134,13 @@ export default function ResetPassword() {
     };
 
     return (
-        <div className="min-h-screen mt-20 flex items-center justify-center bg-gradient-to-br from-background to-secondary p-4">
+        <div className="min-h-screen mt-20 flex items-center justify-center bg-gradient-to-br from-background to-secondary p-4" style={{
+            backgroundImage: `url(${bgImage.src})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+            backgroundAttachment: "fixed",
+        }}>
             <Card className="w-full max-w-md bg-card text-card-foreground">
                 <CardHeader className="space-y-1">
                     <div className="flex items-center justify-center mb-6">

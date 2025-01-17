@@ -555,10 +555,10 @@ export function DataTable({ data }: { data: Data[] }) {
                                         {header.isPlaceholder
                                             ? null
                                             : flexRender(
-                                                  header.column.columnDef
-                                                      .header,
-                                                  header.getContext()
-                                              )}
+                                                header.column.columnDef
+                                                    .header,
+                                                header.getContext()
+                                            )}
                                     </TableHead>
                                 ))}
                             </TableRow>
@@ -574,7 +574,13 @@ export function DataTable({ data }: { data: Data[] }) {
                                     }
                                 >
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>
+                                        <TableCell key={cell.id} onClick={() => {
+                                            if (cell.column.id === 'usn') {
+                                                const cellValue = row.getValue('usn');
+                                                router.push(`/register/getregister/${cellValue}`);
+                                            }
+
+                                        }}>
                                             {flexRender(
                                                 cell.column.columnDef.cell,
                                                 cell.getContext()
