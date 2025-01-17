@@ -1,17 +1,17 @@
 "use client"; // Enable client-side data fetching
-import image1 from '@/public/images/4000.jpg'
-import image2 from '@/public/images/8000.jpg'
+import image1 from "@/public/images/4000.jpg";
+import image2 from "@/public/images/8000.jpg";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { UploadDropzone } from '@/utils/uploadthing';
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { UploadDropzone } from "@/utils/uploadthing";
 import Image, { StaticImageData } from "next/image";
 
 import React, { useEffect, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import Link from 'next/link';
+import Link from "next/link";
 
 interface MyCustomEvent {
     id: number;
@@ -25,7 +25,6 @@ interface PaymentInput {
 }
 
 export default function EventsPage() {
-    
     const [events, setEvents] = useState<MyCustomEvent[]>([]);
 
     // Fetch events from backend
@@ -133,11 +132,12 @@ export default function EventsPage() {
                                 render={() => (
                                     <UploadDropzone
                                         endpoint="imageUploader"
-                
                                         onClientUploadComplete={(res) => {
                                             const urlKey = res[0].key;
-                                            setValue('paymentUrl', urlKey);
-                                            toast.success('payment screenshot uploaded');
+                                            setValue("paymentUrl", urlKey);
+                                            toast.success(
+                                                "payment screenshot uploaded"
+                                            );
                                         }}
                                         // eslint-disable-next-line @typescript-eslint/no-unused-vars
                                         onUploadError={(error: Error) => {
@@ -225,8 +225,8 @@ function BankDetails() {
                 <span className="font-medium">Bank Name:</span> Union Bank
             </p>
             <p>
-                <span className="font-medium">Account Holder Name:</span>{" "}
-                Global Academy Of Technology
+                <span className="font-medium">Account Holder Name:</span> Global
+                Academy Of Technology
             </p>
             <p>
                 <span className="font-medium">Account Number:</span>{" "}
