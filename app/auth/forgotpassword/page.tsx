@@ -134,7 +134,7 @@ export default function ResetPassword() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-secondary p-4">
+        <div className="min-h-screen mt-20 flex items-center justify-center bg-gradient-to-br from-background to-secondary p-4">
             <Card className="w-full max-w-md bg-card text-card-foreground">
                 <CardHeader className="space-y-1">
                     <div className="flex items-center justify-center mb-6">
