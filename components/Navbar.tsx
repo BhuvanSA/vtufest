@@ -111,62 +111,9 @@ const NavBar = () => {
                     className="fixed right-10  top-1"
                 />
             </div>
-            <div className="flex items-center mt-6 justify-center max-w-6xl lg:max-w-[72rem] xl:max-w-6xl px-4 mx-auto sm:px-6">
-                {/* <div className="hidden lg:block overflow-x-auto whitespace-nowrap">
-                    <nav className="flex space-x-3 text-lg">
-                        {navItems.map(({ href, text }, index) => (
-                            <NavItem
-                                key={index}
-                                href={href}
-                                text={text}
-                                isActive={
-                                    pathname === href ||
-                                    (pathname.startsWith(
-                                        "/" + href.split("/")[1]
-                                    ) &&
-                                        href !== "/")
-                                }
-                            />
-                        ))}
-                        {isLoggedIn ? (
-                            <>
-                                <NavItem
-                                    href="/register/getallregister"
-                                    text="Register"
-                                    isActive={pathname.startsWith("/register")}
-                                />
-                                <NavItem
-                                    href="/auth/logout"
-                                    text="Logout"
-                                    isActive={pathname.startsWith("/auth")}
-                                    className="hover:bg-red-500"
-                                />
-                            </>
-                        ) : (
-                            <>
-                                <NavItem
-                                    href="/auth/signin"
-                                    text="Login"
-                                    isActive={pathname.startsWith("/auth")}
-                                />
-                            </>
-                        )}
-                    </nav>
-                </div> */}
-                {/* <div className="flex items-center space-x-4">
-                    <div className="flex items-center">
-                        <ThemeToggler />
-                    </div>
-                    <div
-                        className="lg:hidden flex items-center"
-                        onClick={handleClick}
-                    >
-                        <Menu />
-                    </div>
-                </div> */}
-            </div>
+          
             {/* new navigation menu */}
-            <div className="flex items-center mt-4 justify-center max-w-6xl lg:max-w-[72rem] xl:max-w-6xl px-3 py-6 mx-auto sm:px-6">
+            <div className="flex items-center mt-2 justify-center max-w-6xl lg:max-w-[72rem] xl:max-w-6xl px-3 py-6 mx-auto sm:px-6">
                 <NavigationMenu>
                     <NavigationMenuList className="flex gap-0 ">
                         <NavigationMenuItem>
