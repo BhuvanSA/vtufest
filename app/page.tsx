@@ -2,12 +2,15 @@
 import React from "react";
 import "./globals.css"; // Adjust the import path as needed
 import Header from "@/components/Background";
-import Image from "next/image";
+import MessageCarousel from "@/components/MessageCarousel";
+
 // import Gallery from "@/components/subcomponents/gallery";
 // import Pronities from "@/components/subcomponents/pronities";
 // import Events from "@/components/subcomponents/events";
-import { image5, image34, image42 } from "@/components/images/gallery";
+
 const Home = () => {
+    
+
     return (
         <div className="bg-background pt-16">
             <Header />
@@ -85,7 +88,7 @@ const Home = () => {
                                 <div className="relative pt-36 ">
                                     <div className="lg:w-2/3 md:text-center  mx-auto">
                                         <h1 className="text-[#bbc5c6] font-bold text-4xl md:text-6xl xl:text-7xl">
-                                            
+
                                             <span className="text-primary text-[#e2af3e]">
                                                 {" "}
                                                 VTU Youth Fest 2025
@@ -116,9 +119,9 @@ const Home = () => {
                                         </p>
                                     </div>
                                 </div>
-                                <div className="w-full px-4 lg:w-6/12">
+                                {/* <div className="w-full px-4 lg:w-6/12">
                                     <div className="-mx-3 flex items-center sm:-mx-4">
-                                        {/* <div className="w-full px-3 sm:px-4 xl:w-1/2">
+                                        <div className="w-full px-3 sm:px-4 xl:w-1/2">
                                         <div className="py-3 sm:py-4">
                                             <Image
                                                 src={image34}
@@ -142,9 +145,11 @@ const Home = () => {
                                                 className="w-full rounded-2xl"
                                             />
                                         </div>
-                                    </div> */}
                                     </div>
-                                </div>
+                                    </div>
+                                </div> */}
+                                <MessageCarousel/>
+
                             </div>
                         </div>
                     </div>
@@ -154,6 +159,7 @@ const Home = () => {
                 <Pronities />
                 <Events />
             </div> */}
+
             </div>
         </div>
     );
