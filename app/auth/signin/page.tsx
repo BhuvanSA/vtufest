@@ -12,7 +12,7 @@ import vtulogo from "@/public/images/vtulogo.png";
 import Image from "next/image";
 import interactLogo from "@/public/images/INTERACT-4.png";
 import bgImage from "../../../components/images/GATBGIMG.png"; // Your background image import
-
+import gatLogo from "@/public/images/old-college-logo.png"
 import {
     Card,
     CardContent,
@@ -99,7 +99,7 @@ export default function SignIn() {
                     </div>
                     <div className="flex items-center justify-between pb-0">
                         <Image
-                            src="/images/college-logo.png"
+                            src={gatLogo}
                             alt="College Logo"
                             width={85}
                             height={80}

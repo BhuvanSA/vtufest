@@ -9,16 +9,20 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UploadDropzone } from "@/utils/uploadthing";
 import { toast } from "sonner";
-
+import { z } from "zod";
+import { useForm, Controller } from "react-hook-form";
 // Define interfaces for our data structures
+
+
 interface Registrant {
   id: string;
   name: string;
   usn: string;
   phone: string;
   teamManager: boolean;
-  gender: string | null;
-  accomodation: boolean | null;
+  gender: string;
+  accomodation: boolean;
+  blood : string;
   events: Event[];
   eventRegistrations: EventRegistration[];
   [key: string]: any; // For dynamic access to file URLs
@@ -50,11 +54,22 @@ interface UpdateRegisterProps {
   params: Promise<{ slug: string }>;
 }
 
+
+
 const UpdateRegister: React.FC<UpdateRegisterProps> = ({ params }) => {
+
+  const { control, handleSubmit, setValue, formState: { errors } } = useForm({
+    defaultValues: {
+      name: "",
+      phone: "",
+      usn: "",
+      accomodation: false,
+      gender: "",
+      blood : ""
+    },
+  })
+
   const [id, setId] = useState<string>("");
-  const [name, setName] = useState<string>("");
-  const [usn, setUsn] = useState<string>("");
-  const [phone, setPhone] = useState<string>("");
   const [isTeamManager, setIsTeamManager] = useState<boolean>(false);
   const [editOne, setEditOne] = useState<boolean>(false);
   const [field, setField] = useState<string>("");
@@ -64,9 +79,9 @@ const UpdateRegister: React.FC<UpdateRegisterProps> = ({ params }) => {
   const [addEvent, setAddEvent] = useState<Event | null>(null);
   const [addEventType, setAddEventType] = useState<string>("");
   const [allRegisteredEvents, setAllRegisteredEvents] = useState<Event[]>([]);
-  const [gender, setGender] = useState<string | null>(null);
-  const [accomodation, setAccomodation] = useState<boolean | null>(null);
   const [handleAddEventEffect, setHandleAddEventEffect] = useState<boolean>(false);
+  
+
   // Fetch registrant details
   async function fetchRegistrant() {
     const id = (await params).slug;
@@ -83,15 +98,15 @@ const UpdateRegister: React.FC<UpdateRegisterProps> = ({ params }) => {
 
     if (data.registrant) {
       const registrant: Registrant = data.registrant;
-      setName(registrant.name);
-      setUsn(registrant.usn);
-      setPhone(registrant.phone);
+      setValue('name', registrant.name);
+      setValue('phone', registrant.phone);
+      setValue('usn', registrant.usn);
+      setValue('accomodation', registrant.accomodation);
+      setValue('gender', registrant.gender);
+      setValue('blood',registrant.blood);
       setIsTeamManager(registrant.teamManager);
       setId(registrant.id);
       setRegistrant(registrant);
-      setGender(registrant.gender);
-      setAccomodation(registrant.accomodation);
-
       const fetchResponse = await fetch("/api/getalleventregister", {
         method: "GET",
         headers: { "Content-Type": "application/json" },
@@ -99,9 +114,9 @@ const UpdateRegister: React.FC<UpdateRegisterProps> = ({ params }) => {
 
       const { userEvents } = await fetchResponse.json();
 
-      let mergedEvents:MergedEvent[] = data.registrant.events.map((event:Event) => {
+      let mergedEvents: MergedEvent[] = data.registrant.events.map((event: Event) => {
         const registration = data.registrant.eventRegistrations.find(
-          (reg:Registrant) => reg.eventId === event.id
+          (reg: Registrant) => reg.eventId === event.id
         );
         return {
           ...event,
@@ -110,15 +125,15 @@ const UpdateRegister: React.FC<UpdateRegisterProps> = ({ params }) => {
           editRole: "",
         };
       });
-  
+
       mergedEvents = mergedEvents.filter((event) => {
         return event.registrantId;
       });
-  
-      const updateUserEvent = userEvents.filter((event:Event) => {
+
+      const updateUserEvent = userEvents.filter((event: Event) => {
         return (
           (event.registeredParticipant < event.maxParticipant ||
-          event.registeredAccompanist < event.maxAccompanist) && !mergedEvents.some((events:Event)=> events.eventNo===event.eventNo)
+            event.registeredAccompanist < event.maxAccompanist) && !mergedEvents.some((events: Event) => events.eventNo === event.eventNo)
         );
       });
 
@@ -134,16 +149,18 @@ const UpdateRegister: React.FC<UpdateRegisterProps> = ({ params }) => {
   }, [handleAddEventEffect]);
 
   // Handle save action
-  const handleSave = async () => {
+  const handleSave = async (formData:any) => {
+    console.log(formData);
     const response = await fetch("/api/updateregisterdetails", {
       method: "PATCH",
       body: JSON.stringify({
         id: id,
-        usn: usn,
-        phone: phone,
-        name: name,
-        accomodation: accomodation,
-        gender: gender
+        usn: formData.usn,
+        phone: formData.phone,
+        name: formData.name,
+        accomodation: formData.accomodation,
+        gender: formData.gender,
+        blood : formData.blood,
       }),
       headers: { "Content-Type": "application/json" },
     });
@@ -228,7 +245,7 @@ const UpdateRegister: React.FC<UpdateRegisterProps> = ({ params }) => {
       // setEvents((prevEvents) =>
       //   prevEvents.filter((e) => e.eventNo !== event.eventNo)
       // );
-      setHandleAddEventEffect((prev:boolean)=> !prev)
+      setHandleAddEventEffect((prev: boolean) => !prev)
     } else {
       console.log(data);
       toast.error(`Failed to delete event ${event.eventName}. Please try again.`);
@@ -260,7 +277,7 @@ const UpdateRegister: React.FC<UpdateRegisterProps> = ({ params }) => {
 
     const data = await response.json();
     console.log(data);
-    setHandleAddEventEffect((prev:boolean)=> !prev)
+    setHandleAddEventEffect((prev: boolean) => !prev)
     toast.success(data.message);
 
   };
@@ -279,97 +296,164 @@ const UpdateRegister: React.FC<UpdateRegisterProps> = ({ params }) => {
             </CardDescription>
             <CardContent>
               <div className="flex flex-col gap-4 mb-6">
-                <div>
-                  <div className="flex flex-col md:flex-row gap-4 md:gap-10">
-                    <div className="w-full md:w-1/3 space-y-1.5">
-                      <Label htmlFor="name">Name</Label>
-                      <Input
-                        type="text"
-                        id="name"
-                        value={name}
-                        disabled={!editOne}
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder="Full Name - will be printed in your certificate"
-                      />
+                <form >
+                  <div>
+                    <div className="flex flex-col md:flex-row gap-4 md:gap-10">
+                      <div className="w-full md:w-1/3 space-y-1.5">
+                        <Label htmlFor="name">Name</Label>
+                        <Controller
+                          control={control}
+                          name="name"
+                          rules={{ required: "Name is required" }}
+                          render={({ field }) => (
+                            <Input
+                              type="text"
+                              id="name"
+                              {...field}
+                              disabled={!editOne}
+                              placeholder="Full Name - will be printed in your certificate"
+                            />
+                          )}
+                        />
+                        {errors.name && <p className="text-red-500">{errors.name.message}</p>}
+                      </div>
+                      <div className="w-full md:w-1/3 space-y-1.5">
+                        <Label htmlFor="usn">USN / ID Number</Label>
+                        <Controller
+                          control={control}
+                          name="usn"
+                          rules={{ required: "Usn is required" }}
+                          render={({ field }) => (
+                            <Input
+                              type="text"
+                              id="usn"
+                              {...field}
+                              disabled={!editOne}
+                              placeholder="USN / ID Number"
+                            />
+                          )}
+                        />
+                        {errors.usn && <p className="text-red-500">{errors.usn.message}</p>}
+                      </div>
+                      <div className="w-full md:w-1/3 space-y-1.5">
+                        <Label htmlFor="phone">Phone Number</Label>
+                        <Controller
+                          control={control}
+                          name="phone"
+                          rules={{
+                            required: "phone is required",
+                            minLength: { value: 10, message: "Must be 10 digits" },
+                            maxLength: { value: 10, message: "Must be 10 digits" },
+                          }}
+                          render={({ field }) => (
+                            <Input
+                              type="text"
+                              id="phone"
+                              {...field}
+                              disabled={!editOne}
+                              placeholder="Enter your phone number"
+                            />
+                          )}
+                        />
+                        {errors.phone && <p className="text-red-500">{errors.phone.message}</p>}
+                      </div>
                     </div>
-                    <div className="w-full md:w-1/3 space-y-1.5">
-                      <Label htmlFor="usn">USN / ID Number</Label>
-                      <Input
-                        type="text"
-                        id="usn"
-                        value={usn}
-                        disabled={!editOne}
-                        onChange={(e) => setUsn(e.target.value)}
-                        placeholder="USN / ID Number "
-                      />
-                    </div>
-                    <div className="w-full md:w-1/3 space-y-1.5">
-                      <Label htmlFor="phone">Phone Number</Label>
-                      <Input
-                        type="text"
-                        id="phone"
-                        value={phone}
-                        disabled={!editOne}
-                        onChange={(e) => setPhone(e.target.value)}
-                        placeholder="Enter your phone number"
-                      />
+                    <div className="flex flex-row gap-10 mt-5" >
+
+                      <div className="w-full md:w-1/3 space-y-1.5">
+                        <Label htmlFor="gender">Gender</Label>
+                        <Controller
+                          control={control}
+                          name="gender"
+                          rules={{ required: "Gender is required" }}
+                          render={({ field }) => (
+                            <Select
+                              value={field.value || ""}
+                              onValueChange={field.onChange}
+                              disabled={!editOne}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select Gender" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectGroup>
+                                  <SelectLabel>Gender</SelectLabel>
+                                  <SelectItem value="male">Male</SelectItem>
+                                  <SelectItem value="female">Female</SelectItem>
+                                  <SelectItem value="other">Other</SelectItem>
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
+                          )}
+                        />
+                        {errors.gender && <p className="text-red-500">{errors.gender.message}</p>}
+
+                      </div>
+                      <div className="w-full md:w-1/3 space-y-1.5">
+                        <Label htmlFor="accomodation">Need Accommodation</Label>
+                        <Controller
+                          control={control}
+                          name="accomodation"
+                          render={({ field }) => (
+                            <Select
+                              value={field.value ? "yes" : "no"}
+                              onValueChange={(value) => setValue('accomodation', value === "yes")}
+                              disabled={!editOne}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select Accommodation" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectGroup>
+                                  <SelectLabel>Accommodation</SelectLabel>
+                                  <SelectItem value="yes">Yes</SelectItem>
+                                  <SelectItem value="no">No</SelectItem>
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
+                          )}
+                        />
+                        {errors.accomodation && (
+                          <p className="text-red-500">{errors.accomodation.message}</p>
+                        )}
+                      </div>
+
+                      <div className="w-full md:w-1/3 space-y-1.5">
+                        <Label htmlFor="blood">Blood Group</Label>
+                        <Controller
+                          control={control}
+                          name="blood"
+                          rules={{
+                            required: "Blood is required",
+                          }}
+                          render={({ field }) => (
+                            <Input
+                              type="text"
+                              id="blood"
+                              {...field}
+                              disabled={!editOne}
+                              placeholder="Enter your Blood Group"
+                            />
+                          )}
+                        />
+                        {errors.blood && <p className="text-red-500">{errors.blood.message}</p>}
+                      </div>
+                      <div className="flex flex-row gap-4 mt-5">
+                        <p className="block text-sm font-medium text-primary mb-2 mt-2">
+                          Are You Team Manager?{" "}
+                          <span className=" ">&nbsp;{isTeamManager ? "YES" : "NO"}</span>
+                        </p>
+                        {editOne ? (
+                          <Button type="button" onClick={handleSubmit(handleSave)}>Save</Button>
+                        ) : (
+                          <Button onClick={() => setEditOne(true)} type="button">Edit</Button>
+                        )}
+
+                      </div>
                     </div>
                   </div>
-                  <div className="flex flex-row gap-10 mt-5">
-                    <div className="w-full md:w-1/3 space-y-1.5">
-                      <Label htmlFor="gender">Gender</Label>
-                      <Select
-                        value={gender ?? ""}
-                        onValueChange={(value) => setGender(value)}
-                        disabled={!editOne}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select Gender" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectLabel>Gender</SelectLabel>
-                            <SelectItem value="male">Male</SelectItem>
-                            <SelectItem value="female">Female</SelectItem>
-                            <SelectItem value="other">Other</SelectItem>
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="w-full md:w-1/3 space-y-1.5">
-                      <Label htmlFor="accommodation">Need Accommodation</Label>
-                      <Select
-                        value={accomodation === true ? "yes" : "no"}
-                        onValueChange={(value) => setAccomodation(value === "yes")}
-                        disabled={!editOne}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select Accommodation" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectLabel>Accommodation</SelectLabel>
-                            <SelectItem value="yes">Yes</SelectItem>
-                            <SelectItem value="no">No</SelectItem>
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  <div className="flex flex-row gap-4 mt-5">
-                    <p className="block text-sm font-medium text-primary mb-2 mt-2">
-                      Are You Team Manager?{" "}
-                      <span className=" ">
-                        &nbsp;{isTeamManager ? "YES" : "NO"}
-                      </span>
-                    </p>
-                    {editOne ? (
-                      <Button  onClick={() => handleSave()}>Save</Button>
-                    ) : (
-                      <Button onClick={() => setEditOne(true)}>Edit</Button>
-                    )}
-                  </div>
-                </div>
+                </form>
+
 
                 {!isTeamManager && (
                   <>
@@ -562,7 +646,7 @@ const UpdateRegister: React.FC<UpdateRegisterProps> = ({ params }) => {
           </Card>
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 

@@ -120,6 +120,7 @@ export default function SelectRolesAndEvents({
             },
             gender: "",
             accomodation: false,
+            blood: ""
         },
     });
 
@@ -141,6 +142,7 @@ export default function SelectRolesAndEvents({
             },
             gender: "",
             accomodation: false,
+            blood: ""
         },
     });
 
@@ -439,6 +441,21 @@ export default function SelectRolesAndEvents({
                                         </Select>
                                         {errors.accomodation && (
                                             <p className="text-red-500 text-sm">{errors.accomodation.message}</p>
+                                        )}
+                                    </div >
+
+                                    <div className="w-full md:w-1/3 space-y-1.5 m-6">
+                                        <Label htmlFor="ablood">Blood Group</Label>
+                                        <Input
+                                            {...register("blood")}
+                                            id="blood"
+                                            name="blood"
+                                            placeholder="Enter the Blood Group"
+                                        />
+                                        {errors.blood && (
+                                            <p className="text-red-500 text-sm">
+                                                {errors.blood.message}
+                                            </p>
                                         )}
                                     </div>
                                 </div>

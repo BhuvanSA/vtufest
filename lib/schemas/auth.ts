@@ -21,8 +21,8 @@ export const signupSchema = z
         phone: z
             .string()
             .regex(
-                /^\d{10,15}$/,
-                "Phone number must be between 10 to 15 digits"
+                /^\d{10}$/,
+                "Phone number must be between 10 digits"
             ),
         email: z.string().email("Invalid email address"),
         otp: z.string().regex(/^\d{6}$/, "OTP must be a 6-digit number"),
@@ -50,3 +50,5 @@ export const resetPasswordSchema = z
         message: "Passwords must match",
         path: ["confirmPassword"], // Error will show under `confirmPassword` field
     });
+
+
