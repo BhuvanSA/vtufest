@@ -29,7 +29,7 @@ model Users {
   paymentUrl  String?
   txnNumber   String?
   Amount      Int?
-  PaymentVerified Boolean @default(false) 
+  PaymentVerified  PaymentVerifiedStatus @default(PENDING)
   events      Events[]
   registrants Registrants[]
 }
@@ -97,4 +97,10 @@ enum DocumentVerificationStatus {
   PROCESSING
   APPROVED
   REJECTED
+}
+
+enum PaymentVerifiedStatus {
+  PENDING
+  COMPLETED
+  FAILED
 }
