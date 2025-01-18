@@ -38,7 +38,7 @@ const About = () => {
                         </div>
                         <div className="w-full px-4 lg:w-1/2 xl:w-5/12">
                             <div className="mt-10 lg:mt-0">
-                                <p className="text-body-color text-justify mb-8 text-base">
+                                <p className="text-body-color text-justify mb-8 text-black">
                                     Global Academy of Technology was established
                                     in 2001, celebrating 25 years of excellence
                                     with the monumental objective of promoting
@@ -69,10 +69,10 @@ const About = () => {
                             </div>
                         </div>
                     </div>
-                    <div className="-mx-4 mt-10 flex flex-wrap items-center justify-between">
+                    {/* <div className="-mx-4 mt-10 flex flex-wrap items-center justify-between">
                         <div className="w-full lg:w-1/2 xl:w-5/12">
                             <div className="mt-10 lg:mt-0">
-                                <p className="text-body-color mb-8 text-justify text-base">
+                                <p className="text-body-color mb-8 text-justify text-black">
                                     VTU Youth Fest attracts participants from
                                     various colleges across the region. The fest
                                     features a wide range of events, including
@@ -124,7 +124,7 @@ const About = () => {
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </div>

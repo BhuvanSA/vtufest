@@ -66,6 +66,7 @@ model Registrants {
   idcardUrl          String?
   gender             String
   accomodation       Boolean                    @default(false)
+  blood              String
   userId             String
   user               Users                      @relation(fields: [userId], references: [id], onDelete: Cascade)
   events             Events[]                   @relation("EventRegistrations")

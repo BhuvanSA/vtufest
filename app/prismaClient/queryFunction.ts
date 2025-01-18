@@ -24,7 +24,8 @@ export async function insertRegistrant(
                         idcardUrl: arg.idcardUrl,
                         userId: arg.userId,
                         accomodation : arg.accomodation,
-                        gender:arg.gender
+                        gender:arg.gender,
+                        blood : arg.blood
                     },
                 });
                 return registrant;
@@ -78,7 +79,8 @@ export async function insertRegistrant(
                     idcardUrl: arg.idcardUrl,
                     userId: arg.userId,
                     accomodation: arg.accomodation,
-                    gender :arg.gender
+                    gender :arg.gender,
+                    blood:arg.blood
                 },
             });
 
@@ -571,7 +573,8 @@ export async function updateRegisterDetails(data: RegistrantDetailUpdate) {
                 usn: data.usn,
                 phone: data.phone,
                 gender:data.gender,
-                accomodation : data.accomodation
+                accomodation : data.accomodation,
+                blood : data.blood
             },
         });
     } catch (err: unknown) {

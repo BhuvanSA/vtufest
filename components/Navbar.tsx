@@ -9,7 +9,7 @@ import Image from "next/image";
 import { ThemeToggler } from "@/contexts/theme-provider";
 import { X, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
-
+import gatLogo from "@/public/images/old-college-logo.png"
 import vtulogo from '@/public/images/vtulogo.png'
 
 export const navItems = [
@@ -89,7 +89,7 @@ const NavBar = () => {
     to-[#416de3] backdrop-blur-sm border-none shadow-sm z-50 ">
             <div className="flex items-center justify-between text-2xl mt-4">
                 <Image
-                    src="/images/college-logo.png"
+                    src={gatLogo}
                     alt="College Logo"
                     width={120}
                     height={120}
