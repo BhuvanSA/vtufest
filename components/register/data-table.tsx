@@ -51,7 +51,7 @@ export type Data = {
     photo: string;
     name: string;
     usn: string;
-    type: "Participant" | "Accompanist" | "Team Manager" | "";
+    type: "Participant" | "Accompanist" | "Team Manager" | "Participant, Accompanist" | "";
     events: { eventName: string }[];
     status: "Pending" | "Processing" | "Success" | "Failed";
 };
@@ -67,6 +67,8 @@ export function DataTable({ data }: { data: Data[] }) {
         },
         [router]
     );
+
+   
 
     const handleRemove = React.useCallback(
         async (id: string) => {
@@ -258,19 +260,22 @@ export function DataTable({ data }: { data: Data[] }) {
                 accessorKey: "type",
                 header: ({ column }) => {
                     const filterCycle = [
-                        "ALL",
+                        "",
+                        "Total",
                         "Participant",
                         "Accompanist",
                         "Team Manager",
+                        "Participant, Accompanist",
+                        
                     ];
                     const currentFilter =
-                        (column.getFilterValue() as string) ?? "ALL";
+                        (column.getFilterValue() as string) ?? "";
                     const currentIndex = filterCycle.indexOf(currentFilter);
                     const nextIndex = (currentIndex + 1) % filterCycle.length;
                     const nextFilter = filterCycle[nextIndex];
 
                     const handleFilterChange = () => {
-                        if (nextFilter === "ALL") {
+                        if (nextFilter === "") {
                             column.setFilterValue(undefined); // Clears the filter
                         } else {
                             column.setFilterValue(nextFilter);
@@ -280,7 +285,7 @@ export function DataTable({ data }: { data: Data[] }) {
                     return (
                         <Button variant="ghost" onClick={handleFilterChange}>
                             Type <ListFilterIcon className="p-1" />{" "}
-                            {currentFilter !== "ALL"
+                            {currentFilter !== ""
                                 ? `: ${currentFilter}`
                                 : ""}
                         </Button>
@@ -290,7 +295,13 @@ export function DataTable({ data }: { data: Data[] }) {
                     <div className="capitalize">{row.getValue("type")}</div>
                 ),
                 filterFn: (row, columnId, filterValue) => {
-                    if (!filterValue || filterValue === "ALL") return true;
+                    if(!filterValue || filterValue==='') return true;
+                    if (!filterValue || filterValue === "Total") {
+                        const type = row.getValue('type');
+                        if(type === 'Participant, Accompanist' || type==='Team Manager'){
+                            return true;
+                        }
+                    }
                     const type = row.getValue(columnId);
                     return type === filterValue;
                 },
