@@ -87,18 +87,18 @@ const NavBar = () => {
     from-[#6197cd]
     via-[#fdfdff]
     to-[#416de3] backdrop-blur-sm border-none shadow-sm z-50 ">
-            <div className="flex items-center justify-between text-2xl mt-4">
+            <div className="flex items-center justify-between text-2xl">
                 <Image
                     src={gatLogo}
                     alt="College Logo"
                     width={120}
                     height={120}
                     priority
-                    className="fixed top-6 left-10"
+                    className="relative left-10"
                 />
-                <h1 className="mx-auto text-primary_heading text-6xl font-semibold tracking-[0.6rem] transition-colors">
+                <h1 className="mx-auto text-primary_heading relative left-6 sm:text-lg md:text-xl lg:text-6xl font-semibold tracking-[0.6rem] transition-colors">
                     Global Academy of Technology
-                    <div className="text-red-500 text-xl font-semibold mt-2 text-left tracking-widest ">
+                    <div className="text-red-500  text-xl font-semibold mt-2 text-left tracking-widest ">
                         An Autonomus Institute, Affiliated to VTU
                     </div>
                 </h1>
@@ -108,12 +108,12 @@ const NavBar = () => {
                     width={160}
                     height={160}
                     priority
-                    className="fixed right-10  top-1"
+                    className="relative right-10  "
                 />
             </div>
-          
+
             {/* new navigation menu */}
-            <div className="flex items-center mt-2 justify-center max-w-6xl lg:max-w-[72rem] xl:max-w-6xl px-3 py-6 mx-auto sm:px-6">
+            <div className="flex items-center justify-center max-w-6xl lg:max-w-[72rem] xl:max-w-4xl px-3 py-3 mx-auto sm:px-6">
                 <NavigationMenu>
                     <NavigationMenuList className="flex gap-0 ">
                         <NavigationMenuItem>
