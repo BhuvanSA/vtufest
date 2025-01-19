@@ -1,6 +1,5 @@
 "use client"
 import React from 'react'
-import cheif2 from '@/public/dignitaries/Aisshwarya DKS Hegde (1).jpg'
 import cheif1 from '@/public/dignitaries/images-2.jpeg.jpg'
 import organize1 from '@/public/dignitaries/hbp.png'
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
@@ -30,18 +29,17 @@ const MessageCarousel = () => {
         }
     ]
     const plugin = React.useRef(
-        Autoplay({ delay: 3000, stopOnInteraction: false })
+        Autoplay({ delay: 3000, stopOnInteraction: false})
     )
     return (
         <Carousel className="w-[50%] mt-20 shadow-primary shadow-inner shadow-lg rounded-lg"
             plugins={[plugin.current]}
-            onMouseEnter={plugin.current.stop}
-            onMouseLeave={plugin.current.reset}>
+            >
             <CarouselContent>
                 {messageList.map((person, index) => (
                     <CarouselItem key={index}>
                         <div>
-                            <Card className="border-0">
+                            <Card className="border-0 border-collapse">
                                 <CardHeader>
                                     <div className="flex flex-col items-center justify-center gap-7">
                                         <h2 className="font-sans text-xl font-bold">
