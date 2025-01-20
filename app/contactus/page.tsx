@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import React from "react";
-import bgImage from "../../components/images/GATBGIMG.png"; 
+import bgImage from "../../components/images/GATBGIMG.png";
 
 // Define the interface for the form fields
 interface IContactForm {
@@ -24,20 +24,37 @@ const ContactUs: React.FC = () => {
     formState: { errors },
   } = useForm<IContactForm>();
 
-  const onSubmit = (data: IContactForm) => {
-    console.log("Form Data:", data);
-    alert("Form submitted successfully!");
+  const onSubmit = async (data: IContactForm) => {
+    try {
+      const response = await fetch("/api/sendEmail", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to send email");
+      }
+
+      alert("Form submitted and email sent successfully!");
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Failed to send email. Please try again.");
+    }
   };
 
   return (
-    <div className="overflow-hidden pt-20 pb-12 lg:pt-[120px] lg:pb-[90px] text-[#bbc5c6]
-    " style={{
-      backgroundImage: `url(${bgImage.src})`,
-      backgroundSize: "cover",
-      backgroundPosition: "center",
-      backgroundRepeat: "no-repeat",
-      backgroundAttachment: "fixed",
-  }}>
+    <div
+      className="overflow-hidden pt-20 pb-12 lg:pt-[120px] lg:pb-[90px] text-[#bbc5c6]
+    "
+      style={{
+        backgroundImage: `url(${bgImage.src})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        backgroundAttachment: "fixed",
+      }}
+    >
       <div className="container mx-auto">
         <div className="md:px-12 xl:px-6">
           <div className="relative">
@@ -89,7 +106,8 @@ const ContactUs: React.FC = () => {
                         {...register("email", {
                           required: "Email is required",
                           pattern: {
-                            value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+                            value:
+                              /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
                             message: "Invalid email address",
                           },
                         })}
