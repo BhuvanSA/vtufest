@@ -98,6 +98,11 @@ const Footer = () => {
                         <a href="/ourteam" className="hover:text-primary transition">
                             &copy; {new Date().getFullYear()} Global Academy of Technology
                         </a>
+                        <br></br>
+                        <br />
+                        <a href="/developer" className="hover:text-primary transition pt-4">
+                            Developed by
+                        </a>
                     </p>
                 </div>
             </div>
