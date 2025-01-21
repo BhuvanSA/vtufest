@@ -495,7 +495,7 @@ export function DataTable({ data }: { data: Data[] }) {
     };
 
     return (
-        <div className="w-full px-5">
+        <div className="w-full px-5 bg-white rounded-xl bg-opacity-90">
             <div className="flex items-center py-4">
                 <div className="relative max-w-sm">
                     <Search className="absolute left-2 top-3 h-4 w-4 text-muted-foreground" />

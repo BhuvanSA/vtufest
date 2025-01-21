@@ -3,17 +3,29 @@ import React from "react";
 import "./globals.css"; // Adjust the import path as needed
 import Header from "@/components/Background";
 import MessageCarousel from "@/components/MessageCarousel";
+import Image from "next/image";
+import background from "@/public/images/Untitled design (4).png";
+import Presenthomepage from "@/components/Presenthomepage";
 
 // import Gallery from "@/components/subcomponents/gallery";
 // import Pronities from "@/components/subcomponents/pronities";
 // import Events from "@/components/subcomponents/events";
 
 const Home = () => {
-    
+
 
     return (
+        
         <div className="bg-background pt-16">
-            <Header />
+            <div className="w-full h-[50em] relative bottom-64 ">
+                <Image
+                    src={background}
+                    alt="background"
+                    
+                    className="w-full   bg-gradient-to-b from-black/50 via-transparent  to-black/80"
+                />
+               <Presenthomepage/>
+                </div>
             <div className="relative z-10">
                 <section className="bg-background ">
                     <div className="ml-auto ">
@@ -83,6 +95,23 @@ const Home = () => {
                                 </div>
                             </div>
                         </div>
+                        <div className="flex items-center mt-16 justify-center">
+                            <video
+                                autoPlay
+                                muted
+                                loop
+                                playsInline
+                                className="bg-background rounded-xl"
+                                width="80%"
+                                height="100% "
+                            >
+                                <source
+                                    src="/backround_video.mp4"
+                                    type="video/mp4"
+                                    className="bg-background"
+                                />
+                            </video>
+                        </div>
                         <div className=" mt-8 mx-10  justify-between">
                             <div className="px-0   md:px-12 xl:px-2">
                                 <div className="relative pt-36 ">
@@ -148,7 +177,7 @@ const Home = () => {
                                     </div>
                                     </div>
                                 </div> */}
-                                <MessageCarousel/>
+                                <MessageCarousel />
 
                             </div>
                         </div>

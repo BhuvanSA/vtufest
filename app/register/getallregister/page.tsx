@@ -6,7 +6,8 @@ import { Type } from "@prisma/client";
 import { verifySession } from "@/lib/session";
 import { redirect } from "next/navigation";
 import { PenSquare, UserPlus, CreditCard } from "lucide-react";
-
+import bgImage from "../../../components/images/Untitled design (4).png"; // Your background image import
+import Image from "next/image";
 export const docStatusMap = {
     PENDING: "Pending",
     PROCESSING: "Processing",
@@ -93,7 +94,7 @@ export default async function Page() {
             .map((r) => ({ eventName: r.eventName! }));
 
 
-        
+
 
 
         // If no events at all, push a single blank record
@@ -110,7 +111,7 @@ export default async function Page() {
             continue;
         }
 
-        
+
 
         // If participant
         if (participantEvents.length > 0) {
@@ -153,43 +154,73 @@ export default async function Page() {
     }
 
     return (
-        <div className="bg-background min-h-screen pt-24">
-            <div className="mt-4 justify-center flex flex-col gap-4">
-                <div className="max-w-4xl mx-auto p-4">
-                    <h1 className="text-primary font-bold text-5xl md:text-5xl xl:text-5xl mb-6">
-                        Registrant List
-                    </h1>
+        <>
+            <div className="-z-40 inset-0 absolute flex items-center justify-center w-full h-screen">
+                <Image src={bgImage}
+                    alt="bgimage"
+                    className="w-full "
+                    objectFit="cover"
+                    priority
+                />
+                <Image src={bgImage}
+                    alt="bgimage"
+                    className="w-full "
+                    objectFit="cover"
+                    priority
+                />
+            </div>
+            <div className="-z-30 inset-0 absolute flex items-center justify-center w-full h-[105rem]">
+                <Image src={bgImage}
+                    alt="bgimage"
+                    className="w-full "
+                    objectFit="cover"
+                    priority
+                />
+                <Image src={bgImage}
+                    alt="bgimage"
+                    className="w-full "
+                    objectFit="cover"
+                    priority
+                />
+            </div>
+            <div className="-z-10">
+                <div className="justify-center flex flex-col gap-4 ">
+                    <div className="max-w-4xl mx-auto p-4">
+                        <h1 className="text-red-900 font-bold text-5xl md:text-5xl xl:text-5xl mb-6">
+                            Registrant List
+                        </h1>
+                    </div>
+                </div>
+                <DataTable data={results} />
+                <div className="flex justify-center gap-4 pb-36 mt-5">
+                    <Link href="/register/modifyevents">
+                        <Button
+                            variant="outline"
+                            className="border bg-primary text-white hover:bg-primary hover:text-white hover:scale-105 transition-all"
+                        >
+                            <PenSquare className="mr-2 h-4 w-4" />
+                            Modify Events
+                        </Button>
+                    </Link>
+                    <Link href="/register/addRegistrant">
+                        <Button
+                            variant="outline"
+                            className="border bg-primary text-white hover:bg-primary hover:text-white hover:scale-105 transition-all"
+                        >
+                            <UserPlus className="mr-2 h-4 w-4" />
+                            Add Registrant
+                        </Button>
+                    </Link>
+                    <Link href="/register/paymentinfo">
+                        <Button variant="default"
+                            className="border bg-primary text-white hover:bg-primary hover:text-white hover:scale-105 transition-all"
+                        >
+                            <CreditCard className="mr-2 h-4 w-4" />
+                            Go to payments
+                        </Button>
+                    </Link>
                 </div>
             </div>
-            <DataTable data={results} />
-            <div className="flex justify-center mt-4 gap-4 pb-36">
-                <Link href="/register/modifyevents">
-                    <Button
-                        variant="outline"
-                        className="border bg-primary text-white hover:bg-primary hover:text-white hover:scale-105 transition-all"
-                    >
-                        <PenSquare className="mr-2 h-4 w-4" />
-                        Modify Events
-                    </Button>
-                </Link>
-                <Link href="/register/addRegistrant">
-                    <Button
-                        variant="outline"
-                        className="border bg-primary text-white hover:bg-primary hover:text-white hover:scale-105 transition-all"
-                    >
-                        <UserPlus className="mr-2 h-4 w-4" />
-                        Add Registrant
-                    </Button>
-                </Link>
-                <Link href="/register/paymentinfo">
-                    <Button variant="default"
-                        className="border bg-primary text-white hover:bg-primary hover:text-white hover:scale-105 transition-all"
-                    >
-                        <CreditCard className="mr-2 h-4 w-4" />
-                        Go to payments
-                    </Button>
-                </Link>
-            </div>
-        </div>
+        </>
     );
 }

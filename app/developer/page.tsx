@@ -6,6 +6,9 @@ import Image2 from "@/public/images/1733070759022.png";
 import Image3 from "@/public/images/1735673424888.jpeg.jpg"
 import  image4 from "@/public/images/1713973297954.jpeg.jpg"
 import imageicon from "@/public/images/instalogo.png"
+import imageicon1 from "@/public/images/icons8-linkedin-48.png"
+import imageicon2 from '@/public/images/icons8-github-64.png'
+import imageicon3 from "@/public/images/icons8-twitter-30.png"
 const list = [
   {
     name: 'Bhuvan S A',
@@ -33,6 +36,14 @@ const list = [
   },
   {
     name: 'Kottapalli Likhith Reddy',
+    linkedIn: '',
+    insta: '',
+    twitter: '',
+    github: '',
+    image: Image2
+  },
+  {
+    name: 'Keerthan K Archarya',
     linkedIn: '',
     insta: '',
     twitter: '',
@@ -66,13 +77,27 @@ const Page = () => {
                 width={250}
                 />
             </CardContent>
-            <CardFooter className='flex items-center justify-center'>
+            <CardFooter className='flex gap-3 items-center justify-center'>
                 <Image
                 src={imageicon}
                 alt='image'
                 width={50}
                 />
-
+                <Image
+                src={imageicon1}
+                alt='image'
+                width={70}
+                />
+                <Image
+                src={imageicon2}
+                alt='image'
+                width={70}
+                />
+                <Image
+                src={imageicon3}
+                alt='image'
+                width={70}
+                />
             </CardFooter>
           </Card>
         ))}

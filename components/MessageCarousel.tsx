@@ -19,7 +19,7 @@ const MessageCarousel = () => {
             name: "Sri. D. K. Shivakumar",
             image: cheif1,
             message: "As you cross the traditional threshold and step into the portals of GLOBAL ACADEMY OF TECHNOLOGY, the realm of professional education is unfastened to achieve your goals and fulfil your dreams. I look forward to your becoming just not an engineer or a manager, but a person with holistic approach to contribute to our nation’s prosperity through individual growth. We @GAT, simply believe in and tread the path of Quality & Discipline, the basic mantra of success.\n\nYou have entered an educational experience that goes far beyond the professional course of your choice in engineering and management. @GAT, we offer multiple opportunities for you to experience as you learn and contribute to the betterment of the society. This should also translate into benefiting the mankind through your technical knowledge & management skill and innate sensitivity to the dynamics of the times and environment around us.\n\nYou are the future of our great nation and our vision is to see you as responsible individuals with the pursuit of excellence as your motto in all that you undertake.",
-            header: "TRUSTEE SECRETARY, NEF"
+            header: "Chairman, NEF"
         },
         {
             name: "Dr. Balakrishna H. B.",

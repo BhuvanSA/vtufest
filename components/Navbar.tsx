@@ -11,6 +11,7 @@ import { X, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import gatLogo from "@/public/images/old-college-logo.png"
 import vtulogo from '@/public/images/vtulogo.png'
+import background from "@/public/images/Untitled design (2).png";
 
 export const navItems = [
     { href: "/", text: "Home" },
@@ -83,37 +84,36 @@ const NavBar = () => {
 
     return (
 
-        <header className="fixed top-0 left-0 right-0 w-full bg-gradient-to-bl
-    from-[#6197cd]
-    via-[#fdfdff]
-    to-[#416de3] backdrop-blur-sm border-none shadow-sm z-50 ">
-            <div className="flex items-center justify-between text-2xl">
+        <header className=" w-full bg-transparent absolute top-0 text-primary_heading backdrop-blur-sm border-none fixed z-10 shadow-4xl">
+            
+            <div className="flex ">
+            <div className="flex items-center gap-2 mx-5 text-2xl">
                 <Image
                     src={gatLogo}
                     alt="College Logo"
-                    width={120}
-                    height={120}
+                    width={60}
+                    height={60}
                     priority
-                    className="relative left-10"
+                    className=""
                 />
-                <h1 className="mx-auto text-primary_heading relative left-6 sm:text-lg md:text-xl lg:text-6xl font-semibold tracking-[0.6rem] transition-colors">
-                    Global Academy of Technology
-                    <div className="text-red-500  text-xl font-semibold mt-2 text-left tracking-widest ">
-                        An Autonomus Institute, Affiliated to VTU
-                    </div>
-                </h1>
                 <Image
                     src={vtulogo}
                     alt="College Logo"
-                    width={160}
-                    height={160}
+                    width={80}
+                    height={80}
                     priority
-                    className="relative right-10  "
+                    className="  "
                 />
             </div>
-
-            {/* new navigation menu */}
-            <div className="flex items-center justify-center max-w-6xl lg:max-w-[72rem] xl:max-w-4xl px-3 py-3 mx-auto sm:px-6">
+            <div>
+            <div className="mx-auto text-primary_heading text-xl font-bold relative right-5 top-5 text-primary_heading">
+                    Global Academy of Technology
+                    {/* <div className="text-red-500  text-xl font-semibold mt-2 text-left tracking-widest ">
+                        An Autonomus Institute, Affiliated to VTU
+                    </div> */}
+                </div>
+            </div>
+            <div className="flex items-center text-white justify-center max-w-6xl lg:max-w-[72rem] xl:max-w-4xl px-3 py-3 mx-auto sm:px-6">
                 <NavigationMenu>
                     <NavigationMenuList className="flex gap-0 ">
                         <NavigationMenuItem>
@@ -322,6 +322,9 @@ const NavBar = () => {
                     </div>
                 </Dialog>
             )}
+            </div>
+            {/* new navigation menu */}
+           
         </header>
     );
 };

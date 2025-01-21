@@ -2,6 +2,7 @@ import Image from "next/image";
 import insta from "@/public/images/instalogo.png";
 import yt from "@/public/images/youtube_1384060.png";
 import facebook from "@/public/images/facebook_logo_icon_147291.png";
+import gatlogo from "@/public/images/old-college-logo.png"
 
 const Footer = () => {
     return (
@@ -12,7 +13,7 @@ const Footer = () => {
                     {/* College Logo */}
                     <div className="w-full lg:w-1/3 flex justify-center lg:justify-center">
                         <Image
-                            src="/images/college-logo.png"
+                            src={gatlogo}
                             alt="Global Academy of Technology logo"
                             width={150}
                             height={150}
@@ -30,7 +31,7 @@ const Footer = () => {
                         </h2>
                         <p className="text-lg font-bold mb-2">Autonomous Institute, Affiliated to VTU</p>
                         <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-primary">
-                            A Unit of National Education Foundation
+                            A Institution of National Education Foundation
                         </h2>
                     </div>
                 </div>

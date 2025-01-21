@@ -212,7 +212,7 @@ export default function GetRegistrant({
                                                 >
                                                     {registration.attendanceStatus
                                                         ? "Attended"
-                                                        : "Mark as Attended"}
+                                                        : "Not Attended"}
                                                 </Button>
                                             </div>
                                         </li>

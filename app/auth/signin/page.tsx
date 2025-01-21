@@ -11,7 +11,7 @@ import axios from "axios";
 import vtulogo from "@/public/images/vtulogo.png";
 import Image from "next/image";
 import interactLogo from "@/public/images/INTERACT-4.png";
-import bgImage from "../../../components/images/GATBGIMG.png"; // Your background image import
+import bgImage from "../../../components/images/Untitled design (4).png"; // Your background image import
 import gatLogo from "@/public/images/old-college-logo.png"
 import {
     Card,
@@ -82,144 +82,146 @@ export default function SignIn() {
     }
 
     return (
-        <div
-            className="mt-28 min-h-screen flex items-center justify-center p-4"
-            style={{
-                backgroundImage: `url(${bgImage.src})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                backgroundRepeat: "no-repeat",
-                backgroundAttachment: "fixed",
-            }}
-        >
-            <Card className="w-full max-w-md bg-card text-card-foreground">
-                <CardHeader>
-                    <div className="flex items-center text-blue-800 justify-center mb-6 font-bold text-2xl leading-6 tracking-wider">
-                        <h1>Global Academy of Technology</h1>
-                    </div>
-                    <div className="flex items-center justify-between pb-0">
-                        <Image
-                            src={gatLogo}
-                            alt="College Logo"
-                            width={85}
-                            height={80}
-                            priority
-                            className="object-contain"
-                        />
-                        <Image
-                            src={interactLogo}
-                            alt="College Logo"
-                            width={170}
-                            height={90}
-                            priority
-                            className="object-contain relative left-4"
-                        />
-                        <Image
-                            src={vtulogo}
-                            alt="College Logo"
-                            width={120}
-                            height={120}
-                            priority
-                            className="object-contain"
-                        />
-                    </div>
-                    <CardTitle className="text-2xl text-center font-bold text-foreground">
-                        Login
-                    </CardTitle>
-                    <CardDescription className="text-center text-muted-foreground">
-                        Use your registered email-id and password.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <Form {...form}>
-                        <form
-                            onSubmit={form.handleSubmit(onSubmit)}
-                            className="space-y-4"
-                        >
-                            <FormField
-                                control={form.control}
-                                name="email"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-foreground">
-                                            Registered Email ID
-                                        </FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                className="bg-background border-input"
-                                                placeholder="Enter your email"
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormMessage className="text-destructive" />
-                                    </FormItem>
-                                )}
+        <>
+            <div className="-z-40 inset-0 absolute flex items-center justify-center w-full h-screen">
+                <Image src={bgImage}
+                    alt="bgimage"
+                    className="w-full h-[69rem]"
+                    priority
+                />
+            </div>
+            <div
+                className=" flex justify-center "
+            >
+                <Card className="w-full max-w-md bg-card text-card-foreground  mb-=">
+                    <CardHeader>
+                        <div className="flex items-center text-blue-800 justify-center  font-bold text-2xl leading-6 tracking-wider">
+                            <h1>Global Academy of Technology</h1>
+                        </div>
+                        <div className="flex items-center justify-between pb-0">
+                            <Image
+                                src={gatLogo}
+                                alt="College Logo"
+                                width={85}
+                                height={80}
+                                priority
+                                className="object-contain"
                             />
-                            <FormField
-                                control={form.control}
-                                name="password"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-foreground">
-                                            Password
-                                        </FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                className="bg-background border-input"
-                                                type="password"
-                                                placeholder="Enter your password"
-                                                {...field}
-                                            />
-                                        </FormControl>
-                                        <FormMessage className="text-destructive" />
-                                    </FormItem>
-                                )}
+                            <Image
+                                src={interactLogo}
+                                alt="College Logo"
+                                width={170}
+                                height={90}
+                                priority
+                                className="object-contain relative left-4"
                             />
-                            {error && (
-                                <div className="text-sm text-destructive text-center">
-                                    {error}
-                                </div>
-                            )}
-                            <LoadingButton type="submit" loading={isLoading}>
-                                Sign In
-                            </LoadingButton>
-                        </form>
-                    </Form>
-                </CardContent>
-                <CardFooter className="flex flex-col space-y-2">
-                    <div className="relative w-full">
+                            <Image
+                                src={vtulogo}
+                                alt="College Logo"
+                                width={120}
+                                height={120}
+                                priority
+                                className="object-contain"
+                            />
+                        </div>
+                        <CardTitle className="text-2xl text-center font-bold text-foreground">
+                            Login
+                        </CardTitle>
+                        <CardDescription className="text-center text-muted-foreground">
+                            Use your registered email-id and password.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <Form {...form}>
+                            <form
+                                onSubmit={form.handleSubmit(onSubmit)}
+                                className="space-y-4"
+                            >
+                                <FormField
+                                    control={form.control}
+                                    name="email"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-foreground">
+                                                Registered Email ID
+                                            </FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    className="bg-background border-input"
+                                                    placeholder="Enter your email"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage className="text-destructive" />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="password"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-foreground">
+                                                Password
+                                            </FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    className="bg-background border-input"
+                                                    type="password"
+                                                    placeholder="Enter your password"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage className="text-destructive" />
+                                        </FormItem>
+                                    )}
+                                />
+                                {error && (
+                                    <div className="text-sm text-destructive text-center">
+                                        {error}
+                                    </div>
+                                )}
+                                <LoadingButton type="submit" loading={isLoading}>
+                                    Sign In
+                                </LoadingButton>
+                            </form>
+                        </Form>
+                    </CardContent>
+                    <CardFooter className="flex flex-col space-y-2">
+                        <div className="relative w-full">
+                            <Button
+                                variant="link"
+                                className="w-full -mt-4 text-primary hover:text-primary/90"
+                                onClick={() => router.push("/auth/forgotpassword")}
+                            >
+                                Forgot Password?
+                            </Button>
+                        </div>
+                        <div className="relative w-full">
+                            <div className="absolute inset-0 flex items-center">
+                                <span className="w-full border-t border-border" />
+                            </div>
+                            <div className="relative flex justify-center text-xs uppercase">
+                                <span className="bg-card px-2 text-muted-foreground">
+                                    Not yet Registered?
+                                </span>
+                            </div>
+                        </div>
                         <Button
-                            variant="link"
-                            className="w-full -mt-4 text-primary hover:text-primary/90"
-                            onClick={() => router.push("/auth/forgotpassword")}
+                            variant="outline"
+                            className="w-full border-border hover:bg-secondary"
+                            onClick={() => router.push("/auth/signup")}
                         >
-                            Forgot Password?
+                            Sign Up
                         </Button>
-                    </div>
-                    <div className="relative w-full">
-                        <div className="absolute inset-0 flex items-center">
-                            <span className="w-full border-t border-border" />
-                        </div>
-                        <div className="relative flex justify-center text-xs uppercase">
-                            <span className="bg-card px-2 text-muted-foreground">
-                                Not yet Registered?
-                            </span>
-                        </div>
-                    </div>
-                    <Button
-                        variant="outline"
-                        className="w-full border-border hover:bg-secondary"
-                        onClick={() => router.push("/auth/signup")}
-                    >
-                        Sign Up
-                    </Button>
-                    <Link className="w-full" href="/link/to/how/to/register">
-                        <Button className="w-full" variant="outline">
-                            Link for registration instructions
-                        </Button>
-                    </Link>
-                </CardFooter>
-            </Card>
-        </div>
+                        <Link className="w-full" href="/link/to/how/to/register">
+                            <Button className="w-full" variant="outline">
+                                Link for registration instructions
+                            </Button>
+                        </Link>
+                    </CardFooter>
+                </Card>
+            </div>
+        </>
     );
 }
