@@ -84,7 +84,7 @@ const NavBar = () => {
 
     return (
 
-        <header className=" w-full bg-transparent absolute top-0 text-primary_heading backdrop-blur-sm border-none fixed z-10 shadow-4xl">
+        <header className=" w-full bg-transparent absolute top-0 text-primary_heading backdrop-blur-lg  border-none fixed z-10 shadow-4xl">
             
             <div className="flex ">
             <div className="flex items-center gap-2 mx-5 text-2xl">
@@ -126,7 +126,7 @@ const NavBar = () => {
                             </Link>
                         </NavigationMenuItem>
                         <NavigationMenuItem>
-                            <NavigationMenuTrigger>About</NavigationMenuTrigger>
+                            <NavigationMenuTrigger className="font-normal">About</NavigationMenuTrigger>
                             <NavigationMenuContent>
                                 <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
                                     <li className="row-span-3">
@@ -178,7 +178,7 @@ const NavBar = () => {
                             </NavigationMenuContent>
                         </NavigationMenuItem>
                         <NavigationMenuItem>
-                            <NavigationMenuTrigger>Event</NavigationMenuTrigger>
+                            <NavigationMenuTrigger className="font-normal">Event</NavigationMenuTrigger>
                             <NavigationMenuContent className="">
                                 <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
                                     {components.map((component) => (

@@ -34,7 +34,7 @@ const Home = () => {
                                 <span className="text-primary ">About GAT</span>
                             </h1>
 
-                            <h4 className="mt-8 text-black">
+                            <h4 className="mt-8 text-base">
                                 Global Academy of Technology (GAT), established in the year
                                 2001, is one of the most sought-after engineering and management
                                 colleges in Bengaluru, Karnataka. Located in a sprawling campus
