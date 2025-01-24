@@ -126,6 +126,7 @@ export default function SignUp() {
         setIsLoading(true);
         try {
             const response = await axios.post("/api/signup", values);
+            console.log(response);
             if (response.data.success) {
                 toast("Signup successful! Redirecting to login...");
                 router.push("/auth/signin");
