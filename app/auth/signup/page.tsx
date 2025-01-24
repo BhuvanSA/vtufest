@@ -35,10 +35,19 @@ import {
     InputOTPSlot,
 } from "@/components/ui/input-otp";
 import Image from "next/image";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { colleges } from "@/data/colleges";
 
 const signupSchema = z
     .object({
-        college: z
+        collegeName: z
+            .string()
+            .min(3, "College name must be at least 3 characters"),
+        collegeCode: z
+            .string()
+            .min(3, "College name must be at least 3 characters")
+            .max(3),
+        region: z
             .string()
             .min(3, "College name must be at least 3 characters"),
         phone: z
@@ -67,7 +76,9 @@ export default function SignUp() {
     const form = useForm<z.infer<typeof signupSchema>>({
         resolver: zodResolver(signupSchema),
         defaultValues: {
-            college: "",
+            collegeName: "",
+            collegeCode: "",
+            region: "",
             phone: "",
             email: "",
             otp: "",
@@ -97,7 +108,7 @@ export default function SignUp() {
                 });
                 toast.error(
                     response.data.message ||
-                        "Failed to send OTP. Please try again."
+                    "Failed to send OTP. Please try again."
                 );
             }
         } catch (error: unknown) {
@@ -185,19 +196,41 @@ export default function SignUp() {
                         >
                             <FormField
                                 control={form.control}
-                                name="college"
-                                render={({ field, fieldState }) => (
+                                name="collegeCode"
+                                render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-foreground">
-                                            College Name
-                                        </FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                className="bg-background border-input"
-                                                placeholder="Enter your college name"
-                                                {...field}
-                                            />
-                                        </FormControl>
+                                        <FormLabel className="text-foreground">College</FormLabel>
+                                        <Select onValueChange={(value) => {
+                                            // Find the selected college and region
+                                            const selectedRegion = colleges.find(region =>
+                                                region.colleges.some(college => college.code === value)
+                                            );
+                                            const selectedCollege = selectedRegion?.colleges.find(
+                                                college => college.code === value
+                                            );
+                                            // Up date collegeCode and region in the form
+                                            form.setValue("collegeCode", value);
+                                            form.setValue("collegeName", selectedCollege?.name as string);
+                                            form.setValue("region", selectedRegion?.region || "");
+                                        }} defaultValue={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger className="bg-background border-input">
+                                                    <SelectValue placeholder="Select your college" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {colleges.map((region) => (
+                                                    <SelectGroup key={region.region}>
+                                                        <SelectLabel>{region.region}</SelectLabel>
+                                                        {region.colleges.map((college) => (
+                                                            <SelectItem key={college.code} value={college.code}>
+                                                                {college.name}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectGroup>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
                                         <FormMessage className="text-destructive" />
                                     </FormItem>
                                 )}
@@ -249,8 +282,8 @@ export default function SignUp() {
                                                     {isSendingOTP
                                                         ? "Sending..."
                                                         : resendTimer > 0
-                                                        ? `Resend OTP (${resendTimer}s)`
-                                                        : "Send OTP"}
+                                                            ? `Resend OTP (${resendTimer}s)`
+                                                            : "Send OTP"}
                                                 </Button>
                                             </div>
                                         </FormControl>
@@ -264,7 +297,7 @@ export default function SignUp() {
                                 render={({ field, fieldState }) => (
                                     <FormItem>
                                         <FormLabel className="text-foreground">
-                                            Enter OTP
+                                            Enter OTP Number
                                         </FormLabel>
                                         <FormControl>
                                             <div className="flex justify-center">
