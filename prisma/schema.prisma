@@ -18,8 +18,10 @@ datasource db {
 
 model Users {
   id          String        @id @default(uuid())
-  collegeCode String?       @unique
-  collegeName String
+  collegeCode String       @unique
+  collegeName String       @unique
+  region      String
+  collegeOurCode String?    @unique
   phone       String        @unique
   email       String        @unique
   password    String
