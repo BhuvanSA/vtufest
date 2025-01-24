@@ -78,8 +78,8 @@ export async function POST(request: Request) {
             return NextResponse.json({ success: false, errors: fieldErrors });
         }
 
-        const { college, email, phone, otp, password } = validation.data;
-        console.log(college,email,password,otp,phone);
+        const {  email, phone, otp, password, collegeCode, collegeName, region } = validation.data;
+        console.log(collegeName,email,password,otp,phone);
 
         // Check if the user already exists in the database (by email or phone)
         const existingUser = await prisma.users.findFirst({
@@ -117,10 +117,12 @@ export async function POST(request: Request) {
         // Create the user in the database
         const newUser = await prisma.users.create({
             data: {
-                collegeName: college,
+                collegeName: collegeName,
                 email,
                 phone,
                 password: hashedPassword, // Store the hashed password
+                collegeCode: collegeCode,
+                region : region
             },
         });
 
