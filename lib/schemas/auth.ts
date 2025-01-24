@@ -14,16 +14,21 @@ export const loginSchema = z.object({
 
 export const signupSchema = z
     .object({
-        college: z
-            .string()
-            .min(3, "College name must be at least 3 characters")
-            .max(100, "College name should not exceed 100 characters"),
+
         phone: z
             .string()
             .regex(
                 /^\d{10}$/,
                 "Phone number must be between 10 digits"
             ),
+        collegeName: z
+            .string()
+            .min(3, "College name must be at least 3 characters"),
+        collegeCode: z
+            .string()
+            .min(3, "College name must be at least 3 characters"),
+        region: z
+            .string(),
         email: z.string().email("Invalid email address"),
         otp: z.string().regex(/^\d{6}$/, "OTP must be a 6-digit number"),
         password: z.string().min(8, "Password must be at least 8 characters"),

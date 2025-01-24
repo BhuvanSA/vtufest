@@ -1008,3 +1008,19 @@ export async function savePayment(userId:string,txnNumber:string,paymentUrl:stri
     }
     
 }
+
+
+export async function addCollege(collegeName,email,hashedPassword,otp,phone,region,collegeCode){
+    const newUser = await prisma.users.create({
+        data: {
+            collegeName: collegeName as string,
+            email:email as string,
+            phone:phone as string,
+            password: hashedPassword, // Store the hashed password
+            collegeCode: collegeCode as string,
+            region : region as string,
+            
+        },
+    });
+    return newUser;
+}

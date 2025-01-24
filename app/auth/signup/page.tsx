@@ -125,6 +125,7 @@ export default function SignUp() {
     const onSubmit = async (values: z.infer<typeof signupSchema>) => {
         setIsLoading(true);
         try {
+            console.log(values);
             const response = await axios.post("/api/signup", values);
             console.log(response);
             if (response.data.success) {
