@@ -83,32 +83,31 @@ const NavBar = () => {
 
     return (
 
-        <header className="fixed top-0 left-0 right-0 w-full bg-gradient-to-bl
-    from-[#6197cd]
-    via-[#fdfdff]
-    to-[#416de3] backdrop-blur-sm border-none shadow-sm z-50 ">
-            <div className="flex items-center justify-between text-2xl mt-4">
+        <header className="fixed top-0 left-0 right-0 w-full backdrop-blur-sm border-none shadow-sm z-50 ">
+            <div className="flex items-center justify-between text-2xl mt-4 px-32 ">
+                <div className="flex gap-10">
                 <Image
                     src="/images/college-logo.png"
                     alt="College Logo"
-                    width={120}
-                    height={120}
+                    width={80}
+                    height={80}
                     priority
-                    className="fixed top-6 left-10"
+                
                 />
-                <h1 className="mx-auto text-primary_heading text-4xl font-semibold tracking-[0.8rem] transition-colors">
+                <h1 className="text-primary_heading text-4xl font-bold tracking-widest  transition-colors">
                     Global Academy of Technology
-                    <div className="text-red-500 text-xl font-semibold mt-2 text-left tracking-widest ">
+                    <div className="text-red-500 text-xl font-semibold mt-2 text-left  ">
                         An Autonomus Institute, Affiliated to VTU
                     </div>
                 </h1>
+                </div>
                 <Image
                     src={vtulogo}
                     alt="College Logo"
-                    width={160}
-                    height={160}
+                    width={100}
+                    height={100}
                     priority
-                    className="fixed right-10  top-1"
+                   
                 />
             </div>
             <div className="flex items-center mt-6 justify-center max-w-6xl lg:max-w-[72rem] xl:max-w-6xl px-4 mx-auto sm:px-6">
@@ -166,24 +165,27 @@ const NavBar = () => {
                 </div> */}
             </div>
             {/* new navigation menu */}
-            <div className="flex items-center mt-4 justify-center max-w-6xl lg:max-w-[72rem] xl:max-w-6xl px-3 py-6 mx-auto sm:px-6">
+            <div className="flex items-center justify-center max-w-6xl lg:max-w-[72rem] xl:max-w-6xl px-3 mx-auto sm:px-6">
                 <NavigationMenu>
-                    <NavigationMenuList className="flex gap-0 ">
-                        <NavigationMenuItem>
+                    <NavigationMenuList className="bg-inherit">
+                        <NavigationMenuItem className="bg-inherit">
                             <Link href="/" legacyBehavior passHref>
                                 <NavigationMenuLink
-                                    className={navigationMenuTriggerStyle()}
+                                    className={`${navigationMenuTriggerStyle()} bg-inherit`}
+
                                 >
                                     Home
                                 </NavigationMenuLink>
                             </Link>
                         </NavigationMenuItem>
                         <NavigationMenuItem>
-                            <NavigationMenuTrigger>About</NavigationMenuTrigger>
+                            <NavigationMenuTrigger className={` bg-inherit`}
+                            >About</NavigationMenuTrigger>
                             <NavigationMenuContent>
                                 <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
                                     <li className="row-span-3">
-                                        <NavigationMenuLink asChild>
+                                        <NavigationMenuLink asChild
+                                        >
                                             <a
                                                 className="flex h-full w-full select-none flex-col justify-end bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
                                                 href="/about"
@@ -231,8 +233,8 @@ const NavBar = () => {
                             </NavigationMenuContent>
                         </NavigationMenuItem>
                         <NavigationMenuItem>
-                            <NavigationMenuTrigger>Event</NavigationMenuTrigger>
-                            <NavigationMenuContent className="">
+                            <NavigationMenuTrigger className={` bg-inherit`}>Event</NavigationMenuTrigger>
+                            <NavigationMenuContent >
                                 <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
                                     {components.map((component) => (
                                         <ListItem
@@ -249,7 +251,8 @@ const NavBar = () => {
                         <NavigationMenuItem>
                             <Link href="/Dignitaries" legacyBehavior passHref>
                                 <NavigationMenuLink
-                                    className={navigationMenuTriggerStyle()}
+                                    className={`${navigationMenuTriggerStyle()} bg-inherit`}
+
                                 >
                                     Organising Committe
                                 </NavigationMenuLink>
@@ -262,7 +265,8 @@ const NavBar = () => {
                                 passHref
                             >
                                 <NavigationMenuLink
-                                    className={navigationMenuTriggerStyle()}
+                                    className={`${navigationMenuTriggerStyle()} bg-inherit`}
+
                                 >
                                     General Instructions
                                 </NavigationMenuLink>
@@ -275,7 +279,8 @@ const NavBar = () => {
                                 passHref
                             >
                                 <NavigationMenuLink
-                                    className={navigationMenuTriggerStyle()}
+                                    className={`${navigationMenuTriggerStyle()} bg-inherit`}
+
                                 >
                                     Rules and Regulations
                                 </NavigationMenuLink>
@@ -284,7 +289,8 @@ const NavBar = () => {
                         <NavigationMenuItem>
                             <Link href="/contactus" legacyBehavior passHref>
                                 <NavigationMenuLink
-                                    className={navigationMenuTriggerStyle()}
+                                    className={`${navigationMenuTriggerStyle()} bg-inherit`}
+
                                 >
                                     Contact Us
                                 </NavigationMenuLink>
@@ -297,14 +303,16 @@ const NavBar = () => {
                                 <NavigationMenuItem>
                                     <Link href={"/register/getallregister"} legacyBehavior passHref>
                                         <NavigationMenuLink
-                                            className={navigationMenuTriggerStyle()}
+                                            className={`${navigationMenuTriggerStyle()} bg-inherit`}
+
 
                                         >Register</NavigationMenuLink>
                                     </Link></NavigationMenuItem>
                                 <NavigationMenuItem>
                                     <Link href={"/auth/logout"} legacyBehavior passHref>
                                         <NavigationMenuLink
-                                            className={navigationMenuTriggerStyle()}
+                                           className={`${navigationMenuTriggerStyle()} bg-inherit`}
+
                                         >Logout</NavigationMenuLink>
                                     </Link></NavigationMenuItem>
                             </>
@@ -312,7 +320,8 @@ const NavBar = () => {
                             <>
                                 <Link href="/auth/signin" legacyBehavior passHref>
                                     <NavigationMenuLink
-                                        className={navigationMenuTriggerStyle()}
+                                        className={`${navigationMenuTriggerStyle()} bg-inherit`}
+
 
                                     >Login</NavigationMenuLink>
                                 </Link>
