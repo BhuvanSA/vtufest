@@ -7,10 +7,10 @@ import { Dialog, DialogOverlay } from "./ui/dialog";
 import { useAuthContext } from "@/contexts/auth-context";
 import Image from "next/image";
 import { ThemeToggler } from "@/contexts/theme-provider";
-import { X, Menu } from "lucide-react";
+import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-import vtulogo from '@/public/images/vtulogo.png'
+import vtulogo from "@/public/images/vtulogo.png";
 
 export const navItems = [
     { href: "/", text: "Home" },
@@ -82,24 +82,22 @@ const NavBar = () => {
     };
 
     return (
-
         <header className="fixed top-0 left-0 right-0 w-full backdrop-blur-sm border-none shadow-sm z-50 ">
             <div className="flex items-center justify-between text-2xl mt-4 px-32 ">
                 <div className="flex gap-10">
-                <Image
-                    src="/images/college-logo.png"
-                    alt="College Logo"
-                    width={80}
-                    height={80}
-                    priority
-                
-                />
-                <h1 className="text-primary_heading text-4xl font-bold tracking-widest  transition-colors">
-                    Global Academy of Technology
-                    <div className="text-red-500 text-xl font-semibold mt-2 text-left  ">
-                        An Autonomus Institute, Affiliated to VTU
-                    </div>
-                </h1>
+                    <Image
+                        src="/images/college-logo.png"
+                        alt="College Logo"
+                        width={80}
+                        height={80}
+                        priority
+                    />
+                    <h1 className="text-primary_heading text-4xl font-bold tracking-widest  transition-colors">
+                        Global Academy of Technology
+                        <div className="text-red-500 text-xl font-semibold mt-2 text-left  ">
+                            An Autonomus Institute, Affiliated to VTU
+                        </div>
+                    </h1>
                 </div>
                 <Image
                     src={vtulogo}
@@ -107,7 +105,6 @@ const NavBar = () => {
                     width={100}
                     height={100}
                     priority
-                   
                 />
             </div>
             <div className="flex items-center mt-6 justify-center max-w-6xl lg:max-w-[72rem] xl:max-w-6xl px-4 mx-auto sm:px-6">
@@ -172,20 +169,19 @@ const NavBar = () => {
                             <Link href="/" legacyBehavior passHref>
                                 <NavigationMenuLink
                                     className={`${navigationMenuTriggerStyle()} bg-inherit`}
-
                                 >
                                     Home
                                 </NavigationMenuLink>
                             </Link>
                         </NavigationMenuItem>
                         <NavigationMenuItem>
-                            <NavigationMenuTrigger className={` bg-inherit`}
-                            >About</NavigationMenuTrigger>
+                            <NavigationMenuTrigger className={` bg-inherit`}>
+                                About
+                            </NavigationMenuTrigger>
                             <NavigationMenuContent>
                                 <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
                                     <li className="row-span-3">
-                                        <NavigationMenuLink asChild
-                                        >
+                                        <NavigationMenuLink asChild>
                                             <a
                                                 className="flex h-full w-full select-none flex-col justify-end bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
                                                 href="/about"
@@ -233,8 +229,10 @@ const NavBar = () => {
                             </NavigationMenuContent>
                         </NavigationMenuItem>
                         <NavigationMenuItem>
-                            <NavigationMenuTrigger className={` bg-inherit`}>Event</NavigationMenuTrigger>
-                            <NavigationMenuContent >
+                            <NavigationMenuTrigger className={` bg-inherit`}>
+                                Event
+                            </NavigationMenuTrigger>
+                            <NavigationMenuContent>
                                 <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
                                     {components.map((component) => (
                                         <ListItem
@@ -252,7 +250,6 @@ const NavBar = () => {
                             <Link href="/Dignitaries" legacyBehavior passHref>
                                 <NavigationMenuLink
                                     className={`${navigationMenuTriggerStyle()} bg-inherit`}
-
                                 >
                                     Organising Committe
                                 </NavigationMenuLink>
@@ -266,7 +263,6 @@ const NavBar = () => {
                             >
                                 <NavigationMenuLink
                                     className={`${navigationMenuTriggerStyle()} bg-inherit`}
-
                                 >
                                     General Instructions
                                 </NavigationMenuLink>
@@ -280,7 +276,6 @@ const NavBar = () => {
                             >
                                 <NavigationMenuLink
                                     className={`${navigationMenuTriggerStyle()} bg-inherit`}
-
                                 >
                                     Rules and Regulations
                                 </NavigationMenuLink>
@@ -290,40 +285,53 @@ const NavBar = () => {
                             <Link href="/contactus" legacyBehavior passHref>
                                 <NavigationMenuLink
                                     className={`${navigationMenuTriggerStyle()} bg-inherit`}
-
                                 >
                                     Contact Us
                                 </NavigationMenuLink>
                             </Link>
                         </NavigationMenuItem>
 
-
                         {isLoggedIn ? (
                             <>
                                 <NavigationMenuItem>
-                                    <Link href={"/register/getallregister"} legacyBehavior passHref>
+                                    <Link
+                                        href={"/register/getallregister"}
+                                        legacyBehavior
+                                        passHref
+                                    >
                                         <NavigationMenuLink
                                             className={`${navigationMenuTriggerStyle()} bg-inherit`}
-
-
-                                        >Register</NavigationMenuLink>
-                                    </Link></NavigationMenuItem>
+                                        >
+                                            Register
+                                        </NavigationMenuLink>
+                                    </Link>
+                                </NavigationMenuItem>
                                 <NavigationMenuItem>
-                                    <Link href={"/auth/logout"} legacyBehavior passHref>
+                                    <Link
+                                        href={"/auth/logout"}
+                                        legacyBehavior
+                                        passHref
+                                    >
                                         <NavigationMenuLink
-                                           className={`${navigationMenuTriggerStyle()} bg-inherit`}
-
-                                        >Logout</NavigationMenuLink>
-                                    </Link></NavigationMenuItem>
+                                            className={`${navigationMenuTriggerStyle()} bg-inherit`}
+                                        >
+                                            Logout
+                                        </NavigationMenuLink>
+                                    </Link>
+                                </NavigationMenuItem>
                             </>
                         ) : (
                             <>
-                                <Link href="/auth/signin" legacyBehavior passHref>
+                                <Link
+                                    href="/auth/signin"
+                                    legacyBehavior
+                                    passHref
+                                >
                                     <NavigationMenuLink
                                         className={`${navigationMenuTriggerStyle()} bg-inherit`}
-
-
-                                    >Login</NavigationMenuLink>
+                                    >
+                                        Login
+                                    </NavigationMenuLink>
                                 </Link>
                             </>
                         )}
