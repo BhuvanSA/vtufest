@@ -209,10 +209,11 @@ const NavBar = () => {
                                             </a>
                                         </NavigationMenuLink>
                                     </li>
-                                    <ListItem href="/about" title="About GAT">
+                                    
+                                    {/* <ListItem href="/about" title="About GAT">
                                         Information about the college and its
                                         history.
-                                    </ListItem>
+                                    </ListItem> */}
                                     <ListItem
                                         href="/about/vtu"
                                         title="About VTU"
@@ -225,6 +226,13 @@ const NavBar = () => {
                                     >
                                         About the Youth Fest and its history.
                                     </ListItem>
+                                    <ListItem
+                                        href="/Dignitaries"
+                                        title="Organising Committee"
+                                    >
+                                        Information about the Organising Committee.
+                                    </ListItem>
+                                    
                                 </ul>
                             </NavigationMenuContent>
                         </NavigationMenuItem>
@@ -243,10 +251,22 @@ const NavBar = () => {
                                             {component.description}
                                         </ListItem>
                                     ))}
+                                    <ListItem
+                                        href="/generalinstructions"
+                                        title="General Instructions"
+                                    >
+                                        Information about general instructions.
+                                    </ListItem>
+                                    <ListItem
+                                        href="/rulesandregulations"
+                                        title="Rules and Regulations"
+                                    >
+                                        Information about rules and regulations.
+                                    </ListItem>
                                 </ul>
                             </NavigationMenuContent>
                         </NavigationMenuItem>
-                        <NavigationMenuItem>
+                        {/* <NavigationMenuItem>
                             <Link href="/Dignitaries" legacyBehavior passHref>
                                 <NavigationMenuLink
                                     className={`${navigationMenuTriggerStyle()} bg-inherit`}
@@ -254,8 +274,8 @@ const NavBar = () => {
                                     Organising Committe
                                 </NavigationMenuLink>
                             </Link>
-                        </NavigationMenuItem>
-                        <NavigationMenuItem>
+                        </NavigationMenuItem> */}
+                        {/* <NavigationMenuItem>
                             <Link
                                 href="/generalinstructions"
                                 legacyBehavior
@@ -280,7 +300,7 @@ const NavBar = () => {
                                     Rules and Regulations
                                 </NavigationMenuLink>
                             </Link>
-                        </NavigationMenuItem>
+                        </NavigationMenuItem> */}
                         <NavigationMenuItem>
                             <Link href="/contactus" legacyBehavior passHref>
                                 <NavigationMenuLink
