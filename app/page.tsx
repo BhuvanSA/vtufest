@@ -1,6 +1,6 @@
 // app/home/page.tsx
 import React from "react";
-import "./globals.css"; // Adjust the import path as needed
+import "./globals.css";
 import Header from "@/components/Background";
 
 const Home = () => {
