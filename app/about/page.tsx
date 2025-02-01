@@ -1,149 +1,205 @@
 "use client";
 import React from "react";
 import Image from "next/image";
-import gat from "@/components/images/gat1.jpg";
-// Credential images – update these paths with your actual image files.
-import affiliationImg from "@/components/images/affiliation.png";
-import aicteImg from "@/components/images/aicte.png";
-import recognizedImg from "@/components/images/recognized.png";
+// Main VTU banner image – update the path as needed.
+import vtuImage from "@/components/images/vtu.jpg";
 
-const About = () => {
+// Regional center images – update these paths as needed.
+import bengaluruImg from "@/components/images/bengaluru.jpg";
+import belagaviImg from "@/components/images/belagavi.jpg";
+import kalaburagiImg from "@/components/images/kalaburagi.jpg";
+import mysuruImg from "@/components/images/mysuru.jpg";
+
+const AboutVTU = () => {
   return (
     <div>
       <div className="overflow-hidden pt-20 pb-12 lg:pt-[120px] lg:pb-[90px] text-[#003366]">
         <div className="container mx-auto">
-          {/* About Header */}
+          {/* Page Header */}
           <div className="px-4 md:px-12 xl:px-6">
             <div className="relative">
               <div className="lg:w-2/3 md:text-center mx-auto">
                 <h1 className="text-[#003366] font-bold text-5xl md:text-7xl xl:text-8xl">
-                  About <span className="text-[#F4D03F]"> GAT.</span>
+                  About <span className="text-[#F4D03F]">VTU</span>
                 </h1>
               </div>
             </div>
           </div>
 
-          {/* About Content */}
+          {/* Main Section: VTU Image & Introductory Text */}
           <div className="flex flex-col lg:flex-row items-center justify-between mt-10">
-            {/* Image Section */}
+            {/* VTU Image */}
             <div className="w-full lg:w-1/2 px-4">
               <div className="relative z-10 transition-all duration-300 rounded-2xl cursor-pointer filter">
                 <Image
-                  src={gat}
-                  alt="Global Academy of Technology"
-                  className="w-full h-[500px] object-cover rounded-2xl"
+                  src={vtuImage}
+                  alt="Visvesvaraya Technological University"
+                  className="w-full h-[250px] object-cover rounded-2xl"
                 />
               </div>
             </div>
-            {/* Text Section */}
+            {/* Introductory Text */}
             <div className="w-full lg:w-1/2 px-4 mt-8 lg:mt-0">
               <div>
                 <p className="text-body-color text-justify mb-6 text-xl">
-                  Global Academy of Technology (GAT), <strong>established in 2001</strong>, is one of the most sought-after engineering and management colleges in Bengaluru, Karnataka. Nestled within a sprawling 10-acre campus, GAT provides an ideal environment for students to excel academically amidst an atmosphere of innovation and optimism.
+                  VTU is one of the largest Technological Universities in India with{" "}
+                  <strong className="text-[#F4D03F]">27 years of tradition</strong> of excellence in Engineering &amp; Technical Education, Research, and Innovations. Established in <strong>1998</strong>, VTU was founded to meet the needs of Indian industries for trained technical manpower possessing both practical experience and sound theoretical knowledge.
                 </p>
                 <p className="text-body-color text-justify mb-6 text-xl">
-                  This year <strong>2025</strong> marks a momentous milestone as the institution celebrates its <strong>Silver Jubilee – 25 years</strong> of academic excellence, innovation, and transformative education. With a legacy of shaping future leaders and achievers, GAT continues to set benchmarks in higher education, solidifying its position as a premier destination for aspiring engineers and managers.
-                </p>
-                <p className="text-body-color text-justify mb-6 text-xl">
-                  GAT offers ample opportunities for various co-curricular and extracurricular activities, ensuring a well-rounded student experience. The campus is home to over <strong>3,500 students</strong> and <strong>300 experienced staff members</strong> dedicated to an effective teaching and learning process. Academics are further enriched through mentoring, peer learning, and counseling, fostering the holistic development of students. Additionally, GAT has established academic alliances with various institutions, industries, and research organizations to provide students with valuable industry perspectives.
+                  The university has successfully unified various colleges – previously affiliated with different universities, with different syllabi, procedures, and traditions – under one umbrella.
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Credentials Section */}
+          {/* University Composition Section */}
           <div className="px-4 md:px-12 xl:px-6 mt-16">
-            <div className="relative pb-12">
-              <div className="lg:w-2/3 md:text-center mx-auto">
-                <h1 className="text-[#003366] font-bold text-5xl md:text-7xl xl:text-8xl">
-                  Our <span className="text-[#F4D03F]">Credentials</span>
-                </h1>
+            <div className="mb-12">
+              <h2 className="text-[#003366] font-bold text-4xl md:text-5xl xl:text-6xl text-center mb-8">
+                University Composition
+              </h2>
+              {/* College Affiliations */}
+              <div className="mb-10">
+                <h3 className="text-3xl font-bold text-[#003366] mb-4">
+                  College Affiliations
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="border border-[#003366] p-6">
+                    <p className="text-4xl font-extrabold text-[#003366]">189</p>
+                    <p className="text-2xl mt-2">Affiliated Colleges</p>
+                  </div>
+                  <div className="border border-[#003366] p-6">
+                    <p className="text-4xl font-extrabold text-[#003366]">1</p>
+                    <p className="text-2xl mt-2">Constituent College</p>
+                  </div>
+                  <div className="border border-[#003366] p-6">
+                    <p className="text-4xl font-extrabold text-[#003366]">37</p>
+                    <p className="text-2xl mt-2">Autonomous Colleges</p>
+                  </div>
+                </div>
+              </div>
+              {/* Programs Offered */}
+              <div>
+                <h3 className="text-3xl font-bold text-[#003366] mb-4">
+                  Programs Offered
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="border border-[#003366] p-6">
+                    <p className="text-4xl font-extrabold text-[#003366]">37</p>
+                    <p className="text-2xl mt-2">Undergraduate Programs</p>
+                  </div>
+                  <div className="border border-[#003366] p-6">
+                    <p className="text-4xl font-extrabold text-[#003366]">96</p>
+                    <p className="text-2xl mt-2">Postgraduate Programs</p>
+                  </div>
+                  <div className="border border-[#003366] p-6">
+                    <p className="text-4xl font-extrabold text-[#003366]">7</p>
+                    <p className="text-2xl mt-2">Faculty of Research Programs</p>
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="flex flex-col md:flex-row items-start justify-between mt-10 space-y-8 md:space-y-0">
-              {/* University Affiliation */}
-              <div className="w-full md:w-1/3 px-4">
-                <div className="p-6 border border-[#003366] rounded-none text-center">
-                  {/* Credential Image */}
-                  <div className="flex justify-center">
+          </div>
+
+          {/* Regional Centers Section */}
+          <div className="px-4 md:px-12 xl:px-6 mt-16">
+            <div className="mb-12">
+              <h2 className="text-[#003366] font-bold text-4xl md:text-5xl xl:text-6xl text-center mb-8">
+                Regional Centers
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                {/* Bengaluru */}
+                <div className="border border-[#003366] rounded-xl overflow-hidden">
+                  <div className="relative h-48">
                     <Image
-                      src={affiliationImg}
-                      alt="University Affiliation"
-                      width={150}
-                      height={150}
-                      className="mb-4"
+                      src={bengaluruImg}
+                      alt="Bengaluru Center"
+                      className="object-cover w-full h-full"
                     />
                   </div>
-                  {/* Credential Heading */}
-                  <h2 className="text-3xl font-extrabold text-[#003366] mb-2">
-                    University Affiliation
-                  </h2>
-                  {/* Credential Details */}
-                  <p className="mt-2 text-xl text-justify">
-                    The college has been affiliated with <strong className="text-[#F4D03F]">Visvesvaraya Technological University (VTU)</strong>, Belagavi, Karnataka, <strong>since 2001</strong>. This longstanding affiliation ensures our curriculum meets industry standards.
-                  </p>
+                  <div className="p-4 text-center">
+                    <h3 className="text-3xl font-bold text-[#003366]">Bengaluru</h3>
+                    <p className="text-xl">
+                     The technological hub and innovation capital, home to VTU’s advanced research and development facilities.
+                    </p>
+                  </div>
                 </div>
-              </div>
-              {/* Approved by AICTE */}
-              <div className="w-full md:w-1/3 px-4">
-                <div className="p-6 border border-[#003366] rounded-none text-center">
-                  {/* Credential Image */}
-                  <div className="flex justify-center">
+                {/* Belagavi */}
+                <div className="border border-[#003366] rounded-xl overflow-hidden">
+                  <div className="relative h-48">
                     <Image
-                      src={aicteImg}
-                      alt="Approved by AICTE"
-                      width={150}
-                      height={150}
-                      className="mb-4"
+                      src={belagaviImg}
+                      alt="Belagavi Center"
+                      className="object-cover w-full h-full"
                     />
                   </div>
-                  {/* Credential Heading */}
-                  <h2 className="text-3xl font-extrabold text-[#003366] mb-2">
-                    Approved by AICTE
-                  </h2>
-                  {/* Credential Details */}
-                  <p className="mt-2 text-xl text-justify">
-                    All the engineering and MBA programs offered by the college have been approved by the <strong className="text-[#F4D03F]">All India Council for Technical Education (AICTE)</strong>, ensuring adherence to high education standards.
-                  </p>
+                  <div className="p-4 text-center">
+                    <h3 className="text-3xl font-bold text-[#003366]">Belagavi</h3>
+                    <p className="text-xl">
+                     The administrative headquarters of VTU, fostering strong industry collaborations and academic excellence.
+
+                    </p>
+                  </div>
                 </div>
-              </div>
-              {/* Recognized by Govt. of Karnataka */}
-              <div className="w-full md:w-1/3 px-4">
-                <div className="p-6 border border-[#003366] rounded-none text-center">
-                  {/* Credential Image */}
-                  <div className="flex justify-center">
+                {/* Kalaburagi */}
+                <div className="border border-[#003366] rounded-xl overflow-hidden">
+                  <div className="relative h-48">
                     <Image
-                      src={recognizedImg}
-                      alt="Recognized by Govt. of Karnataka"
-                      width={150}
-                      height={150}
-                      className="mb-4"
+                      src={kalaburagiImg}
+                      alt="Kalaburagi Center"
+                      className="object-cover w-full h-full"
                     />
                   </div>
-                  {/* Credential Heading */}
-                  <h2 className="text-3xl font-extrabold text-[#003366] mb-2">
-                    Recognized by Govt. of Karnataka
-                  </h2>
-                  {/* Credential Details */}
-                  <p className="mt-2 text-xl text-justify">
-                    Our programs are recognized by the <strong className="text-[#F4D03F]">Government of Karnataka</strong>, ensuring that our courses meet both regional and national benchmarks.
-                  </p>
+                  <div className="p-4 text-center">
+                    <h3 className="text-3xl font-bold text-[#003366]">Kalaburagi</h3>
+                    <p className="text-xl">
+                      A center for emerging technologies and research, supporting innovation in technical education.
+                    </p>
+                  </div>
+                </div>
+                {/* Mysuru */}
+                <div className="border border-[#003366] rounded-xl overflow-hidden">
+                  <div className="relative h-48">
+                    <Image
+                      src={mysuruImg}
+                      alt="Mysuru Center"
+                      className="object-cover w-full h-full"
+                    />
+                  </div>
+                  <div className="p-4 text-center">
+                    <h3 className="text-3xl font-bold text-[#003366]">Mysuru</h3>
+                    <p className="text-xl">
+                     A city rich in cultural heritage, known for its serene academic environment and quality education.
+                    </p>
+                  </div>
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* Additional Information */}
+          <div className="px-4 md:px-12 xl:px-6 mt-16">
+            <div>
+              <p className="text-body-color text-justify mb-6 text-xl">
+                VTU is a multi-disciplinary and multi-level institution offering a wide range of programmes in engineering, technology, and management. The university is steadily progressing in developing and providing the best technical environment for education and will continue to serve the nation in the coming years.
+              </p>
+              <p className="text-body-color text-justify mb-6 text-xl">
+                Equipped with an outstanding student body and faculty, robust partnerships with industry, government, and business, and strong support from alumni and friends, VTU is designing a future of global preeminence, leadership, and service.
+              </p>
             </div>
           </div>
 
           {/* Footer Link */}
           <div className="text-center mt-12 px-4">
             <p className="text-xl">
-              For more details, visit:{" "}
+              For comprehensive details, visit the official VTU website at:{" "}
               <a
-                href="http://www.gat.ac.in"
-                className="text-[#D32F23] font-bold"
+                href="http://www.vtu.ac.in"
                 target="_blank"
                 rel="noreferrer"
+                className="text-[#D32F23] font-bold"
               >
-                www.gat.ac.in
+                www.vtu.ac.in
               </a>
             </p>
           </div>
@@ -153,4 +209,4 @@ const About = () => {
   );
 };
 
-export default About;
+export default AboutVTU;
