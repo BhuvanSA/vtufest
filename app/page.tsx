@@ -11,7 +11,7 @@ const Home = () => {
                 <section className="bg-background ">
                     <div className="ml-auto ">
                         <div className="lg:w-2/3 mt-10 text-justify mx-auto">
-                            {/* <h1 className="text-primary font-bold text-5xl md:text-6xl xl:text-7xl text-center flex-col"> */}
+                            {/* <h1 className="text-primary font-bold text-5xl md:text-6xl xl:text-7xl text-center flex-col access"> */}
                             <span className="text-primary mt-8 text-black">
                                 <p
                                     style={{
