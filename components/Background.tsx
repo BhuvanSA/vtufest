@@ -41,12 +41,12 @@ const ArrowRightIcon = () => (
 const Background = () => {
     // 1) Carousel images. Replace with your own paths or URLs:
     const images = [
-        "/images/img1.jpg",
-        "/images/img2.jpg",
-        "/images/img3.jpg",
-        "/images/img4.jpg",
-        "/images/img5.jpg",
-        "/images/img6.jpg",
+        "/images/carouselimg1.jpg",
+        "/images/carouselimg2.jpg",
+        "/images/carouselimg3.jpg",
+        "/images/carouselimg4.jpg",
+        "/images/carouselimg5.jpg",
+        "/images/carouselimg6.jpg",
     ];
 
     // 2) Current slide index
