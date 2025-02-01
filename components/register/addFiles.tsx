@@ -56,26 +56,26 @@ const REQUIRED_DOCUMENTS = [
         label: "Aadhar Card",
         hint: "Please ensure to upload in a way 12-digit Aadhaar Number must be clearly visible",
     },
-    {
-        id: "sslc",
-        label: "SSLC Marks Card",
-        hint: "SSLC/10th or any equivalent marks card",
-    },
-    {
-        id: "puc",
-        label: "PUC Marks Card",
-        hint: "2nd PUC/ 12th Diploma or any equivalent marks card",
-    },
-    {
-        id: "admission1",
-        label: "Fee Receipt",
-        hint: "First Semester Fee Receipt taken during Admission",
-    },
-    {
-        id: "admission2",
-        label: "Fee Reciept 2",
-        hint: "Current Semester/Previous Semester Fee Receipt ",
-    },
+    // {
+    //     id: "sslc",
+    //     label: "SSLC Marks Card",
+    //     hint: "SSLC/10th or any equivalent marks card",
+    // },
+    // {
+    //     id: "puc",
+    //     label: "PUC Marks Card",
+    //     hint: "2nd PUC/ 12th Diploma or any equivalent marks card",
+    // },
+    // {
+    //     id: "admission1",
+    //     label: "Fee Receipt",
+    //     hint: "First Semester Fee Receipt taken during Admission",
+    // },
+    // {
+    //     id: "admission2",
+    //     label: "Fee Reciept 2",
+    //     hint: "Current Semester/Previous Semester Fee Receipt ",
+    // },
 ];
 
 type SelectRolesAndEventsProps = {
@@ -113,10 +113,10 @@ export default function SelectRolesAndEvents({
                 photo: "",
                 idCard: "",
                 aadhar: "",
-                sslc: "",
-                puc: "",
-                admission1: "",
-                admission2: "",
+                // sslc: "",
+                // puc: "",
+                // admission1: "",
+                // admission2: "",
             },
             gender: "",
             accomodation: false,
@@ -398,47 +398,76 @@ export default function SelectRolesAndEvents({
 
                                 <div className="flex flex-col md:flex-row gap-4 md:gap-10">
                                     <div className="w-1/3 md:w-1/3 space-y-1.5 m-6">
-                                        <Label htmlFor="gender">Gender of the student</Label>
+                                        <Label htmlFor="gender">
+                                            Gender of the student
+                                        </Label>
                                         <Select
                                             {...register("gender")}
-                                            onValueChange={(value) => setValue("gender", value)}
+                                            onValueChange={(value) =>
+                                                setValue("gender", value)
+                                            }
                                         >
                                             <SelectTrigger>
                                                 <SelectValue placeholder="Select Gender" />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectGroup>
-                                                    <SelectLabel>Gender</SelectLabel>
-                                                    <SelectItem value="male">Male</SelectItem>
-                                                    <SelectItem value="female">Female</SelectItem>
-                                                    <SelectItem value="other">Other</SelectItem>
+                                                    <SelectLabel>
+                                                        Gender
+                                                    </SelectLabel>
+                                                    <SelectItem value="male">
+                                                        Male
+                                                    </SelectItem>
+                                                    <SelectItem value="female">
+                                                        Female
+                                                    </SelectItem>
+                                                    <SelectItem value="other">
+                                                        Other
+                                                    </SelectItem>
                                                 </SelectGroup>
                                             </SelectContent>
                                         </Select>
                                         {errors.gender && (
-                                            <p className="text-red-500 text-sm">{errors.gender.message}</p>
+                                            <p className="text-red-500 text-sm">
+                                                {errors.gender.message}
+                                            </p>
                                         )}
                                     </div>
 
                                     <div className="w-full md:w-1/3 space-y-1.5 m-6">
-                                        <Label htmlFor="accommodation">Need Accommodation</Label>
+                                        <Label htmlFor="accommodation">
+                                            Need Accommodation
+                                        </Label>
                                         <Select
                                             {...register("accomodation")}
-                                            onValueChange={(value) => setValue("accomodation", value === "yes")}
+                                            onValueChange={(value) =>
+                                                setValue(
+                                                    "accomodation",
+                                                    value === "yes"
+                                                )
+                                            }
                                         >
                                             <SelectTrigger>
                                                 <SelectValue placeholder="Select Accommodation" />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectGroup>
-                                                    <SelectLabel>Accommodation</SelectLabel>
-                                                    <SelectItem value="yes">Yes</SelectItem>
-                                                    <SelectItem value="no">No</SelectItem>
+                                                    <SelectLabel>
+                                                        Accommodation
+                                                    </SelectLabel>
+                                                    <SelectItem value="yes">
+                                                        Yes
+                                                    </SelectItem>
+                                                    <SelectItem value="no">
+                                                        No
+                                                    </SelectItem>
                                                 </SelectGroup>
                                             </SelectContent>
                                         </Select>
                                         {errors.accomodation && (
-                                            <p className="text-red-500 text-sm">{errors.accomodation.message}</p>
+                                            <p className="text-red-500 text-sm">
+                                                {errors.accomodation.message}
+                                            </p>
                                         )}
                                     </div>
                                 </div>
@@ -514,9 +543,9 @@ export default function SelectRolesAndEvents({
                                                                             ) => {
                                                                                 if (
                                                                                     e.key ===
-                                                                                    "Enter" ||
+                                                                                        "Enter" ||
                                                                                     e.key ===
-                                                                                    " "
+                                                                                        " "
                                                                                 ) {
                                                                                     onToggleSelect(
                                                                                         event.eventNo,
@@ -524,10 +553,11 @@ export default function SelectRolesAndEvents({
                                                                                     );
                                                                                 }
                                                                             }}
-                                                                            className={`p-4 border-2 rounded-lg cursor-pointer transition duration-300 flex flex-col h-full ${isSelected
-                                                                                ? "border-primary bg-primary/10"
-                                                                                : "border-border bg-card"
-                                                                                }`}
+                                                                            className={`p-4 border-2 rounded-lg cursor-pointer transition duration-300 flex flex-col h-full ${
+                                                                                isSelected
+                                                                                    ? "border-primary bg-primary/10"
+                                                                                    : "border-border bg-card"
+                                                                            }`}
                                                                         >
                                                                             <h3 className="text-lg font-semibold mb-2">
                                                                                 {
@@ -570,8 +600,8 @@ export default function SelectRolesAndEvents({
                                                                                             onChangeRole(
                                                                                                 event.eventNo,
                                                                                                 val as
-                                                                                                | "PARTICIPANT"
-                                                                                                | "ACCOMPANIST"
+                                                                                                    | "PARTICIPANT"
+                                                                                                    | "ACCOMPANIST"
                                                                                             )
                                                                                         }
                                                                                     >
@@ -585,16 +615,16 @@ export default function SelectRolesAndEvents({
                                                                                                 </SelectLabel>
                                                                                                 {event.registeredParticipant <
                                                                                                     event.maxParticipant && (
-                                                                                                        <SelectItem value="PARTICIPANT">
-                                                                                                            Participant
-                                                                                                        </SelectItem>
-                                                                                                    )}
+                                                                                                    <SelectItem value="PARTICIPANT">
+                                                                                                        Participant
+                                                                                                    </SelectItem>
+                                                                                                )}
                                                                                                 {event.registeredAccompanist <
                                                                                                     event.maxAccompanist && (
-                                                                                                        <SelectItem value="ACCOMPANIST">
-                                                                                                            Accompanist
-                                                                                                        </SelectItem>
-                                                                                                    )}
+                                                                                                    <SelectItem value="ACCOMPANIST">
+                                                                                                        Accompanist
+                                                                                                    </SelectItem>
+                                                                                                )}
                                                                                             </SelectGroup>
                                                                                         </SelectContent>
                                                                                     </Select>
@@ -639,10 +669,11 @@ export default function SelectRolesAndEvents({
                                         return (
                                             <div
                                                 key={doc.id}
-                                                className={`space-y-1.5 border rounded-[var(--radius)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 p-2 ${isUploaded
-                                                    ? "border-green-500 border-2"
-                                                    : "border-gray-300"
-                                                    }`}
+                                                className={`space-y-1.5 border rounded-[var(--radius)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 p-2 ${
+                                                    isUploaded
+                                                        ? "border-green-500 border-2"
+                                                        : "border-gray-300"
+                                                }`}
                                             >
                                                 <Label htmlFor={doc.id}>
                                                     {doc.label}
@@ -699,14 +730,14 @@ export default function SelectRolesAndEvents({
                                                 {errors.documents?.[
                                                     doc.id as keyof typeof errors.documents
                                                 ] && (
-                                                        <p className="text-red-500 text-sm">
-                                                            {
-                                                                errors.documents[
-                                                                    doc.id as keyof typeof errors.documents
-                                                                ]?.message
-                                                            }
-                                                        </p>
-                                                    )}
+                                                    <p className="text-red-500 text-sm">
+                                                        {
+                                                            errors.documents[
+                                                                doc.id as keyof typeof errors.documents
+                                                            ]?.message
+                                                        }
+                                                    </p>
+                                                )}
                                             </div>
                                         );
                                     })}
@@ -714,7 +745,10 @@ export default function SelectRolesAndEvents({
                             </div>
                         </CardContent>
                         <CardFooter className="flex justify-center gap-5">
-                            <Button className="px-8 text-xl" type="submit"> Save </Button>
+                            <Button className="px-8 text-xl" type="submit">
+                                {" "}
+                                Save{" "}
+                            </Button>
 
                             <Link href="/register/getallregister">
                                 <Button
@@ -750,7 +784,9 @@ export default function SelectRolesAndEvents({
                             <div className="flex flex-col gap-4 mb-6">
                                 <div className="flex flex-col md:flex-row gap-4 md:gap-6">
                                     <div className="w-full md:w-1/3 space-y-1.5">
-                                        <Label htmlFor="managerName">Name</Label>
+                                        <Label htmlFor="managerName">
+                                            Name
+                                        </Label>
                                         <Input
                                             {...registerManager("name")}
                                             id="managerName"
@@ -794,52 +830,79 @@ export default function SelectRolesAndEvents({
 
                                 <div className="flex flex-col md:flex-row gap-4 md:gap-6">
                                     <div className="w-full md:w-1/3 space-y-1.5 m-6">
-                                        <Label htmlFor="managerGender">Gender of the student</Label>
+                                        <Label htmlFor="managerGender">
+                                            Gender of the student
+                                        </Label>
                                         <Select
                                             {...registerManager("gender")}
-                                            onValueChange={(value) => setValueManager("gender", value)}
+                                            onValueChange={(value) =>
+                                                setValueManager("gender", value)
+                                            }
                                         >
                                             <SelectTrigger>
                                                 <SelectValue placeholder="Select Gender" />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectGroup>
-                                                    <SelectLabel>Gender</SelectLabel>
-                                                    <SelectItem value="male">Male</SelectItem>
-                                                    <SelectItem value="female">Female</SelectItem>
-                                                    <SelectItem value="other">Other</SelectItem>
+                                                    <SelectLabel>
+                                                        Gender
+                                                    </SelectLabel>
+                                                    <SelectItem value="male">
+                                                        Male
+                                                    </SelectItem>
+                                                    <SelectItem value="female">
+                                                        Female
+                                                    </SelectItem>
+                                                    <SelectItem value="other">
+                                                        Other
+                                                    </SelectItem>
                                                 </SelectGroup>
                                             </SelectContent>
                                         </Select>
                                         {errorsManager.gender && (
-                                            <p className="text-red-500 text-sm">{errorsManager.gender.message}</p>
+                                            <p className="text-red-500 text-sm">
+                                                {errorsManager.gender.message}
+                                            </p>
                                         )}
                                     </div>
                                     <div className="w-full md:w-1/3 space-y-1.5 m-6">
-                                        <Label htmlFor="Manageraccommodation">Need Accommodation</Label>
+                                        <Label htmlFor="Manageraccommodation">
+                                            Need Accommodation
+                                        </Label>
                                         <Select
                                             {...register("accomodation")}
-                                            onValueChange={(value) => setValue("accomodation", value === "yes")}
+                                            onValueChange={(value) =>
+                                                setValue(
+                                                    "accomodation",
+                                                    value === "yes"
+                                                )
+                                            }
                                         >
                                             <SelectTrigger>
                                                 <SelectValue placeholder="Select Accommodation" />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 <SelectGroup>
-                                                    <SelectLabel>Accommodation</SelectLabel>
-                                                    <SelectItem value="yes">Yes</SelectItem>
-                                                    <SelectItem value="no">No</SelectItem>
+                                                    <SelectLabel>
+                                                        Accommodation
+                                                    </SelectLabel>
+                                                    <SelectItem value="yes">
+                                                        Yes
+                                                    </SelectItem>
+                                                    <SelectItem value="no">
+                                                        No
+                                                    </SelectItem>
                                                 </SelectGroup>
                                             </SelectContent>
                                         </Select>
                                         {errors.accomodation && (
-                                            <p className="text-red-500 text-sm">{errors.accomodation.message}</p>
+                                            <p className="text-red-500 text-sm">
+                                                {errors.accomodation.message}
+                                            </p>
                                         )}
                                     </div>
                                 </div>
                             </div>
-
-
 
                             {/* Documents Upload */}
                             <div className="mt-6">
@@ -858,10 +921,11 @@ export default function SelectRolesAndEvents({
                                         return (
                                             <div
                                                 key={doc.id}
-                                                className={`space-y-1.5 border rounded-[var(--radius)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 p-2 ${isUploaded
-                                                    ? "border-green-500 border-2"
-                                                    : "border-gray-300"
-                                                    }`}
+                                                className={`space-y-1.5 border rounded-[var(--radius)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 p-2 ${
+                                                    isUploaded
+                                                        ? "border-green-500 border-2"
+                                                        : "border-gray-300"
+                                                }`}
                                             >
                                                 <Label htmlFor={doc.id}>
                                                     {doc.label}
@@ -919,15 +983,15 @@ export default function SelectRolesAndEvents({
                                                 {errorsManager.documents?.[
                                                     doc.id as keyof typeof errorsManager.documents
                                                 ] && (
-                                                        <p className="text-red-500 text-sm">
-                                                            {
-                                                                errorsManager
-                                                                    .documents[
-                                                                    doc.id as keyof typeof errorsManager.documents
-                                                                ]?.message
-                                                            }
-                                                        </p>
-                                                    )}
+                                                    <p className="text-red-500 text-sm">
+                                                        {
+                                                            errorsManager
+                                                                .documents[
+                                                                doc.id as keyof typeof errorsManager.documents
+                                                            ]?.message
+                                                        }
+                                                    </p>
+                                                )}
                                             </div>
                                         );
                                     })}
@@ -935,7 +999,10 @@ export default function SelectRolesAndEvents({
                             </div>
                         </CardContent>
                         <CardFooter className="w-full text-center flex gap-3 justify-center">
-                            <Button className="px-8 text-xl" type="submit"> Save </Button>
+                            <Button className="px-8 text-xl" type="submit">
+                                {" "}
+                                Save{" "}
+                            </Button>
 
                             <Link href="/register/getallregister">
                                 <Button
