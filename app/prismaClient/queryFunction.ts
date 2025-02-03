@@ -24,7 +24,8 @@ export async function insertRegistrant(
                         idcardUrl: arg.idcardUrl,
                         userId: arg.userId,
                         accomodation : arg.accomodation,
-                        gender:arg.gender
+                        gender:arg.gender,
+                        blood : arg.blood
                     },
                 });
                 return registrant;
@@ -78,7 +79,8 @@ export async function insertRegistrant(
                     idcardUrl: arg.idcardUrl,
                     userId: arg.userId,
                     accomodation: arg.accomodation,
-                    gender :arg.gender
+                    gender :arg.gender,
+                    blood:arg.blood
                 },
             });
 
@@ -571,7 +573,8 @@ export async function updateRegisterDetails(data: RegistrantDetailUpdate) {
                 usn: data.usn,
                 phone: data.phone,
                 gender:data.gender,
-                accomodation : data.accomodation
+                accomodation : data.accomodation,
+                blood : data.blood
             },
         });
     } catch (err: unknown) {
@@ -1004,4 +1007,20 @@ export async function savePayment(userId:string,txnNumber:string,paymentUrl:stri
         }
     }
     
+}
+
+
+export async function addCollege(collegeName,email,hashedPassword,otp,phone,region,collegeCode){
+    const newUser = await prisma.users.create({
+        data: {
+            collegeName: collegeName as string,
+            email:email as string,
+            phone:phone as string,
+            password: hashedPassword, // Store the hashed password
+            collegeCode: collegeCode as string,
+            region : region as string,
+            
+        },
+    });
+    return newUser;
 }

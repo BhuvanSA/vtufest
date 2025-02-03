@@ -51,7 +51,7 @@ export type Data = {
     photo: string;
     name: string;
     usn: string;
-    type: "Participant" | "Accompanist" | "Team Manager" | "";
+    type: "Participant" | "Accompanist" | "Team Manager" | "Participant, Accompanist" | "";
     events: { eventName: string }[];
     status: "Pending" | "Processing" | "Success" | "Failed";
 };
@@ -67,6 +67,8 @@ export function DataTable({ data }: { data: Data[] }) {
         },
         [router]
     );
+
+   
 
     const handleRemove = React.useCallback(
         async (id: string) => {
@@ -258,19 +260,22 @@ export function DataTable({ data }: { data: Data[] }) {
                 accessorKey: "type",
                 header: ({ column }) => {
                     const filterCycle = [
-                        "ALL",
+                        "",
+                        "Total",
                         "Participant",
                         "Accompanist",
                         "Team Manager",
+                        "Participant, Accompanist",
+                        
                     ];
                     const currentFilter =
-                        (column.getFilterValue() as string) ?? "ALL";
+                        (column.getFilterValue() as string) ?? "";
                     const currentIndex = filterCycle.indexOf(currentFilter);
                     const nextIndex = (currentIndex + 1) % filterCycle.length;
                     const nextFilter = filterCycle[nextIndex];
 
                     const handleFilterChange = () => {
-                        if (nextFilter === "ALL") {
+                        if (nextFilter === "") {
                             column.setFilterValue(undefined); // Clears the filter
                         } else {
                             column.setFilterValue(nextFilter);
@@ -280,7 +285,7 @@ export function DataTable({ data }: { data: Data[] }) {
                     return (
                         <Button variant="ghost" onClick={handleFilterChange}>
                             Type <ListFilterIcon className="p-1" />{" "}
-                            {currentFilter !== "ALL"
+                            {currentFilter !== ""
                                 ? `: ${currentFilter}`
                                 : ""}
                         </Button>
@@ -290,7 +295,13 @@ export function DataTable({ data }: { data: Data[] }) {
                     <div className="capitalize">{row.getValue("type")}</div>
                 ),
                 filterFn: (row, columnId, filterValue) => {
-                    if (!filterValue || filterValue === "ALL") return true;
+                    if(!filterValue || filterValue==='') return true;
+                    if (!filterValue || filterValue === "Total") {
+                        const type = row.getValue('type');
+                        if(type === 'Participant, Accompanist' || type==='Team Manager'){
+                            return true;
+                        }
+                    }
                     const type = row.getValue(columnId);
                     return type === filterValue;
                 },
@@ -484,10 +495,10 @@ export function DataTable({ data }: { data: Data[] }) {
     };
 
     return (
-        <div className="w-full px-5">
-            <div className="flex items-center py-4">
-                <div className="relative max-w-sm">
-                    <Search className="absolute left-2 top-3 h-4 w-4 text-muted-foreground" />
+        <div className="w-full px-5 bg-white rounded-xl bg-opacity-90 h-[70rem]">
+            <div className="flex items-center py-4 ">
+                <div className="relative max-w-sm " >
+                    <Search className="absolute left-2 top-3 h-4 w-4 text-muted-foreground " />
                     <Input
                         placeholder="Search name..."
                         value={
@@ -555,10 +566,10 @@ export function DataTable({ data }: { data: Data[] }) {
                                         {header.isPlaceholder
                                             ? null
                                             : flexRender(
-                                                  header.column.columnDef
-                                                      .header,
-                                                  header.getContext()
-                                              )}
+                                                header.column.columnDef
+                                                    .header,
+                                                header.getContext()
+                                            )}
                                     </TableHead>
                                 ))}
                             </TableRow>
@@ -574,7 +585,13 @@ export function DataTable({ data }: { data: Data[] }) {
                                     }
                                 >
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>
+                                        <TableCell key={cell.id} onClick={() => {
+                                            if (cell.column.id === 'usn') {
+                                                const cellValue = row.getValue('usn');
+                                                router.push(`/register/getregister/${cellValue}`);
+                                            }
+
+                                        }}>
                                             {flexRender(
                                                 cell.column.columnDef.cell,
                                                 cell.getContext()
@@ -587,7 +604,7 @@ export function DataTable({ data }: { data: Data[] }) {
                             <TableRow>
                                 <TableCell
                                     colSpan={columns.length}
-                                    className="h-24 text-center "
+                                    className="h-[50rem] text-3xl    text-center "
                                 >
                                     No results.
                                 </TableCell>

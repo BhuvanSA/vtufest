@@ -26,7 +26,9 @@ interface PaymentInput {
 
 export default function EventsPage() {
     const [events, setEvents] = useState<MyCustomEvent[]>([]);
-
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [paymentUrl, setPaymentUrl] = useState<string>("");
+    const [isUploaded, setIsUploaded] = useState(false);
     // Fetch events from backend
     useEffect(() => {
         const fetchEvents = async () => {
@@ -121,39 +123,62 @@ export default function EventsPage() {
                             )}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="paymentScreenshot">
-                                Payment Screenshot{" "}
-                                <span className="text-red-700">*</span>
-                            </Label>
-                            <Controller
-                                control={control}
-                                name="paymentUrl"
-                                rules={{ required: true }}
-                                render={() => (
-                                    <UploadDropzone
-                                        endpoint="imageUploader"
-                                        onClientUploadComplete={(res) => {
-                                            const urlKey = res[0].key;
-                                            setValue("paymentUrl", urlKey);
-                                            toast.success(
-                                                "payment screenshot uploaded"
-                                            );
-                                        }}
-                                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                                        onUploadError={(error: Error) => {
-                                            // Do something with the error.
-                                            toast.error(
-                                                "payment screenshot Error"
-                                            );
-                                        }}
-                                    />
+                            <div className="space-y-2">
+                                <Label htmlFor="paymentScreenshot">
+                                    Payment Screenshot <span className="text-red-700">*</span>
+                                </Label>
+                                <Controller
+                                    control={control}
+                                    name="paymentUrl"
+                                    rules={{ required: true }}
+                                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                                    render={({ field }) => (
+                                        <div
+                                            className={`space-y-1.5 border rounded-[var(--radius)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 p-2 ${isUploaded ? "border-green-500 border-2" : "border-gray-300"
+                                                }`}
+                                        >
+                                            {isUploaded ? (
+                                                <div className="w-full h-[244px] flex flex-col rounded-[var(--radius)] items-center justify-end p-12 space-y-2 bg-gradient-to-t from-green-50 to-transparent">
+                                                    <p className="text-green-500 flex items-center gap-1 pb-10">
+                                                        Upload Complete
+                                                    </p>
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        onClick={() => {
+                                                            setIsUploaded(false);
+                                                            setPaymentUrl("");
+                                                            setValue("paymentUrl", "");
+                                                        }}
+                                                    >
+                                                        Edit (Re-upload)
+                                                    </Button>
+                                                </div>
+                                            ) : (
+                                                <UploadDropzone
+                                                    endpoint="imageUploader"
+                                                    onClientUploadComplete={(res) => {
+                                                        if (res && res[0]) {
+                                                            setPaymentUrl(res[0].key);
+                                                            setValue("paymentUrl", res[0].key);
+                                                            setIsUploaded(true);
+                                                            toast.success("Upload Completed");
+                                                        }
+                                                    }}
+                                                    onUploadError={(error: Error) => {
+                                                        toast.error(`Error: ${error.message} Uploading`);
+                                                    }}
+                                                />
+                                            )}
+                                        </div>
+                                    )}
+                                />
+                                {errors.paymentUrl && (
+                                    <small className="text-red-700 mt-6 font-semibold">
+                                        Payment Screenshot File is required
+                                    </small>
                                 )}
-                            />
-                            {errors.paymentUrl && (
-                                <small className="text-red-700 mt-6 font-semibold">
-                                    Payment Screenshot File is required
-                                </small>
-                            )}
+                            </div>
                         </div>
                         <Button className="w-full my-2" type="submit">
                             Submit

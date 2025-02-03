@@ -120,6 +120,7 @@ export default function SelectRolesAndEvents({
             },
             gender: "",
             accomodation: false,
+            blood: ""
         },
     });
 
@@ -141,8 +142,22 @@ export default function SelectRolesAndEvents({
             },
             gender: "",
             accomodation: false,
+            blood: ""
         },
     });
+
+    const [collegeRegion, setCollegeRegion] = useState<string>("");
+
+    useEffect(() => {
+
+        async function regionFetch() {
+            const response = await fetch('/api/getonlycollegeregion');
+            const regionCode = await response.json();
+            const region = regionCode.region.region;
+            setCollegeRegion(region)
+        }
+        regionFetch();
+    }, [collegeRegion])
 
     // Synchronize selectedEvents with form
     useEffect(() => {
@@ -158,6 +173,7 @@ export default function SelectRolesAndEvents({
                 documentUrls[doc.id] || ""
             );
         });
+
     }, [documentUrls, setValue]);
 
     // Add this useEffect alongside the existing one
@@ -434,39 +450,41 @@ export default function SelectRolesAndEvents({
                                         )}
                                     </div>
 
+                                    {collegeRegion && ['Belgavi Region (2)', 'Kalaburgi Region (3)', 'Mysuru Region (4)'].includes(collegeRegion) ?
+                                        <div className="w-full md:w-1/3 space-y-1.5 m-6">
+                                            <Label htmlFor="accommodation">Need Accommodation</Label>
+                                            <Select
+                                                {...register("accomodation")}
+                                                onValueChange={(value) => setValue("accomodation", value === "yes")}
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select Accommodation" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectGroup>
+                                                        <SelectLabel>Accommodation</SelectLabel>
+                                                        <SelectItem value="yes">Yes</SelectItem>
+                                                        <SelectItem value="no">No</SelectItem>
+                                                    </SelectGroup>
+                                                </SelectContent>
+                                            </Select>
+                                            {errors.accomodation && (
+                                                <p className="text-red-500 text-sm">{errors.accomodation.message}</p>
+                                            )}
+                                        </div > : <></>
+                                    }
+
                                     <div className="w-full md:w-1/3 space-y-1.5 m-6">
-                                        <Label htmlFor="accommodation">
-                                            Need Accommodation
-                                        </Label>
-                                        <Select
-                                            {...register("accomodation")}
-                                            onValueChange={(value) =>
-                                                setValue(
-                                                    "accomodation",
-                                                    value === "yes"
-                                                )
-                                            }
-                                        >
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Select Accommodation" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectGroup>
-                                                    <SelectLabel>
-                                                        Accommodation
-                                                    </SelectLabel>
-                                                    <SelectItem value="yes">
-                                                        Yes
-                                                    </SelectItem>
-                                                    <SelectItem value="no">
-                                                        No
-                                                    </SelectItem>
-                                                </SelectGroup>
-                                            </SelectContent>
-                                        </Select>
-                                        {errors.accomodation && (
+                                        <Label htmlFor="blood">Blood Group</Label>
+                                        <Input
+                                            {...register("blood")}
+                                            id="blood"
+                                            name="blood"
+                                            placeholder="Enter the Blood Group"
+                                        />
+                                        {errors.blood && (
                                             <p className="text-red-500 text-sm">
-                                                {errors.accomodation.message}
+                                                {errors.blood.message}
                                             </p>
                                         )}
                                     </div>
@@ -865,39 +883,40 @@ export default function SelectRolesAndEvents({
                                             </p>
                                         )}
                                     </div>
+                                    {collegeRegion && ['Belgavi Region (2)','Kalaburgi Region (3)','Mysuru Region (4)'].includes(collegeRegion)?
+                                        <div className="w-full md:w-1/3 space-y-1.5 m-6">
+                                            <Label htmlFor="Manageraccommodation">Need Accommodation</Label>
+                                            <Select
+                                                {...register("accomodation")}
+                                                onValueChange={(value) => setValue("accomodation", value === "yes")}
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select Accommodation" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectGroup>
+                                                        <SelectLabel>Accommodation</SelectLabel>
+                                                        <SelectItem value="yes">Yes</SelectItem>
+                                                        <SelectItem value="no">No</SelectItem>
+                                                    </SelectGroup>
+                                                </SelectContent>
+                                            </Select>
+                                            {errors.accomodation && (
+                                                <p className="text-red-500 text-sm">{errors.accomodation.message}</p>
+                                            )}
+                                        </div>:<></>
+                                    }
                                     <div className="w-full md:w-1/3 space-y-1.5 m-6">
-                                        <Label htmlFor="Manageraccommodation">
-                                            Need Accommodation
-                                        </Label>
-                                        <Select
-                                            {...register("accomodation")}
-                                            onValueChange={(value) =>
-                                                setValue(
-                                                    "accomodation",
-                                                    value === "yes"
-                                                )
-                                            }
-                                        >
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Select Accommodation" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectGroup>
-                                                    <SelectLabel>
-                                                        Accommodation
-                                                    </SelectLabel>
-                                                    <SelectItem value="yes">
-                                                        Yes
-                                                    </SelectItem>
-                                                    <SelectItem value="no">
-                                                        No
-                                                    </SelectItem>
-                                                </SelectGroup>
-                                            </SelectContent>
-                                        </Select>
-                                        {errors.accomodation && (
+                                        <Label htmlFor="Managerblood">Blood Group</Label>
+                                        <Input
+                                            {...registerManager("blood")}
+                                            id="Managerblood"
+                                            name="blood"
+                                            placeholder="Enter the Blood Group"
+                                        />
+                                        {errors.blood && (
                                             <p className="text-red-500 text-sm">
-                                                {errors.accomodation.message}
+                                                {errors.blood.message}
                                             </p>
                                         )}
                                     </div>

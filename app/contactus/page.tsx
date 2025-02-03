@@ -1,21 +1,67 @@
 "use client";
 
+import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import React from "react";
+import bgImage from "../../components/images/GATBGIMG.png";
+
+// Define the interface for the form fields
+interface IContactForm {
+  name: string;
+  email: string;
+  phone: string;
+  college: string;
+  message: string;
+}
 
 const ContactUs: React.FC = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<IContactForm>();
+
+  const onSubmit = async (data: IContactForm) => {
+    try {
+      const response = await fetch("/api/sendEmail", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to send email");
+      }
+
+      alert("Form submitted and email sent successfully!");
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Failed to send email. Please try again.");
+    }
+  };
+
   return (
-    <div className="overflow-hidden pt-20 pb-12 lg:pt-[120px] lg:pb-[90px] text-[#bbc5c6]">
+    <div
+      className="overflow-hidden pt-20 pb-12 lg:pt-[120px] lg:pb-[90px] text-[#bbc5c6]
+    "
+      style={{
+        backgroundImage: `url(${bgImage.src})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        backgroundAttachment: "fixed",
+      }}
+    >
       <div className="container mx-auto">
         <div className="md:px-12 xl:px-6">
           <div className="relative">
             <div className="lg:w-2/3 mx-auto text-center">
-              <h1 className="text-[#bbc5c6] font-bold text-4xl md:text-6xl xl:text-7xl">
+              <h1 className="text-primary font-bold text-4xl md:text-6xl xl:text-7xl">
                 Contact
-                <span className="text-primary text-[#e2af3e]"> US.</span>
+                <span className="text-primary text-[#e2af3e]"> Us.</span>
               </h1>
             </div>
 
@@ -28,73 +74,128 @@ const ContactUs: React.FC = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <form className="space-y-6">
+                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                     <div>
-                      <label htmlFor="name" className="block mb-2 text-sm font-medium">
+                      <label
+                        htmlFor="name"
+                        className="block mb-2 text-sm font-medium"
+                      >
                         Full name
                       </label>
                       <Input
+                        {...register("name", { required: "Name is required" })}
                         type="text"
                         id="name"
-                        name="name"
                         placeholder="Full Name"
-                        required
                       />
+                      {errors.name && (
+                        <p className="text-red-500 text-sm mt-1">
+                          {errors.name.message}
+                        </p>
+                      )}
                     </div>
 
                     <div>
-                      <label htmlFor="email" className="block mb-2 text-sm font-medium">
+                      <label
+                        htmlFor="email"
+                        className="block mb-2 text-sm font-medium"
+                      >
                         Email
                       </label>
                       <Input
+                        {...register("email", {
+                          required: "Email is required",
+                          pattern: {
+                            value:
+                              /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+                            message: "Invalid email address",
+                          },
+                        })}
                         type="email"
                         id="email"
-                        name="email"
                         placeholder="name@example.com"
-                        required
                       />
+                      {errors.email && (
+                        <p className="text-red-500 text-sm mt-1">
+                          {errors.email.message}
+                        </p>
+                      )}
                     </div>
 
                     <div>
-                      <label htmlFor="phone" className="block mb-2 text-sm font-medium">
+                      <label
+                        htmlFor="phone"
+                        className="block mb-2 text-sm font-medium"
+                      >
                         Phone Number
                       </label>
                       <Input
+                        {...register("phone", {
+                          required: "Phone is required",
+                          pattern: {
+                            value: /^[0-9]{10,15}$/,
+                            message: "Enter a valid phone number",
+                          },
+                        })}
                         type="text"
                         id="phone"
-                        name="phone"
                         placeholder="Phone Number"
-                        required
                       />
+                      {errors.phone && (
+                        <p className="text-red-500 text-sm mt-1">
+                          {errors.phone.message}
+                        </p>
+                      )}
                     </div>
 
                     <div>
-                      <label htmlFor="college" className="block mb-2 text-sm font-medium">
+                      <label
+                        htmlFor="college"
+                        className="block mb-2 text-sm font-medium"
+                      >
                         College
                       </label>
                       <Input
+                        {...register("college", {
+                          required: "College name is required",
+                        })}
                         type="text"
                         id="college"
-                        name="college"
                         placeholder="Enter your College Name"
-                        required
                       />
+                      {errors.college && (
+                        <p className="text-red-500 text-sm mt-1">
+                          {errors.college.message}
+                        </p>
+                      )}
                     </div>
 
                     <div>
-                      <label htmlFor="message" className="block mb-2 text-sm font-medium">
+                      <label
+                        htmlFor="message"
+                        className="block mb-2 text-sm font-medium"
+                      >
                         Message
                       </label>
                       <Textarea
+                        {...register("message", {
+                          required: "Message is required",
+                        })}
                         id="message"
-                        name="message"
                         rows={4}
                         placeholder="Mention your query!"
-                        required
                       />
+                      {errors.message && (
+                        <p className="text-red-500 text-sm mt-1">
+                          {errors.message.message}
+                        </p>
+                      )}
                     </div>
 
-                    <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">
+                    <Button
+                      type="submit"
+                      className="w-full bg-blue-600 hover:bg-blue-700"
+                    >
                       Submit
                     </Button>
                   </form>

@@ -1,4 +1,4 @@
-// 'use client';
+'use client';
 
 // import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from "@/components/ui/card";
 // import Layout from "./layout"; // Adjust the path if necessary

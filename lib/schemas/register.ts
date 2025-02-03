@@ -15,8 +15,7 @@ export const participantFormSchema = z.object({
     teamManager: z.boolean().default(false),
     phone: z
         .string()
-        .min(10, "Enter valid phone number")
-        .regex(/^\d+$/, "Phone must contain only digits"),
+        .regex(/^\d{10}$/, "Phone must be exactly 10 digits"),
     events: z
         .array(
             z.object({
@@ -28,6 +27,7 @@ export const participantFormSchema = z.object({
         .min(1, "Select at least one event"),
     gender: z.string().min(1, "Gender is required"),
     accomodation: z.boolean(),
+    blood: z.string().min(1, "Blood is required"),
     documents: z.object({
         photo: z.string().min(1, "Photo is required"),
         idCard: z.string().min(1, "College ID Card is required"),
@@ -45,12 +45,14 @@ export const managerFormSchema = z.object({
     teamManager: z.boolean().default(true),
     phone: z
         .string()
-        .min(10, "Enter valid phone number")
-        .regex(/^\d+$/, "Phone must contain only digits"),
+        .regex(/^\d{10}$/, "Phone must be exactly 10 digits"),
     documents: z.object({
         photo: z.string().min(1, "Photo is required"),
         idCard: z.string().min(1, "College ID Card is required"),
     }),
     gender: z.string().min(1, "Gender is required"),
     accomodation: z.boolean(),
+    blood: z.string().min(1, "Blood is required"),
 });
+
+

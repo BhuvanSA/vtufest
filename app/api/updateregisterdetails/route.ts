@@ -11,16 +11,18 @@ const registerSchema = z.object({
     }),
     usn: z.string({ message: "usn is required" }),
     gender: z.string({message:"gender is required"}),
-    accomodation : z.boolean({message:"accomodation is required"})
+    accomodation : z.boolean({message:"accomodation is required"}),
+    blood : z.string({message:"blood is required"})
 }).strict();
 
 export interface RegistrantDetailUpdate {
-    id : string,
-    name : string,
-    phone : string,
-    usn : string,
-    gender : string,
-    accomodation : boolean
+    id : string;
+    name : string;
+    phone : string;
+    usn : string;
+    gender : string;
+    accomodation : boolean;
+    blood : string;
 }
 
 export async function PATCH(request: Request) {
@@ -32,7 +34,7 @@ export async function PATCH(request: Request) {
     if(!result.success){
         return NextResponse.json({success:false,message:result.error.message},{status:400});
     }
-
+    console.log(data);
     try {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const updateDetails = await updateRegisterDetails(data);
