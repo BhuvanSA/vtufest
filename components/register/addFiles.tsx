@@ -154,6 +154,7 @@ export default function SelectRolesAndEvents({
             const response = await fetch('/api/getonlycollegeregion');
             const regionCode = await response.json();
             const region = regionCode.region.region;
+            console.log("Region:",region);
             setCollegeRegion(region)
         }
         regionFetch();

@@ -4,7 +4,6 @@ import bcrypt from "bcrypt";
 import { z } from "zod";
 import { Redis } from "@upstash/redis";
 import { signupSchema } from "@/lib/schemas/auth";
-import { addCollege } from "@/app/prismaClient/queryFunction";
 
 // Initialize Upstash Redis client
 const redis = new Redis({
@@ -81,23 +80,23 @@ export async function POST(request: Request) {
 
         const {  email, phone, otp, password, collegeCode, collegeName, region } = validation.data;
         console.log(collegeName,email,password,otp,phone);
-        console.log("fjdaklsjkl")
+
         // Check if the user already exists in the database (by email or phone)
-        // const existingUser = await prisma.users.findFirst({
-        //     where: {
-        //         OR: [{ email }, { phone }],
-        //     },
-        // });
+        const existingUser = await prisma.users.findFirst({
+            where: {
+                OR: [{ email }, { phone }],
+            },
+        });
+        console.log("the existing user",existingUser);
 
-
-        // if (existingUser) {
-        //     return NextResponse.json({
-        //         success: false,
-        //         errors: {
-        //             email: "A user with this email or phone number already exists.",
-        //         },
-        //     });
-        // }
+        if (existingUser) {
+            return NextResponse.json({
+                success: false,
+                errors: {
+                    email: "A user with this email or phone number already exists.",
+                },
+            });
+        }
 
         // Verify OTP entered by the user
         const otpValidation = await verifyOtp(email, otp);
@@ -114,11 +113,19 @@ export async function POST(request: Request) {
         const hashedPassword = await bcrypt.hash(password, 13);
 
         console.log("hashed password",hashedPassword);
-        console.log(collegeName,email,password,otp,phone,region,collegeCode);
+
         // Create the user in the database
-        const newUser = addCollege(collegeName,email,hashedPassword,otp,phone,region,collegeCode);
-        
-        console.log(newUser);
+        const newUser = await prisma.users.create({
+            data: {
+                collegeName: collegeName,
+                email,
+                phone,
+                password: hashedPassword, // Store the hashed password
+                collegeCode: collegeCode,
+                region : region
+            },
+        });
+
         // Return successful response
         return NextResponse.json(
             {
@@ -134,7 +141,7 @@ export async function POST(request: Request) {
             { status: 200 }
         );
     } catch (error: unknown) {
-        console.log(error);
+        console.error("Error in registration process:", error);
         return NextResponse.json(
             { success: false, errors: { general: "Internal Server Error" } },
             { status: 500 }
