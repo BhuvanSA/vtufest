@@ -43,7 +43,15 @@ const list = [
     image: Image2
   },
   {
-    name: 'Keerthan K Archarya',
+    name: 'Anuj',
+    linkedIn: '',
+    insta: '',
+    twitter: '',
+    github: '',
+    image: Image2
+  },
+  {
+    name: 'Bhavya Bhosale',
     linkedIn: '',
     insta: '',
     twitter: '',
