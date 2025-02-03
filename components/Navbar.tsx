@@ -2,16 +2,15 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import NavItem from "./NavItem";
+// import NavItem from "./NavItem";
 import { Dialog, DialogOverlay } from "./ui/dialog";
 import { useAuthContext } from "@/contexts/auth-context";
 import Image from "next/image";
 import { ThemeToggler } from "@/contexts/theme-provider";
-import { X, Menu } from "lucide-react";
+import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import gatLogo from "@/public/images/old-college-logo.png"
-import vtulogo from '@/public/images/vtulogo.png'
-import background from "@/public/images/Untitled design (2).png";
+
+import vtulogo from "@/public/images/vtulogo.png";
 
 export const navItems = [
     { href: "/", text: "Home" },
@@ -83,50 +82,102 @@ const NavBar = () => {
     };
 
     return (
-
-        <header className=" w-full bg-transparent absolute top-0 text-primary_heading backdrop-blur-lg  border-none fixed z-10 shadow-4xl">
-            
-            <div className="flex ">
-            <div className="flex items-center gap-2 mx-5 text-2xl">
-                <Image
-                    src={gatLogo}
-                    alt="College Logo"
-                    width={60}
-                    height={60}
-                    priority
-                    className=""
-                />
+        <header className="fixed top-0 left-0 right-0 w-full backdrop-blur-sm border-none shadow-sm z-50 ">
+            <div className="flex items-center justify-between text-2xl mt-4 px-32 ">
+                <div className="flex gap-10">
+                    <Image
+                        src="/images/college-logo.png"
+                        alt="College Logo"
+                        width={80}
+                        height={80}
+                        priority
+                    />
+                    <h1 className="text-primary_heading text-4xl font-bold tracking-widest  transition-colors">
+                        Global Academy of Technology
+                        <div className="text-red-500 text-xl font-semibold mt-2 text-left  ">
+                            An Autonomus Institute, Affiliated to VTU
+                        </div>
+                    </h1>
+                </div>
                 <Image
                     src={vtulogo}
                     alt="College Logo"
-                    width={80}
-                    height={80}
+                    width={100}
+                    height={100}
                     priority
-                    className="  "
                 />
             </div>
-            <div>
-            <div className="mx-auto text-primary_heading text-xl font-bold relative right-5 top-5 text-primary_heading">
-                    Global Academy of Technology
-                    {/* <div className="text-red-500  text-xl font-semibold mt-2 text-left tracking-widest ">
-                        An Autonomus Institute, Affiliated to VTU
-                    </div> */}
-                </div>
+            <div className="flex items-center mt-6 justify-center max-w-6xl lg:max-w-[72rem] xl:max-w-6xl px-4 mx-auto sm:px-6">
+                {/* <div className="hidden lg:block overflow-x-auto whitespace-nowrap">
+                    <nav className="flex space-x-3 text-lg">
+                        {navItems.map(({ href, text }, index) => (
+                            <NavItem
+                                key={index}
+                                href={href}
+                                text={text}
+                                isActive={
+                                    pathname === href ||
+                                    (pathname.startsWith(
+                                        "/" + href.split("/")[1]
+                                    ) &&
+                                        href !== "/")
+                                }
+                            />
+                        ))}
+                        {isLoggedIn ? (
+                            <>
+                                <NavItem
+                                    href="/register/getallregister"
+                                    text="Register"
+                                    isActive={pathname.startsWith("/register")}
+                                />
+                                <NavItem
+                                    href="/auth/logout"
+                                    text="Logout"
+                                    isActive={pathname.startsWith("/auth")}
+                                    className="hover:bg-red-500"
+                                />
+                            </>
+                        ) : (
+                            <>
+                                <NavItem
+                                    href="/auth/signin"
+                                    text="Login"
+                                    isActive={pathname.startsWith("/auth")}
+                                />
+                            </>
+                        )}
+                    </nav>
+                </div> */}
+                {/* <div className="flex items-center space-x-4">
+                    <div className="flex items-center">
+                        <ThemeToggler />
+                    </div>
+                    <div
+                        className="lg:hidden flex items-center"
+                        onClick={handleClick}
+                    >
+                        <Menu />
+                    </div>
+                </div> */}
             </div>
-            <div className="flex items-center text-white justify-center max-w-6xl lg:max-w-[72rem] xl:max-w-4xl px-3 py-3 mx-auto sm:px-6">
+            {/* new navigation menu */}
+            <div className="flex items-center justify-center max-w-6xl lg:max-w-[72rem] xl:max-w-6xl px-3 mx-auto sm:px-6">
                 <NavigationMenu>
-                    <NavigationMenuList className="flex gap-0 ">
-                        <NavigationMenuItem>
+                    <NavigationMenuList className="bg-inherit">
+                        <NavigationMenuItem className="bg-inherit">
                             <Link href="/" legacyBehavior passHref>
                                 <NavigationMenuLink
-                                    className={navigationMenuTriggerStyle()}
+                                    className={`${navigationMenuTriggerStyle()} bg-inherit`}
                                 >
                                     Home
                                 </NavigationMenuLink>
                             </Link>
                         </NavigationMenuItem>
                         <NavigationMenuItem>
-                            <NavigationMenuTrigger className="font-normal">About</NavigationMenuTrigger>
+                            <NavigationMenuTrigger className={` bg-inherit`}>
+                                About
+                            </NavigationMenuTrigger>
                             <NavigationMenuContent>
                                 <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
                                     <li className="row-span-3">
@@ -158,10 +209,11 @@ const NavBar = () => {
                                             </a>
                                         </NavigationMenuLink>
                                     </li>
-                                    <ListItem href="/about" title="About GAT">
+                                    
+                                    {/* <ListItem href="/about" title="About GAT">
                                         Information about the college and its
                                         history.
-                                    </ListItem>
+                                    </ListItem> */}
                                     <ListItem
                                         href="/about/vtu"
                                         title="About VTU"
@@ -174,12 +226,21 @@ const NavBar = () => {
                                     >
                                         About the Youth Fest and its history.
                                     </ListItem>
+                                    <ListItem
+                                        href="/Dignitaries"
+                                        title="Organising Committee"
+                                    >
+                                        Information about the Organising Committee.
+                                    </ListItem>
+                                    
                                 </ul>
                             </NavigationMenuContent>
                         </NavigationMenuItem>
                         <NavigationMenuItem>
-                            <NavigationMenuTrigger className="font-normal">Event</NavigationMenuTrigger>
-                            <NavigationMenuContent className="">
+                            <NavigationMenuTrigger className={` bg-inherit`}>
+                                Event
+                            </NavigationMenuTrigger>
+                            <NavigationMenuContent>
                                 <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
                                     {components.map((component) => (
                                         <ListItem
@@ -190,26 +251,38 @@ const NavBar = () => {
                                             {component.description}
                                         </ListItem>
                                     ))}
+                                    <ListItem
+                                        href="/generalinstructions"
+                                        title="General Instructions"
+                                    >
+                                        Information about general instructions.
+                                    </ListItem>
+                                    <ListItem
+                                        href="/rulesandregulations"
+                                        title="Rules and Regulations"
+                                    >
+                                        Information about rules and regulations.
+                                    </ListItem>
                                 </ul>
                             </NavigationMenuContent>
                         </NavigationMenuItem>
-                        <NavigationMenuItem>
+                        {/* <NavigationMenuItem>
                             <Link href="/Dignitaries" legacyBehavior passHref>
                                 <NavigationMenuLink
-                                    className={navigationMenuTriggerStyle()}
+                                    className={`${navigationMenuTriggerStyle()} bg-inherit`}
                                 >
                                     Organising Committe
                                 </NavigationMenuLink>
                             </Link>
-                        </NavigationMenuItem>
-                        <NavigationMenuItem>
+                        </NavigationMenuItem> */}
+                        {/* <NavigationMenuItem>
                             <Link
                                 href="/generalinstructions"
                                 legacyBehavior
                                 passHref
                             >
                                 <NavigationMenuLink
-                                    className={navigationMenuTriggerStyle()}
+                                    className={`${navigationMenuTriggerStyle()} bg-inherit`}
                                 >
                                     General Instructions
                                 </NavigationMenuLink>
@@ -222,46 +295,63 @@ const NavBar = () => {
                                 passHref
                             >
                                 <NavigationMenuLink
-                                    className={navigationMenuTriggerStyle()}
+                                    className={`${navigationMenuTriggerStyle()} bg-inherit`}
                                 >
                                     Rules and Regulations
                                 </NavigationMenuLink>
                             </Link>
-                        </NavigationMenuItem>
+                        </NavigationMenuItem> */}
                         <NavigationMenuItem>
                             <Link href="/contactus" legacyBehavior passHref>
                                 <NavigationMenuLink
-                                    className={navigationMenuTriggerStyle()}
+                                    className={`${navigationMenuTriggerStyle()} bg-inherit`}
                                 >
                                     Contact Us
                                 </NavigationMenuLink>
                             </Link>
                         </NavigationMenuItem>
 
-
                         {isLoggedIn ? (
                             <>
                                 <NavigationMenuItem>
-                                    <Link href={"/register/getallregister"} legacyBehavior passHref>
+                                    <Link
+                                        href={"/register/getallregister"}
+                                        legacyBehavior
+                                        passHref
+                                    >
                                         <NavigationMenuLink
-                                            className={navigationMenuTriggerStyle()}
-
-                                        >Register</NavigationMenuLink>
-                                    </Link></NavigationMenuItem>
+                                            className={`${navigationMenuTriggerStyle()} bg-inherit`}
+                                        >
+                                            Register
+                                        </NavigationMenuLink>
+                                    </Link>
+                                </NavigationMenuItem>
                                 <NavigationMenuItem>
-                                    <Link href={"/auth/logout"} legacyBehavior passHref>
+                                    <Link
+                                        href={"/auth/logout"}
+                                        legacyBehavior
+                                        passHref
+                                    >
                                         <NavigationMenuLink
-                                            className={navigationMenuTriggerStyle()}
-                                        >Logout</NavigationMenuLink>
-                                    </Link></NavigationMenuItem>
+                                            className={`${navigationMenuTriggerStyle()} bg-inherit`}
+                                        >
+                                            Logout
+                                        </NavigationMenuLink>
+                                    </Link>
+                                </NavigationMenuItem>
                             </>
                         ) : (
                             <>
-                                <Link href="/auth/signin" legacyBehavior passHref>
+                                <Link
+                                    href="/auth/signin"
+                                    legacyBehavior
+                                    passHref
+                                >
                                     <NavigationMenuLink
-                                        className={navigationMenuTriggerStyle()}
-
-                                    >Login</NavigationMenuLink>
+                                        className={`${navigationMenuTriggerStyle()} bg-inherit`}
+                                    >
+                                        Login
+                                    </NavigationMenuLink>
                                 </Link>
                             </>
                         )}
@@ -322,9 +412,6 @@ const NavBar = () => {
                     </div>
                 </Dialog>
             )}
-            </div>
-            {/* new navigation menu */}
-           
         </header>
     );
 };

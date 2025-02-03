@@ -2,7 +2,6 @@ import Image from "next/image";
 import insta from "@/public/images/instalogo.png";
 import yt from "@/public/images/youtube_1384060.png";
 import facebook from "@/public/images/facebook_logo_icon_147291.png";
-import gatlogo from "@/public/images/old-college-logo.png"
 
 const Footer = () => {
     return (
@@ -13,7 +12,7 @@ const Footer = () => {
                     {/* College Logo */}
                     <div className="w-full lg:w-1/3 flex justify-center lg:justify-center">
                         <Image
-                            src={gatlogo}
+                            src="/images/college-logo.png"
                             alt="Global Academy of Technology logo"
                             width={150}
                             height={150}
@@ -29,9 +28,11 @@ const Footer = () => {
                         <h2 className="text-xl sm:text-2xl font-bold text-red-500 mb-2">
                             Growing Ahead of Time ....
                         </h2>
-                        <p className="text-lg font-bold mb-2">Autonomous Institute, Affiliated to VTU</p>
+                        <p className="text-lg font-bold mb-2">
+                            Autonomous Institute, Affiliated to VTU
+                        </p>
                         <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-primary">
-                            A Institution of National Education Foundation
+                            Institute of National Education Foundation
                         </h2>
                     </div>
                 </div>
@@ -96,13 +97,12 @@ const Footer = () => {
                 {/* Footer Bottom Section */}
                 <div className="mt-12 border-t border-border pt-6">
                     <p className="text-center text-sm text-muted-foreground">
-                        <a href="/ourteam" className="hover:text-primary transition">
-                            &copy; {new Date().getFullYear()} Global Academy of Technology
-                        </a>
-                        <br></br>
-                        <br />
-                        <a href="/developer" className="hover:text-primary transition pt-4">
-                            Developed by
+                        <a
+                            href="/ourteam"
+                            className="hover:text-primary transition"
+                        >
+                            &copy; {new Date().getFullYear()} Global Academy of
+                            Technology
                         </a>
                     </p>
                 </div>
@@ -112,4 +112,3 @@ const Footer = () => {
 };
 
 export default Footer;
-
