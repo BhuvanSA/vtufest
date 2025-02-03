@@ -105,7 +105,7 @@ const Background = () => {
     };
 
     return (
-        <div className="relative w-full h-[600px] mt-[100px] overflow-hidden bg-gray-900 text-white">
+        <div className="relative w-full h-[600px] overflow-hidden bg-gray-900 text-white">
             {/* Outer wrapper to capture touch events and display the horizontal slider */}
             <div
                 className="w-full h-full flex transition-transform duration-700 ease-in-out"
@@ -127,7 +127,7 @@ const Background = () => {
                             alt={`Slide ${idx}`}
                             fill
                             priority={idx === 0}
-                            className="object-cover"
+                            className="object-fill"
                         />
                         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/60" />
                         <div className="absolute bottom-8 left-8 z-10">
@@ -157,7 +157,7 @@ const Background = () => {
             </button>
 
             {/* Dots Indicators */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
+            <div className=" flex container ">
                 {images.map((_, idx) => (
                     <button
                         key={idx}

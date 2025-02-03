@@ -78,24 +78,24 @@ const NavBar = () => {
                         <h1 className="text-white font-bold tracking-widest transition-colors">
                             Global Academy of Technology
                         </h1>
-                        <div className="text-white text-sm md:text-base font-semibold mt-1">
+                        <div className="text-white text-sm md:text-base pb-2 font-semibold mt-1">
                             An Autonomous Institute, Affiliated to VTU
                         </div>
                     </div>
-                    <Image src={vtulogo || "/placeholder.svg"} alt="VTU Logo" width={80} height={50} priority />
+                    <Image src={vtulogo || "/placeholder.svg"} alt="VTU Logo" width={90} height={60} priority />
                 </div>
 
                 <div className="md:hidden">
                     <button
                         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                        className="text-foreground hover:text-primary transition-colors"
+                        className="text-white border-2 border p-1 rounded-xs absolute top-3 font-extrabold right-3  text-foreground hover:text-primary transition-colors"
                     >
                         <Menu className="h-6 w-6" />
                     </button>
                 </div>
             </div>
 
-            <div className="hidden md:flex items-center flex-wrap justify-center max-w-6xl lg:max-w-[72rem] pb-2 xl:max-w-6xl px-3 mx-auto sm:px-6">
+            <div className="hidden md:flex items-center flex-wrap  justify-center max-w-6xl lg:max-w-[72rem] pb-2 xl:max-w-6xl px-3 mx-auto sm:px-6">
                 <NavigationMenu>
                     <NavigationMenuList className="bg-inherit">
                         <NavigationMenuItem className="bg-inherit">
