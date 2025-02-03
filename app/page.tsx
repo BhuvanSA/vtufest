@@ -12,7 +12,7 @@ const Home = () => {
   return (
     <div className="bg-background pt-4">
       {/* Carousel / Header Section in an elegant bordered container with extra shadow */}
-      <div className="max-w-5xl mx-auto border border-gray-300 rounded-lg overflow-hidden shadow-2xl mb-8">
+      <div className="max-w-5xl mx-auto border mt-10 border-gray-300 rounded-lg overflow-hidden shadow-2xl mb-8">
         <Header />
       </div>
 

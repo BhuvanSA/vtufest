@@ -21,6 +21,7 @@ export type Registrant = {
     admission2Url?: string;
     userId: string;
     gender : string;
+    blood : string;
     accomodation : boolean;
     events: {
         eventNo: number;
@@ -95,7 +96,8 @@ export async function POST(request: Request) {
             userId: session.id as string, // Type assertion to string
             events: validation.data.events, // Ensure events are included
             gender: validation.data.gender as string,
-            accomodation :validation.data.accomodation as boolean
+            accomodation :validation.data.accomodation as boolean,
+            blood : validation.data.blood
         };
 
         if (
@@ -177,7 +179,8 @@ export async function POST(request: Request) {
             userId: session.id as string, // Type assertion to string
             events: [], // Team Managers do not select events
             accomodation : validation.data.accomodation as boolean,
-            gender : validation.data.gender as string
+            gender : validation.data.gender as string,
+            blood: validation.data.blood as string
         };
 
         // Check for existing registrant with same USN or phone

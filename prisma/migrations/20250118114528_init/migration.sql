@@ -1,6 +1,9 @@
 -- CreateEnum
 CREATE TYPE "Type" AS ENUM ('PARTICIPANT', 'ACCOMPANIST');
 
+-- CreateEnum
+CREATE TYPE "DocumentVerificationStatus" AS ENUM ('PENDING', 'PROCESSING', 'APPROVED', 'REJECTED');
+
 -- CreateTable
 CREATE TABLE "Users" (
     "id" TEXT NOT NULL,
@@ -11,6 +14,11 @@ CREATE TABLE "Users" (
     "password" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "role" TEXT NOT NULL DEFAULT 'USER',
+    "paymentUrl" TEXT,
+    "txnNumber" TEXT,
+    "Amount" INTEGER,
+    "PaymentVerified" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "Users_pkey" PRIMARY KEY ("id")
 );
@@ -44,8 +52,11 @@ CREATE TABLE "Registrants" (
     "admission1Url" TEXT,
     "admission2Url" TEXT,
     "idcardUrl" TEXT,
+    "gender" TEXT NOT NULL,
+    "accomodation" BOOLEAN NOT NULL DEFAULT false,
+    "blood" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
-    "verified" BOOLEAN NOT NULL DEFAULT false,
+    "docStatus" "DocumentVerificationStatus" NOT NULL DEFAULT 'PENDING',
 
     CONSTRAINT "Registrants_pkey" PRIMARY KEY ("id")
 );

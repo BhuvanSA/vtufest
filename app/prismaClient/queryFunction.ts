@@ -24,7 +24,8 @@ export async function insertRegistrant(
                         idcardUrl: arg.idcardUrl,
                         userId: arg.userId,
                         accomodation : arg.accomodation,
-                        gender:arg.gender
+                        gender:arg.gender,
+                        blood : arg.blood
                     },
                 });
                 return registrant;
@@ -78,7 +79,8 @@ export async function insertRegistrant(
                     idcardUrl: arg.idcardUrl,
                     userId: arg.userId,
                     accomodation: arg.accomodation,
-                    gender :arg.gender
+                    gender :arg.gender,
+                    blood:arg.blood
                 },
             });
 
@@ -571,7 +573,8 @@ export async function updateRegisterDetails(data: RegistrantDetailUpdate) {
                 usn: data.usn,
                 phone: data.phone,
                 gender:data.gender,
-                accomodation : data.accomodation
+                accomodation : data.accomodation,
+                blood : data.blood
             },
         });
     } catch (err: unknown) {
@@ -1004,4 +1007,61 @@ export async function savePayment(userId:string,txnNumber:string,paymentUrl:stri
         }
     }
     
+}
+
+
+export async function addCollege(collegeName:string,email:string,hashedPassword:string,otp:string,phone:string,region:string,collegeCode:string){
+    const newUser = await prisma.users.create({
+        data: {
+            collegeName: collegeName as string,
+            email:email as string,
+            phone:phone as string,
+            password: hashedPassword, // Store the hashed password
+            collegeCode: collegeCode as string,
+            region : region as string,
+            
+        },
+    });
+    return newUser;
+}
+
+
+export async function getCollegeRegion(userId:string) {
+    try{
+        const region = await prisma.users.findFirst({
+            where:{
+                id: userId
+            },
+            select:{
+                region: true
+            }
+        })
+        return region;
+    }catch (err: unknown) {
+        if (err instanceof Prisma.PrismaClientKnownRequestError) {
+            // Handle specific Prisma error codes
+            switch (err.code) {
+                case "P2002":
+                    throw new Error(
+                        `Unique constraint failed on the field: ${err.meta?.target}`
+                    );
+                case "P2025":
+                    throw new Error("Record not found");
+                default:
+                    throw new Error(`Prisma error: ${err.message}`);
+            }
+        } else if (err instanceof Prisma.PrismaClientValidationError) {
+            throw new Error(`Validation error: ${err.message}`);
+        } else {
+            // Generic error handling
+            console.error("Unexpected error:", err);
+            if (err instanceof Error) {
+                throw new Error(err.message || "An unexpected error occurred");
+            } else {
+                throw new Error("An unexpected error occurred");
+            }
+        }
+    }
+    
+
 }

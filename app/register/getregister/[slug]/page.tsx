@@ -1,4 +1,7 @@
 "use client";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import Image from "next/image";
 import React, { useEffect, useState } from "react";
 
 // Define types for the student data
@@ -118,46 +121,44 @@ export default function GetRegistrant({
     return (
         <div className="min-h-screen bg-50 flex items-center justify-center p-6">
             {/* Main Container centered */}
-            <div className="w-full max-w-6xl bg-white shadow-md rounded-lg p-6 pt-24">
+            <div className="w-full max-w-6xl mt-20 bg-white shadow-md rounded-lg p-6 ">
                 {/* Header */}
                 <div className="text-2xl font-bold mb-6">Student Dashboard</div>
 
                 {/* Profile Section */}
-                <div className="bg-white shadow-md rounded-lg p-4 mb-6">
-                    <div className="flex items-center space-x-6">
+                <Card className="mb-6">
+                    <div className="flex items-center space-x-6 p-5">
                         <div className="w-32 h-32 border-4 border-blue-500 rounded-full flex items-center justify-center text-blue-500 font-bold">
                             {/* Profile Picture */}
-                            <div className="w-32 h-32 border-4 border-blue-500 rounded-full flex items-center justify-center text-blue-500 font-bold">
-                                {/* Profile Picture */}
-                                {studentData?.photoUrl ? (
-                                    <img
-                                        src={studentData.photoUrl}
-                                        alt="Profile"
-                                        className="w-full h-full object-cover rounded-full"
-                                    />
-                                ) : (
-                                    <div className="w-full h-full bg-gray-200 object-cover rounded-full flex items-center justify-center text-gray-500">
-                                        No Image
-                                    </div>
-                                )}
-                            </div>
+                            {studentData?.photoUrl ? (
+                                <Image
+                                    src={`https://${process.env.UPLOADTHING_APP_ID}.ufs.sh/f/${studentData.photoUrl}`}
+                                    alt="Profile"
+                                    width={500}
+                                    height={500}
+                                    className="w-full h-full object-cover rounded-full"
+                                />
+                            ) : (
+                                <div className="w-full h-full bg-gray-200 object-cover rounded-full flex items-center justify-center text-gray-500">
+                                    No Image
+                                </div>
+                            )}
                         </div>
                         <div>
+                            
                             <div
-                                className={`text-xl font-semibold ${
-                                    isVerified
-                                        ? "text-green-500"
-                                        : "text-red-500"
+                                className={`text-xl font-semibold flex ${
+                                    isVerified ? "text-green-500" : "text-red-500"
                                 }`}
                             >
                                 {studentData?.name}
-                                <button
-                                    onClick={toggleVerification}
-                                    className="ml-4 text-1xl  p-2 rounded-lg "
-                                    disabled={isVerified ? true : false}
+                                <div
+                                    // onClick={()=>toggleVerification()}
+                                    className={`ml-4 text-lg mx-4 mb-5 p-2 text-white rounded-lg ${isVerified? 'bg-green-600 hover:bg-green-600':'bg-red-500 hover:bg-red-500'}`}
+                                    // disabled={isVerified ? true : false}
                                 >
                                     {isVerified ? "Verified ✅" : "Unverified"}
-                                </button>
+                                </div>
                             </div>
                             <div className="text-gray-500">
                                 USN: {studentData?.usn}
@@ -167,16 +168,16 @@ export default function GetRegistrant({
                             </div>
                         </div>
                     </div>
-                </div>
+                </Card>
 
                 {/* Content Section */}
                 <div className="grid md:grid-cols-2 gap-4">
                     {/* Events Participated */}
-                    <div className="bg-white shadow-md rounded-lg p-4">
-                        <div className="text-lg font-semibold mb-4">
+                    <Card>
+                        <div className="text-lg font-semibold mb-4 p-8">
                             Events Registered
                         </div>
-                        <ul className="space-y-2">
+                        <ul className="space-y-2 p-5 overflow-auto">
                             {studentData?.eventRegistrations.map(
                                 (registration) => {
                                     const event = studentData?.events.find(
@@ -195,41 +196,41 @@ export default function GetRegistrant({
                                         >
                                             <span>{event.eventName}</span>
                                             <div className="flex space-x-2 items-center">
-                                                <button
-                                                    onClick={() =>
-                                                        toggleAttendance(
-                                                            studentData.usn,
-                                                            registration.registrantId,
-                                                            registration.eventId
-                                                        )
-                                                    }
+                                                <Button
+                                                    // onClick={() =>
+                                                    //     toggleAttendance(
+                                                    //         studentData.usn,
+                                                    //         registration.registrantId,
+                                                    //         registration.eventId
+                                                    //     )
+                                                    // }
                                                     className={`${
                                                         registration.attendanceStatus
-                                                            ? "bg-green-500"
-                                                            : "bg-red-500"
+                                                            ? "bg-green-500 hover:bg-green-500 "
+                                                            : "bg-red-500 hover:bg-red-500 "
                                                     } text-white px-4 py-2 rounded`}
                                                 >
                                                     {registration.attendanceStatus
                                                         ? "Attended"
-                                                        : "Mark as Attended"}
-                                                </button>
+                                                        : "Not Attended"}
+                                                </Button>
                                             </div>
                                         </li>
                                     );
                                 }
                             )}
                         </ul>
-                    </div>
+                    </Card>
 
                     {/* Documents */}
-                    <div className="bg-white shadow-md rounded-lg p-4">
-                        <div className="text-lg font-semibold mb-4">
+                    <Card>
+                        <div className="text-lg font-semibold mb-4 p-5 ">
                             Documents
                         </div>
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-2 gap-3 p-5">
                             {/* Render document links if you have them */}
                             <a
-                                href={studentData?.aadharUrl ?? "#"}
+                                href={`https://${process.env.UPLOADTHING_APP_ID}.ufs.sh/f/${studentData?.aadharUrl}`}
                                 className="bg-gray-100 p-3 rounded-lg flex items-center space-x-2 hover:bg-gray-200"
                                 target="_blank"
                                 rel="noopener noreferrer"
@@ -238,7 +239,7 @@ export default function GetRegistrant({
                                 <span>Aadhar Card</span>
                             </a>
                             <a
-                                href={studentData?.idcardUrl ?? "#"}
+                                href={`https://${process.env.UPLOADTHING_APP_ID}.ufs.sh/f/${studentData?.idcardUrl}`}
                                 className="bg-gray-100 p-3 rounded-lg flex items-center space-x-2 hover:bg-gray-200"
                                 target="_blank"
                                 rel="noopener noreferrer"
@@ -248,16 +249,16 @@ export default function GetRegistrant({
                             </a>
 
                             <a
-                                href={studentData?.admission1Url ?? "#"}
+                                href={`https://${process.env.UPLOADTHING_APP_ID}.ufs.sh/f/${studentData?.admission1Url}`}
                                 className="bg-gray-100 p-3 rounded-lg flex items-center space-x-2 hover:bg-gray-200"
                                 target="_blank"
                                 rel="noopener noreferrer"
                             >
                                 <span>📄</span>
-                                <span>Admission First Year</span>
+                                <span>First Year Fee Receipt</span>
                             </a>
                             <a
-                                href={studentData?.admission2Url ?? "#"}
+                                href={`https://${process.env.UPLOADTHING_APP_ID}.ufs.sh/f/${studentData?.admission2Url}`}
                                 className="bg-gray-100 p-3 rounded-lg flex items-center space-x-2 hover:bg-gray-200"
                                 target="_blank"
                                 rel="noopener noreferrer"
@@ -267,7 +268,7 @@ export default function GetRegistrant({
                             </a>
 
                             <a
-                                href={studentData?.pucUrl ?? "#"}
+                                href={`https://${process.env.UPLOADTHING_APP_ID}.ufs.sh/f/${studentData?.pucUrl}`}
                                 className="bg-gray-100 p-3 rounded-lg flex items-center space-x-2 hover:bg-gray-200"
                                 target="_blank"
                                 rel="noopener noreferrer"
@@ -276,7 +277,7 @@ export default function GetRegistrant({
                                 <span>12th marks sheet</span>
                             </a>
                             <a
-                                href={studentData?.sslcUrl ?? "#"}
+                                href={`https://${process.env.UPLOADTHING_APP_ID}.ufs.sh/f/${studentData?.sslcUrl}`}
                                 className="bg-gray-100 p-3 rounded-lg flex items-center space-x-2 hover:bg-gray-200"
                                 target="_blank"
                                 rel="noopener noreferrer"
@@ -286,7 +287,7 @@ export default function GetRegistrant({
                             </a>
                             {/* Add more documents similarly */}
                         </div>
-                    </div>
+                    </Card>
                 </div>
             </div>
         </div>

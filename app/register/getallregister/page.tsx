@@ -88,6 +88,14 @@ export default async function Page() {
             .filter((r) => r.type === "ACCOMPANIST" && r.eventName)
             .map((r) => ({ eventName: r.eventName! }));
 
+        const participantAccompanistEvents = row.registrations
+            .filter((r) => r.type === 'ACCOMPANIST' || r.type === 'PARTICIPANT')
+            .map((r) => ({ eventName: r.eventName! }));
+
+
+
+
+
         // If no events at all, push a single blank record
         if (!hasEvents) {
             results.push({
@@ -101,6 +109,8 @@ export default async function Page() {
             });
             continue;
         }
+
+
 
         // If participant
         if (participantEvents.length > 0) {
@@ -127,6 +137,19 @@ export default async function Page() {
                 status: docStatusMap[row.docStatus],
             });
         }
+        if (participantAccompanistEvents.length > 0) {
+            results.push({
+                id: `${row.registrantId}#PARTICIPANT, ACCOMPANIST`,
+                name: row.name,
+                usn: row.usn,
+                photo: row.photoUrl,
+                type: "Participant, Accompanist",
+                events: participantAccompanistEvents,
+                status: docStatusMap[row.docStatus],
+            });
+            continue;
+        }
+
     }
 
     return (
@@ -167,6 +190,6 @@ export default async function Page() {
                     </Button>
                 </Link>
             </div>
-        </div>
+        </div> 
     );
 }
