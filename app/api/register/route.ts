@@ -22,6 +22,7 @@ export type Registrant = {
     userId: string;
     gender : string;
     blood : string;
+    email : string;
     accomodation : boolean;
     events: {
         eventNo: number;
@@ -82,6 +83,7 @@ export async function POST(request: Request) {
 
         // Map incoming data to include all required Registrant fields
         const registrantData: Registrant = {
+            email : validation.data.email,
             name: validation.data.name,
             usn: validation.data.usn,
             phone: validation.data.phone,
@@ -166,6 +168,7 @@ export async function POST(request: Request) {
         // Map incoming data to include all required Registrant fields
         const registrantData: Registrant = {
             name: validation.data.name,
+            email : validation.data.email,
             usn: validation.data.usn,
             phone: validation.data.phone,
             teamManager: validation.data.teamManager,

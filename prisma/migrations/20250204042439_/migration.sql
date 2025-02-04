@@ -4,11 +4,16 @@ CREATE TYPE "Type" AS ENUM ('PARTICIPANT', 'ACCOMPANIST');
 -- CreateEnum
 CREATE TYPE "DocumentVerificationStatus" AS ENUM ('PENDING', 'PROCESSING', 'APPROVED', 'REJECTED');
 
+-- CreateEnum
+CREATE TYPE "PaymentVerifiedStatus" AS ENUM ('PENDING', 'COMPLETED', 'FAILED');
+
 -- CreateTable
 CREATE TABLE "Users" (
     "id" TEXT NOT NULL,
-    "collegeCode" TEXT,
+    "collegeCode" TEXT NOT NULL,
     "collegeName" TEXT NOT NULL,
+    "region" TEXT NOT NULL,
+    "collegeOurCode" TEXT,
     "phone" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
@@ -18,7 +23,7 @@ CREATE TABLE "Users" (
     "paymentUrl" TEXT,
     "txnNumber" TEXT,
     "Amount" INTEGER,
-    "PaymentVerified" BOOLEAN NOT NULL DEFAULT false,
+    "PaymentVerified" "PaymentVerifiedStatus" NOT NULL DEFAULT 'PENDING',
 
     CONSTRAINT "Users_pkey" PRIMARY KEY ("id")
 );
@@ -46,6 +51,7 @@ CREATE TABLE "Registrants" (
     "phone" TEXT NOT NULL,
     "teamManager" BOOLEAN NOT NULL DEFAULT false,
     "photoUrl" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
     "aadharUrl" TEXT,
     "sslcUrl" TEXT,
     "pucUrl" TEXT,
@@ -83,6 +89,12 @@ CREATE TABLE "_EventRegistrations" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Users_collegeCode_key" ON "Users"("collegeCode");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Users_collegeName_key" ON "Users"("collegeName");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Users_collegeOurCode_key" ON "Users"("collegeOurCode");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Users_phone_key" ON "Users"("phone");

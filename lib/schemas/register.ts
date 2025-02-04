@@ -16,6 +16,7 @@ export const participantFormSchema = z.object({
     phone: z
         .string()
         .regex(/^\d{10}$/, "Phone must be exactly 10 digits"),
+    email: z.string().email(),
     events: z
         .array(
             z.object({
@@ -43,6 +44,7 @@ export const managerFormSchema = z.object({
     name: z.string().min(1, "Name required"),
     usn: z.string().min(1, "USN required"),
     teamManager: z.boolean().default(true),
+    email: z.string().email(),
     phone: z
         .string()
         .regex(/^\d{10}$/, "Phone must be exactly 10 digits"),
