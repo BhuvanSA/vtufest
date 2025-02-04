@@ -109,6 +109,7 @@ export default function SelectRolesAndEvents({
             usn: "",
             phone: "",
             events: [],
+            email:"",
             documents: {
                 photo: "",
                 idCard: "",
@@ -134,6 +135,7 @@ export default function SelectRolesAndEvents({
         defaultValues: {
             name: "",
             usn: "",
+            email : "",
             teamManager: true,
             phone: "",
             documents: {
@@ -396,7 +398,7 @@ export default function SelectRolesAndEvents({
                                             </p>
                                         )}
                                     </div>
-                                    <div className="w-full md:w-1/3 space-y-1.5 m-6">
+                                    <div className="w-full md:w-1/3 space-y-1.5 mt-6">
                                         <Label htmlFor="phone">
                                             Phone number of the student
                                         </Label>
@@ -414,7 +416,7 @@ export default function SelectRolesAndEvents({
                                 </div>
 
                                 <div className="flex flex-col md:flex-row gap-4 md:gap-10">
-                                    <div className="w-1/3 md:w-1/3 space-y-1.5 m-6">
+                                    <div className="w-1/3 md:w-1/3 space-y-1.5 mt-6">
                                         <Label htmlFor="gender">
                                             Gender of the student
                                         </Label>
@@ -452,7 +454,7 @@ export default function SelectRolesAndEvents({
                                     </div>
 
                                     {collegeRegion && ['Belgavi Region (2)', 'Kalaburgi Region (3)', 'Mysuru Region (4)'].includes(collegeRegion) ?
-                                        <div className="w-full md:w-1/3 space-y-1.5 m-6">
+                                        <div className="w-full md:w-1/3 space-y-1.5 mt-6">
                                             <Label htmlFor="accommodation">Need Accommodation</Label>
                                             <Select
                                                 {...register("accomodation")}
@@ -475,7 +477,7 @@ export default function SelectRolesAndEvents({
                                         </div > : <></>
                                     }
 
-                                    <div className="w-full md:w-1/3 space-y-1.5 m-6">
+                                    <div className="w-full md:w-1/3 space-y-1.5 mt-6">
                                         <Label htmlFor="blood">Blood Group</Label>
                                         <Input
                                             {...register("blood")}
@@ -486,6 +488,21 @@ export default function SelectRolesAndEvents({
                                         {errors.blood && (
                                             <p className="text-red-500 text-sm">
                                                 {errors.blood.message}
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    <div className="w-full md:w-1/3 space-y-1.5 mt-6">
+                                        <Label htmlFor="email">Email</Label>
+                                        <Input
+                                            {...register("email")}
+                                            id="email"
+                                            name="email"
+                                            placeholder="Enter the email "
+                                        />
+                                        {errors.email && (
+                                            <p className="text-red-500 text-sm">
+                                                {errors.email.message}
                                             </p>
                                         )}
                                     </div>
@@ -848,7 +865,7 @@ export default function SelectRolesAndEvents({
                                 </div>
 
                                 <div className="flex flex-col md:flex-row gap-4 md:gap-6">
-                                    <div className="w-full md:w-1/3 space-y-1.5 m-6">
+                                    <div className="w-full md:w-1/3 space-y-1.5 mt-6">
                                         <Label htmlFor="managerGender">
                                             Gender of the student
                                         </Label>
@@ -885,7 +902,7 @@ export default function SelectRolesAndEvents({
                                         )}
                                     </div>
                                     {collegeRegion && ['Belgavi Region (2)','Kalaburgi Region (3)','Mysuru Region (4)'].includes(collegeRegion)?
-                                        <div className="w-full md:w-1/3 space-y-1.5 m-6">
+                                        <div className="w-full md:w-1/3 space-y-1.5 mt-6">
                                             <Label htmlFor="Manageraccommodation">Need Accommodation</Label>
                                             <Select
                                                 {...register("accomodation")}
@@ -907,7 +924,7 @@ export default function SelectRolesAndEvents({
                                             )}
                                         </div>:<></>
                                     }
-                                    <div className="w-full md:w-1/3 space-y-1.5 m-6">
+                                    <div className="w-full md:w-1/3 space-y-1.5 mt-6">
                                         <Label htmlFor="Managerblood">Blood Group</Label>
                                         <Input
                                             {...registerManager("blood")}
@@ -918,6 +935,20 @@ export default function SelectRolesAndEvents({
                                         {errors.blood && (
                                             <p className="text-red-500 text-sm">
                                                 {errors.blood.message}
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="w-full md:w-1/3 space-y-1.5 mt-6">
+                                        <Label htmlFor="Manageremail">Email </Label>
+                                        <Input
+                                            {...registerManager("email")}
+                                            id="Manageremail"
+                                            name="email"
+                                            placeholder="Enter the email "
+                                        />
+                                        {errors.email && (
+                                            <p className="text-red-500 text-sm">
+                                                {errors.email.message}
                                             </p>
                                         )}
                                     </div>
