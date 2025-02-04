@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useAuthContext } from "@/contexts/auth-context";
 import Image from "next/image";
 import { ThemeToggler } from "@/contexts/theme-provider";
-import { Menu, Sparkles } from "lucide-react";
+import { Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import vtulogo from "@/public/images/vtulogo.png";
 import MobileSidebar from "./MobileSidebar";
@@ -38,13 +38,13 @@ const components: { title: string; href: string; description: string }[] = [
         title: "Summary",
         href: "/summary",
         description:
-            " A summary of the event, including the theme, date, and location.",
+            "A summary of the event, including the theme, date, and location.",
     },
 ];
 
 const ListItem = React.forwardRef<
     React.ElementRef<"a">,
-    React.ComponentPropsWithoutRef<"a">
+    React.ComponentPropsWithoutRef<"a"> & { title: string }
 >(({ className, title, children, ...props }, ref) => {
     return (
         <li>
@@ -52,15 +52,17 @@ const ListItem = React.forwardRef<
                 <a
                     ref={ref}
                     className={cn(
-                        "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+                        // Advanced styling: smooth color transition, subtle blue background on hover,
+                        // and blue text color when hovered/focused.
+                        "block select-none space-y-1 rounded-md p-2 leading-none no-underline outline-none transition-colors duration-200 hover:bg-blue-100 hover:text-blue-500 focus:bg-blue-100 focus:text-blue-500",
                         className
                     )}
                     {...props}
                 >
-                    <div className="text-sm font-medium leading-none">
+                    <div className="text-base font-medium leading-none">
                         {title}
                     </div>
-                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                    <p className="line-clamp-2 text-base leading-snug text-muted-foreground">
                         {children}
                     </p>
                 </a>
@@ -76,77 +78,92 @@ const NavBar = () => {
     const { isLoggedIn } = useAuthContext();
 
     return (
-        <header className="fixed top-0 left-0 right-0 backdrop-blur-sm border-none w-full bg-gradient-to-r shadow-lg z-40">
-            <Sparkles className="absolute top-2  left-3 text-yellow-300 h-6 w-6 animate-pulse" />
-            <div className="flex items-center justify-between text-2xl mt-4 px-4 md:px-32">
-                <div className="flex gap-3 w-full justify-between items-center">
-                    <Image
-                        src="/images/college-logo.png"
-                        alt="College Logo"
-                        width={70}
-                        height={60}
-                        priority
-                    />
-                    <div className="flex flex-col items-center text-center">
-                        <h1 className="text-primary font-bold tracking-widest transition-colors">
-                            Global Academy of Technology
-                        </h1>
-                        <div className="text-secondary-foreground text-sm md:text-base pb-2 font-semibold mt-1">
-                            An Autonomous Institute, Affiliated to VTU
+        <header className="fixed top-0 left-0 right-0 w-full backdrop-blur-sm bg-transparent shadow-lg z-40">
+            {/* Header Container */}
+            <div className="container mx-auto px-4 md:px-16">
+                <div className="flex items-center justify-between mt-1 mb-1">
+                    <div className="flex items-center gap-3">
+                        {/* Left Logo (GAT Logo) */}
+                        <Image
+                            src="/images/college-logo.png"
+                            alt="GAT Logo"
+                            width={60}
+                            height={60}
+                            priority
+                        />
+                        {/* Center Text */}
+                        <div className="flex flex-col items-start text-left">
+                            <h1 className="text-blue-700 font-bold tracking-wide transition-colors text-2xl">
+                                Global Academy of Technology
+                            </h1>
+                            <div className="text-red-600 text-lg font-semibold">
+                                An Autonomous Institute, Affiliated to VTU
+                            </div>
                         </div>
                     </div>
-                    <Image
-                        src={vtulogo || "/placeholder.svg"}
-                        alt="VTU Logo"
-                        width={90}
-                        height={60}
-                        priority
-                    />
+                    {/* Right Logo (VTU Logo) */}
+                    <div className="hidden md:block">
+                        <Image
+                            src={vtulogo || "/placeholder.svg"}
+                            alt="VTU Logo"
+                            width={80}
+                            height={80}
+                            priority
+                        />
+                    </div>
                 </div>
 
-                <div className="md:hidden">
+                {/* Mobile Menu Button */}
+                <div className="md:hidden relative">
                     <button
                         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                        className="text-white border-2 border p-1 rounded-xs absolute top-3 font-extrabold right-3  text-foreground hover:text-primary transition-colors"
+                        className="absolute top-2 right-2 text-white border-2 p-1 rounded-xs font-extrabold hover:text-blue-500 transition-colors duration-200"
                     >
                         <Menu className="h-6 w-6" />
                     </button>
                 </div>
             </div>
 
-            <div className="hidden md:flex items-center flex-wrap  justify-center max-w-6xl lg:max-w-[72rem] pb-2 xl:max-w-6xl px-3 mx-auto sm:px-6">
+            {/* Desktop Navigation Menu */}
+            <div className="hidden md:flex items-center flex-wrap justify-center max-w-6xl lg:max-w-[72rem] pb-1 px-3 mx-auto sm:px-6">
                 <NavigationMenu>
                     <NavigationMenuList className="bg-inherit">
+                        {/* Home */}
                         <NavigationMenuItem className="bg-inherit">
                             <Link href="/" legacyBehavior passHref>
                                 <NavigationMenuLink
-                                    className={`${navigationMenuTriggerStyle()} bg-inherit`}
+                                    className={cn(
+                                        navigationMenuTriggerStyle(),
+                                        "bg-inherit text-xl hover:text-blue-500 transition-colors duration-200"
+                                    )}
                                 >
                                     Home
                                 </NavigationMenuLink>
                             </Link>
                         </NavigationMenuItem>
+
+                        {/* About Dropdown */}
                         <NavigationMenuItem>
-                            <NavigationMenuTrigger className={` bg-inherit`}>
+                            <NavigationMenuTrigger className="bg-inherit text-xl hover:text-blue-500 transition-colors duration-200">
                                 About
                             </NavigationMenuTrigger>
                             <NavigationMenuContent>
-                                <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
+                                <ul className="grid gap-3 p-4 md:w-[350px] lg:w-[450px] lg:grid-cols-[.75fr_1fr]">
                                     <li className="row-span-3">
                                         <NavigationMenuLink asChild>
                                             <a
-                                                className="flex h-full w-full select-none flex-col justify-end bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                                                className="flex h-full w-full select-none flex-col justify-end bg-gradient-to-b from-muted/50 to-muted p-4 no-underline outline-none focus:shadow-md transition-colors duration-200 hover:text-blue-500"
                                                 href="/about"
                                             >
                                                 <div className="flex justify-center items-center">
                                                     <Image
                                                         src="/images/college-logo.png"
-                                                        height={40}
-                                                        width={40}
+                                                        height={30}
+                                                        width={30}
                                                         alt="Global Academy of Technology"
                                                     />
                                                 </div>
-                                                <div className="mb-0 mt-4 text-lg font-medium">
+                                                <div className="mb-0 mt-4 text-base font-medium">
                                                     Global Academy of Technology
                                                 </div>
                                                 <p className="text-sm leading-tight text-muted-foreground">
@@ -182,12 +199,14 @@ const NavBar = () => {
                                 </ul>
                             </NavigationMenuContent>
                         </NavigationMenuItem>
+
+                        {/* Event Dropdown */}
                         <NavigationMenuItem>
-                            <NavigationMenuTrigger className={` bg-inherit`}>
+                            <NavigationMenuTrigger className="bg-inherit text-xl hover:text-blue-500 transition-colors duration-200">
                                 Event
                             </NavigationMenuTrigger>
                             <NavigationMenuContent>
-                                <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                                <ul className="grid w-[350px] gap-3 p-4 md:w-[450px] md:grid-cols-2 lg:w-[550px]">
                                     {components.map((component) => (
                                         <ListItem
                                             key={component.title}
@@ -212,16 +231,22 @@ const NavBar = () => {
                                 </ul>
                             </NavigationMenuContent>
                         </NavigationMenuItem>
+
+                        {/* Contact */}
                         <NavigationMenuItem>
                             <Link href="/contactus" legacyBehavior passHref>
                                 <NavigationMenuLink
-                                    className={`${navigationMenuTriggerStyle()} bg-inherit`}
+                                    className={cn(
+                                        navigationMenuTriggerStyle(),
+                                        "bg-inherit text-xl hover:text-blue-500 transition-colors duration-200"
+                                    )}
                                 >
                                     Contact Us
                                 </NavigationMenuLink>
                             </Link>
                         </NavigationMenuItem>
 
+                        {/* Conditional Auth Links */}
                         {isLoggedIn ? (
                             <>
                                 <NavigationMenuItem>
@@ -231,7 +256,10 @@ const NavBar = () => {
                                         passHref
                                     >
                                         <NavigationMenuLink
-                                            className={`${navigationMenuTriggerStyle()} bg-inherit`}
+                                            className={cn(
+                                                navigationMenuTriggerStyle(),
+                                                "bg-inherit text-xl hover:text-blue-500 transition-colors duration-200"
+                                            )}
                                         >
                                             Register
                                         </NavigationMenuLink>
@@ -244,7 +272,10 @@ const NavBar = () => {
                                         passHref
                                     >
                                         <NavigationMenuLink
-                                            className={`${navigationMenuTriggerStyle()} bg-inherit`}
+                                            className={cn(
+                                                navigationMenuTriggerStyle(),
+                                                "bg-inherit text-xl hover:text-blue-500 transition-colors duration-200"
+                                            )}
                                         >
                                             Logout
                                         </NavigationMenuLink>
@@ -259,7 +290,10 @@ const NavBar = () => {
                                     passHref
                                 >
                                     <NavigationMenuLink
-                                        className={`${navigationMenuTriggerStyle()} bg-inherit`}
+                                        className={cn(
+                                            navigationMenuTriggerStyle(),
+                                            "bg-inherit text-xl hover:text-blue-500 transition-colors duration-200"
+                                        )}
                                     >
                                         Login
                                     </NavigationMenuLink>
@@ -267,6 +301,7 @@ const NavBar = () => {
                             </NavigationMenuItem>
                         )}
 
+                        {/* Theme Toggler */}
                         <NavigationMenuItem>
                             <ThemeToggler />
                         </NavigationMenuItem>
@@ -274,11 +309,11 @@ const NavBar = () => {
                 </NavigationMenu>
             </div>
 
+            {/* Mobile Sidebar */}
             <MobileSidebar
                 isOpen={isMobileMenuOpen}
                 onClose={() => setIsMobileMenuOpen(false)}
             />
-            <Sparkles className="absolute top-2 right-2 text-yellow-300 h-6 w-6 animate-pulse" />
         </header>
     );
 };
