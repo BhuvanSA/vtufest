@@ -262,7 +262,7 @@ export function DataTable({ data }: { data: Data[] }) {
                     const filterCycle = [
                         "",
                         "Team Manager",
-                        "Participant, Accompanist",
+                        "Participant/Accompanist",
                         
                     ];
                     const currentFilter =
