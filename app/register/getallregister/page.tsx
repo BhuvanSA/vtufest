@@ -90,7 +90,7 @@ export default async function Page() {
 
         const participantAccompanistEvents = row.registrations
             .filter((r) => r.type === 'ACCOMPANIST' || r.type === 'PARTICIPANT')
-            .map((r) => ({ eventName: r.eventName! }));
+            .map((r) => ({ eventName: r.eventName }));
 
 
 
@@ -113,30 +113,30 @@ export default async function Page() {
 
 
         //If participant
-        if (participantEvents.length > 0) {
-            results.push({
-                id: `${row.registrantId}#PARTICIPANT`,
-                name: row.name,
-                usn: row.usn,
-                photo: row.photoUrl,
-                type: "Participant",
-                events: participantEvents,
-                status: docStatusMap[row.docStatus],
-            });
-        }
+        // if (participantEvents.length > 0) {
+        //     results.push({
+        //         id: `${row.registrantId}#PARTICIPANT`,
+        //         name: row.name,
+        //         usn: row.usn,
+        //         photo: row.photoUrl,
+        //         type: "Participant",
+        //         events: participantEvents,
+        //         status: docStatusMap[row.docStatus],
+        //     });
+        // }
 
-        // If accompanist
-        if (accompanistEvents.length > 0) {
-            results.push({
-                id: `${row.registrantId}#ACCOMPANIST`,
-                name: row.name,
-                usn: row.usn,
-                photo: row.photoUrl,
-                type: "Accompanist",
-                events: accompanistEvents,
-                status: docStatusMap[row.docStatus],
-            });
-        }
+        // // If accompanist
+        // if (accompanistEvents.length > 0) {
+        //     results.push({
+        //         id: `${row.registrantId}#ACCOMPANIST`,
+        //         name: row.name,
+        //         usn: row.usn,
+        //         photo: row.photoUrl,
+        //         type: "Accompanist",
+        //         events: accompanistEvents,
+        //         status: docStatusMap[row.docStatus],
+        //     });
+        // }
         if (participantAccompanistEvents.length > 0) {
             results.push({
                 id: `${row.registrantId}#PARTICIPANT/ACCOMPANIST`,
