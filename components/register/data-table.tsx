@@ -261,9 +261,6 @@ export function DataTable({ data }: { data: Data[] }) {
                 header: ({ column }) => {
                     const filterCycle = [
                         "",
-                        "Total",
-                        "Participant",
-                        "Accompanist",
                         "Team Manager",
                         "Participant, Accompanist",
                         

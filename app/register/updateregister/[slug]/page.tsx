@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -11,6 +11,9 @@ import { UploadDropzone } from "@/utils/uploadthing";
 import { toast } from "sonner";
 import { z } from "zod";
 import { useForm, Controller } from "react-hook-form";
+
+
+import Link from "next/link";
 // Define interfaces for our data structures
 
 
@@ -585,12 +588,8 @@ const UpdateRegister: React.FC<UpdateRegisterProps> = ({ params }) => {
                     <SelectContent>
                       {!isTeamManager && (
                         <>
-                          <SelectItem value="sslcUrl">SSLC</SelectItem>
-                          <SelectItem value="pucUrl">PUC</SelectItem>
                           <SelectItem value="idcardUrl">ID Card</SelectItem>
                           <SelectItem value="aadharUrl">Aadhar</SelectItem>
-                          <SelectItem value="admission1Url">Admission 1</SelectItem>
-                          <SelectItem value="admission2Url">Admission 2</SelectItem>
                           <SelectItem value="photoUrl">Photo</SelectItem>
                         </>
                       )}
@@ -633,7 +632,6 @@ const UpdateRegister: React.FC<UpdateRegisterProps> = ({ params }) => {
                             );
                           }}
                         />
-
                         <Button className="mt-5 w-full" type="submit">
                           Upload
                         </Button>
@@ -643,6 +641,15 @@ const UpdateRegister: React.FC<UpdateRegisterProps> = ({ params }) => {
                 </div>
               </div>
             </CardContent>
+            <CardFooter>
+            <Link href="/register/getallregister" className="w-full mx-14">
+                                <Button
+                                    className="w-full "
+                                >
+                                    Back
+                                </Button>
+                            </Link>
+            </CardFooter>
           </Card>
         </div>
       </div>
