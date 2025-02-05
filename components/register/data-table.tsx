@@ -51,7 +51,7 @@ export type Data = {
     photo: string;
     name: string;
     usn: string;
-    type: "Participant" | "Accompanist" | "Team Manager" | "Participant, Accompanist" | "";
+    type: "Participant" | "Accompanist" | "Team Manager" | "Participant/Accompanist" | "";
     events: { eventName: string }[];
     status: "Pending" | "Processing" | "Success" | "Failed";
 };
@@ -262,7 +262,7 @@ export function DataTable({ data }: { data: Data[] }) {
                     const filterCycle = [
                         "",
                         "Team Manager",
-                        "Participant, Accompanist",
+                        "Participant/Accompanist",
                         
                     ];
                     const currentFilter =
@@ -295,7 +295,7 @@ export function DataTable({ data }: { data: Data[] }) {
                     if(!filterValue || filterValue==='') return true;
                     if (!filterValue || filterValue === "Total") {
                         const type = row.getValue('type');
-                        if(type === 'Participant, Accompanist' || type==='Team Manager'){
+                        if(type === 'Participant/Accompanist' || type==='Team Manager'){
                             return true;
                         }
                     }
