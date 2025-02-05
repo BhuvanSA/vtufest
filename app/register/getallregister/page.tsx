@@ -80,17 +80,17 @@ export default async function Page() {
         }
 
         // Otherwise gather participant + accompanist events
-        // const participantEvents = row.registrations
-        //     .filter((r) => r.type === "PARTICIPANT" && r.eventName)
-        //     .map((r) => ({ eventName: r.eventName! }));
+        const participantEvents = row.registrations
+            .filter((r) => r.type === "PARTICIPANT" && r.eventName)
+            .map((r) => ({ eventName: r.eventName! }));
 
-        // const accompanistEvents = row.registrations
-        //     .filter((r) => r.type === "ACCOMPANIST" && r.eventName)
-        //     .map((r) => ({ eventName: r.eventName! }));
+        const accompanistEvents = row.registrations
+            .filter((r) => r.type === "ACCOMPANIST" && r.eventName)
+            .map((r) => ({ eventName: r.eventName! }));
 
         const participantAccompanistEvents = row.registrations
             .filter((r) => r.type === 'ACCOMPANIST' || r.type === 'PARTICIPANT')
-            .map((r) => ({ eventName: r.eventName }));
+            .map((r) => ({ eventName: r.eventName! }));
 
 
 
@@ -112,42 +112,42 @@ export default async function Page() {
 
 
 
-        // If participant
-        // if (participantEvents.length > 0) {
-        //     results.push({
-        //         id: `${row.registrantId}#PARTICIPANT`,
-        //         name: row.name,
-        //         usn: row.usn,
-        //         photo: row.photoUrl,
-        //         type: "Participant",
-        //         events: participantEvents,
-        //         status: docStatusMap[row.docStatus],
-        //     });
-        // }
-
-        // // If accompanist
-        // if (accompanistEvents.length > 0) {
-        //     results.push({
-        //         id: `${row.registrantId}#ACCOMPANIST`,
-        //         name: row.name,
-        //         usn: row.usn,
-        //         photo: row.photoUrl,
-        //         type: "Accompanist",
-        //         events: accompanistEvents,
-        //         status: docStatusMap[row.docStatus],
-        //     });
-        // }
-        if (participantAccompanistEvents.length > 0) {
+        //If participant
+        if (participantEvents.length > 0) {
             results.push({
-                id: `${row.registrantId}#PARTICIPANT, ACCOMPANIST`,
+                id: `${row.registrantId}#PARTICIPANT`,
                 name: row.name,
                 usn: row.usn,
                 photo: row.photoUrl,
-                type: "Participant, Accompanist",
+                type: "Participant",
+                events: participantEvents,
+                status: docStatusMap[row.docStatus],
+            });
+        }
+
+        // If accompanist
+        if (accompanistEvents.length > 0) {
+            results.push({
+                id: `${row.registrantId}#ACCOMPANIST`,
+                name: row.name,
+                usn: row.usn,
+                photo: row.photoUrl,
+                type: "Accompanist",
+                events: accompanistEvents,
+                status: docStatusMap[row.docStatus],
+            });
+        }
+        if (participantAccompanistEvents.length > 0) {
+            results.push({
+                id: `${row.registrantId}#PARTICIPANT/ACCOMPANIST`,
+                name: row.name,
+                usn: row.usn,
+                photo: row.photoUrl,
+                type: "Participant/Accompanist",
                 events: participantAccompanistEvents,
                 status: docStatusMap[row.docStatus],
             });
-            continue;
+    
         }
 
     }
