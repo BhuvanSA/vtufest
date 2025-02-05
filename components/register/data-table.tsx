@@ -295,7 +295,7 @@ export function DataTable({ data }: { data: Data[] }) {
                     if(!filterValue || filterValue==='') return true;
                     if (!filterValue || filterValue === "Total") {
                         const type = row.getValue('type');
-                        if(type === 'Participant, Accompanist' || type==='Team Manager'){
+                        if(type === 'Participant/Accompanist' || type==='Team Manager'){
                             return true;
                         }
                     }
