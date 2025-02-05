@@ -90,7 +90,7 @@ export default async function Page() {
 
         const participantAccompanistEvents = row.registrations
             .filter((r) => r.type === 'ACCOMPANIST' || r.type === 'PARTICIPANT')
-            .map((r) => ({ eventName: r.eventName! }));
+            .map((r) => ({ eventName: r.eventName }));
 
 
 
