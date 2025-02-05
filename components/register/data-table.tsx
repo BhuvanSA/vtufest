@@ -263,7 +263,6 @@ export function DataTable({ data }: { data: Data[] }) {
                         "",
                         "Team Manager",
                         "Participant/Accompanist",
-                        
                     ];
                     const currentFilter =
                         (column.getFilterValue() as string) ?? "";
@@ -293,12 +292,6 @@ export function DataTable({ data }: { data: Data[] }) {
                 ),
                 filterFn: (row, columnId, filterValue) => {
                     if(!filterValue || filterValue==='') return true;
-                    if (!filterValue || filterValue === "Total") {
-                        const type = row.getValue('type');
-                        if(type === 'Participant/Accompanist' || type==='Team Manager'){
-                            return true;
-                        }
-                    }
                     const type = row.getValue(columnId);
                     return type === filterValue;
                 },
