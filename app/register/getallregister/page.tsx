@@ -147,7 +147,7 @@ export default async function Page() {
                 events: participantAccompanistEvents,
                 status: docStatusMap[row.docStatus],
             });
-            continue;
+           
         }
 
     }
