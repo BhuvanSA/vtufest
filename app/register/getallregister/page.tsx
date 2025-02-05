@@ -139,11 +139,11 @@ export default async function Page() {
         // }
         if (participantAccompanistEvents.length > 0) {
             results.push({
-                id: `${row.registrantId}#PARTICIPANT, ACCOMPANIST`,
+                id: `${row.registrantId}#PARTICIPANT/ACCOMPANIST`,
                 name: row.name,
                 usn: row.usn,
                 photo: row.photoUrl,
-                type: "Participant, Accompanist",
+                type: "Participant/Accompanist",
                 events: participantAccompanistEvents,
                 status: docStatusMap[row.docStatus],
             });
