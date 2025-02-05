@@ -51,7 +51,7 @@ export type Data = {
     photo: string;
     name: string;
     usn: string;
-    type: "Participant" | "Accompanist" | "Team Manager" | "Participant, Accompanist" | "";
+    type: "Participant" | "Accompanist" | "Team Manager" | "Participant/Accompanist" | "";
     events: { eventName: string }[];
     status: "Pending" | "Processing" | "Success" | "Failed";
 };
