@@ -17,6 +17,7 @@ export async function insertRegistrant(
                 const registrant = await prisma.registrants.create({
                     data: {
                         name: arg.name,
+                        email : arg.email,
                         usn: arg.usn,
                         teamManager: true,
                         phone: arg.phone,
@@ -68,6 +69,7 @@ export async function insertRegistrant(
                 data: {
                     name: arg.name,
                     usn: arg.usn,
+                    email : arg.email,
                     teamManager: false,
                     phone: arg.phone,
                     photoUrl: arg.photoUrl,
