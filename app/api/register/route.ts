@@ -24,6 +24,7 @@ export type Registrant = {
     blood : string;
     email : string;
     accomodation : boolean;
+    designation? : string;
     events: {
         eventNo: number;
         eventName: string;
@@ -99,7 +100,7 @@ export async function POST(request: Request) {
             events: validation.data.events, // Ensure events are included
             gender: validation.data.gender as string,
             accomodation :validation.data.accomodation as boolean,
-            blood : validation.data.blood
+            blood : validation.data.blood,
         };
 
         if (
@@ -183,7 +184,8 @@ export async function POST(request: Request) {
             events: [], // Team Managers do not select events
             accomodation : validation.data.accomodation as boolean,
             gender : validation.data.gender as string,
-            blood: validation.data.blood as string
+            blood: validation.data.blood as string,
+            designation : validation.data.designation as string
         };
 
         // Check for existing registrant with same USN or phone

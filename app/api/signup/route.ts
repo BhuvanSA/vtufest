@@ -141,7 +141,7 @@ export async function POST(request: Request) {
             { status: 200 }
         );
     } catch (error: unknown) {
-        console.error("Error in registration process:", error);
+        console.log("Error in registration process:", error);
         return NextResponse.json(
             { success: false, errors: { general: "Internal Server Error" } },
             { status: 500 }

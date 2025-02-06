@@ -124,14 +124,23 @@ export default function SignUp() {
 
     const onSubmit = async (values: z.infer<typeof signupSchema>) => {
         setIsLoading(true);
-        console.log("Form values",values);
+        console.log("Form values", values);
         try {
-            const response = await axios.post("/api/signup", values);
-            if (response.data.success) {
+            const response = await fetch("/api/signup", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(values),
+            });
+    
+            const data = await response.json();
+    
+            if (data.success) {
                 toast("Signup successful! Redirecting to login...");
                 router.push("/auth/signin");
             } else {
-                const { errors } = response.data;
+                const { errors } = data;
                 if (errors) {
                     for (const field in errors) {
                         if (field === "general") {

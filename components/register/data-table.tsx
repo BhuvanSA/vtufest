@@ -57,7 +57,7 @@ export type Data = {
     status: "Pending" | "Processing" | "Success" | "Failed";
 };
 
-export function DataTable({ data }: { data: Data[] }) {
+export function    DataTable({ data }: { data: Data[] }) {
     const router = useRouter();
     const [rows, setRows] = React.useState<Data[]>(data);
 
@@ -156,6 +156,7 @@ export function DataTable({ data }: { data: Data[] }) {
 
     const columns = React.useMemo<ColumnDef<Data>[]>(
         () => [
+            
             {
                 id: "select",
                 header: ({ table }) => (
@@ -205,6 +206,11 @@ export function DataTable({ data }: { data: Data[] }) {
                 },
                 enableSorting: false,
                 enableHiding: false,
+            },
+            {
+                accessorKey: "slno",
+                header: "SL No",
+                cell: ({ row }) => row.index + 1,
             },
             {
                 accessorKey: "photo",
@@ -355,52 +361,7 @@ export function DataTable({ data }: { data: Data[] }) {
                 },
             },
             {
-                accessorKey: "status",
-                header: ({ column }) => {
-                    const filterCycle = [
-                        "ALL",
-                        "Pending",
-                        "Processing",
-                        "Approved",
-                        "Rejected",
-                    ];
-                    const currentFilter =
-                        (column.getFilterValue() as string) ?? "ALL";
-                    const currentIndex = filterCycle.indexOf(currentFilter);
-                    const nextIndex = (currentIndex + 1) % filterCycle.length;
-                    const nextFilter = filterCycle[nextIndex];
-
-                    const handleFilterChange = () => {
-                        if (nextFilter === "ALL") {
-                            column.setFilterValue(undefined);
-                        } else {
-                            column.setFilterValue(nextFilter);
-                        }
-                    };
-
-                    return (
-                        <Button
-                            variant="ghost"
-                            className="capitalize"
-                            onClick={handleFilterChange}
-                        >
-                            Status <ListFilterIcon className="p-1" />{" "}
-                            {currentFilter !== "ALL"
-                                ? `: ${currentFilter}`
-                                : ""}
-                        </Button>
-                    );
-                },
-                cell: ({ row }) => (
-                    <div className="capitalize">{row.getValue("status")}</div>
-                ),
-                filterFn: (row, columnId, filterValue) => {
-                    if (!filterValue || filterValue === "ALL") return true;
-                    const status = row.getValue(columnId);
-                    return status == filterValue;
-                },
-            },
-            {
+                accessorKey:"Action",
                 id: "actions",
                 enableHiding: false,
                 cell: ({ row }) => {
@@ -465,11 +426,8 @@ export function DataTable({ data }: { data: Data[] }) {
 
     // Use the final row model to get the filtered + sorted data
     const handleExport = () => {
-        // Pull final rows from the table’s computed row model:
-        const filteredSortedRows = table
-            .getRowModel()
-            .rows.map((row) => row.original);
-
+        // Pull final rows from the table’s computed row model
+        const filteredSortedRows = table.getRowModel().rows.map((row) => row.original);
     
         // Prepare data for PDF
         const exportData = filteredSortedRows.map((row) => [
@@ -486,29 +444,33 @@ export function DataTable({ data }: { data: Data[] }) {
         // Initialize jsPDF
         const doc = new jsPDF();
     
-        // Add a title
-        doc.text("Registrants List", doc.internal.pageSize.getWidth() / 2, 15, { align: "center" });
-        doc.text("VTU YOUTH Fest", doc.internal.pageSize.getWidth() / 2, 30, { align: "center" });
-        doc.text("Global Academy of Technology", doc.internal.pageSize.getWidth() / 2,45, { align: "center" });
+        // Load the PNG template
+        const img = new HTMLImageElement();
+        img.src = "template.png"; // Replace with the actual template path
     
-        
-        // Add table
-        autoTable(doc, {
-            head: headers,
-            body: exportData,
-            startY: 50,
-            styles: { fontSize: 10, cellPadding: 3 },
-            headStyles: { fillColor: [26, 188, 156] }, // #1abc9c in RGB
-        });
-     // Add signatures at the bottom
-     const pageHeight = doc.internal.pageSize.getHeight();
-     doc.text("Principal's Signature", 14, pageHeight - 20);
-     doc.text("Coordinator's Signature", doc.internal.pageSize.getWidth() - 80, pageHeight - 20);
-
-
-        // Save the PDF
-
-        doc.save("registrants.pdf");
+        img.onload = () => {
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+    
+            // Add the template as a background
+            doc.addImage(img, "PNG", 0, 0, pageWidth, pageHeight);
+    
+            // Add table
+            autoTable(doc, {
+                head: headers,
+                body: exportData,
+                startY: 80, // Adjust this to fit within the template
+                styles: { fontSize: 10, cellPadding: 3 },
+                headStyles: { fillColor: [26, 188, 156] }, // #1abc9c in RGB
+            });
+    
+            // Add signatures at the bottom
+            doc.text("Principal's Signature", 14, pageHeight - 20);
+            doc.text("Coordinator's Signature", pageWidth - 80, pageHeight - 20);
+    
+            // Save the PDF
+            doc.save("registrants.pdf");
+        };
     };
 
 
