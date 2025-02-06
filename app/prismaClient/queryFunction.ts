@@ -1067,3 +1067,22 @@ export async function getCollegeRegion(userId:string) {
     
 
 }
+
+
+export async function getRegisterByCollegeName(collegeName :string){
+    try{
+        const registrantList = await prisma.users.findFirst({
+            where:{
+                collegeName : collegeName,
+            },
+            include:{
+                events:true,
+                registrants:true,
+            }
+        });
+        return registrantList;
+    }
+    catch(error:unknown){
+        handlePrismaError(error);
+    }
+}

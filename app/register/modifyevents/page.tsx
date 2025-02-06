@@ -400,7 +400,12 @@ export default function EventRegister() {
                             </DialogTitle>
                             <DialogDescription className="text-muted-foreground">
                                 Are you sure you want to delete the event `
-                                {eventToDelete?.name}`?
+                                {eventToDelete?.name}`
+                                <br/>
+                                <br/>
+                                <span className="text-red-500">
+                                 * If you delete the event, the participant or accompanist will be removed from the events. You can use the update menu to add events for each registrant.
+                                </span>
                             </DialogDescription>
                         </DialogHeader>
                         <DialogFooter>
@@ -414,9 +419,10 @@ export default function EventRegister() {
                             <Button
                                 variant="destructive"
                                 onClick={confirmDelete}
+                                disabled={isLoading}
                                 className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                             >
-                                Delete
+                                {isLoading ? 'Loading...' : 'Delete'}
                             </Button>
                         </DialogFooter>
                     </DialogContent>
