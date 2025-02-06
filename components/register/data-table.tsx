@@ -22,6 +22,8 @@ import {
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -490,6 +492,43 @@ export function DataTable({ data }: { data: Data[] }) {
         const blob = new Blob([wbout], { type: "application/octet-stream" });
         saveAs(blob, "registrants.xlsx");
     };
+    const handleExportToPDF = () => {
+        // Pull final rows from the table’s computed row model:
+        const filteredSortedRows = table
+            .getRowModel()
+            .rows.map((row) => row.original);
+    
+        // Prepare data for PDF
+        const exportData = filteredSortedRows.map((row) => [
+            row.name,
+            row.usn,
+            row.type,
+            row.events.map((event) => event.eventName).join(", "),
+            row.status,
+        ]);
+    
+        // Column headers for PDF
+        const headers = [["Name", "USN", "Type", "Events", "Status"]];
+    
+        // Initialize jsPDF
+        const doc = new jsPDF();
+    
+        // Add a title
+        doc.text("Registrants List", 14, 10);
+    
+        // Add table
+        autoTable(doc, {
+            head: headers,
+            body: exportData,
+            startY: 20,
+            styles: { fontSize: 10, cellPadding: 3 },
+            headStyles: { fillColor: [26, 188, 156] }, // #1abc9c in RGB
+        });
+    
+        // Save the PDF
+        doc.save("registrants.pdf");
+    };
+
 
     return (
         <div className="w-full px-5 bg-white rounded-xl bg-opacity-90 h-[70rem]">
@@ -514,7 +553,7 @@ export function DataTable({ data }: { data: Data[] }) {
                 <Button
                     variant="outline"
                     className="ml-auto bg-[#00B140] text-white hover:scale-105 hover:bg-[#00B140] hover:text-white "
-                    onClick={handleExport}
+                    onClick={handleExportToPDF}
                 >
                     <FileDown className="mr-2 h-4 w-4" />
                     Download current view as Excel
