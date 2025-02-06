@@ -469,27 +469,39 @@ export function DataTable({ data }: { data: Data[] }) {
             .getRowModel()
             .rows.map((row) => row.original);
 
-        // Prepare data for Excel
-        const exportData = filteredSortedRows.map((row) => ({
-            Name: row.name,
-            USN: row.usn,
-            Type: row.type,
-            Events: row.events.map((event) => event.eventName).join(", "),
-            Status: row.status,
-        }));
-
-        // Create a worksheet
-        const worksheet = XLSX.utils.json_to_sheet(exportData);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Registrants");
-
-        // Generate buffer
-        const wbout = XLSX.write(workbook, { type: "array", bookType: "xlsx" });
-
-        // Create a Blob and trigger download
-        const blob = new Blob([wbout], { type: "application/octet-stream" });
-        saveAs(blob, "registrants.xlsx");
+    
+        // Prepare data for PDF
+        const exportData = filteredSortedRows.map((row) => [
+            row.name,
+            row.usn,
+            row.type,
+            row.events.map((event) => event.eventName).join(", "),
+            row.status,
+        ]);
+    
+        // Column headers for PDF
+        const headers = [["Name", "USN", "Type", "Events", "Status"]];
+    
+        // Initialize jsPDF
+        const doc = new jsPDF();
+    
+        // Add a title
+        doc.text("Registrants List", 14, 10);
+    
+        // Add table
+        autoTable(doc, {
+            head: headers,
+            body: exportData,
+            startY: 20,
+            styles: { fontSize: 10, cellPadding: 3 },
+            headStyles: { fillColor: [26, 188, 156] }, // #1abc9c in RGB
+        });
+    
+        // Save the PDF
+        doc.save("registrants.pdf");
     };
+
+
 
     return (
         <div className="w-full px-5 bg-white rounded-xl bg-opacity-90 h-[70rem]">
