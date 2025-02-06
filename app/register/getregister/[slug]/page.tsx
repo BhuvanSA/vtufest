@@ -248,43 +248,7 @@ export default function GetRegistrant({
                                 <span>ID Card</span>
                             </a>
 
-                            <a
-                                href={`https://${process.env.UPLOADTHING_APP_ID}.ufs.sh/f/${studentData?.admission1Url}`}
-                                className="bg-gray-100 p-3 rounded-lg flex items-center space-x-2 hover:bg-gray-200"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
-                                <span>📄</span>
-                                <span>First Year Fee Receipt</span>
-                            </a>
-                            <a
-                                href={`https://${process.env.UPLOADTHING_APP_ID}.ufs.sh/f/${studentData?.admission2Url}`}
-                                className="bg-gray-100 p-3 rounded-lg flex items-center space-x-2 hover:bg-gray-200"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
-                                <span>📄</span>
-                                <span>Admission Current Year</span>
-                            </a>
-
-                            <a
-                                href={`https://${process.env.UPLOADTHING_APP_ID}.ufs.sh/f/${studentData?.pucUrl}`}
-                                className="bg-gray-100 p-3 rounded-lg flex items-center space-x-2 hover:bg-gray-200"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
-                                <span>📄</span>
-                                <span>12th marks sheet</span>
-                            </a>
-                            <a
-                                href={`https://${process.env.UPLOADTHING_APP_ID}.ufs.sh/f/${studentData?.sslcUrl}`}
-                                className="bg-gray-100 p-3 rounded-lg flex items-center space-x-2 hover:bg-gray-200"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
-                                <span>📄</span>
-                                <span>10th marks sheet</span>
-                            </a>
+                            
                             {/* Add more documents similarly */}
                         </div>
                     </Card>
