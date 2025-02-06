@@ -1,5 +1,6 @@
 "use client";
-
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 import { Columns, FileDown, Pencil, Search, Trash2 } from "lucide-react";
 import * as React from "react";
 import {
@@ -469,31 +470,51 @@ export function DataTable({ data }: { data: Data[] }) {
             .getRowModel()
             .rows.map((row) => row.original);
 
-        // Prepare data for Excel
-        const exportData = filteredSortedRows.map((row) => ({
-            Name: row.name,
-            USN: row.usn,
-            Type: row.type,
-            Events: row.events.map((event) => event.eventName).join(", "),
-            Status: row.status,
-        }));
+    
+        // Prepare data for PDF
+        const exportData = filteredSortedRows.map((row) => [
+            row.name,
+            row.usn,
+            row.type,
+            row.events.map((event) => event.eventName).join(", "),
+            row.status,
+        ]);
+    
+        // Column headers for PDF
+        const headers = [["Name", "USN", "Type", "Events", "Status"]];
+    
+        // Initialize jsPDF
+        const doc = new jsPDF();
+    
+        // Add a title
+        doc.text("Registrants List", doc.internal.pageSize.getWidth() / 2, 15, { align: "center" });
+        doc.text("VTU YOUTH Fest", doc.internal.pageSize.getWidth() / 2, 30, { align: "center" });
+        doc.text("Global Academy of Technology", doc.internal.pageSize.getWidth() / 2,45, { align: "center" });
+    
+        
+        // Add table
+        autoTable(doc, {
+            head: headers,
+            body: exportData,
+            startY: 50,
+            styles: { fontSize: 10, cellPadding: 3 },
+            headStyles: { fillColor: [26, 188, 156] }, // #1abc9c in RGB
+        });
+     // Add signatures at the bottom
+     const pageHeight = doc.internal.pageSize.getHeight();
+     doc.text("Principal's Signature", 14, pageHeight - 20);
+     doc.text("Coordinator's Signature", doc.internal.pageSize.getWidth() - 80, pageHeight - 20);
 
-        // Create a worksheet
-        const worksheet = XLSX.utils.json_to_sheet(exportData);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Registrants");
 
-        // Generate buffer
-        const wbout = XLSX.write(workbook, { type: "array", bookType: "xlsx" });
+        // Save the PDF
 
-        // Create a Blob and trigger download
-        const blob = new Blob([wbout], { type: "application/octet-stream" });
-        saveAs(blob, "registrants.xlsx");
+        doc.save("registrants.pdf");
     };
+
 
     return (
         <div className="w-full px-5 bg-white rounded-xl bg-opacity-90 h-[70rem]">
-            <div className="flex items-center py-4 ">
+            <div className="flex items-center py-4 flex-wrap gap-3 ">
                 <div className="relative max-w-sm " >
                     <Search className="absolute left-2 top-3 h-4 w-4 text-muted-foreground " />
                     <Input
@@ -517,7 +538,7 @@ export function DataTable({ data }: { data: Data[] }) {
                     onClick={handleExport}
                 >
                     <FileDown className="mr-2 h-4 w-4" />
-                    Download current view as Excel
+                    Download current view as PDF
                 </Button>
                 <Button
                     variant="outline"
@@ -553,7 +574,7 @@ export function DataTable({ data }: { data: Data[] }) {
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
-            <div className="rounded-md border min-h-[15rem]">
+            <div className="rounded-md border overflow-auto  min-h-[18rem]">
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (

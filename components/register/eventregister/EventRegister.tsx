@@ -140,24 +140,17 @@ export default function EventRegister({
                 </p>
             )}
 
-            <div className="flex justify-center gap-4">
+            <div className="flex justify-center gap-4 mt-10 ">
+                
                 <LoadingButton
-                    onClick={handleSubmit}
-                    disabled={isSubmitting}
-                    className="bg-primary-foreground w-50 text-primary border border-primary px-6 py-2 font-semibold flex items-center gap-2 hover:text-white"
-                    aria-label="Save event registrations"
-                >
-                    Save Events
-                </LoadingButton>
-                <LoadingButton
-                    className="bg-primary w-50 px-6 py-2 font-semibold border border-primary"
+                    className="bg-primary w-50 text-2xl px-5 mt-10 px-6 py-2 font-semibold border border-primary"
                     disabled={currentlySelected.length === 0}
                     onClick={() => {
                         handleSubmit();
                         router.push("/register/getallregister");
                     }}
                 >
-                    Go to Dashboard
+                    Next >
                 </LoadingButton>
             </div>
         </div>
