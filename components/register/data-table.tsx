@@ -22,8 +22,6 @@ import {
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
-import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -465,38 +463,12 @@ export function DataTable({ data }: { data: Data[] }) {
     });
 
     // Use the final row model to get the filtered + sorted data
-    // const handleExport = () => {
-    //     // Pull final rows from the table’s computed row model:
-    //     const filteredSortedRows = table
-    //         .getRowModel()
-    //         .rows.map((row) => row.original);
-
-    //     // Prepare data for Excel
-    //     const exportData = filteredSortedRows.map((row) => ({
-    //         Name: row.name,
-    //         USN: row.usn,
-    //         Type: row.type,
-    //         Events: row.events.map((event) => event.eventName).join(", "),
-    //         Status: row.status,
-    //     }));
-
-    //     // Create a worksheet
-    //     const worksheet = XLSX.utils.json_to_sheet(exportData);
-    //     const workbook = XLSX.utils.book_new();
-    //     XLSX.utils.book_append_sheet(workbook, worksheet, "Registrants");
-
-    //     // Generate buffer
-    //     const wbout = XLSX.write(workbook, { type: "array", bookType: "xlsx" });
-
-    //     // Create a Blob and trigger download
-    //     const blob = new Blob([wbout], { type: "application/octet-stream" });
-    //     saveAs(blob, "registrants.xlsx");
-    // };
-    const handleExportToPDF = () => {
+    const handleExport = () => {
         // Pull final rows from the table’s computed row model:
         const filteredSortedRows = table
             .getRowModel()
             .rows.map((row) => row.original);
+
     
         // Prepare data for PDF
         const exportData = filteredSortedRows.map((row) => [
@@ -530,6 +502,7 @@ export function DataTable({ data }: { data: Data[] }) {
     };
 
 
+
     return (
         <div className="w-full px-5 bg-white rounded-xl bg-opacity-90 h-[70rem]">
             <div className="flex items-center py-4 ">
@@ -553,7 +526,7 @@ export function DataTable({ data }: { data: Data[] }) {
                 <Button
                     variant="outline"
                     className="ml-auto bg-[#00B140] text-white hover:scale-105 hover:bg-[#00B140] hover:text-white "
-                    onClick={handleExportToPDF}
+                    onClick={handleExport}
                 >
                     <FileDown className="mr-2 h-4 w-4" />
                     Download current view as Excel
