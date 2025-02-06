@@ -94,8 +94,10 @@ export default function SignIn() {
         >
             <Card className="w-full max-w-md bg-card text-card-foreground">
                 <CardHeader>
-                    <div className="flex items-center text-blue-800 justify-center mb-6 font-bold text-2xl leading-6 tracking-wider">
+                    <div className="flex items-center flex-col text-blue-800 justify-center mb-6 font-bold text-2xl leading-6 tracking-wider">
                         <h1>Global Academy of Technology</h1>
+                        <br/>
+                        <h1>24 th VTU Fest</h1>
                     </div>
                     <div className="flex items-center justify-between pb-0">
                         <Image
