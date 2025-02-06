@@ -465,33 +465,33 @@ export function DataTable({ data }: { data: Data[] }) {
     });
 
     // Use the final row model to get the filtered + sorted data
-    const handleExport = () => {
-        // Pull final rows from the table’s computed row model:
-        const filteredSortedRows = table
-            .getRowModel()
-            .rows.map((row) => row.original);
+    // const handleExport = () => {
+    //     // Pull final rows from the table’s computed row model:
+    //     const filteredSortedRows = table
+    //         .getRowModel()
+    //         .rows.map((row) => row.original);
 
-        // Prepare data for Excel
-        const exportData = filteredSortedRows.map((row) => ({
-            Name: row.name,
-            USN: row.usn,
-            Type: row.type,
-            Events: row.events.map((event) => event.eventName).join(", "),
-            Status: row.status,
-        }));
+    //     // Prepare data for Excel
+    //     const exportData = filteredSortedRows.map((row) => ({
+    //         Name: row.name,
+    //         USN: row.usn,
+    //         Type: row.type,
+    //         Events: row.events.map((event) => event.eventName).join(", "),
+    //         Status: row.status,
+    //     }));
 
-        // Create a worksheet
-        const worksheet = XLSX.utils.json_to_sheet(exportData);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Registrants");
+    //     // Create a worksheet
+    //     const worksheet = XLSX.utils.json_to_sheet(exportData);
+    //     const workbook = XLSX.utils.book_new();
+    //     XLSX.utils.book_append_sheet(workbook, worksheet, "Registrants");
 
-        // Generate buffer
-        const wbout = XLSX.write(workbook, { type: "array", bookType: "xlsx" });
+    //     // Generate buffer
+    //     const wbout = XLSX.write(workbook, { type: "array", bookType: "xlsx" });
 
-        // Create a Blob and trigger download
-        const blob = new Blob([wbout], { type: "application/octet-stream" });
-        saveAs(blob, "registrants.xlsx");
-    };
+    //     // Create a Blob and trigger download
+    //     const blob = new Blob([wbout], { type: "application/octet-stream" });
+    //     saveAs(blob, "registrants.xlsx");
+    // };
     const handleExportToPDF = () => {
         // Pull final rows from the table’s computed row model:
         const filteredSortedRows = table
