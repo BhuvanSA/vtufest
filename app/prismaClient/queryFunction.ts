@@ -26,7 +26,8 @@ export async function insertRegistrant(
                         userId: arg.userId,
                         accomodation : arg.accomodation,
                         gender:arg.gender,
-                        blood : arg.blood
+                        blood : arg.blood,
+                        designation : arg.designation
                     },
                 });
                 return registrant;
@@ -1083,6 +1084,22 @@ export async function getRegisterByCollegeName(collegeName :string){
         return registrantList;
     }
     catch(error:unknown){
+        handlePrismaError(error);
+    }
+}
+
+export async function getPaymentInfo(userId : string){
+    try{
+        const payment = await prisma.users.findFirst({
+            where:{
+                id:userId
+            },
+            select:{
+                paymentUrl:true
+            }
+        });
+        return payment;
+    }catch(error:unknown){
         handlePrismaError(error);
     }
 }

@@ -55,6 +55,7 @@ export const managerFormSchema = z.object({
     gender: z.string().min(1, "Gender is required"),
     accomodation: z.boolean(),
     blood: z.string().min(1, "Blood is required"),
+    designation : z.string().min(1,"desgination is required")
 });
 
 

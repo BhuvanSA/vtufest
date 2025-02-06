@@ -29,6 +29,8 @@ export default function EventsPage() {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [paymentUrl, setPaymentUrl] = useState<string>("");
     const [isUploaded, setIsUploaded] = useState(false);
+    const [paymentStatus,setPaymentStatus] = useState(false);
+    const [paymentDone,setPaymentDone] = useState(false);
     // Fetch events from backend
     useEffect(() => {
         const fetchEvents = async () => {
@@ -42,6 +44,26 @@ export default function EventsPage() {
             }
         };
 
+
+        const fetchPaymentInfo = async()=>{
+            try{
+                const response = await fetch("/api/getPaymentInfo");
+                const r = await response.json();
+                let paymentStatus = false;
+                if(r.paymentInfo.paymentUrl=== null){
+                    paymentStatus = false;
+                    setPaymentStatus(false)
+                }else{
+                    paymentStatus = true;
+                    setPaymentStatus(true);
+                    setPaymentDone(true);
+                }
+                
+            }catch(error:unknown){
+                console.error("Failed to fetch events:", error);
+            }
+        }
+        fetchPaymentInfo();
         fetchEvents();
     }, []);
 
@@ -76,6 +98,7 @@ export default function EventsPage() {
         } else {
             toast.error("Internal Server Error");
         }
+        setPaymentStatus(true);
     };
 
     return (
@@ -180,8 +203,8 @@ export default function EventsPage() {
                                 )}
                             </div>
                         </div>
-                        <Button className="w-full my-2" type="submit">
-                            Submit
+                        <Button className="w-full my-2" type="submit" disabled={paymentStatus}>
+                            {paymentDone? "Submit":"Payment Done"}
                         </Button>
                         <Link href="getallregister">
                             <Button

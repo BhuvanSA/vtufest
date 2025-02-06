@@ -109,7 +109,7 @@ export default function SelectRolesAndEvents({
             usn: "",
             phone: "",
             events: [],
-            email:"",
+            email: "",
             documents: {
                 photo: "",
                 idCard: "",
@@ -135,7 +135,7 @@ export default function SelectRolesAndEvents({
         defaultValues: {
             name: "",
             usn: "",
-            email : "",
+            email: "",
             teamManager: true,
             phone: "",
             documents: {
@@ -144,11 +144,13 @@ export default function SelectRolesAndEvents({
             },
             gender: "",
             accomodation: false,
-            blood: ""
+            blood: "",
+            designation: "",
         },
     });
 
     const [collegeRegion, setCollegeRegion] = useState<string>("");
+    const [disbaled,setDisabled ] = useState<boolean>(false);
 
     useEffect(() => {
 
@@ -156,7 +158,7 @@ export default function SelectRolesAndEvents({
             const response = await fetch('/api/getonlycollegeregion');
             const regionCode = await response.json();
             const region = regionCode.region.region;
-            console.log("Region:",region);
+            console.log("Region:", region);
             setCollegeRegion(region)
         }
         regionFetch();
@@ -233,7 +235,7 @@ export default function SelectRolesAndEvents({
             ...data,
             // events and documents are already included via useEffect
         };
-
+        setDisabled(true);
         console.log("Submitting:", payload);
 
         try {
@@ -254,6 +256,9 @@ export default function SelectRolesAndEvents({
                 console.error("Error registering:", error.message);
                 toast.error(error.message || "An error occurred.");
             }
+        }
+        finally{
+        setDisabled(false);
         }
     };
 
@@ -312,7 +317,7 @@ export default function SelectRolesAndEvents({
             teamManager: true, // Ensure teamManager flag is set
             events: [], // No events for manager
         };
-
+        setDisabled(true);
         console.log("Submitting Manager:", payload);
 
         try {
@@ -334,6 +339,9 @@ export default function SelectRolesAndEvents({
                 console.error("Error registering manager:", error.message);
                 toast.error(error.message || "An error occurred.");
             }
+        }
+        finally{
+            setDisabled(false);
         }
     };
 
@@ -478,8 +486,9 @@ export default function SelectRolesAndEvents({
                                     }
 
                                     <div className="w-full md:w-1/3 space-y-1.5 mt-6">
-                                        <Label htmlFor="blood">Blood Group</Label>
+                                        <Label htmlFor="blood">Date of Birth</Label>
                                         <Input
+                                            type="date"
                                             {...register("blood")}
                                             id="blood"
                                             name="blood"
@@ -579,9 +588,9 @@ export default function SelectRolesAndEvents({
                                                                             ) => {
                                                                                 if (
                                                                                     e.key ===
-                                                                                        "Enter" ||
+                                                                                    "Enter" ||
                                                                                     e.key ===
-                                                                                        " "
+                                                                                    " "
                                                                                 ) {
                                                                                     onToggleSelect(
                                                                                         event.eventNo,
@@ -589,11 +598,10 @@ export default function SelectRolesAndEvents({
                                                                                     );
                                                                                 }
                                                                             }}
-                                                                            className={`p-4 border-2 rounded-lg cursor-pointer transition duration-300 flex flex-col h-full ${
-                                                                                isSelected
+                                                                            className={`p-4 border-2 rounded-lg cursor-pointer transition duration-300 flex flex-col h-full ${isSelected
                                                                                     ? "border-primary bg-primary/10"
                                                                                     : "border-border bg-card"
-                                                                            }`}
+                                                                                }`}
                                                                         >
                                                                             <h3 className="text-lg font-semibold mb-2">
                                                                                 {
@@ -636,8 +644,8 @@ export default function SelectRolesAndEvents({
                                                                                             onChangeRole(
                                                                                                 event.eventNo,
                                                                                                 val as
-                                                                                                    | "PARTICIPANT"
-                                                                                                    | "ACCOMPANIST"
+                                                                                                | "PARTICIPANT"
+                                                                                                | "ACCOMPANIST"
                                                                                             )
                                                                                         }
                                                                                     >
@@ -651,16 +659,16 @@ export default function SelectRolesAndEvents({
                                                                                                 </SelectLabel>
                                                                                                 {event.registeredParticipant <
                                                                                                     event.maxParticipant && (
-                                                                                                    <SelectItem value="PARTICIPANT">
-                                                                                                        Participant
-                                                                                                    </SelectItem>
-                                                                                                )}
+                                                                                                        <SelectItem value="PARTICIPANT">
+                                                                                                            Participant
+                                                                                                        </SelectItem>
+                                                                                                    )}
                                                                                                 {event.registeredAccompanist <
                                                                                                     event.maxAccompanist && (
-                                                                                                    <SelectItem value="ACCOMPANIST">
-                                                                                                        Accompanist
-                                                                                                    </SelectItem>
-                                                                                                )}
+                                                                                                        <SelectItem value="ACCOMPANIST">
+                                                                                                            Accompanist
+                                                                                                        </SelectItem>
+                                                                                                    )}
                                                                                             </SelectGroup>
                                                                                         </SelectContent>
                                                                                     </Select>
@@ -705,11 +713,10 @@ export default function SelectRolesAndEvents({
                                         return (
                                             <div
                                                 key={doc.id}
-                                                className={`space-y-1.5 border rounded-[var(--radius)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 p-2 ${
-                                                    isUploaded
+                                                className={`space-y-1.5 border rounded-[var(--radius)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 p-2 ${isUploaded
                                                         ? "border-green-500 border-2"
                                                         : "border-gray-300"
-                                                }`}
+                                                    }`}
                                             >
                                                 <Label htmlFor={doc.id}>
                                                     {doc.label}
@@ -766,14 +773,14 @@ export default function SelectRolesAndEvents({
                                                 {errors.documents?.[
                                                     doc.id as keyof typeof errors.documents
                                                 ] && (
-                                                    <p className="text-red-500 text-sm">
-                                                        {
-                                                            errors.documents[
-                                                                doc.id as keyof typeof errors.documents
-                                                            ]?.message
-                                                        }
-                                                    </p>
-                                                )}
+                                                        <p className="text-red-500 text-sm">
+                                                            {
+                                                                errors.documents[
+                                                                    doc.id as keyof typeof errors.documents
+                                                                ]?.message
+                                                            }
+                                                        </p>
+                                                    )}
                                             </div>
                                         );
                                     })}
@@ -781,7 +788,7 @@ export default function SelectRolesAndEvents({
                             </div>
                         </CardContent>
                         <CardFooter className="flex justify-center gap-5">
-                            <Button className="px-8 text-xl" type="submit">
+                            <Button className="px-8 text-xl" type="submit" disabled={disbaled}>
                                 {" "}
                                 Save{" "}
                             </Button>
@@ -835,11 +842,11 @@ export default function SelectRolesAndEvents({
                                         )}
                                     </div>
                                     <div className="w-full md:w-1/3 space-y-1.5">
-                                        <Label htmlFor="managerUsn">USN</Label>
+                                        <Label htmlFor="managerUsn">ID card Number</Label>
                                         <Input
                                             {...registerManager("usn")}
                                             id="managerUsn"
-                                            placeholder="1GA21AI012"
+                                            placeholder="ID Number"
                                         />
                                         {errorsManager.usn && (
                                             <p className="text-red-500 text-sm">
@@ -847,6 +854,21 @@ export default function SelectRolesAndEvents({
                                             </p>
                                         )}
                                     </div>
+
+                                    <div className="w-full md:w-1/3 space-y-1.5">
+                                        <Label htmlFor="managerdesignation">Designation</Label>
+                                        <Input
+                                            {...registerManager("designation")}
+                                            id="managerdesignation"
+                                            placeholder="designation"
+                                        />
+                                        {errorsManager.designation && (
+                                            <p className="text-red-500 text-sm">
+                                                {errorsManager.designation.message}
+                                            </p>
+                                        )}
+                                    </div>
+
                                     <div className="w-full md:w-1/3 space-y-1.5">
                                         <Label htmlFor="managerPhone">
                                             Phone Number
@@ -901,7 +923,7 @@ export default function SelectRolesAndEvents({
                                             </p>
                                         )}
                                     </div>
-                                    {collegeRegion && ['Belgavi Region (2)','Kalaburgi Region (3)','Mysuru Region (4)'].includes(collegeRegion)?
+                                    {collegeRegion && ['Belgavi Region (2)', 'Kalaburgi Region (3)', 'Mysuru Region (4)'].includes(collegeRegion) ?
                                         <div className="w-full md:w-1/3 space-y-1.5 mt-6">
                                             <Label htmlFor="Manageraccommodation">Need Accommodation</Label>
                                             <Select
@@ -922,7 +944,7 @@ export default function SelectRolesAndEvents({
                                             {errors.accomodation && (
                                                 <p className="text-red-500 text-sm">{errors.accomodation.message}</p>
                                             )}
-                                        </div>:<></>
+                                        </div> : <></>
                                     }
                                     <div className="w-full md:w-1/3 space-y-1.5 mt-6">
                                         <Label htmlFor="Managerblood">Blood Group</Label>
@@ -930,7 +952,7 @@ export default function SelectRolesAndEvents({
                                             {...registerManager("blood")}
                                             id="Managerblood"
                                             name="blood"
-                                            placeholder="Enter the Blood Group"
+                                            type="date"
                                         />
                                         {errors.blood && (
                                             <p className="text-red-500 text-sm">
@@ -972,11 +994,10 @@ export default function SelectRolesAndEvents({
                                         return (
                                             <div
                                                 key={doc.id}
-                                                className={`space-y-1.5 border rounded-[var(--radius)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 p-2 ${
-                                                    isUploaded
+                                                className={`space-y-1.5 border rounded-[var(--radius)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 p-2 ${isUploaded
                                                         ? "border-green-500 border-2"
                                                         : "border-gray-300"
-                                                }`}
+                                                    }`}
                                             >
                                                 <Label htmlFor={doc.id}>
                                                     {doc.label}
@@ -1034,15 +1055,15 @@ export default function SelectRolesAndEvents({
                                                 {errorsManager.documents?.[
                                                     doc.id as keyof typeof errorsManager.documents
                                                 ] && (
-                                                    <p className="text-red-500 text-sm">
-                                                        {
-                                                            errorsManager
-                                                                .documents[
-                                                                doc.id as keyof typeof errorsManager.documents
-                                                            ]?.message
-                                                        }
-                                                    </p>
-                                                )}
+                                                        <p className="text-red-500 text-sm">
+                                                            {
+                                                                errorsManager
+                                                                    .documents[
+                                                                    doc.id as keyof typeof errorsManager.documents
+                                                                ]?.message
+                                                            }
+                                                        </p>
+                                                    )}
                                             </div>
                                         );
                                     })}
@@ -1050,9 +1071,10 @@ export default function SelectRolesAndEvents({
                             </div>
                         </CardContent>
                         <CardFooter className="w-full text-center flex gap-3 justify-center">
-                            <Button className="px-8 text-xl" type="submit">
+                            <Button className="px-8 text-xl" type="submit" disabled={disbaled} >
                                 {" "}
                                 Save{" "}
+                                
                             </Button>
 
                             <Link href="/register/getallregister">

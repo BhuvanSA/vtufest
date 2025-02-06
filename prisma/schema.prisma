@@ -57,6 +57,7 @@ model Registrants {
   id                 String                     @id @default(uuid())
   name               String
   usn                String                     @unique
+  designation        String?                    
   phone              String                     @unique
   teamManager        Boolean                    @default(false)
   photoUrl           String
