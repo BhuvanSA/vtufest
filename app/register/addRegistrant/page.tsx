@@ -38,7 +38,7 @@ export default async function Page() {
         `;
 
     return (
-        <div className="bg-background min-h-screen pt-24">
+        <div className="bg-background min-h-screen pt-12">
             <div className="mt-4 justify-center flex flex-col gap-4">
                 <div className="max-w-4xl mx-auto p-4">
                     <h1 className="text-primary font-bold text-4xl md:text-4xl xl:text-4xl mb-6">

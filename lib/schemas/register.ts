@@ -28,7 +28,7 @@ export const participantFormSchema = z.object({
         .min(1, "Select at least one event"),
     gender: z.string().min(1, "Gender is required"),
     accomodation: z.boolean(),
-    blood: z.string().min(1, "Blood is required"),
+    blood: z.string().min(1, "Date of Birth is required"),
     documents: z.object({
         photo: z.string().min(1, "Photo is required"),
         idCard: z.string().min(1, "College ID Card is required"),
@@ -54,7 +54,7 @@ export const managerFormSchema = z.object({
     }),
     gender: z.string().min(1, "Gender is required"),
     accomodation: z.boolean(),
-    blood: z.string().min(1, "Blood is required"),
+    blood: z.string().min(1, "Date of Birth is required"),
     designation : z.string().min(1,"desgination is required")
 });
 

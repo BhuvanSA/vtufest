@@ -12,6 +12,7 @@ import React, { useEffect, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import Link from "next/link";
+import { LoadingButton } from "@/components/LoadingButton";
 
 interface MyCustomEvent {
     id: number;
@@ -28,9 +29,10 @@ export default function EventsPage() {
     const [events, setEvents] = useState<MyCustomEvent[]>([]);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [paymentUrl, setPaymentUrl] = useState<string>("");
-    const [isUploaded, setIsUploaded] = useState(false);
-    const [paymentStatus,setPaymentStatus] = useState(false);
-    const [paymentDone,setPaymentDone] = useState(false);
+    const [isUploaded, setIsUploaded] = useState<boolean>(false);
+    const [paymentStatus, setPaymentStatus] = useState<boolean>(false);
+    const [paymentDone, setPaymentDone] = useState<boolean>(false);
+    const [paymentStatusInfo,setPaymentStatusInfo] = useState<string>("");
     // Fetch events from backend
     useEffect(() => {
         const fetchEvents = async () => {
@@ -45,21 +47,24 @@ export default function EventsPage() {
         };
 
 
-        const fetchPaymentInfo = async()=>{
-            try{
+        const fetchPaymentInfo = async () => {
+            try {
                 const response = await fetch("/api/getPaymentInfo");
                 const r = await response.json();
+                console.log(r)
                 let paymentStatus = false;
-                if(r.paymentInfo.paymentUrl=== null){
+                if (r.paymentInfo.paymentUrl === null) {
                     paymentStatus = false;
                     setPaymentStatus(false)
-                }else{
+                } else {
                     paymentStatus = true;
                     setPaymentStatus(true);
+                    console.log("fdas",r.paymentInfo.PaymentVerified);
+                    setPaymentStatusInfo(r.paymentInfo.PaymentVerified);
                     setPaymentDone(true);
                 }
-                
-            }catch(error:unknown){
+
+            } catch (error: unknown) {
                 console.error("Failed to fetch events:", error);
             }
         }
@@ -70,10 +75,24 @@ export default function EventsPage() {
     const paymentAmount = events.length > 10 ? 8000 : 4000;
     const imageSrc = events.length > 10 ? image2 : image1;
 
+    async function handleDeleteFromUploadThing(fileId: string) {
+        try {
+            await fetch("/api/deleteFiles", {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ files: [fileId] }),
+            });
+            console.log(fileId);
+        } catch (error) {
+            console.error("Error deleting file:", error);
+        }
+    }
+
     const {
         control,
         handleSubmit,
         setValue,
+        getValues,
         formState: { errors },
     } = useForm({
         defaultValues: {
@@ -117,105 +136,110 @@ export default function EventsPage() {
                             imageSrc={imageSrc}
                         />
                     </div>
-                    <form
-                        className="space-y-4"
-                        onSubmit={handleSubmit(onSubmit)}
-                    >
-                        <div className="space-y-2">
-                            <Label htmlFor="txnNumber">
-                                Transaction Number / ID{" "}
-                                <span className="text-red-700">*</span>
-                            </Label>
-                            <Controller
-                                control={control}
-                                name="txnNumber"
-                                rules={{ required: true }}
-                                render={({ field }) => (
-                                    <Input
-                                        id="txnNumber"
-                                        type="text"
-                                        {...field}
-                                        placeholder="Enter your transaction ID"
-                                    />
-                                )}
-                            />
-                            {errors.txnNumber && (
-                                <small className="text-red-700 mt-6 font-semibold">
-                                    The Transaction Number / ID is required{" "}
-                                </small>
-                            )}
-                        </div>
-                        <div className="space-y-2">
+                    {!paymentDone ?
+                        <form
+                            className="space-y-4"
+                            onSubmit={handleSubmit(onSubmit)}
+                        >
                             <div className="space-y-2">
-                                <Label htmlFor="paymentScreenshot">
-                                    Payment Screenshot <span className="text-red-700">*</span>
+                                <Label htmlFor="txnNumber">
+                                    Transaction Number / ID{" "}
+                                    <span className="text-red-700">*</span>
                                 </Label>
                                 <Controller
                                     control={control}
-                                    name="paymentUrl"
+                                    name="txnNumber"
                                     rules={{ required: true }}
-                                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
                                     render={({ field }) => (
-                                        <div
-                                            className={`space-y-1.5 border rounded-[var(--radius)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 p-2 ${isUploaded ? "border-green-500 border-2" : "border-gray-300"
-                                                }`}
-                                        >
-                                            {isUploaded ? (
-                                                <div className="w-full h-[244px] flex flex-col rounded-[var(--radius)] items-center justify-end p-12 space-y-2 bg-gradient-to-t from-green-50 to-transparent">
-                                                    <p className="text-green-500 flex items-center gap-1 pb-10">
-                                                        Upload Complete
-                                                    </p>
-                                                    <Button
-                                                        type="button"
-                                                        variant="outline"
-                                                        onClick={() => {
-                                                            setIsUploaded(false);
-                                                            setPaymentUrl("");
-                                                            setValue("paymentUrl", "");
-                                                        }}
-                                                    >
-                                                        Edit (Re-upload)
-                                                    </Button>
-                                                </div>
-                                            ) : (
-                                                <UploadDropzone
-                                                    endpoint="imageUploader"
-                                                    onClientUploadComplete={(res) => {
-                                                        if (res && res[0]) {
-                                                            setPaymentUrl(res[0].key);
-                                                            setValue("paymentUrl", res[0].key);
-                                                            setIsUploaded(true);
-                                                            toast.success("Upload Completed");
-                                                        }
-                                                    }}
-                                                    onUploadError={(error: Error) => {
-                                                        toast.error(`Error: ${error.message} Uploading`);
-                                                    }}
-                                                />
-                                            )}
-                                        </div>
+                                        <Input
+                                            id="txnNumber"
+                                            type="text"
+                                            {...field}
+                                            placeholder="Enter your transaction ID"
+                                        />
                                     )}
                                 />
-                                {errors.paymentUrl && (
+                                {errors.txnNumber && (
                                     <small className="text-red-700 mt-6 font-semibold">
-                                        Payment Screenshot File is required
+                                        The Transaction Number / ID is required{" "}
                                     </small>
                                 )}
                             </div>
-                        </div>
-                        <Button className="w-full my-2" type="submit" disabled={paymentStatus}>
-                            {paymentDone? "Submit":"Payment Done"}
-                        </Button>
-                        <Link href="getallregister">
-                            <Button
-                                type="button"
-                                variant="outline"
-                                className="w-full my-2"
-                            >
-                                Go Back
+                            <div className="space-y-2">
+                                <div className="space-y-2">
+                                    <Label htmlFor="paymentScreenshot">
+                                        Payment Screenshot <span className="text-red-700">*</span>
+                                    </Label>
+                                    <Controller
+                                        control={control}
+                                        name="paymentUrl"
+                                        rules={{ required: true }}
+                                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                                        render={({ field }) => (
+                                            <div
+                                                className={`space-y-1.5 border rounded-[var(--radius)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 p-2 ${isUploaded ? "border-green-500 border-2" : "border-gray-300"
+                                                    }`}
+                                            >
+                                                {isUploaded ? (
+                                                    <div className="w-full h-[244px] flex flex-col rounded-[var(--radius)] items-center justify-end p-12 space-y-2 bg-gradient-to-t from-green-50 to-transparent">
+                                                        <p className="text-green-500 flex items-center gap-1 pb-10">
+                                                            Upload Complete
+                                                        </p>
+                                                        <LoadingButton
+                                                            type="button"
+                                                            onClick={async() => {
+                                                                setIsUploaded(false);
+                                                                await  handleDeleteFromUploadThing(getValues("paymentUrl"));
+                                                                setValue("paymentUrl", "");
+                                                                setPaymentUrl("");
+                                                            }}
+                                                        >
+                                                            Edit (Re-upload)
+                                                        </LoadingButton>
+                                                    </div>
+                                                ) : (
+                                                    <UploadDropzone
+                                                        endpoint="imageUploader"
+                                                        onClientUploadComplete={(res) => {
+                                                            if (res && res[0]) {
+                                                                setPaymentUrl(res[0].key);
+                                                                setValue("paymentUrl", res[0].key);
+                                                                setIsUploaded(true);
+                                                                toast.success("Upload Completed");
+                                                            }
+                                                        }}
+                                                        onUploadError={(error: Error) => {
+                                                            toast.error(`Error: ${error.message} Uploading`);
+                                                        }}
+                                                    />
+                                                )}
+                                            </div>
+                                        )}
+                                    />
+                                    {errors.paymentUrl && (
+                                        <small className="text-red-700 mt-6 font-semibold">
+                                            Payment Screenshot File is required
+                                        </small>
+                                    )}
+                                </div>
+                            </div>
+                            <Button className="w-full my-2" type="submit" disabled={paymentStatus}>
+                                {paymentDone ? "Submit" : "Payment Done"}
                             </Button>
-                        </Link>
-                    </form>
+                            <Link href="getallregister">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    className="w-full my-2"
+                                >
+                                    Go Back
+                                </Button>
+                            </Link>
+                        </form> : <>{paymentStatusInfo==="PENDING"? <h2 className="text-lg text-primary text-center">Payment Verification is {paymentStatusInfo}</h2>
+                                    : paymentStatusInfo==="COMPLETED"? <h2 className="text-lg text-green-500 text-center"> Payment Verification is {paymentStatusInfo}</h2>:
+                                    <h2 className="text-lg text-red-500 text-center">Payment Verification is {paymentStatusInfo}</h2> 
+                                }</>}
+                        <p className="text-sm text-red-500 text-center mt-0" >It will take time to verify the status usually 2 days</p>
                 </CardContent>
             </Card>
         </div>

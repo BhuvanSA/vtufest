@@ -1,8 +1,9 @@
 "use client";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
-import { Columns, FileDown, Pencil, Search, Trash2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Columns, FileDown, Pencil, Search, Trash2 } from "lucide-react";
 import * as React from "react";
+import {format} from "../../public/images/gatformat.jpg";
 import {
     ColumnDef,
     ColumnFiltersState,
@@ -445,8 +446,8 @@ export function    DataTable({ data }: { data: Data[] }) {
         const doc = new jsPDF();
     
         // Load the PNG template
-        const img = new HTMLImageElement();
-        img.src = "template.png"; // Replace with the actual template path
+        const img = document.createElement('img');
+        img.src = "/images/gatformat.jpg"; // Replace with the actual template path
     
         img.onload = () => {
             const pageWidth = doc.internal.pageSize.getWidth();
@@ -475,10 +476,10 @@ export function    DataTable({ data }: { data: Data[] }) {
 
 
     return (
-        <div className="w-full px-5 bg-white rounded-xl bg-opacity-90 h-[70rem]">
+        <div className="w-full px-5 bg-white rounded-xl bg-opacity-90 h-[70rem] mt-10">
             <div className="flex items-center py-4 flex-wrap gap-3 ">
                 <div className="relative max-w-sm " >
-                    <Search className="absolute left-2 top-3 h-4 w-4 text-muted-foreground " />
+                    <Search className="absolute left-2 top-3 h-4 w-5 text-muted-foreground " />
                     <Input
                         placeholder="Search name..."
                         value={
@@ -491,7 +492,7 @@ export function    DataTable({ data }: { data: Data[] }) {
                                 .getColumn("name")
                                 ?.setFilterValue(event.target.value)
                         }
-                        className="pl-8"
+                        className="pl-10 w-[26rem]"
                     />
                 </div>
                 <Button
@@ -555,10 +556,10 @@ export function    DataTable({ data }: { data: Data[] }) {
                             </TableRow>
                         ))}
                     </TableHeader>
-                    <TableBody>
+                    <TableBody className="text-primary ">
                         {table.getRowModel().rows?.length ? (
                             table.getRowModel().rows.map((row) => (
-                                <TableRow
+                                <TableRow className="hover:bg-blue-50"
                                     key={row.id}
                                     data-state={
                                         row.getIsSelected() && "selected"
@@ -566,11 +567,10 @@ export function    DataTable({ data }: { data: Data[] }) {
                                 >
                                     {row.getVisibleCells().map((cell) => (
                                         <TableCell key={cell.id} onClick={() => {
-                                            if (cell.column.id === 'usn') {
+                                            if (cell.column.id === 'usn' || cell.column.id==='name' || cell.column.id === "photo") {
                                                 const cellValue = row.getValue('usn');
                                                 router.push(`/register/getregister/${cellValue}`);
                                             }
-
                                         }}>
                                             {flexRender(
                                                 cell.column.columnDef.cell,
@@ -584,9 +584,9 @@ export function    DataTable({ data }: { data: Data[] }) {
                             <TableRow>
                                 <TableCell
                                     colSpan={columns.length}
-                                    className="h-[50rem] text-3xl    text-center "
+                                    className="min-h-[18rem] text-3xl    text-center "
                                 >
-                                    No results.
+                                    No Registrations Are Done Yet.
                                 </TableCell>
                             </TableRow>
                         )}
@@ -605,7 +605,7 @@ export function    DataTable({ data }: { data: Data[] }) {
                         onClick={() => table.previousPage()}
                         disabled={!table.getCanPreviousPage()}
                     >
-                        Previous
+                        <ArrowLeft className="mr-2 h-4 w-4"/> Previous
                     </Button>
                     <Button
                         variant="outline"
@@ -613,7 +613,7 @@ export function    DataTable({ data }: { data: Data[] }) {
                         onClick={() => table.nextPage()}
                         disabled={!table.getCanNextPage()}
                     >
-                        Next
+                        Next <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                 </div>
             </div>

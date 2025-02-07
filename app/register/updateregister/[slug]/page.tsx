@@ -9,11 +9,12 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UploadDropzone } from "@/utils/uploadthing";
 import { toast } from "sonner";
-import { z } from "zod";
 import { useForm, Controller } from "react-hook-form";
 
 
 import Link from "next/link";
+import { ArrowLeft, EyeIcon, Pencil, PlaySquare, PlusIcon, Save, Upload, View, X } from "lucide-react";
+import { LoadingButton } from "@/components/LoadingButton";
 // Define interfaces for our data structures
 
 
@@ -22,10 +23,12 @@ interface Registrant {
   name: string;
   usn: string;
   phone: string;
+  email: string;
   teamManager: boolean;
   gender: string;
   accomodation: boolean;
-  blood : string;
+  blood: string;
+  designation?: string;
   events: Event[];
   eventRegistrations: EventRegistration[];
   [key: string]: any; // For dynamic access to file URLs
@@ -66,12 +69,14 @@ const UpdateRegister: React.FC<UpdateRegisterProps> = ({ params }) => {
       name: "",
       phone: "",
       usn: "",
+      email: "",
       accomodation: false,
       gender: "",
-      blood : ""
+      blood: "",
+      designation: "",
     },
   })
-
+  const [isUploaded, setIsUploaded] = useState<boolean>(false);
   const [id, setId] = useState<string>("");
   const [isTeamManager, setIsTeamManager] = useState<boolean>(false);
   const [editOne, setEditOne] = useState<boolean>(false);
@@ -83,7 +88,21 @@ const UpdateRegister: React.FC<UpdateRegisterProps> = ({ params }) => {
   const [addEventType, setAddEventType] = useState<string>("");
   const [allRegisteredEvents, setAllRegisteredEvents] = useState<Event[]>([]);
   const [handleAddEventEffect, setHandleAddEventEffect] = useState<boolean>(false);
-  
+
+  async function handleDeleteFromUploadThing(fileId: string) {
+    console.log(fileId);
+    try {
+      await fetch("/api/deleteFiles", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ files: [fileId] }),
+      });
+      console.log(fileId);
+    } catch (error) {
+      console.error("Error deleting file:", error);
+    }
+  }
+
 
   // Fetch registrant details
   async function fetchRegistrant() {
@@ -106,7 +125,9 @@ const UpdateRegister: React.FC<UpdateRegisterProps> = ({ params }) => {
       setValue('usn', registrant.usn);
       setValue('accomodation', registrant.accomodation);
       setValue('gender', registrant.gender);
-      setValue('blood',registrant.blood);
+      setValue("email", registrant.email);
+      setValue('blood', registrant.blood);
+      setValue('designation', registrant.designation || "");
       setIsTeamManager(registrant.teamManager);
       setId(registrant.id);
       setRegistrant(registrant);
@@ -152,18 +173,20 @@ const UpdateRegister: React.FC<UpdateRegisterProps> = ({ params }) => {
   }, [handleAddEventEffect]);
 
   // Handle save action
-  const handleSave = async (formData:any) => {
+  const handleSave = async (formData: any) => {
     console.log(formData);
     const response = await fetch("/api/updateregisterdetails", {
       method: "PATCH",
       body: JSON.stringify({
         id: id,
         usn: formData.usn,
+        email: formData.email,
         phone: formData.phone,
         name: formData.name,
         accomodation: formData.accomodation,
         gender: formData.gender,
-        blood : formData.blood,
+        blood: formData.blood,
+        designation: formData.designation
       }),
       headers: { "Content-Type": "application/json" },
     });
@@ -196,6 +219,28 @@ const UpdateRegister: React.FC<UpdateRegisterProps> = ({ params }) => {
       )
     );
   };
+
+
+  const handleDocumentUpdate = async (event: any) => {
+    event.preventDefault();
+    const formData = new FormData();
+    formData.append("registrantId", id);
+    formData.append("field", field);
+    formData.append("fileUrl", fileUrl);
+  
+    const response = await fetch("/api/updateregisterfiles", {
+      method: "PATCH",
+      body: formData,
+    });
+
+    const data = await response.json();
+    if (data.success) {
+      toast.success("Document updated successfully");
+      fetchRegistrant();
+    } else {
+      toast.error("Failed to update document. Please try again.");
+    }
+  }
 
   // Handle Save button click (per event)
   const handleSaveRole = async (event: MergedEvent) => {
@@ -294,8 +339,8 @@ const UpdateRegister: React.FC<UpdateRegisterProps> = ({ params }) => {
           </h1>
 
           <Card className="w-full">
-            <CardDescription className="text-center mt-8 mb-10">
-              Update details for Registrant
+            <CardDescription className="text-center mt-8 mb-10 text-red-500">
+              Update details for Registrant for <span className=" ">{isTeamManager ? "Team Manager" : "Participant/Accompanist"}</span>
             </CardDescription>
             <CardContent>
               <div className="flex flex-col gap-4 mb-6">
@@ -303,7 +348,7 @@ const UpdateRegister: React.FC<UpdateRegisterProps> = ({ params }) => {
                   <div>
                     <div className="flex flex-col md:flex-row gap-4 md:gap-10">
                       <div className="w-full md:w-1/3 space-y-1.5">
-                        <Label htmlFor="name">Name</Label>
+                        <Label htmlFor="name">Name <small className="text-red-600">*</small></Label>
                         <Controller
                           control={control}
                           name="name"
@@ -320,8 +365,26 @@ const UpdateRegister: React.FC<UpdateRegisterProps> = ({ params }) => {
                         />
                         {errors.name && <p className="text-red-500">{errors.name.message}</p>}
                       </div>
+                      {isTeamManager ? <div className="w-full md:w-1/3 space-y-1.5">
+                        <Label htmlFor="designation">Designation<small className="text-red-600"> *</small></Label>
+                        <Controller
+                          control={control}
+                          name="designation"
+                          rules={{ required: "Designation is required" }}
+                          render={({ field }) => (
+                            <Input
+                              type="text"
+                              id="designation"
+                              {...field}
+                              disabled={!editOne}
+                              placeholder="Designation"
+                            />
+                          )}
+                        />
+                        {errors.designation && <p className="text-red-500">{errors.designation.message}</p>}
+                      </div> : <></>}
                       <div className="w-full md:w-1/3 space-y-1.5">
-                        <Label htmlFor="usn">USN / ID Number</Label>
+                        <Label htmlFor="usn">USN / ID Number <small className="text-red-600">*</small></Label>
                         <Controller
                           control={control}
                           name="usn"
@@ -339,7 +402,7 @@ const UpdateRegister: React.FC<UpdateRegisterProps> = ({ params }) => {
                         {errors.usn && <p className="text-red-500">{errors.usn.message}</p>}
                       </div>
                       <div className="w-full md:w-1/3 space-y-1.5">
-                        <Label htmlFor="phone">Phone Number</Label>
+                        <Label htmlFor="phone">Phone Number <small className="text-red-600">*</small></Label>
                         <Controller
                           control={control}
                           name="phone"
@@ -364,7 +427,7 @@ const UpdateRegister: React.FC<UpdateRegisterProps> = ({ params }) => {
                     <div className="flex flex-row gap-10 mt-5" >
 
                       <div className="w-full md:w-1/3 space-y-1.5">
-                        <Label htmlFor="gender">Gender</Label>
+                        <Label htmlFor="gender">Gender <small className="text-red-600">*</small></Label>
                         <Controller
                           control={control}
                           name="gender"
@@ -393,7 +456,7 @@ const UpdateRegister: React.FC<UpdateRegisterProps> = ({ params }) => {
 
                       </div>
                       <div className="w-full md:w-1/3 space-y-1.5">
-                        <Label htmlFor="accomodation">Need Accommodation</Label>
+                        <Label htmlFor="accomodation">Need Accommodation <small className="text-red-600">*</small></Label>
                         <Controller
                           control={control}
                           name="accomodation"
@@ -422,37 +485,61 @@ const UpdateRegister: React.FC<UpdateRegisterProps> = ({ params }) => {
                       </div>
 
                       <div className="w-full md:w-1/3 space-y-1.5">
-                        <Label htmlFor="blood">Blood Group</Label>
+                        <Label htmlFor="blood">Date Of Birth <small className="text-red-600">*</small></Label>
                         <Controller
                           control={control}
                           name="blood"
                           rules={{
-                            required: "Blood is required",
+                            required: "Date of Birth is required",
                           }}
                           render={({ field }) => (
                             <Input
-                              type="text"
+                              type="date"
                               id="blood"
                               {...field}
                               disabled={!editOne}
-                              placeholder="Enter your Blood Group"
+                              placeholder="Enter your Date of Birth"
                             />
                           )}
                         />
                         {errors.blood && <p className="text-red-500">{errors.blood.message}</p>}
                       </div>
-                      <div className="flex flex-row gap-4 mt-5">
-                        <p className="block text-sm font-medium text-primary mb-2 mt-2">
-                          Are You Team Manager?{" "}
-                          <span className=" ">&nbsp;{isTeamManager ? "YES" : "NO"}</span>
-                        </p>
-                        {editOne ? (
-                          <Button type="button" onClick={handleSubmit(handleSave)}>Save</Button>
-                        ) : (
-                          <Button onClick={() => setEditOne(true)} type="button">Edit</Button>
-                        )}
 
+                      <div className="w-full md:w-1/3 space-y-1.5">
+                        <Label htmlFor="email">Email <small className="text-red-600">*</small></Label>
+                        <Controller
+                          control={control}
+                          name="email"
+                          rules={{
+                            required: "Email is required",
+                            pattern: {
+                              value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+                              message: "Invalid email address",
+                            }
+                          }}
+                          render={({ field }) => (
+                            <Input
+                              type="text"
+                              id="email"
+                              {...field}
+                              disabled={!editOne}
+                              placeholder="Enter your Email"
+                            />
+                          )}
+                        />
+                        {errors.email && <p className="text-red-500">{errors.email.message}</p>}
                       </div>
+                    </div>
+                    <div className="flex flex-row gap-4 mt-5 justify-end ">
+
+                      {editOne ? (<>
+                        <Button className="px-5" type="button" onClick={handleSubmit(handleSave)}><Save className="mr-2" /> Save</Button>
+                        <Button className="" type="button" onClick={() => setEditOne(false)}><X className="mr-2" />Don't Save</Button>
+                      </>
+                      ) : (
+                        <Button className="px-6" onClick={() => setEditOne(true)} type="button"><Pencil className="mr-2 h-5 w-5" />Edit</Button>
+                      )}
+
                     </div>
                   </div>
                 </form>
@@ -493,10 +580,11 @@ const UpdateRegister: React.FC<UpdateRegisterProps> = ({ params }) => {
                             )}
                           </SelectContent>
                         </Select>
-
-                        <Button className="bg-primary p-2 rounded-sm mx-20 mt-3 text-lg" type="submit">
-                          Add Event
-                        </Button>
+                        <div className="flex flex-wrap w-full justify-end">
+                          <Button className="bg-primary  px-4 rounded-sm  text-lg" type="submit">
+                            <PlusIcon />Add Event
+                          </Button>
+                        </div>
                       </form>
                     </div>
 
@@ -576,7 +664,9 @@ const UpdateRegister: React.FC<UpdateRegisterProps> = ({ params }) => {
                     </div>
                   </>
                 )}
-                <div>
+
+                <div className="flex flex-col">
+                <div className="">
                   <Label className="block text-sm font-medium mt-10 text-primary mb-2">
                     Select Field for Upload:
                   </Label>
@@ -601,11 +691,13 @@ const UpdateRegister: React.FC<UpdateRegisterProps> = ({ params }) => {
                       )}
                     </SelectContent>
                   </Select>
-
+                  
                   {field && (
                     <>
                       <a href={`https://${process.env.UPLOADTHING_APP_ID}.ufs.sh/f/${fileUrl}`} target="_blank" rel="noopener noreferrer">
-                        <Button className="mt-5 w-full">View</Button>
+                        <div className="flex w-full justify-center mt-5 ">
+                        <Button className="w-40"><EyeIcon className="mr-2"/>View</Button>
+                        </div>
                       </a>
 
                       <Label className="block text-sm font-medium mt-10 text-primary mb-2">
@@ -613,42 +705,62 @@ const UpdateRegister: React.FC<UpdateRegisterProps> = ({ params }) => {
                       </Label>
 
                       <form encType="multipart/form-data" onSubmit={(e) => {
-                        e.preventDefault();
-                        // Handle file upload here
+                        handleDocumentUpdate(e);
                       }}>
-                        <UploadDropzone
-                          endpoint="imageUploader"
-                          onClientUploadComplete={(res) => {
-                            if (res && res[0]) {
-                              setFileUrl(res[0].key)
-                              toast.success(
-                                `Document Upload Completed`
-                              );
-                            }
-                          }}
-                          onUploadError={(error: Error) => {
-                            toast.error(
-                              `Error: ${error.message} Uploading document`
-                            );
-                          }}
-                        />
-                        <Button className="mt-5 w-full" type="submit">
-                          Upload
+                        {isUploaded ? (
+                          <div className="w-full h-[244px] border-2  flex flex-col rounded-[var(--radius)] items-center justify-end p-12 space-y-2 bg-gradient-to-t from-green-50 to-transparent">
+                            <p className="text-green-500 flex items-center gap-1 pb-10">
+                              Upload Complete
+                            </p>
+                            <LoadingButton
+                              type="button"
+                              className="w-40 bg-green-400"
+                              onClick={async () => {
+                                setIsUploaded(false);
+                                await handleDeleteFromUploadThing(fileUrl);
+                                setFileUrl("");
+                              }}
+                            >
+                              Edit (Re-upload)
+                            </LoadingButton>
+                          </div>
+                        ) : (
+                          <UploadDropzone
+                            endpoint="imageUploader"
+                            onClientUploadComplete={(res) => {
+                              if (res && res[0]) {
+                                setFileUrl(res[0].key);
+                                setIsUploaded(true);
+                                toast.success(
+                                  `Document Upload Completed`
+                                );
+                              }
+                            }}
+                            onUploadError={(error: Error) => {
+                              toast.error(`Error: ${error.message} Uploading`);
+                            }}
+                          />
+                        )}
+                        <div className="flex justify-center w-full">
+                        <Button className="mt-5 w-40 bg-green-500" type="submit">
+                          <Upload className="mr-2"/>Upload
                         </Button>
+                        </div>
                       </form>
                     </>
                   )}
                 </div>
               </div>
+              </div>
             </CardContent>
             <CardFooter>
-            <Link href="/register/getallregister" className="w-full mx-14">
-                                <Button
-                                    className="w-full "
-                                >
-                                    Back
-                                </Button>
-                            </Link>
+              <Link href="/register/getallregister" className="w-full mx-14">
+                <Button
+                  className="w-full "
+                >
+                  <ArrowLeft className="ml-5 h-4 w-4"/>Back
+                </Button>
+              </Link>
             </CardFooter>
           </Card>
         </div>

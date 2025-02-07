@@ -83,7 +83,7 @@ export default function SignIn() {
 
     return (
         <div
-            className="mt-28 min-h-screen flex items-center justify-center p-4"
+            className="mt-28 min-h-screen flex items-center justify-center p-4 flex-wrap"
             style={{
                 backgroundImage: `url(${bgImage.src})`,
                 backgroundSize: "cover",
@@ -95,18 +95,18 @@ export default function SignIn() {
             <Card className="w-full max-w-md bg-card text-card-foreground">
                 <CardHeader>
                     <div className="flex items-center flex-col text-blue-800 justify-center mb-6 font-bold text-2xl leading-6 tracking-wider">
-                        <h1>Global Academy of Technology</h1>
+                        <h1 className="text-wrap text-center">Global Academy of Technology</h1>
                         <br/>
-                        <h1>24 th VTU Fest</h1>
+                        <h1 className="text-yellow-600">24 th VTU Youth Fest</h1>
                     </div>
-                    <div className="flex items-center justify-between pb-0">
+                    <div className="flex items-center justify-between pb-0 mb-0">
                         <Image
                             src="/images/college-logo.png"
                             alt="College Logo"
                             width={85}
                             height={80}
                             priority
-                            className="object-contain"
+                            className="object-contain relative right-3"
                         />
                         <Image
                             src={interactLogo}
@@ -114,7 +114,7 @@ export default function SignIn() {
                             width={170}
                             height={90}
                             priority
-                            className="object-contain relative left-4"
+                            className="object-contain relative right-0"
                         />
                         <Image
                             src={vtulogo}
@@ -122,7 +122,7 @@ export default function SignIn() {
                             width={120}
                             height={120}
                             priority
-                            className="object-contain"
+                            className="object-contain relative right-2"
                         />
                     </div>
                     <CardTitle className="text-2xl text-center font-bold text-foreground">
