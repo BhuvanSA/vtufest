@@ -53,7 +53,7 @@ export type Data = {
     photo: string;
     name: string;
     usn: string;
-    type: "Participant" | "Accompanist" | "Team Manager" | "Participant/Accompanist" | "";
+    type: "Participant" | "Accompanist" | "Team Manager" | "";
     events: { eventName: string }[];
     status: "Pending" | "Processing" | "Success" | "Failed";
 };
@@ -270,8 +270,9 @@ export function    DataTable({ data }: { data: Data[] }) {
                     const filterCycle = [
                         "",
                         "Team Manager",
-                        "Participant/Accompanist",
-                        
+                        "Participant",
+                        "Accompanist",
+                        "Total"
                     ];
                     const currentFilter =
                         (column.getFilterValue() as string) ?? "";
@@ -303,7 +304,7 @@ export function    DataTable({ data }: { data: Data[] }) {
                     if(!filterValue || filterValue==='') return true;
                     if (!filterValue || filterValue === "Total") {
                         const type = row.getValue('type');
-                        if(type === 'Participant/Accompanist' || type==='Team Manager'){
+                        if(type === 'Participant' || type==='Accompanist' || type==='Team Manager'){
                             return true;
                         }
                     }
@@ -476,7 +477,7 @@ export function    DataTable({ data }: { data: Data[] }) {
 
 
     return (
-        <div className="w-full px-5 bg-white rounded-xl bg-opacity-90 h-[70rem] mt-10">
+        <div className="w-full px-5 rounded-xl  h-[70rem] mt-10">
             <div className="flex items-center py-4 flex-wrap gap-3 ">
                 <div className="relative max-w-sm " >
                     <Search className="absolute left-2 top-3 h-4 w-5 text-muted-foreground " />
