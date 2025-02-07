@@ -136,6 +136,7 @@ export default async function Page() {
                 events: accompanistEvents,
                 status: docStatusMap[row.docStatus],
             });
+
         }
         // if (participantAccompanistEvents.length > 0) {
         //     results.push({
@@ -165,7 +166,7 @@ export default async function Page() {
                 <Link href="/register/modifyevents">
                     <Button
                         variant="outline"
-                        className="border bg-orange-400 text-white hover:bg-orange-400 hover:text-white hover:scale-105 transition-all"
+                        className="border bg-primary text-white hover:bg-primary hover:text-white hover:scale-105 transition-all"
                     >
                         <PenSquare className="mr-2 h-4 w-4" />
                         Modify Events
@@ -174,23 +175,27 @@ export default async function Page() {
                 <Link href="/register/addRegistrant">
                     <Button
                         variant="outline"
-                        className="border bg-orange-400 text-white hover:bg-orange-400 hover:text-white hover:scale-105 transition-all"
+                        className="border bg-primary text-white hover:bg-primary hover:text-white hover:scale-105 transition-all"
                     >
                         <UserPlus className="mr-2 h-4 w-4" />
                         Add Registrant
                     </Button>
                 </Link>
-                <Link href="/register/paymentinfo">
+
+            </div>
+            
+            <DataTable data={results} />
+            <Link href="/register/paymentinfo">
+                <div className="flex justify-center items-center">
                     <Button variant="default"
-                    className="border bg-orange-400 text-white hover:bg-orange-400 hover:text-white hover:scale-105 transition-all"
+                        className="border bg-primary relative text-white hover:bg-primary hover:text-white hover:scale-105 transition-all"
                     >
                         <CreditCard className="mr-2 h-4 w-4" />
                         Go to payments
                     </Button>
-                </Link>
-            </div>
-            <DataTable data={results} />
-            
-        </div> 
+                </div>
+            </Link>
+
+        </div>
     );
 }

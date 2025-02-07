@@ -64,6 +64,8 @@ interface UpdateRegisterProps {
 
 const UpdateRegister: React.FC<UpdateRegisterProps> = ({ params }) => {
 
+  
+const [isOther, setIsOther] = useState<boolean>(false);
   const { control, handleSubmit, setValue, formState: { errors } } = useForm({
     defaultValues: {
       name: "",
@@ -365,24 +367,83 @@ const UpdateRegister: React.FC<UpdateRegisterProps> = ({ params }) => {
                         />
                         {errors.name && <p className="text-red-500">{errors.name.message}</p>}
                       </div>
-                      {isTeamManager ? <div className="w-full md:w-1/3 space-y-1.5">
-                        <Label htmlFor="designation">Designation<small className="text-red-600"> *</small></Label>
-                        <Controller
-                          control={control}
-                          name="designation"
-                          rules={{ required: "Designation is required" }}
-                          render={({ field }) => (
-                            <Input
-                              type="text"
-                              id="designation"
-                              {...field}
-                              disabled={!editOne}
-                              placeholder="Designation"
-                            />
-                          )}
-                        />
-                        {errors.designation && <p className="text-red-500">{errors.designation.message}</p>}
-                      </div> : <></>}
+                      {isTeamManager && (
+  <div className="w-full md:w-1/3 space-y-1.5">
+    <Label htmlFor="designation">
+      Designation <small className="text-red-600">*</small>
+    </Label>
+    <Controller
+      control={control}
+      name="designation"
+      rules={{ required: "Designation is required" }}
+      render={({ field: { onChange, value, ref } }) => (
+        <>
+          {!isOther ? (
+            <Select
+              onValueChange={(selectedValue) => {
+                if (selectedValue === "others") {
+                  setIsOther(true);
+                  // Clear the field to allow custom input.
+                  onChange("");
+                } else {
+                  setIsOther(false);
+                  onChange(selectedValue);
+                }
+              }}
+              disabled={!editOne}
+            >
+              <SelectTrigger id="managerdesignation">
+                <SelectValue placeholder="Select Designation" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Designation</SelectLabel>
+                  <SelectItem value="Professor">Professor</SelectItem>
+                  <SelectItem value="Associate Professor">
+                    Associate Professor
+                  </SelectItem>
+                  <SelectItem value="Assistant Professor">
+                    Assistant Professor
+                  </SelectItem>
+                  <SelectItem value="P.E.Director">
+                   P.E.Director
+                  </SelectItem>
+                  <SelectItem value="others">Others</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          ) : (
+            <>
+              <Input
+                id="managerdesignation"
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                placeholder="Please specify your designation"
+                disabled={!editOne}
+                ref={ref}
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  // Optionally clear the designation field before switching back.
+                  onChange("");
+                  setIsOther(false);
+                }}
+                className="text-sm text-blue-600 underline mt-1"
+              >
+                Back to selection
+              </button>
+            </>
+          )}
+        </>
+      )}
+    />
+    {errors.designation && (
+      <p className="text-red-500">{errors.designation.message}</p>
+    )}
+  </div>
+)}
+
                       <div className="w-full md:w-1/3 space-y-1.5">
                         <Label htmlFor="usn">USN / ID Number <small className="text-red-600">*</small></Label>
                         <Controller

@@ -130,6 +130,7 @@ export default function SelectRolesAndEvents({
         handleSubmit: handleSubmitManager,
         formState: { errors: errorsManager },
         setValue: setValueManager,
+        watch: watchManager,
     } = useForm<z.infer<typeof managerFormSchema>>({
         resolver: zodResolver(managerFormSchema),
         defaultValues: {
@@ -148,6 +149,20 @@ export default function SelectRolesAndEvents({
             designation: "",
         },
     });
+    const [isOther, setIsOther] = useState(false);
+
+  // Watch the current value of designation
+  const selectedDesignation = watchManager("designation");
+  const handleDesignationChange = (value: string) => {
+    if (value === "others") {
+      setIsOther(true);
+      // Clear the field to let the user type a custom value
+      setValueManager("designation", "");
+    } else {
+      setIsOther(false);
+      setValueManager("designation", value);
+    }
+  };
 
     const [collegeRegion, setCollegeRegion] = useState<string>("");
     const [disbaled, setDisabled] = useState<boolean>(false);
@@ -363,10 +378,10 @@ export default function SelectRolesAndEvents({
                         )}
                     >
                         <CardHeader>
-                            <CardTitle className="text-center text-[#FF4D4D] font-bold">
+                            <CardTitle className="text-center text-[#D32F23] font-bold">
                                 Register (Participant/Accompanist)
                             </CardTitle>
-                            <CardDescription className="text-center text-yellow-600 font-bold">
+                            <CardDescription className="text-center text-[#F4D03F] font-bold">
                                 Add details for Participant or Accompanist
                                 roles.
                             </CardDescription>
@@ -812,10 +827,10 @@ export default function SelectRolesAndEvents({
                         )}
                     >
                         <CardHeader>
-                            <CardTitle className="text-center text-[#FF4D4D] font-bold">
+                            <CardTitle className="text-center text-[#D32F23] font-bold">
                                 Team Manager
                             </CardTitle>
-                            <CardDescription className="text-center text-yellow-600 font-bold">
+                            <CardDescription className="text-center text-[#F4D03F] font-bold">
                                 Add Details for the Team Manager role.
                             </CardDescription>
                         </CardHeader>
@@ -853,18 +868,63 @@ export default function SelectRolesAndEvents({
                                     </div>
 
                                     <div className="w-full md:w-1/3 space-y-1.5">
-                                        <Label htmlFor="managerdesignation">Designation <small className="text-red-600">*</small></Label>
-                                        <Input
-                                            {...registerManager("designation")}
-                                            id="managerdesignation"
-                                            placeholder="Designation"
-                                        />
-                                        {errorsManager.designation && (
-                                            <p className="text-red-500 text-sm">
-                                                {errorsManager.designation.message}
-                                            </p>
-                                        )}
-                                    </div>
+        <Label htmlFor="managerdesignation">
+          Designation <small className="text-red-600">*</small>
+        </Label>
+
+        {/* Render either the Select dropdown or an Input based on isOther */}
+        {!isOther ? (
+          <Select onValueChange={handleDesignationChange}>
+            <SelectTrigger id="managerdesignation">
+              <SelectValue placeholder="Select Designation" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Designation</SelectLabel>
+                <SelectItem value="Professor">Professor</SelectItem>
+                                  <SelectItem value="Associate Professor">
+                                    Associate Professor
+                                  </SelectItem>
+                                  <SelectItem value="Assistant Professor">
+                                    Assistant Professor
+                                  </SelectItem>
+                                  <SelectItem value="P.E.Director">
+                                   P.E.Director
+                                  </SelectItem>
+                                  <SelectItem value="others">Others</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        ) : (
+            <>
+          <Input
+            id="managerdesignation"
+            // Notice that the input’s value is taken from the same field
+            value={selectedDesignation}
+            // Instead of using the register spread, we update the field directly.
+            onChange={(e) => setValueManager("designation", e.target.value)}
+            placeholder="Please specify your designation"
+          />
+          <button
+        type="button"
+        onClick={() => {
+          // Optionally, clear the designation field before switching back.
+          setValueManager("designation", "");
+          setIsOther(false);
+        }}
+        className="text-sm text-blue-600 underline mt-1"
+      >
+        Back to selection
+      </button>
+         </>
+        )}
+
+        {errorsManager.designation && (
+          <p className="text-red-500 text-sm">
+            {errorsManager.designation.message}
+          </p>
+        )}
+      </div>
 
                                     <div className="w-full md:w-1/3 space-y-1.5">
                                         <Label htmlFor="managerPhone">
