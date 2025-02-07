@@ -88,6 +88,16 @@ export default function SignUp() {
         },
     });
 
+    useEffect(() => {
+        let timer: NodeJS.Timeout;
+        if (resendTimer > 0) {
+            timer = setInterval(() => {
+                setResendTimer((prev) => prev - 1);
+            }, 1000);
+        }
+        return () => clearInterval(timer);
+    }, [resendTimer]);
+
     const sendOTP = async () => {
         const email = form.getValues("email");
         if (!email) {

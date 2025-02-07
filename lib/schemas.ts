@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const fileSchema = z
     .instanceof(File)
-    .refine((file) => file.size <= 150 * 1024, {
+    .refine((file) => file.size <= 256 * 1024, {
         message: "File size should be less than 300KB",
     })
     .refine(

@@ -17,6 +17,7 @@ const navItems = [
         text: "About Us",
         href: "/about",
         subitems: [
+            { href:"/about" , text:"About Global Academy Of Technology"},
             { href: "/about/vtu", text: "About VTU" },
             { href: "/about/youthfest", text: "About Youth Fest" },
             { href: "/Dignitaries", text: "Organising Committee" },
@@ -39,7 +40,7 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onClose }) => {
 
     return (
         <div
-            className={`absolute top-2  min-h-screen right-0  z-50 w-64 max-w-full bg-background shadow-lg transform ${isOpen ? "translate-x-0" : "translate-x-full"
+            className={`absolute top-0 min-h-screen right-0  z-50 w-64 max-w-full bg-background shadow-lg transform ${isOpen ? "translate-x-0" : "translate-x-full"
                 } transition-transform duration-300 ease-in-out overflow-y-auto`}
         >
             <div className="flex justify-end p-4">
@@ -91,7 +92,7 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onClose }) => {
                     ))}
                      <li>
                              <Link
-                                    href="/contactUs"
+                                    href="/contactus"
                                     className="block py-1 text-foreground hover:text-primary transition-colors"
                                 >
                                     contact Us

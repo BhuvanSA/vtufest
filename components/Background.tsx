@@ -127,7 +127,7 @@ const Background = () => {
                             alt={`Slide ${idx}`}
                             fill
                             priority={idx === 0}
-                            className="object-fill"
+                            className="object-fit"
                         />
                         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/60" />
                         <div className="absolute bottom-8 left-8 z-10">
