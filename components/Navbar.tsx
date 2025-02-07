@@ -76,54 +76,53 @@ const NavBar = () => {
   const { isLoggedIn } = useAuthContext()
 
   return (
-    <header className="fixed top-0 left-0 right-0 w-full backdrop-blur-sm bg-transparent shadow-lg z-40">
+    <header className={`fixed top-0 left-0 right-0 p-3 w-full backdrop-blur-sm bg-transparent shadow-lg z-40`}>
       {/* Header Container */}
-      <div className="container mx-auto px-4 md:px-16">
-        <div className="flex items-center justify-between mt-1 mb-1">
-          <div className="flex items-center gap-3">
-            {/* Left Logo (GAT Logo) */}
-            <Image
-              src="/images/college-logo.png"
-              alt="GAT Logo"
-              width={60}
-              height={60}
-              priority
-            />
-            {/* Center Text */}
-            <div className="flex flex-col items-start text-left">
-              <h1 className="text-blue-700 font-bold tracking-wide transition-colors text-2xl">
-                Global Academy of Technology
-              </h1>
-              <div className="text-red-600 text-lg font-semibold">
-                An Autonomous Institute, Affiliated to VTU
-              </div>
+      <div className=" mx-auto  w-full px-4 md:px-16">
+        <div className="flex flex-col justify-around  items-center md:flex-row md:space-x-4">
+          <div className="flex flex-row flex-wrap items-center justify-center">
+            <img src="/images/vtulogo.png" alt="VTU Logo" className="h-14 " />
+            <div className="text-sm md:mt-0">
+              <p className="font-semibold text-primary " >
+                VISVESVARAYA TECHNOLOGICAL UNIVERSITY
+              </p>
+              <p className="text-xs text-red-400">
+                (STATE TECHNOLOGICAL UNIVERSITY, GOVT. OF KARNATAKA)
+              </p>
             </div>
           </div>
-          {/* Right Logo (VTU Logo) */}
-          <div className="hidden md:block">
-            <Image
-              src={vtulogo || "/placeholder.svg"}
-              alt="VTU Logo"
-              width={80}
-              height={80}
-              priority
-            />
+          <div className="text-xl font-bold mt-2 md:mt-0 md:whitespace-nowrap flex flex-col items-center justify-center leading-tight" style={{ fontFamily: "Roboto" }}>
+            <p className="text-yellow-500">24TH VTU YOUTH FEST</p>
+            <p className="text-red-500">INTERACT 2025</p>
+          </div>
+
+          <div className="flex flex-row gap-2 flex-wrap-reverse items-center  mt-4 md:mt-0">
+            <div className="text-sm text-center md:text-right">
+              <p className="font-semibold text-primary">GLOBAL ACADEMY OF TECHNOLOGY</p>
+              <p className="text-xs text-red-400">AUTONOMOUS INSTITUTE, AFFILIATED TO VTU</p>
+            </div>
+            <div>
+              <img
+                src="/images/college-logo.png"
+                alt="GAT Logo"
+                className="h-12 mt-2  mb-2 md:mt-0"
+              />
+            </div>
           </div>
         </div>
-
         {/* Mobile Menu Button */}
         <div className="md:hidden relative">
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="absolute top-2 right-2 text-white border-2 p-1 rounded-xs font-extrabold hover:text-blue-500 transition-colors duration-200"
-          >
+            className="absolute bottom-20 right-2 text-black  border-2 p-1 rounded-xs font-extrabold hover:text-blue-500 transition-colors duration-200 "
+          > 
             <Menu className="h-6 w-6" />
           </button>
         </div>
       </div>
 
       {/* Desktop Navigation Menu */}
-      <div className="hidden md:flex items-center flex-wrap justify-center max-w-6xl lg:max-w-[72rem] pb-1 px-3 mx-auto sm:px-6">
+      <div className="hidden md:flex items-center mt-5  flex-wrap justify-center max-w-6xl lg:max-w-[72rem] pb-1 px-3 mx-auto sm:px-6">
         <NavigationMenu>
           <NavigationMenuList className="bg-inherit">
             {/* Home */}
@@ -279,6 +278,7 @@ const NavBar = () => {
 
       {/* Mobile Sidebar */}
       <MobileSidebar
+
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
       />
