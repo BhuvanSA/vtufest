@@ -3,7 +3,6 @@ import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { ArrowLeft, ArrowRight, Columns, FileDown, Pencil, Search, Trash2 } from "lucide-react";
 import * as React from "react";
-import {format} from "../../public/images/gatformat.jpg";
 import {
     ColumnDef,
     ColumnFiltersState,
@@ -24,8 +23,6 @@ import {
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
-import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -431,21 +428,15 @@ export function    DataTable({ data }: { data: Data[] }) {
     // Use the final row model to get the filtered + sorted data
     const handleExportToPDF = () => {
         // Pull final rows from the table’s computed row model:
-        const filteredSortedRows = table
-            .getRowModel()
-            .rows.map((row) => row.original);
-
-    const handleExport = () => {
-        // Pull final rows from the table’s computed row model
-        const filteredSortedRows = table.getRowModel().rows.map((row) => row.original);
-    
+        const filteredSortedRows = table.getRowModel().rows;
+        
         // Prepare data for PDF
         const exportData = filteredSortedRows.map((row) => [
-            row.name,
-            row.usn,
-            row.type,
-            row.events.map((event) => event.eventName).join(", "),
-            row.status,
+            row.getValue("name"),
+            row.getValue("usn"),
+            row.getValue("type"),
+            (row.getValue("events") as { eventName: string }[]).map((event) => event.eventName).join(", "),
+            
         ]);
     
         // Column headers for PDF
