@@ -97,7 +97,7 @@ export default function SignIn() {
                     <div className="flex items-center flex-col text-blue-800 justify-center mb-6 font-bold text-2xl leading-6 tracking-wider">
                         <h1 className="text-wrap text-center">Global Academy of Technology</h1>
                         <br/>
-                        <h1 className="text-yellow-600">24 th VTU Youth Fest</h1>
+                        <h1 className="text-yellow-600">24th VTU Youth Fest</h1>
                     </div>
                     <div className="flex items-center justify-between pb-0 mb-0">
                         <Image
@@ -114,7 +114,7 @@ export default function SignIn() {
                             width={170}
                             height={90}
                             priority
-                            className="object-contain relative right-0"
+                            className="object-contain relative left-5"
                         />
                         <Image
                             src={vtulogo}
@@ -122,7 +122,7 @@ export default function SignIn() {
                             width={120}
                             height={120}
                             priority
-                            className="object-contain relative right-2"
+                            className="object-contain relative left-5"
                         />
                     </div>
                     <CardTitle className="text-2xl text-center font-bold text-foreground">
