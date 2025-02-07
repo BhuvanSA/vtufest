@@ -269,9 +269,9 @@ const NavBar = () => {
             )}
 
             {/* Theme Toggler */}
-            {/* <NavigationMenuItem>
+            <NavigationMenuItem>
               <ThemeToggler />
-            </NavigationMenuItem> */}
+            </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
       </div>
