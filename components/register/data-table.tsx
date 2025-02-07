@@ -24,6 +24,8 @@ import {
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -426,6 +428,12 @@ export function    DataTable({ data }: { data: Data[] }) {
     });
 
     // Use the final row model to get the filtered + sorted data
+    const handleExportToPDF = () => {
+        // Pull final rows from the table’s computed row model:
+        const filteredSortedRows = table
+            .getRowModel()
+            .rows.map((row) => row.original);
+
     const handleExport = () => {
         // Pull final rows from the table’s computed row model
         const filteredSortedRows = table.getRowModel().rows.map((row) => row.original);
@@ -498,7 +506,7 @@ export function    DataTable({ data }: { data: Data[] }) {
                 <Button
                     variant="outline"
                     className="ml-auto bg-[#00B140] text-white hover:scale-105 hover:bg-[#00B140] hover:text-white "
-                    onClick={handleExport}
+                    onClick={handleExportToPDF}
                 >
                     <FileDown className="mr-2 h-4 w-4" />
                     Download current view as PDF
