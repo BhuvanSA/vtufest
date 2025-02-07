@@ -577,7 +577,9 @@ export async function updateRegisterDetails(data: RegistrantDetailUpdate) {
                 phone: data.phone,
                 gender:data.gender,
                 accomodation : data.accomodation,
-                blood : data.blood
+                blood : data.blood,
+                email : data.email,
+                designation : data.designation
             },
         });
     } catch (err: unknown) {
@@ -751,45 +753,22 @@ export async function updateEventRole(data: UpdateRole) {
 
 export async function updateFile(
     registrantId: string,
-    file: File,
+    file: string,
     field: string
 ) {
     try {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const result = await prisma.$transaction(async (prisma) => {
-            const registrant = await prisma.registrants.findFirst({
-                where: {
-                    id: registrantId,
+        const query = await prisma.registrants.update(
+            {
+                where:{
+                    id:registrantId
                 },
-            });
-            const FileUpload = await utapi.uploadFiles([file]);
-            console.log("???????????", FileUpload[0].data);
-
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            if (!registrant) {
-                throw new Error("Registrant not found");
+                data:{
+                    [field] : file
+                }
             }
-            const FileTobeDeletedURL: string = (registrant as any)[
-                field
-            ] as string;
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const updatedRegistrant = await prisma.registrants.update({
-                where: {
-                    id: registrantId,
-                },
-                data: {
-                    [field]: FileUpload[0].data?.url,
-                },
-            });
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            if (FileTobeDeletedURL) {
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                const deleteFileUpload = await utapi.deleteFiles(
-                    FileTobeDeletedURL.split("/").pop() as string
-                );
-            }
-        });
-        return result;
+        );
+        return query;
     } catch (err: unknown) {
         if (err instanceof Prisma.PrismaClientKnownRequestError) {
             // Handle specific Prisma error codes
@@ -1095,7 +1074,8 @@ export async function getPaymentInfo(userId : string){
                 id:userId
             },
             select:{
-                paymentUrl:true
+                paymentUrl:true,
+                PaymentVerified : true,
             }
         });
         return payment;
