@@ -90,7 +90,7 @@ export default async function Page() {
 
         const participantAccompanistEvents = row.registrations
             .filter((r) => r.type === 'ACCOMPANIST' || r.type === 'PARTICIPANT')
-            .map((r) => ({ eventName: r.eventName! }));
+            .map((r) => ({ eventName: r.eventName }));
 
 
 
@@ -112,7 +112,7 @@ export default async function Page() {
 
 
 
-        // If participant
+        //If participant
         if (participantEvents.length > 0) {
             results.push({
                 id: `${row.registrantId}#PARTICIPANT`,
@@ -136,33 +136,33 @@ export default async function Page() {
                 events: accompanistEvents,
                 status: docStatusMap[row.docStatus],
             });
+
         }
-        if (participantAccompanistEvents.length > 0) {
-            results.push({
-                id: `${row.registrantId}#PARTICIPANT, ACCOMPANIST`,
-                name: row.name,
-                usn: row.usn,
-                photo: row.photoUrl,
-                type: "Participant, Accompanist",
-                events: participantAccompanistEvents,
-                status: docStatusMap[row.docStatus],
-            });
-            continue;
-        }
+        // if (participantAccompanistEvents.length > 0) {
+        //     results.push({
+        //         id: `${row.registrantId}#PARTICIPANT/ACCOMPANIST`,
+        //         name: row.name,
+        //         usn: row.usn,
+        //         photo: row.photoUrl,
+        //         type: "Participant/Accompanist",
+        //         events: participantAccompanistEvents,
+        //         status: docStatusMap[row.docStatus],
+        //     });
+    
+        // }
 
     }
 
     return (
-        <div className="bg-background min-h-screen pt-24">
+        <div className="bg-background min-h-screen pt-10">
             <div className="mt-4 justify-center flex flex-col gap-4">
                 <div className="max-w-4xl mx-auto p-4">
                     <h1 className="text-primary font-bold text-5xl md:text-5xl xl:text-5xl mb-6">
-                        Registrant List
+                        Registration List
                     </h1>
                 </div>
             </div>
-            <DataTable data={results} />
-            <div className="flex justify-center mt-4 gap-4 pb-36">
+            <div className="flex justify-center mt-4 gap-4 mb-3 flex-wrap ">
                 <Link href="/register/modifyevents">
                     <Button
                         variant="outline"
@@ -181,15 +181,21 @@ export default async function Page() {
                         Add Registrant
                     </Button>
                 </Link>
-                <Link href="/register/paymentinfo">
+
+            </div>
+            
+            <DataTable data={results} />
+            <Link href="/register/paymentinfo">
+                <div className="flex justify-center items-center">
                     <Button variant="default"
-                    className="border bg-primary text-white hover:bg-primary hover:text-white hover:scale-105 transition-all"
+                        className="border bg-primary relative text-white hover:bg-primary hover:text-white hover:scale-105 transition-all"
                     >
                         <CreditCard className="mr-2 h-4 w-4" />
                         Go to payments
                     </Button>
-                </Link>
-            </div>
-        </div> 
+                </div>
+            </Link>
+
+        </div>
     );
 }

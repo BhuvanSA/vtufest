@@ -1,6 +1,7 @@
 "use client";
-
-import { Columns, FileDown, Pencil, Search, Trash2 } from "lucide-react";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
+import { ArrowLeft, ArrowRight, Columns, FileDown, Pencil, Search, Trash2 } from "lucide-react";
 import * as React from "react";
 import {
     ColumnDef,
@@ -51,12 +52,12 @@ export type Data = {
     photo: string;
     name: string;
     usn: string;
-    type: "Participant" | "Accompanist" | "Team Manager" | "Participant, Accompanist" | "";
+    type: "Participant" | "Accompanist" | "Team Manager" | "";
     events: { eventName: string }[];
     status: "Pending" | "Processing" | "Success" | "Failed";
 };
 
-export function DataTable({ data }: { data: Data[] }) {
+export function    DataTable({ data }: { data: Data[] }) {
     const router = useRouter();
     const [rows, setRows] = React.useState<Data[]>(data);
 
@@ -155,6 +156,7 @@ export function DataTable({ data }: { data: Data[] }) {
 
     const columns = React.useMemo<ColumnDef<Data>[]>(
         () => [
+            
             {
                 id: "select",
                 header: ({ table }) => (
@@ -204,6 +206,11 @@ export function DataTable({ data }: { data: Data[] }) {
                 },
                 enableSorting: false,
                 enableHiding: false,
+            },
+            {
+                accessorKey: "slno",
+                header: "SL No",
+                cell: ({ row }) => row.index + 1,
             },
             {
                 accessorKey: "photo",
@@ -261,12 +268,10 @@ export function DataTable({ data }: { data: Data[] }) {
                 header: ({ column }) => {
                     const filterCycle = [
                         "",
-                        "Total",
+                        "Team Manager",
                         "Participant",
                         "Accompanist",
-                        "Team Manager",
-                        "Participant, Accompanist",
-                        
+                        "Total"
                     ];
                     const currentFilter =
                         (column.getFilterValue() as string) ?? "";
@@ -298,7 +303,7 @@ export function DataTable({ data }: { data: Data[] }) {
                     if(!filterValue || filterValue==='') return true;
                     if (!filterValue || filterValue === "Total") {
                         const type = row.getValue('type');
-                        if(type === 'Participant, Accompanist' || type==='Team Manager'){
+                        if(type === 'Participant' || type==='Accompanist' || type==='Team Manager'){
                             return true;
                         }
                     }
@@ -357,52 +362,7 @@ export function DataTable({ data }: { data: Data[] }) {
                 },
             },
             {
-                accessorKey: "status",
-                header: ({ column }) => {
-                    const filterCycle = [
-                        "ALL",
-                        "Pending",
-                        "Processing",
-                        "Approved",
-                        "Rejected",
-                    ];
-                    const currentFilter =
-                        (column.getFilterValue() as string) ?? "ALL";
-                    const currentIndex = filterCycle.indexOf(currentFilter);
-                    const nextIndex = (currentIndex + 1) % filterCycle.length;
-                    const nextFilter = filterCycle[nextIndex];
-
-                    const handleFilterChange = () => {
-                        if (nextFilter === "ALL") {
-                            column.setFilterValue(undefined);
-                        } else {
-                            column.setFilterValue(nextFilter);
-                        }
-                    };
-
-                    return (
-                        <Button
-                            variant="ghost"
-                            className="capitalize"
-                            onClick={handleFilterChange}
-                        >
-                            Status <ListFilterIcon className="p-1" />{" "}
-                            {currentFilter !== "ALL"
-                                ? `: ${currentFilter}`
-                                : ""}
-                        </Button>
-                    );
-                },
-                cell: ({ row }) => (
-                    <div className="capitalize">{row.getValue("status")}</div>
-                ),
-                filterFn: (row, columnId, filterValue) => {
-                    if (!filterValue || filterValue === "ALL") return true;
-                    const status = row.getValue(columnId);
-                    return status == filterValue;
-                },
-            },
-            {
+                accessorKey:"Action",
                 id: "actions",
                 enableHiding: false,
                 cell: ({ row }) => {
@@ -466,39 +426,60 @@ export function DataTable({ data }: { data: Data[] }) {
     });
 
     // Use the final row model to get the filtered + sorted data
-    const handleExport = () => {
+    const handleExportToPDF = () => {
         // Pull final rows from the table’s computed row model:
-        const filteredSortedRows = table
-            .getRowModel()
-            .rows.map((row) => row.original);
-
-        // Prepare data for Excel
-        const exportData = filteredSortedRows.map((row) => ({
-            Name: row.name,
-            USN: row.usn,
-            Type: row.type,
-            Events: row.events.map((event) => event.eventName).join(", "),
-            Status: row.status,
-        }));
-
-        // Create a worksheet
-        const worksheet = XLSX.utils.json_to_sheet(exportData);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Registrants");
-
-        // Generate buffer
-        const wbout = XLSX.write(workbook, { type: "array", bookType: "xlsx" });
-
-        // Create a Blob and trigger download
-        const blob = new Blob([wbout], { type: "application/octet-stream" });
-        saveAs(blob, "registrants.xlsx");
+        const filteredSortedRows = table.getRowModel().rows;
+        
+        // Prepare data for PDF
+        const exportData = filteredSortedRows.map((row) => [
+            row.getValue("name"),
+            row.getValue("usn"),
+            row.getValue("type"),
+            (row.getValue("events") as { eventName: string }[]).map((event) => event.eventName).join(", "),
+            
+        ]);
+    
+        // Column headers for PDF
+        const headers = [["Name", "USN", "Type", "Events", "Status"]];
+    
+        // Initialize jsPDF
+        const doc = new jsPDF();
+    
+        // Load the PNG template
+        const img = document.createElement('img');
+        img.src = "/images/gatformat.jpg"; // Replace with the actual template path
+    
+        img.onload = () => {
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+    
+            // Add the template as a background
+            doc.addImage(img, "PNG", 0, 0, pageWidth, pageHeight);
+    
+            // Add table
+            autoTable(doc, {
+                head: headers,
+                body: exportData,
+                startY: 80, // Adjust this to fit within the template
+                styles: { fontSize: 10, cellPadding: 3 },
+                headStyles: { fillColor: [26, 188, 156] }, // #1abc9c in RGB
+            });
+    
+            // Add signatures at the bottom
+            doc.text("Principal's Signature", 14, pageHeight - 20);
+            doc.text("Coordinator's Signature", pageWidth - 80, pageHeight - 20);
+    
+            // Save the PDF
+            doc.save("registrants.pdf");
+        };
     };
 
+
     return (
-        <div className="w-full px-5 bg-white rounded-xl bg-opacity-90 h-[70rem]">
-            <div className="flex items-center py-4 ">
+        <div className="w-full px-5 rounded-xl  h-[70rem] mt-10">
+            <div className="flex items-center py-4 flex-wrap gap-3 ">
                 <div className="relative max-w-sm " >
-                    <Search className="absolute left-2 top-3 h-4 w-4 text-muted-foreground " />
+                    <Search className="absolute left-2 top-3 h-4 w-5 text-muted-foreground " />
                     <Input
                         placeholder="Search name..."
                         value={
@@ -511,16 +492,16 @@ export function DataTable({ data }: { data: Data[] }) {
                                 .getColumn("name")
                                 ?.setFilterValue(event.target.value)
                         }
-                        className="pl-8"
+                        className="pl-10 w-[26rem]"
                     />
                 </div>
                 <Button
                     variant="outline"
                     className="ml-auto bg-[#00B140] text-white hover:scale-105 hover:bg-[#00B140] hover:text-white "
-                    onClick={handleExport}
+                    onClick={handleExportToPDF}
                 >
                     <FileDown className="mr-2 h-4 w-4" />
-                    Download current view as Excel
+                    Download current view as PDF
                 </Button>
                 <Button
                     variant="outline"
@@ -556,7 +537,7 @@ export function DataTable({ data }: { data: Data[] }) {
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
-            <div className="rounded-md border min-h-[15rem]">
+            <div className="rounded-md border overflow-auto  min-h-[18rem]">
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
@@ -575,10 +556,10 @@ export function DataTable({ data }: { data: Data[] }) {
                             </TableRow>
                         ))}
                     </TableHeader>
-                    <TableBody>
+                    <TableBody className="text-primary ">
                         {table.getRowModel().rows?.length ? (
                             table.getRowModel().rows.map((row) => (
-                                <TableRow
+                                <TableRow className="hover:bg-blue-50"
                                     key={row.id}
                                     data-state={
                                         row.getIsSelected() && "selected"
@@ -586,11 +567,10 @@ export function DataTable({ data }: { data: Data[] }) {
                                 >
                                     {row.getVisibleCells().map((cell) => (
                                         <TableCell key={cell.id} onClick={() => {
-                                            if (cell.column.id === 'usn') {
+                                            if (cell.column.id === 'usn' || cell.column.id==='name' || cell.column.id === "photo") {
                                                 const cellValue = row.getValue('usn');
                                                 router.push(`/register/getregister/${cellValue}`);
                                             }
-
                                         }}>
                                             {flexRender(
                                                 cell.column.columnDef.cell,
@@ -604,9 +584,9 @@ export function DataTable({ data }: { data: Data[] }) {
                             <TableRow>
                                 <TableCell
                                     colSpan={columns.length}
-                                    className="h-[50rem] text-3xl    text-center "
+                                    className="min-h-[18rem] text-3xl    text-center "
                                 >
-                                    No results.
+                                    No Registrations Are Done Yet.
                                 </TableCell>
                             </TableRow>
                         )}
@@ -625,7 +605,7 @@ export function DataTable({ data }: { data: Data[] }) {
                         onClick={() => table.previousPage()}
                         disabled={!table.getCanPreviousPage()}
                     >
-                        Previous
+                        <ArrowLeft className="mr-2 h-4 w-4"/> Previous
                     </Button>
                     <Button
                         variant="outline"
@@ -633,7 +613,7 @@ export function DataTable({ data }: { data: Data[] }) {
                         onClick={() => table.nextPage()}
                         disabled={!table.getCanNextPage()}
                     >
-                        Next
+                        Next <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                 </div>
             </div>

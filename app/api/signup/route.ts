@@ -81,10 +81,11 @@ export async function POST(request: Request) {
         const {  email, phone, otp, password, collegeCode, collegeName, region } = validation.data;
         console.log(collegeName,email,password,otp,phone);
 
+
         // Check if the user already exists in the database (by email or phone)
         const existingUser = await prisma.users.findFirst({
             where: {
-                OR: [{ email }, { phone }],
+                OR: [{ email }, { phone },{collegeName}],
             },
         });
         console.log("the existing user",existingUser);
@@ -93,7 +94,7 @@ export async function POST(request: Request) {
             return NextResponse.json({
                 success: false,
                 errors: {
-                    email: "A user with this email or phone number already exists.",
+                    email: "A user with this email or phone number and the college Name already exists.",
                 },
             });
         }
@@ -141,7 +142,7 @@ export async function POST(request: Request) {
             { status: 200 }
         );
     } catch (error: unknown) {
-        console.error("Error in registration process:", error);
+        console.log("Error in registration process:", error);
         return NextResponse.json(
             { success: false, errors: { general: "Internal Server Error" } },
             { status: 500 }

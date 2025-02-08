@@ -35,7 +35,7 @@ import {
 } from "@/components/ui/accordion";
 import { LoadingButton } from "../LoadingButton";
 import { UploadDropzone } from "@/utils/uploadthing";
-import { VerifiedIcon } from "lucide-react";
+import { ArrowLeft, Save, VerifiedIcon } from "lucide-react";
 import { Event } from "@/app/register/addRegistrant/page";
 import {
     participantFormSchema,
@@ -109,7 +109,7 @@ export default function SelectRolesAndEvents({
             usn: "",
             phone: "",
             events: [],
-            email:"",
+            email: "",
             documents: {
                 photo: "",
                 idCard: "",
@@ -130,12 +130,13 @@ export default function SelectRolesAndEvents({
         handleSubmit: handleSubmitManager,
         formState: { errors: errorsManager },
         setValue: setValueManager,
+        watch: watchManager,
     } = useForm<z.infer<typeof managerFormSchema>>({
         resolver: zodResolver(managerFormSchema),
         defaultValues: {
             name: "",
             usn: "",
-            email : "",
+            email: "",
             teamManager: true,
             phone: "",
             documents: {
@@ -144,11 +145,27 @@ export default function SelectRolesAndEvents({
             },
             gender: "",
             accomodation: false,
-            blood: ""
+            blood: "",
+            designation: "",
         },
     });
+    const [isOther, setIsOther] = useState(false);
+
+  // Watch the current value of designation
+  const selectedDesignation = watchManager("designation");
+  const handleDesignationChange = (value: string) => {
+    if (value === "others") {
+      setIsOther(true);
+      // Clear the field to let the user type a custom value
+      setValueManager("designation", "");
+    } else {
+      setIsOther(false);
+      setValueManager("designation", value);
+    }
+  };
 
     const [collegeRegion, setCollegeRegion] = useState<string>("");
+    const [disbaled, setDisabled] = useState<boolean>(false);
 
     useEffect(() => {
 
@@ -156,7 +173,7 @@ export default function SelectRolesAndEvents({
             const response = await fetch('/api/getonlycollegeregion');
             const regionCode = await response.json();
             const region = regionCode.region.region;
-            console.log("Region:",region);
+            console.log("Region:", region);
             setCollegeRegion(region)
         }
         regionFetch();
@@ -233,7 +250,7 @@ export default function SelectRolesAndEvents({
             ...data,
             // events and documents are already included via useEffect
         };
-
+        setDisabled(true);
         console.log("Submitting:", payload);
 
         try {
@@ -254,6 +271,9 @@ export default function SelectRolesAndEvents({
                 console.error("Error registering:", error.message);
                 toast.error(error.message || "An error occurred.");
             }
+        }
+        finally {
+            setDisabled(false);
         }
     };
 
@@ -312,7 +332,7 @@ export default function SelectRolesAndEvents({
             teamManager: true, // Ensure teamManager flag is set
             events: [], // No events for manager
         };
-
+        setDisabled(true);
         console.log("Submitting Manager:", payload);
 
         try {
@@ -335,19 +355,22 @@ export default function SelectRolesAndEvents({
                 toast.error(error.message || "An error occurred.");
             }
         }
+        finally {
+            setDisabled(false);
+        }
     };
 
     return (
-        <Tabs defaultValue="participant" className="w-full px-10">
+        <Tabs defaultValue="participant" className="w-full px-10 ">
             <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="participant">
+                <TabsTrigger value="participant"  >
                     Participant & Accompanist
                 </TabsTrigger>
                 <TabsTrigger value="manager">Team Manager</TabsTrigger>
             </TabsList>
 
             <TabsContent value="participant">
-                <Card>
+                <Card className="shadow-xl">
                     <form
                         onSubmit={handleSubmit(
                             onParticipantSubmit,
@@ -355,10 +378,10 @@ export default function SelectRolesAndEvents({
                         )}
                     >
                         <CardHeader>
-                            <CardTitle className="text-center">
+                            <CardTitle className="text-center text-[#D32F23] font-bold">
                                 Register (Participant/Accompanist)
                             </CardTitle>
-                            <CardDescription className="text-center">
+                            <CardDescription className="text-center text-[#F4D03F] font-bold">
                                 Add details for Participant or Accompanist
                                 roles.
                             </CardDescription>
@@ -370,7 +393,7 @@ export default function SelectRolesAndEvents({
                                     <div className="w-full md:w-1/3 space-y-1.5">
                                         <Label htmlFor="name">
                                             Name of the student (As mentioned on
-                                            10th or any equivalent marks card)
+                                            10th or any equivalent marks card) <small className="text-red-600">*</small>
                                         </Label>
                                         <Input
                                             {...register("name")}
@@ -384,13 +407,13 @@ export default function SelectRolesAndEvents({
                                         )}
                                     </div>
                                     <div className="w-full md:w-1/3 space-y-1.5 mt-6">
-                                        <Label htmlFor="username" className="">
-                                            USN of the student
+                                        <Label htmlFor="username" >
+                                            USN of the Student <small className="text-red-600">*</small>
                                         </Label>
                                         <Input
                                             {...register("usn")}
                                             id="usn"
-                                            placeholder="1GA21AI012"
+                                            placeholder="University Seat Number"
                                         />
                                         {errors.usn && (
                                             <p className="text-red-500 text-sm">
@@ -400,7 +423,7 @@ export default function SelectRolesAndEvents({
                                     </div>
                                     <div className="w-full md:w-1/3 space-y-1.5 mt-6">
                                         <Label htmlFor="phone">
-                                            Phone number of the student
+                                            Phone number of the student <small className="text-red-600">*</small>
                                         </Label>
                                         <Input
                                             id="phoneno"
@@ -415,10 +438,10 @@ export default function SelectRolesAndEvents({
                                     </div>
                                 </div>
 
-                                <div className="flex flex-col md:flex-row gap-4 md:gap-10">
-                                    <div className="w-1/3 md:w-1/3 space-y-1.5 mt-6">
+                                <div className="flex flex-col md:flex-row gap-4 md:gap-10 w-full">
+                                    <div className="w-1/3 md:w-1/3 space-y-1.5 mt-6 w-full">
                                         <Label htmlFor="gender">
-                                            Gender of the student
+                                            Gender of the student <small className="text-red-600">*</small>
                                         </Label>
                                         <Select
                                             {...register("gender")}
@@ -455,7 +478,7 @@ export default function SelectRolesAndEvents({
 
                                     {collegeRegion && ['Belgavi Region (2)', 'Kalaburgi Region (3)', 'Mysuru Region (4)'].includes(collegeRegion) ?
                                         <div className="w-full md:w-1/3 space-y-1.5 mt-6">
-                                            <Label htmlFor="accommodation">Need Accommodation</Label>
+                                            <Label htmlFor="accommodation">Need Accommodation <small className="text-red-600">*</small></Label>
                                             <Select
                                                 {...register("accomodation")}
                                                 onValueChange={(value) => setValue("accomodation", value === "yes")}
@@ -478,12 +501,14 @@ export default function SelectRolesAndEvents({
                                     }
 
                                     <div className="w-full md:w-1/3 space-y-1.5 mt-6">
-                                        <Label htmlFor="blood">Blood Group</Label>
+                                        <Label htmlFor="blood">Date of Birth <small className="text-red-600">*</small></Label>
                                         <Input
+                                            type="date"
                                             {...register("blood")}
                                             id="blood"
                                             name="blood"
-                                            placeholder="Enter the Blood Group"
+                                            className="w-full"
+                                            placeholder="Enter the date of birth"
                                         />
                                         {errors.blood && (
                                             <p className="text-red-500 text-sm">
@@ -493,7 +518,7 @@ export default function SelectRolesAndEvents({
                                     </div>
 
                                     <div className="w-full md:w-1/3 space-y-1.5 mt-6">
-                                        <Label htmlFor="email">Email</Label>
+                                        <Label htmlFor="email">Email <small className="text-red-600">*</small></Label>
                                         <Input
                                             {...register("email")}
                                             id="email"
@@ -579,9 +604,9 @@ export default function SelectRolesAndEvents({
                                                                             ) => {
                                                                                 if (
                                                                                     e.key ===
-                                                                                        "Enter" ||
+                                                                                    "Enter" ||
                                                                                     e.key ===
-                                                                                        " "
+                                                                                    " "
                                                                                 ) {
                                                                                     onToggleSelect(
                                                                                         event.eventNo,
@@ -589,11 +614,10 @@ export default function SelectRolesAndEvents({
                                                                                     );
                                                                                 }
                                                                             }}
-                                                                            className={`p-4 border-2 rounded-lg cursor-pointer transition duration-300 flex flex-col h-full ${
-                                                                                isSelected
-                                                                                    ? "border-primary bg-primary/10"
-                                                                                    : "border-border bg-card"
-                                                                            }`}
+                                                                            className={`p-4 border-2 rounded-lg cursor-pointer transition duration-300 flex flex-col h-full ${isSelected
+                                                                                ? "border-primary bg-primary/10"
+                                                                                : "border-border bg-card"
+                                                                                }`}
                                                                         >
                                                                             <h3 className="text-lg font-semibold mb-2">
                                                                                 {
@@ -636,8 +660,8 @@ export default function SelectRolesAndEvents({
                                                                                             onChangeRole(
                                                                                                 event.eventNo,
                                                                                                 val as
-                                                                                                    | "PARTICIPANT"
-                                                                                                    | "ACCOMPANIST"
+                                                                                                | "PARTICIPANT"
+                                                                                                | "ACCOMPANIST"
                                                                                             )
                                                                                         }
                                                                                     >
@@ -651,16 +675,16 @@ export default function SelectRolesAndEvents({
                                                                                                 </SelectLabel>
                                                                                                 {event.registeredParticipant <
                                                                                                     event.maxParticipant && (
-                                                                                                    <SelectItem value="PARTICIPANT">
-                                                                                                        Participant
-                                                                                                    </SelectItem>
-                                                                                                )}
+                                                                                                        <SelectItem value="PARTICIPANT">
+                                                                                                            Participant
+                                                                                                        </SelectItem>
+                                                                                                    )}
                                                                                                 {event.registeredAccompanist <
                                                                                                     event.maxAccompanist && (
-                                                                                                    <SelectItem value="ACCOMPANIST">
-                                                                                                        Accompanist
-                                                                                                    </SelectItem>
-                                                                                                )}
+                                                                                                        <SelectItem value="ACCOMPANIST">
+                                                                                                            Accompanist
+                                                                                                        </SelectItem>
+                                                                                                    )}
                                                                                             </SelectGroup>
                                                                                         </SelectContent>
                                                                                     </Select>
@@ -705,11 +729,10 @@ export default function SelectRolesAndEvents({
                                         return (
                                             <div
                                                 key={doc.id}
-                                                className={`space-y-1.5 border rounded-[var(--radius)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 p-2 ${
-                                                    isUploaded
-                                                        ? "border-green-500 border-2"
-                                                        : "border-gray-300"
-                                                }`}
+                                                className={`space-y-1.5 border rounded-[var(--radius)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 p-2 ${isUploaded
+                                                    ? "border-green-500 border-2"
+                                                    : "border-gray-300"
+                                                    }`}
                                             >
                                                 <Label htmlFor={doc.id}>
                                                     {doc.label}
@@ -766,14 +789,14 @@ export default function SelectRolesAndEvents({
                                                 {errors.documents?.[
                                                     doc.id as keyof typeof errors.documents
                                                 ] && (
-                                                    <p className="text-red-500 text-sm">
-                                                        {
-                                                            errors.documents[
-                                                                doc.id as keyof typeof errors.documents
-                                                            ]?.message
-                                                        }
-                                                    </p>
-                                                )}
+                                                        <p className="text-red-500 text-sm">
+                                                            {
+                                                                errors.documents[
+                                                                    doc.id as keyof typeof errors.documents
+                                                                ]?.message
+                                                            }
+                                                        </p>
+                                                    )}
                                             </div>
                                         );
                                     })}
@@ -781,17 +804,13 @@ export default function SelectRolesAndEvents({
                             </div>
                         </CardContent>
                         <CardFooter className="flex justify-center gap-5">
-                            <Button className="px-8 text-xl" type="submit">
-                                {" "}
-                                Save{" "}
+                            <Button className="px-8 text-xl" type="submit" disabled={disbaled}>
+                                <Save className="w-5 h-5 mr-2" /> Save
                             </Button>
 
                             <Link href="/register/getallregister">
-                                <Button
-                                    variant="outline"
-                                    className="border hover:border-primary px-8 text-xl"
-                                >
-                                    Back
+                                <Button variant="outline" className="border hover:border-primary px-8 text-xl">
+                                    <ArrowLeft className="w-5 h-5 mr-2" /> Back
                                 </Button>
                             </Link>
                         </CardFooter>
@@ -808,11 +827,11 @@ export default function SelectRolesAndEvents({
                         )}
                     >
                         <CardHeader>
-                            <CardTitle className="text-center">
+                            <CardTitle className="text-center text-[#D32F23] font-bold">
                                 Team Manager
                             </CardTitle>
-                            <CardDescription className="text-center">
-                                Manager details here.
+                            <CardDescription className="text-center text-[#F4D03F] font-bold">
+                                Add Details for the Team Manager role.
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
@@ -821,7 +840,7 @@ export default function SelectRolesAndEvents({
                                 <div className="flex flex-col md:flex-row gap-4 md:gap-6">
                                     <div className="w-full md:w-1/3 space-y-1.5">
                                         <Label htmlFor="managerName">
-                                            Name
+                                            Name <small className="text-red-600">*</small>
                                         </Label>
                                         <Input
                                             {...registerManager("name")}
@@ -835,11 +854,11 @@ export default function SelectRolesAndEvents({
                                         )}
                                     </div>
                                     <div className="w-full md:w-1/3 space-y-1.5">
-                                        <Label htmlFor="managerUsn">USN</Label>
+                                        <Label htmlFor="managerUsn">ID card Number  <small className="text-red-600">*</small></Label>
                                         <Input
                                             {...registerManager("usn")}
                                             id="managerUsn"
-                                            placeholder="1GA21AI012"
+                                            placeholder="ID Number"
                                         />
                                         {errorsManager.usn && (
                                             <p className="text-red-500 text-sm">
@@ -847,9 +866,69 @@ export default function SelectRolesAndEvents({
                                             </p>
                                         )}
                                     </div>
+
+                                    <div className="w-full md:w-1/3 space-y-1.5">
+        <Label htmlFor="managerdesignation">
+          Designation <small className="text-red-600">*</small>
+        </Label>
+
+        {/* Render either the Select dropdown or an Input based on isOther */}
+        {!isOther ? (
+          <Select onValueChange={handleDesignationChange}>
+            <SelectTrigger id="managerdesignation">
+              <SelectValue placeholder="Select Designation" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Designation</SelectLabel>
+                <SelectItem value="Professor">Professor</SelectItem>
+                                  <SelectItem value="Associate Professor">
+                                    Associate Professor
+                                  </SelectItem>
+                                  <SelectItem value="Assistant Professor">
+                                    Assistant Professor
+                                  </SelectItem>
+                                  <SelectItem value="P.E.Director">
+                                   P.E.Director
+                                  </SelectItem>
+                                  <SelectItem value="others">Others</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        ) : (
+            <>
+          <Input
+            id="managerdesignation"
+            // Notice that the input’s value is taken from the same field
+            value={selectedDesignation}
+            // Instead of using the register spread, we update the field directly.
+            onChange={(e) => setValueManager("designation", e.target.value)}
+            placeholder="Please specify your designation"
+          />
+          <button
+        type="button"
+        onClick={() => {
+          // Optionally, clear the designation field before switching back.
+          setValueManager("designation", "");
+          setIsOther(false);
+        }}
+        className="text-sm text-blue-600 underline mt-1"
+      >
+        Back to selection
+      </button>
+         </>
+        )}
+
+        {errorsManager.designation && (
+          <p className="text-red-500 text-sm">
+            {errorsManager.designation.message}
+          </p>
+        )}
+      </div>
+
                                     <div className="w-full md:w-1/3 space-y-1.5">
                                         <Label htmlFor="managerPhone">
-                                            Phone Number
+                                            Phone Number  <small className="text-red-600">*</small>
                                         </Label>
                                         <Input
                                             {...registerManager("phone")}
@@ -867,7 +946,7 @@ export default function SelectRolesAndEvents({
                                 <div className="flex flex-col md:flex-row gap-4 md:gap-6">
                                     <div className="w-full md:w-1/3 space-y-1.5 mt-6">
                                         <Label htmlFor="managerGender">
-                                            Gender of the student
+                                            Gender <small className="text-red-600">*</small>
                                         </Label>
                                         <Select
                                             {...registerManager("gender")}
@@ -901,9 +980,9 @@ export default function SelectRolesAndEvents({
                                             </p>
                                         )}
                                     </div>
-                                    {collegeRegion && ['Belgavi Region (2)','Kalaburgi Region (3)','Mysuru Region (4)'].includes(collegeRegion)?
+                                    {collegeRegion && ['Belgavi Region (2)', 'Kalaburgi Region (3)', 'Mysuru Region (4)'].includes(collegeRegion) ?
                                         <div className="w-full md:w-1/3 space-y-1.5 mt-6">
-                                            <Label htmlFor="Manageraccommodation">Need Accommodation</Label>
+                                            <Label htmlFor="Manageraccommodation">Need Accommodation  <small className="text-red-600">*</small></Label>
                                             <Select
                                                 {...register("accomodation")}
                                                 onValueChange={(value) => setValue("accomodation", value === "yes")}
@@ -922,15 +1001,15 @@ export default function SelectRolesAndEvents({
                                             {errors.accomodation && (
                                                 <p className="text-red-500 text-sm">{errors.accomodation.message}</p>
                                             )}
-                                        </div>:<></>
+                                        </div> : <></>
                                     }
                                     <div className="w-full md:w-1/3 space-y-1.5 mt-6">
-                                        <Label htmlFor="Managerblood">Blood Group</Label>
+                                        <Label htmlFor="Managerblood">Date Of Birth  <small className="text-red-600">*</small></Label>
                                         <Input
                                             {...registerManager("blood")}
                                             id="Managerblood"
                                             name="blood"
-                                            placeholder="Enter the Blood Group"
+                                            type="date"
                                         />
                                         {errors.blood && (
                                             <p className="text-red-500 text-sm">
@@ -939,7 +1018,7 @@ export default function SelectRolesAndEvents({
                                         )}
                                     </div>
                                     <div className="w-full md:w-1/3 space-y-1.5 mt-6">
-                                        <Label htmlFor="Manageremail">Email </Label>
+                                        <Label htmlFor="Manageremail">Email  <small className="text-red-600">*</small> </Label>
                                         <Input
                                             {...registerManager("email")}
                                             id="Manageremail"
@@ -972,11 +1051,10 @@ export default function SelectRolesAndEvents({
                                         return (
                                             <div
                                                 key={doc.id}
-                                                className={`space-y-1.5 border rounded-[var(--radius)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 p-2 ${
-                                                    isUploaded
-                                                        ? "border-green-500 border-2"
-                                                        : "border-gray-300"
-                                                }`}
+                                                className={`space-y-1.5 border rounded-[var(--radius)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 p-2 ${isUploaded
+                                                    ? "border-green-500 border-2"
+                                                    : "border-gray-300"
+                                                    }`}
                                             >
                                                 <Label htmlFor={doc.id}>
                                                     {doc.label}
@@ -1034,15 +1112,15 @@ export default function SelectRolesAndEvents({
                                                 {errorsManager.documents?.[
                                                     doc.id as keyof typeof errorsManager.documents
                                                 ] && (
-                                                    <p className="text-red-500 text-sm">
-                                                        {
-                                                            errorsManager
-                                                                .documents[
-                                                                doc.id as keyof typeof errorsManager.documents
-                                                            ]?.message
-                                                        }
-                                                    </p>
-                                                )}
+                                                        <p className="text-red-500 text-sm">
+                                                            {
+                                                                errorsManager
+                                                                    .documents[
+                                                                    doc.id as keyof typeof errorsManager.documents
+                                                                ]?.message
+                                                            }
+                                                        </p>
+                                                    )}
                                             </div>
                                         );
                                     })}
@@ -1050,17 +1128,13 @@ export default function SelectRolesAndEvents({
                             </div>
                         </CardContent>
                         <CardFooter className="w-full text-center flex gap-3 justify-center">
-                            <Button className="px-8 text-xl" type="submit">
-                                {" "}
-                                Save{" "}
+                        <Button className="px-8 text-xl" type="submit" disabled={disbaled}>
+                                <Save className="w-5 h-5 mr-2" /> Save
                             </Button>
 
                             <Link href="/register/getallregister">
-                                <Button
-                                    variant="outline"
-                                    className="border hover:border-primary px-8 text-xl"
-                                >
-                                    Back
+                                <Button variant="outline" className="border hover:border-primary px-8 text-xl">
+                                    <ArrowLeft className="w-5 h-5 mr-2" /> Back
                                 </Button>
                             </Link>
                         </CardFooter>

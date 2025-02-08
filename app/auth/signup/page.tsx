@@ -6,9 +6,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import * as z from "zod";
 import axios from "axios";
+import vtulogo from "@/public/images/vtulogo.png";
 import { toast } from "sonner";
-
-import bgImage from "../../../components/images/GATBGIMG.png";
+import interactLogo from "@/public/images/INTERACT-4.png";
+import bgImage from "../../../components/images/GATBGIMG.png"; // Your background image import
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -87,6 +88,16 @@ export default function SignUp() {
         },
     });
 
+    useEffect(() => {
+        let timer: NodeJS.Timeout;
+        if (resendTimer > 0) {
+            timer = setInterval(() => {
+                setResendTimer((prev) => prev - 1);
+            }, 1000);
+        }
+        return () => clearInterval(timer);
+    }, [resendTimer]);
+
     const sendOTP = async () => {
         const email = form.getValues("email");
         if (!email) {
@@ -124,14 +135,23 @@ export default function SignUp() {
 
     const onSubmit = async (values: z.infer<typeof signupSchema>) => {
         setIsLoading(true);
-        console.log("Form values",values);
+        console.log("Form values", values);
         try {
-            const response = await axios.post("/api/signup", values);
-            if (response.data.success) {
+            const response = await fetch("/api/signup", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(values),
+            });
+    
+            const data = await response.json();
+    
+            if (data.success) {
                 toast("Signup successful! Redirecting to login...");
                 router.push("/auth/signin");
             } else {
-                const { errors } = response.data;
+                const { errors } = data;
                 if (errors) {
                     for (const field in errors) {
                         if (field === "general") {
@@ -168,14 +188,35 @@ export default function SignUp() {
         >
             <Card className="w-full max-w-md bg-card text-card-foreground" >
                 <CardHeader className="space-y-1">
-                <div className="flex items-center justify-center mb-6">
+                <div className="flex items-center flex-col text-blue-800 justify-center mb-6 font-bold text-2xl leading-6 tracking-wider">
+                        <h1 className="text-wrap text-center">Global Academy of Technology</h1>
+                        <br/>
+                        <h1 className="text-yellow-600">24th VTU Youth Fest</h1>
+                    </div>
+                    <div className="flex items-center justify-between pb-0 mb-0">
                         <Image
                             src="/images/college-logo.png"
                             alt="College Logo"
-                            width={100}
-                            height={100}
+                            width={85}
+                            height={80}
                             priority
-                            className="object-contain"
+                            className="object-contain relative right-3"
+                        />
+                        <Image
+                            src={interactLogo}
+                            alt="College Logo"
+                            width={170}
+                            height={90}
+                            priority
+                            className="object-contain relative left-5"
+                        />
+                        <Image
+                            src={vtulogo}
+                            alt="College Logo"
+                            width={120}
+                            height={120}
+                            priority
+                            className="object-contain relative left-5"
                         />
                     </div>
                     <CardTitle className="text-2xl text-center font-bold text-foreground">
