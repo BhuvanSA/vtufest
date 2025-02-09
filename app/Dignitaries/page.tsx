@@ -13,7 +13,8 @@ import patron5 from "@/public/images/1.png";
 import organize1 from "@/public/dignitaries/hbp.png";
 import organize2 from "@/public/dignitaries/snr.jpeg";
 import organize3 from "@/public/images/2.png";
-
+import organize4 from "@/public/images/placeholder.jpg";
+import organize5 from "@/public/images/deanstudentaffairs.png";
 const Dignitaries = () => {
     const committee = {
         chiefPatron: {
@@ -41,7 +42,7 @@ const Dignitaries = () => {
             members: [
                 {
                     name: "Dr NAGAMANI NAGARAJA",
-                    role: "CHIEF OF STRATEGY AND SYSTEMS,GAT",
+                    role: "CHIEF OF STRATEGY AND SYSTEMS,NEF",
                     image: patron5,
                 },
                 {
@@ -80,19 +81,19 @@ const Dignitaries = () => {
                     image: organize3,
                 },
                 {
-                    name: "Dr. Ravi J",
-                    role: "DEAN  STUDENT AFFAIRS , GAT",
-                    image: "/images/deanstudentaffairs.png",
+                    name: "Dr. Latha Rajgopal",
+                    role: "Dean-Academics , GAT",
+                    image: organize4,
                 },
                 {
-                    name: "LT. SARAVANAN R",
+                    name: "Dr. Ravi J",
+                    role: "Dean-Student Affairs & Welfare, GAT",
+                    image: organize5,
+                },
+                {
+                    name: "Lt. Saravannan R",
                     role: "PHYSICAL EDUCATION DIRECTOR, GAT",
                     image: organize2,
-                },
-                {
-                    name: "Dr. H M Rajashekar Swamy",
-                    role: "DEAN (ACADEMICS), GAT",
-                    image: "/images/deanacademics.png",
                 },
             ],
         },
