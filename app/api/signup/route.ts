@@ -80,9 +80,9 @@ export async function POST(request: Request) {
             return NextResponse.json({ success: false, errors: fieldErrors });
         }
 
-        const { email, phone, otp, collegeCode, collegeName, region } = validation.data;
+        const { email, phone, otp, collegeCode, collegeName, region } =
+            validation.data;
         console.log(collegeName, email, otp, phone);
-
 
         // Check if the user already exists in the database (by email or phone)
         const existingUser = await prisma.users.findFirst({
@@ -113,9 +113,6 @@ export async function POST(request: Request) {
         }
         console.log("the otp is success", otpValidation.success);
 
-
-
-
         const password: string = generatePassword(12) as string;
         // Hash the user's provided password
         const hashedPassword = await bcrypt.hash(password, 13);
@@ -130,7 +127,7 @@ export async function POST(request: Request) {
                 phone,
                 password: hashedPassword, // Store the hashed password
                 collegeCode: collegeCode,
-                region: region
+                region: region,
             },
         });
 
@@ -142,12 +139,12 @@ export async function POST(request: Request) {
                     pass: process.env.EMAIL_PASSWORD as string, // Your email password or app password
                 },
             });
-    
 
             const mailOptions = {
                 from: process.env.EMAIL_USER, // Sender's email
                 to: email, // Receiver's email
-                subject: "Your Login Credentials for VTU Youth Fest at Global Academy of Technology",
+                subject:
+                    "Your Login Credentials for VTU Youth Fest at Global Academy of Technology",
                 html: `
                     <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
                         <h2 style="color: #007bff; text-align: center;">VTU Youth Fest - Login Credentials</h2>
