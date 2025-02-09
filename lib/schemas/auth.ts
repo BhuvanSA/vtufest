@@ -31,12 +31,6 @@ export const signupSchema = z
             .string(),
         email: z.string().email("Invalid email address"),
         otp: z.string().regex(/^\d{6}$/, "OTP must be a 6-digit number"),
-        password: z.string().min(8, "Password must be at least 8 characters"),
-        confirmPassword: z.string(),
-    })
-    .refine((data) => data.password === data.confirmPassword, {
-        message: "Passwords do not match",
-        path: ["confirmPassword"],
     });
 
 export const resetPasswordSchema = z

@@ -6,6 +6,7 @@ import { Type } from "@prisma/client";
 import { verifySession } from "@/lib/session";
 import { redirect } from "next/navigation";
 import { PenSquare, UserPlus, CreditCard } from "lucide-react";
+import { PaymentDialog } from "@/components/getRegister/paymentDialog";
 
 export const docStatusMap = {
     PENDING: "Pending",
@@ -185,16 +186,11 @@ export default async function Page() {
             </div>
             
             <DataTable data={results} />
-            <Link href="/register/paymentinfo">
+           
                 <div className="flex justify-center items-center">
-                    <Button variant="default"
-                        className="border bg-primary relative text-white hover:bg-primary hover:text-white hover:scale-105 transition-all"
-                    >
-                        <CreditCard className="mr-2 h-4 w-4" />
-                        Go to payments
-                    </Button>
+                    <PaymentDialog/>
                 </div>
-            </Link>
+   
 
         </div>
     );

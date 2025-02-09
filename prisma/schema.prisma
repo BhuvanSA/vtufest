@@ -31,6 +31,8 @@ model Users {
   paymentUrl  String?
   txnNumber   String?
   Amount      Int?
+  arrivalDate String?
+  arrivalTime String?
   PaymentVerified  PaymentVerifiedStatus @default(PENDING)
   events      Events[]
   registrants Registrants[]

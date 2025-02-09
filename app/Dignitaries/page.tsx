@@ -81,7 +81,7 @@ const Dignitaries = () => {
                 },
                 {
                     name: "Dr. Ravi J",
-                    role: "DEAN ( STUDENT AFFAIRS ), GAT",
+                    role: "DEAN  STUDENT AFFAIRS , GAT",
                     image: "/images/deanstudentaffairs.png",
                 },
                 {
