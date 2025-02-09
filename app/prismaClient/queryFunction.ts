@@ -17,17 +17,17 @@ export async function insertRegistrant(
                 const registrant = await prisma.registrants.create({
                     data: {
                         name: arg.name,
-                        email : arg.email,
+                        email: arg.email,
                         usn: arg.usn,
                         teamManager: true,
                         phone: arg.phone,
                         photoUrl: arg.photoUrl,
                         idcardUrl: arg.idcardUrl,
                         userId: arg.userId,
-                        accomodation : arg.accomodation,
-                        gender:arg.gender,
-                        blood : arg.blood,
-                        designation : arg.designation
+                        accomodation: arg.accomodation,
+                        gender: arg.gender,
+                        blood: arg.blood,
+                        designation: arg.designation
                     },
                 });
                 return registrant;
@@ -70,7 +70,7 @@ export async function insertRegistrant(
                 data: {
                     name: arg.name,
                     usn: arg.usn,
-                    email : arg.email,
+                    email: arg.email,
                     teamManager: false,
                     phone: arg.phone,
                     photoUrl: arg.photoUrl,
@@ -82,8 +82,8 @@ export async function insertRegistrant(
                     idcardUrl: arg.idcardUrl,
                     userId: arg.userId,
                     accomodation: arg.accomodation,
-                    gender :arg.gender,
-                    blood:arg.blood
+                    gender: arg.gender,
+                    blood: arg.blood
                 },
             });
 
@@ -575,11 +575,11 @@ export async function updateRegisterDetails(data: RegistrantDetailUpdate) {
                 name: data.name,
                 usn: data.usn,
                 phone: data.phone,
-                gender:data.gender,
-                accomodation : data.accomodation,
-                blood : data.blood,
-                email : data.email,
-                designation : data.designation
+                gender: data.gender,
+                accomodation: data.accomodation,
+                blood: data.blood,
+                email: data.email,
+                designation: data.designation
             },
         });
     } catch (err: unknown) {
@@ -656,8 +656,8 @@ export async function updateEventRole(data: UpdateRole) {
                             registeredParticipant:
                                 updateRole.event.registeredParticipant > 0
                                     ? {
-                                          decrement: 1,
-                                      }
+                                        decrement: 1,
+                                    }
                                     : 0,
                         },
                     });
@@ -711,8 +711,8 @@ export async function updateEventRole(data: UpdateRole) {
                             registeredAccompanist:
                                 updateRole.event.registeredAccompanist > 0
                                     ? {
-                                          decrement: 1,
-                                      }
+                                        decrement: 1,
+                                    }
                                     : 0,
                         },
                     });
@@ -760,11 +760,11 @@ export async function updateFile(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const query = await prisma.registrants.update(
             {
-                where:{
-                    id:registrantId
+                where: {
+                    id: registrantId
                 },
-                data:{
-                    [field] : file
+                data: {
+                    [field]: file
                 }
             }
         );
@@ -951,13 +951,13 @@ export async function AddEvent(arg: AddEvent) {
 }
 
 
-export async function savePayment(userId:string,txnNumber:string,paymentUrl:string,Amount:number){
-    try{
+export async function savePayment(userId: string, txnNumber: string, paymentUrl: string, Amount: number) {
+    try {
         await prisma.users.update({
-            where:{
-                id:userId
+            where: {
+                id: userId
             },
-            data:{
+            data: {
                 txnNumber,
                 paymentUrl,
                 Amount,
@@ -988,38 +988,38 @@ export async function savePayment(userId:string,txnNumber:string,paymentUrl:stri
             }
         }
     }
-    
+
 }
 
 
-export async function addCollege(collegeName:string,email:string,hashedPassword:string,otp:string,phone:string,region:string,collegeCode:string){
+export async function addCollege(collegeName: string, email: string, hashedPassword: string, otp: string, phone: string, region: string, collegeCode: string) {
     const newUser = await prisma.users.create({
         data: {
             collegeName: collegeName as string,
-            email:email as string,
-            phone:phone as string,
+            email: email as string,
+            phone: phone as string,
             password: hashedPassword, // Store the hashed password
             collegeCode: collegeCode as string,
-            region : region as string,
-            
+            region: region as string,
+
         },
     });
     return newUser;
 }
 
 
-export async function getCollegeRegion(userId:string) {
-    try{
+export async function getCollegeRegion(userId: string) {
+    try {
         const region = await prisma.users.findFirst({
-            where:{
+            where: {
                 id: userId
             },
-            select:{
+            select: {
                 region: true
             }
         })
         return region;
-    }catch (err: unknown) {
+    } catch (err: unknown) {
         if (err instanceof Prisma.PrismaClientKnownRequestError) {
             // Handle specific Prisma error codes
             switch (err.code) {
@@ -1044,42 +1044,63 @@ export async function getCollegeRegion(userId:string) {
             }
         }
     }
-    
+
 
 }
 
 
-export async function getRegisterByCollegeName(collegeName :string){
-    try{
+export async function getRegisterByCollegeName(collegeName: string) {
+    try {
         const registrantList = await prisma.users.findFirst({
-            where:{
-                collegeName : collegeName,
+            where: {
+                collegeName: collegeName,
             },
-            include:{
-                events:true,
-                registrants:true,
+            include: {
+                events: true,
+                registrants: true,
             }
         });
         return registrantList;
     }
-    catch(error:unknown){
+    catch (error: unknown) {
         handlePrismaError(error);
     }
 }
 
-export async function getPaymentInfo(userId : string){
-    try{
+export async function getPaymentInfo(userId: string) {
+    try {
         const payment = await prisma.users.findFirst({
-            where:{
-                id:userId
+            where: {
+                id: userId
             },
-            select:{
-                paymentUrl:true,
-                PaymentVerified : true,
+            select: {
+                paymentUrl: true,
+                PaymentVerified: true,
             }
         });
         return payment;
-    }catch(error:unknown){
+    } catch (error: unknown) {
+        handlePrismaError(error);
+    }
+}
+
+export async function saveDateTimeOfArrival(userId: string, dateOfArrival: string, timeOfArrival: string) {
+
+    try {
+        await prisma.users.update(
+            {
+                where: {
+                    id: userId
+                },
+
+                data: {
+                    arrivalDate: dateOfArrival,
+                    arrivalTime : timeOfArrival
+                }
+            }
+        );
+        
+    }catch(error: unknown){
         handlePrismaError(error);
     }
 }
