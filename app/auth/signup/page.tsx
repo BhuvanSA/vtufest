@@ -60,8 +60,6 @@ const signupSchema = z
             .string()
             .length(6, "OTP must be 6 digits")
             .regex(/^\d{6}$/, "OTP must be numeric"),
-        password: z.string().min(8, "Password must be at least 8 characters"),
-        confirmPassword: z.string(),
     })
     .refine((data) => data.password === data.confirmPassword, {
         message: "Passwords do not match",
@@ -83,8 +81,6 @@ export default function SignUp() {
             phone: "",
             email: "",
             otp: "",
-            password: "",
-            confirmPassword: "",
         },
     });
 
@@ -378,7 +374,7 @@ export default function SignUp() {
                                     </FormItem>
                                 )}
                             />
-                            <FormField
+                            {/* <FormField
                                 control={form.control}
                                 name="password"
                                 render={({ field, fieldState }) => (
@@ -417,7 +413,7 @@ export default function SignUp() {
                                         <FormMessage className="text-destructive" />
                                     </FormItem>
                                 )}
-                            />
+                            /> */}
 
                             <LoadingButton
                                 type="submit"

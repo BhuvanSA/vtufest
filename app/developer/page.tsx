@@ -42,22 +42,6 @@ const list = [
     github: '',
     image: Image2
   },
-  {
-    name: 'Anuj',
-    linkedIn: '',
-    insta: '',
-    twitter: '',
-    github: '',
-    image: Image2
-  },
-  {
-    name: 'Bhavya Bhosale',
-    linkedIn: '',
-    insta: '',
-    twitter: '',
-    github: '',
-    image: Image2
-  }
 ]
 
 const Page = () => {
