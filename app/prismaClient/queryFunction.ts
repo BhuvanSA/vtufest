@@ -27,7 +27,7 @@ export async function insertRegistrant(
                         accomodation: arg.accomodation,
                         gender: arg.gender,
                         blood: arg.blood,
-                        designation: arg.designation
+                        designation: arg.designation,
                     },
                 });
                 return registrant;
@@ -65,68 +65,77 @@ export async function insertRegistrant(
         });
         console.log(eventList);
 
-        const result = await prisma.$transaction(async (prisma) => {
-            const registrant = await prisma.registrants.create({
-                data: {
-                    name: arg.name,
-                    usn: arg.usn,
-                    email: arg.email,
-                    teamManager: false,
-                    phone: arg.phone,
-                    photoUrl: arg.photoUrl,
-                    sslcUrl: arg.sslcUrl || "",
-                    pucUrl: arg.pucUrl || "",
-                    aadharUrl: arg.aadharUrl || "",
-                    admission1Url: arg.admission1Url || "",
-                    admission2Url: arg.admission2Url || "",
-                    idcardUrl: arg.idcardUrl,
-                    userId: arg.userId,
-                    accomodation: arg.accomodation,
-                    gender: arg.gender,
-                    blood: arg.blood
-                },
-            });
+        const result = await prisma.$transaction(
+            async (prisma) => {
+                const registrant = await prisma.registrants.create({
+                    data: {
+                        name: arg.name,
+                        usn: arg.usn,
+                        email: arg.email,
+                        teamManager: false,
+                        phone: arg.phone,
+                        photoUrl: arg.photoUrl,
+                        sslcUrl: arg.sslcUrl || "",
+                        pucUrl: arg.pucUrl || "",
+                        aadharUrl: arg.aadharUrl || "",
+                        admission1Url: arg.admission1Url || "",
+                        admission2Url: arg.admission2Url || "",
+                        idcardUrl: arg.idcardUrl,
+                        userId: arg.userId,
+                        accomodation: arg.accomodation,
+                        gender: arg.gender,
+                        blood: arg.blood,
+                    },
+                });
 
-            const events = await Promise.all(
-                eventList.map((event: any) =>
-                    prisma.events.update({
-                        where: {
-                            userId_eventNo: {
-                                userId: arg.userId,
-                                eventNo: event.eventNo,
+                const events = await Promise.all(
+                    eventList.map((event: any) =>
+                        prisma.events.update({
+                            where: {
+                                userId_eventNo: {
+                                    userId: arg.userId,
+                                    eventNo: event.eventNo,
+                                },
                             },
-                        },
-                        data: {
-                            registrants: {
-                                connect: { id: registrant.id },
+                            data: {
+                                registrants: {
+                                    connect: { id: registrant.id },
+                                },
+                                registeredParticipant:
+                                    event.registeredParticipant,
+                                registeredAccompanist:
+                                    event.registeredAccompanist,
                             },
-                            registeredParticipant: event.registeredParticipant,
-                            registeredAccompanist: event.registeredAccompanist,
-                        },
-                    })
-                )
-            );
-
-            const updatedEvents = events.map((x: any) => {
-                const findEvent = eventList.find(
-                    (y) => y.eventNo === x.eventNo
+                        })
+                    )
                 );
-                return { ...x, type: findEvent.type };
-            });
 
-            const eventRegistrant = await Promise.all(
-                updatedEvents.map((event: any) =>
-                    prisma.eventRegistrations.create({
-                        data: {
-                            registrantId: registrant.id,
-                            eventId: event.id,
-                            type: event.type,
-                        },
-                    })
-                )
-            );
-            return { registrant, events, eventRegistrant };
-        });
+                const updatedEvents = events.map((x: any) => {
+                    const findEvent = eventList.find(
+                        (y) => y.eventNo === x.eventNo
+                    );
+                    return { ...x, type: findEvent.type };
+                });
+
+                const eventRegistrant = await Promise.all(
+                    updatedEvents.map((event: any) =>
+                        prisma.eventRegistrations.create({
+                            data: {
+                                registrantId: registrant.id,
+                                eventId: event.id,
+                                type: event.type,
+                            },
+                        })
+                    )
+                );
+                return { registrant, events, eventRegistrant };
+            },
+            {
+                maxWait: 5000, // default: 2000
+                timeout: 10000, // default: 5000
+                isolationLevel: Prisma.TransactionIsolationLevel.Serializable, // optional, default defined by database configuration
+            }
+        );
         return result;
     } catch (err: unknown) {
         handlePrismaError(err);
@@ -579,7 +588,7 @@ export async function updateRegisterDetails(data: RegistrantDetailUpdate) {
                 accomodation: data.accomodation,
                 blood: data.blood,
                 email: data.email,
-                designation: data.designation
+                designation: data.designation,
             },
         });
     } catch (err: unknown) {
@@ -656,8 +665,8 @@ export async function updateEventRole(data: UpdateRole) {
                             registeredParticipant:
                                 updateRole.event.registeredParticipant > 0
                                     ? {
-                                        decrement: 1,
-                                    }
+                                          decrement: 1,
+                                      }
                                     : 0,
                         },
                     });
@@ -711,8 +720,8 @@ export async function updateEventRole(data: UpdateRole) {
                             registeredAccompanist:
                                 updateRole.event.registeredAccompanist > 0
                                     ? {
-                                        decrement: 1,
-                                    }
+                                          decrement: 1,
+                                      }
                                     : 0,
                         },
                     });
@@ -758,16 +767,14 @@ export async function updateFile(
 ) {
     try {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const query = await prisma.registrants.update(
-            {
-                where: {
-                    id: registrantId
-                },
-                data: {
-                    [field]: file
-                }
-            }
-        );
+        const query = await prisma.registrants.update({
+            where: {
+                id: registrantId,
+            },
+            data: {
+                [field]: file,
+            },
+        });
         return query;
     } catch (err: unknown) {
         if (err instanceof Prisma.PrismaClientKnownRequestError) {
@@ -950,18 +957,22 @@ export async function AddEvent(arg: AddEvent) {
     }
 }
 
-
-export async function savePayment(userId: string, txnNumber: string, paymentUrl: string, Amount: number) {
+export async function savePayment(
+    userId: string,
+    txnNumber: string,
+    paymentUrl: string,
+    Amount: number
+) {
     try {
         await prisma.users.update({
             where: {
-                id: userId
+                id: userId,
             },
             data: {
                 txnNumber,
                 paymentUrl,
                 Amount,
-            }
+            },
         });
     } catch (err: unknown) {
         if (err instanceof Prisma.PrismaClientKnownRequestError) {
@@ -988,11 +999,17 @@ export async function savePayment(userId: string, txnNumber: string, paymentUrl:
             }
         }
     }
-
 }
 
-
-export async function addCollege(collegeName: string, email: string, hashedPassword: string, otp: string, phone: string, region: string, collegeCode: string) {
+export async function addCollege(
+    collegeName: string,
+    email: string,
+    hashedPassword: string,
+    otp: string,
+    phone: string,
+    region: string,
+    collegeCode: string
+) {
     const newUser = await prisma.users.create({
         data: {
             collegeName: collegeName as string,
@@ -1001,23 +1018,21 @@ export async function addCollege(collegeName: string, email: string, hashedPassw
             password: hashedPassword, // Store the hashed password
             collegeCode: collegeCode as string,
             region: region as string,
-
         },
     });
     return newUser;
 }
 
-
 export async function getCollegeRegion(userId: string) {
     try {
         const region = await prisma.users.findFirst({
             where: {
-                id: userId
+                id: userId,
             },
             select: {
-                region: true
-            }
-        })
+                region: true,
+            },
+        });
         return region;
     } catch (err: unknown) {
         if (err instanceof Prisma.PrismaClientKnownRequestError) {
@@ -1044,10 +1059,7 @@ export async function getCollegeRegion(userId: string) {
             }
         }
     }
-
-
 }
-
 
 export async function getRegisterByCollegeName(collegeName: string) {
     try {
@@ -1058,11 +1070,10 @@ export async function getRegisterByCollegeName(collegeName: string) {
             include: {
                 events: true,
                 registrants: true,
-            }
+            },
         });
         return registrantList;
-    }
-    catch (error: unknown) {
+    } catch (error: unknown) {
         handlePrismaError(error);
     }
 }
@@ -1071,12 +1082,12 @@ export async function getPaymentInfo(userId: string) {
     try {
         const payment = await prisma.users.findFirst({
             where: {
-                id: userId
+                id: userId,
             },
             select: {
                 paymentUrl: true,
                 PaymentVerified: true,
-            }
+            },
         });
         return payment;
     } catch (error: unknown) {
@@ -1084,23 +1095,23 @@ export async function getPaymentInfo(userId: string) {
     }
 }
 
-export async function saveDateTimeOfArrival(userId: string, dateOfArrival: string, timeOfArrival: string) {
-
+export async function saveDateTimeOfArrival(
+    userId: string,
+    dateOfArrival: string,
+    timeOfArrival: string
+) {
     try {
-        await prisma.users.update(
-            {
-                where: {
-                    id: userId
-                },
+        await prisma.users.update({
+            where: {
+                id: userId,
+            },
 
-                data: {
-                    arrivalDate: dateOfArrival,
-                    arrivalTime : timeOfArrival
-                }
-            }
-        );
-        
-    }catch(error: unknown){
+            data: {
+                arrivalDate: dateOfArrival,
+                arrivalTime: timeOfArrival,
+            },
+        });
+    } catch (error: unknown) {
         handlePrismaError(error);
     }
 }
