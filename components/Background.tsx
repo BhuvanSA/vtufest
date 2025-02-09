@@ -41,12 +41,12 @@ const ArrowRightIcon = () => (
 const Background = () => {
     // 1) Carousel images. Replace with your own paths or URLs:
     const images = [
-        "/images/carouselimg1.jpg",
-        "/images/carouselimg2.jpg",
-        "/images/carouselimg3.jpg",
-        "/images/carouselimg4.jpg",
-        "/images/carouselimg5.jpg",
-        "/images/carouselimg6.jpg",
+        "/images/carouselimg1.jpeg",
+        "/images/carouselimg2.jpeg",
+        "/images/carouselimg3.jpeg",
+        "/images/carouselimg4.jpeg",
+        "/images/carouselimg5.jpeg",
+        "/images/carouselimg6.jpeg",
     ];
 
     // 2) Current slide index
@@ -131,12 +131,12 @@ const Background = () => {
                         />
                         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/60" />
                         <div className="absolute bottom-8 left-8 z-10">
-                            <h2 className="text-3xl font-bold">
+                            {/* <h2 className="text-3xl font-bold">
                                 Slide {idx + 1}
                             </h2>
                             <p className="mt-2 max-w-md">
                                 This is a sample caption for slide {idx + 1}.
-                            </p>
+                            </p> */}
                         </div>
                     </div>
                 ))}
