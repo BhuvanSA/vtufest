@@ -132,7 +132,7 @@ export async function insertRegistrant(
             },
             {
                 maxWait: 5000, // default: 2000
-                timeout: 10000, // default: 5000
+                timeout: 20000, // default: 5000
                 isolationLevel: Prisma.TransactionIsolationLevel.Serializable, // optional, default defined by database configuration
             }
         );
