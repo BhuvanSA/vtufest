@@ -26,7 +26,7 @@ export async function DELETE(request: Request) {
         }
 
         // Initialize an array to collect all file URLs to delete
-        let filesToDelete: string[] = [];
+        const filesToDelete: string[] = [];
 
         await prisma.$transaction(async (tx) => {
             // 1. Get all registrants with their event registrations and file URLs

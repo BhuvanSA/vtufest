@@ -34,8 +34,8 @@ async function verifyOtp(
         const storedOtp = await redis.get<string>(`otp:${email}`);
 
         // Debug Logs
-        console.log(`Stored OTP for ${email}: ${storedOtp}`);
-        console.log(`Received OTP for ${email}: ${otp}`);
+        // console.log(`Stored OTP for ${email}: ${storedOtp}`);
+        // console.log(`Received OTP for ${email}: ${otp}`);
 
         if (!storedOtp) {
             console.log("OTP has expired or does not exist.");
@@ -111,13 +111,13 @@ export async function POST(request: Request) {
                 },
             });
         }
-        console.log("the otp is success", otpValidation.success);
+        // console.log("the otp is success", otpValidation.success);
 
         const password: string = generatePassword(12) as string;
         // Hash the user's provided password
         const hashedPassword = await bcrypt.hash(password, 13);
 
-        console.log("hashed password", hashedPassword);
+        // console.log("hashed password", hashedPassword);
 
         // Create the user in the database
         const newUser = await prisma.users.create({

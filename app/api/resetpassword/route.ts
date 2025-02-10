@@ -18,8 +18,8 @@ async function verifyOtp(
         const storedOtp = await redis.get<string>(`otp:${email}`);
 
         // Debug Logs
-        console.log(`Stored OTP for ${email}: ${storedOtp}`);
-        console.log(`Received OTP for ${email}: ${otp}`);
+        // console.log(`Stored OTP for ${email}: ${storedOtp}`);
+        // console.log(`Received OTP for ${email}: ${otp}`);
 
         if (!storedOtp) {
             console.log("OTP has expired or does not exist.");

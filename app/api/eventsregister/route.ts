@@ -47,7 +47,7 @@ export async function POST(request: Request) {
 
     const userId: string = session.id as string;
     try {
-        console.log(userId, result.data);
+        // console.log(userId, result.data);
         await registerUserEvents(userId, result.data);
         return NextResponse.json(
             { success: true, message: "events are registered " },

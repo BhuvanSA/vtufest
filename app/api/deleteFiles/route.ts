@@ -10,7 +10,7 @@ export async function DELETE(request: Request) {
             redirect("/auth/signin");
         }
         const data = await request.json();
-        console.log(data);
+        // console.log(data);
         const deleteStatus = await utapi.deleteFiles(data.files);
         console.log(deleteStatus);
         return NextResponse.json({
