@@ -6,6 +6,8 @@ import {
 } from "@/lib/schemas/register";
 import { getUser, insertRegistrant } from "@/app/prismaClient/queryFunction";
 
+export const maxDuration = 60; // This function can run for a maximum of 5 seconds
+
 // Define the Registrant type if not already defined
 export type Registrant = {
     name: string;
@@ -20,11 +22,11 @@ export type Registrant = {
     admission1Url?: string;
     admission2Url?: string;
     userId: string;
-    gender : string;
-    blood : string;
-    email : string;
-    accomodation : boolean;
-    designation? : string;
+    gender: string;
+    blood: string;
+    email: string;
+    accomodation: boolean;
+    designation?: string;
     events: {
         eventNo: number;
         eventName: string;
@@ -84,7 +86,7 @@ export async function POST(request: Request) {
 
         // Map incoming data to include all required Registrant fields
         const registrantData: Registrant = {
-            email : validation.data.email,
+            email: validation.data.email,
             name: validation.data.name,
             usn: validation.data.usn,
             phone: validation.data.phone,
@@ -99,8 +101,8 @@ export async function POST(request: Request) {
             userId: session.id as string, // Type assertion to string
             events: validation.data.events, // Ensure events are included
             gender: validation.data.gender as string,
-            accomodation :validation.data.accomodation as boolean,
-            blood : validation.data.blood,
+            accomodation: validation.data.accomodation as boolean,
+            blood: validation.data.blood,
         };
 
         if (
@@ -169,7 +171,7 @@ export async function POST(request: Request) {
         // Map incoming data to include all required Registrant fields
         const registrantData: Registrant = {
             name: validation.data.name,
-            email : validation.data.email,
+            email: validation.data.email,
             usn: validation.data.usn,
             phone: validation.data.phone,
             teamManager: validation.data.teamManager,
@@ -182,10 +184,10 @@ export async function POST(request: Request) {
             admission2Url: "", // Not required for Team Manager
             userId: session.id as string, // Type assertion to string
             events: [], // Team Managers do not select events
-            accomodation : validation.data.accomodation as boolean,
-            gender : validation.data.gender as string,
+            accomodation: validation.data.accomodation as boolean,
+            gender: validation.data.gender as string,
             blood: validation.data.blood as string,
-            designation : validation.data.designation as string
+            designation: validation.data.designation as string,
         };
 
         // Check for existing registrant with same USN or phone

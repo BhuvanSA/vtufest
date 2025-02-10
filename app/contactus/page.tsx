@@ -45,8 +45,7 @@ const ContactUs: React.FC = () => {
 
   return (
     <div
-      className="overflow-hidden pt-20 pb-12 lg:pt-[120px] lg:pb-[90px] text-[#bbc5c6]
-    "
+      className="overflow-hidden pt-20 pb-12 lg:pt-[120px] lg:pb-[90px] text-[#bbc5c6]"
       style={{
         backgroundImage: `url(${bgImage.src})`,
         backgroundSize: "cover",
@@ -76,10 +75,7 @@ const ContactUs: React.FC = () => {
                 <CardContent>
                   <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                     <div>
-                      <label
-                        htmlFor="name"
-                        className="block mb-2 text-sm font-medium"
-                      >
+                      <label htmlFor="name" className="block mb-2 text-sm font-medium">
                         Full name
                       </label>
                       <Input
@@ -89,17 +85,12 @@ const ContactUs: React.FC = () => {
                         placeholder="Full Name"
                       />
                       {errors.name && (
-                        <p className="text-red-500 text-sm mt-1">
-                          {errors.name.message}
-                        </p>
+                        <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
                       )}
                     </div>
 
                     <div>
-                      <label
-                        htmlFor="email"
-                        className="block mb-2 text-sm font-medium"
-                      >
+                      <label htmlFor="email" className="block mb-2 text-sm font-medium">
                         Email
                       </label>
                       <Input
@@ -116,17 +107,12 @@ const ContactUs: React.FC = () => {
                         placeholder="name@example.com"
                       />
                       {errors.email && (
-                        <p className="text-red-500 text-sm mt-1">
-                          {errors.email.message}
-                        </p>
+                        <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
                       )}
                     </div>
 
                     <div>
-                      <label
-                        htmlFor="phone"
-                        className="block mb-2 text-sm font-medium"
-                      >
+                      <label htmlFor="phone" className="block mb-2 text-sm font-medium">
                         Phone Number
                       </label>
                       <Input
@@ -142,60 +128,41 @@ const ContactUs: React.FC = () => {
                         placeholder="Phone Number"
                       />
                       {errors.phone && (
-                        <p className="text-red-500 text-sm mt-1">
-                          {errors.phone.message}
-                        </p>
+                        <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>
                       )}
                     </div>
 
                     <div>
-                      <label
-                        htmlFor="college"
-                        className="block mb-2 text-sm font-medium"
-                      >
+                      <label htmlFor="college" className="block mb-2 text-sm font-medium">
                         College
                       </label>
                       <Input
-                        {...register("college", {
-                          required: "College name is required",
-                        })}
+                        {...register("college", { required: "College name is required" })}
                         type="text"
                         id="college"
                         placeholder="Enter your College Name"
                       />
                       {errors.college && (
-                        <p className="text-red-500 text-sm mt-1">
-                          {errors.college.message}
-                        </p>
+                        <p className="text-red-500 text-sm mt-1">{errors.college.message}</p>
                       )}
                     </div>
 
                     <div>
-                      <label
-                        htmlFor="message"
-                        className="block mb-2 text-sm font-medium"
-                      >
+                      <label htmlFor="message" className="block mb-2 text-sm font-medium">
                         Message
                       </label>
                       <Textarea
-                        {...register("message", {
-                          required: "Message is required",
-                        })}
+                        {...register("message", { required: "Message is required" })}
                         id="message"
                         rows={4}
                         placeholder="Mention your query!"
                       />
                       {errors.message && (
-                        <p className="text-red-500 text-sm mt-1">
-                          {errors.message.message}
-                        </p>
+                        <p className="text-red-500 text-sm mt-1">{errors.message.message}</p>
                       )}
                     </div>
 
-                    <Button
-                      type="submit"
-                      className="w-full bg-blue-600 hover:bg-blue-700"
-                    >
+                    <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">
                       Submit
                     </Button>
                   </form>
@@ -211,18 +178,27 @@ const ContactUs: React.FC = () => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <p>
-                    <strong>Email:</strong> example@gat.edu
+                    <strong>Email:</strong> vtufest@gat.ac.in
                   </p>
                   <p>
                     <strong>Phone:</strong>
                   </p>
-                  <ul>
-                    <li>+91 9999999999</li>
-                    <li>+91 9999999999</li>
-                  </ul>
+                  {/* Two separate phone tiles */}
+                  <div className="flex flex-col gap-4">
+                    <div className="p-4 border rounded-md shadow-sm">
+                      <p className="text-lg font-semibold">+91 9986770082</p>
+                      <p className="text-sm text-gray-600">Lt. Saravannan R</p>
+                      <p className="text-sm text-gray-600">Physical Education Director</p>
+                    </div>
+                    <div className="p-4 border rounded-md shadow-sm">
+                      <p className="text-lg font-semibold">+91 8660041943</p>
+                      <p className="text-sm text-gray-600">Mr. Abhishek</p>
+                      <p className="text-sm text-gray-600">Junior Cultural Coordinator</p>
+                    </div>
+                  </div>
                   <p>
-                    <strong>Address:</strong> 4, Bangarappanagar Main Rd,
-                    Rajarajeshwari Nagar, Bengaluru, Karnataka 560098
+                    <strong>Address:</strong> 4, Bangarappanagar Main Rd, Rajarajeshwari Nagar,
+                    Bengaluru, Karnataka 560098
                   </p>
                   <div className="mt-4">
                     <iframe

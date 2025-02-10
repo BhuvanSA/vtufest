@@ -88,7 +88,7 @@ const Home = () => {
                   <line x1="8" y1="2" x2="8" y2="6"></line>
                   <line x1="3" y1="10" x2="21" y2="10"></line>
                 </svg>
-                <span className="text-[#bbc5c6]">TBD</span>
+                <span className="text-[#bbc5c6]">24th March 2025</span>
               </div>
               <div className="flex space-x-2 items-center">
                 <svg
@@ -238,7 +238,7 @@ const Home = () => {
                 by the essence of Namma Karnataka and Namma Bengaluru.
               </p>
               <p className="text-xl text-[#003366] mb-4">
-                <strong>Date:</strong> [Fest Dates] • <strong>Venue:</strong> Global Academy
+                <strong>Date:</strong> 24th March 2025 • <strong>Venue:</strong> Global Academy
                 of Technology, Bengaluru
               </p>
               <p className="text-xl text-justify text-[#003366]">

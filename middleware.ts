@@ -13,12 +13,21 @@ const protectedRoutes: string[] = [
     "/api/register",
     "/api/getallregister",
     "/api/eventsregister",
+    "/api/getalleventregister",
+    "/api/deleteeventregister",
+    "/api/postdatetime",
+    "/api/updateregisterdetails",
+    "/api/updateregisterfiles",
+    "/api/updateroleinevent",
+    "/api/deleteregistrantevent",
+    "/api/addeventregister",
     "/register",
     "/register/documentupload",
     "/register/eventregister",
     "/register/getallregister",
     "/register/getregister",
     "/register/updateregister",
+    "/api/getPaymentInfo"
 ];
 
 export async function middleware(request: NextRequest) {

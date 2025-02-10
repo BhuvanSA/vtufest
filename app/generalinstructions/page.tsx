@@ -11,7 +11,7 @@ const Page = () => {
         <CardContent className="p-6 space-y-4 text-gray-700 text-justify w-full font-semibold tracking-tight">
           <ol className="list-decimal list-inside flex gap-4 flex-col">
             <li>The 24th VTU Youth Festival will be held during March 24 - 27, 2025.</li>
-            <li>Registrations for participating teams will be opened from 10 February, 2025 and closed on 9 March, 2025.</li>
+            <li>Registrations for participating teams will be opened from 15th February, 2025 and closes on 5th March, 2025.</li>
             <li>Late entries will not be accepted under any circumstances.</li>
             <li>Requests for changes in registration details after submission will not be entertained whatsoever.</li>
             <li>The maximum contingent size, inclusive of officials, participants, and accompanists, is fixed at 45.</li>
@@ -20,13 +20,14 @@ const Page = () => {
               For up to 10 events: ₹4,000/- <br />
               For beyond 10 events: ₹8,000/-
             </li>
-            <li>An additional refundable caution deposit of ₹3,000/- shall be paid online along with the registration fee.</li>
+            <li>An additional refundable caution deposit of ₹3,000/- shall be paid at the registration desk along with the documents of the students.</li>
             <li>
               <strong>Accommodation Facilities:</strong> <br />
-              Provided for contingents opting for it on a need basis only. Meals will be provided for all participants and
-              officials. Contingents are advised to bring light bedding and locks. Accommodation will only be provided to the
+              Provided for contingents opting for it on a need basis only. Contingents are advised to bring light bedding and locks. Accommodation will only be provided to the
               registered contingent members during the dates of the fest.
             </li>
+            <li><strong>Food Arrangements:</strong> <br />
+              Food will be provided to all the participants and the officials.</li>
             <li>All necessary musical instruments and other materials required for performances shall be brought by the participants/contingent members.</li>
             <li>
               The accompanying Team Manager shall be a faculty member with a minimum of 5 years of experience and/or be the
