@@ -6,6 +6,7 @@ import { Redis } from "@upstash/redis";
 import { signupSchema } from "@/lib/schemas/auth";
 import { generatePassword } from "@/lib/generator";
 import nodemailer from "nodemailer";
+import { emailList } from "@/data/emailList";
 
 // Initialize Upstash Redis client
 const redis = new Redis({
@@ -83,6 +84,13 @@ export async function POST(request: Request) {
         const { email, phone, otp, collegeCode, collegeName, region } =
             validation.data;
         console.log(collegeName, email, otp, phone);
+
+
+        const checkEmail = emailList.findIndex((value:string)=> value===email);
+
+        if(checkEmail===-1){
+            return NextResponse.json({success:false, message:"email is not registered"},{status:400});
+        }
 
         // Check if the user already exists in the database (by email or phone)
         const existingUser = await prisma.users.findFirst({
