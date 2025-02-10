@@ -71,17 +71,17 @@ const Dignitaries = () => {
             title: "ORGANIZING CHAIRS",
             members: [
                 {
-                    name: "Dr. H B BALAKRISHNA",
+                    name: "Dr. H B Balakrishna",
                     role: "PRINCIPAL , GAT",
                     image: organize1,
                 },
                 {
-                    name: "Dr. SRIDHAR",
+                    name: "Dr. A Sreedhar Kumar",
                     role: "CAMPUS DIRECTOR , GAT",
                     image: organize3,
                 },
                 {
-                    name: "Dr. Latha Rajgopal",
+                    name: "Dr. Latha Rajagopalan",
                     role: "Dean-Academics , GAT",
                     image: organize4,
                 },
