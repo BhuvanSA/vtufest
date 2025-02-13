@@ -742,6 +742,8 @@ const [isOther, setIsOther] = useState<boolean>(false);
                           <SelectItem value="idcardUrl">ID Card</SelectItem>
                           <SelectItem value="aadharUrl">Aadhar</SelectItem>
                           <SelectItem value="photoUrl">Photo</SelectItem>
+                          <SelectItem value="sslcUrl">SSLC</SelectItem>
+                          
                         </>
                       )}
                       {isTeamManager && (

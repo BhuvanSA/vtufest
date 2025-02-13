@@ -33,7 +33,7 @@ export const participantFormSchema = z.object({
         photo: z.string().min(1, "Photo is required"),
         idCard: z.string().min(1, "College ID Card is required"),
         aadhar: z.string().min(1, "Aadhar is required"),
-        // sslc: z.string().min(1, "SSLC is required"),
+        sslc: z.string().min(1, "SSLC is required"),
         // puc: z.string().min(1, "PUC is required"),
         // admission1: z.string().min(1, "Admission1 is required"),
         // admission2: z.string().min(1, "Admission2 is required"),
