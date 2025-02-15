@@ -237,6 +237,9 @@ export const colleges = [
       { name: "VIVEKANANDA COLLEGE OF ENGINEERING AND TECHNOLOGY", code: "4VP" },
       { name: "Mysuru Royal Institute Of Technology, Mysuru", code: "4MU" },
       { name: "Sahyadri Institute of Tech. & Mgmt., Mangaluru", code: "4SF" },
+      { name : "test1", code : "TST123" },
+      { name : "test2", code : "TST456" },
+      { name : "test3", code : "TST789" },
     ],
   },
 ]
