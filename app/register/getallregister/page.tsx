@@ -90,12 +90,8 @@ export default async function Page() {
             .map((r) => ({ eventName: r.eventName! }));
 
         const participantAccompanistEvents = row.registrations
-            .filter((r) => r.type === 'ACCOMPANIST' || r.type === 'PARTICIPANT')
+            .filter((r) => r.type === "ACCOMPANIST" || r.type === "PARTICIPANT")
             .map((r) => ({ eventName: r.eventName }));
-
-
-
-
 
         // If no events at all, push a single blank record
         if (!hasEvents) {
@@ -110,8 +106,6 @@ export default async function Page() {
             });
             continue;
         }
-
-
 
         //If participant
         if (participantEvents.length > 0) {
@@ -137,7 +131,6 @@ export default async function Page() {
                 events: accompanistEvents,
                 status: docStatusMap[row.docStatus],
             });
-
         }
         // if (participantAccompanistEvents.length > 0) {
         //     results.push({
@@ -149,9 +142,8 @@ export default async function Page() {
         //         events: participantAccompanistEvents,
         //         status: docStatusMap[row.docStatus],
         //     });
-    
-        // }
 
+        // }
     }
 
     return (
@@ -182,16 +174,13 @@ export default async function Page() {
                         Add Registrant
                     </Button>
                 </Link>
-
             </div>
-            
-            <DataTable data={results} />
-           
-                <div className="flex justify-center items-center">
-                    <PaymentDialog/>
-                </div>
-   
 
+            <DataTable data={results} />
+
+            <div className="flex justify-center items-center">
+                <PaymentDialog />
+            </div>
         </div>
     );
 }

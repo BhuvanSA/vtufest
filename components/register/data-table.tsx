@@ -1,7 +1,15 @@
 "use client";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
-import { ArrowLeft, ArrowRight, Columns, FileDown, Pencil, Search, Trash2 } from "lucide-react";
+import {
+    ArrowLeft,
+    ArrowRight,
+    Columns,
+    FileDown,
+    Pencil,
+    Search,
+    Trash2,
+} from "lucide-react";
 import * as React from "react";
 import {
     ColumnDef,
@@ -57,7 +65,7 @@ export type Data = {
     status: "Pending" | "Processing" | "Success" | "Failed";
 };
 
-export function    DataTable({ data }: { data: Data[] }) {
+export function DataTable({ data }: { data: Data[] }) {
     const router = useRouter();
     const [rows, setRows] = React.useState<Data[]>(data);
 
@@ -68,8 +76,6 @@ export function    DataTable({ data }: { data: Data[] }) {
         },
         [router]
     );
-
-   
 
     const handleRemove = React.useCallback(
         async (id: string) => {
@@ -156,7 +162,6 @@ export function    DataTable({ data }: { data: Data[] }) {
 
     const columns = React.useMemo<ColumnDef<Data>[]>(
         () => [
-            
             {
                 id: "select",
                 header: ({ table }) => (
@@ -271,7 +276,7 @@ export function    DataTable({ data }: { data: Data[] }) {
                         "Team Manager",
                         "Participant",
                         "Accompanist",
-                        "Total"
+                        "Total",
                     ];
                     const currentFilter =
                         (column.getFilterValue() as string) ?? "";
@@ -290,9 +295,7 @@ export function    DataTable({ data }: { data: Data[] }) {
                     return (
                         <Button variant="ghost" onClick={handleFilterChange}>
                             Type <ListFilterIcon className="p-1" />{" "}
-                            {currentFilter !== ""
-                                ? `: ${currentFilter}`
-                                : ""}
+                            {currentFilter !== "" ? `: ${currentFilter}` : ""}
                         </Button>
                     );
                 },
@@ -300,10 +303,14 @@ export function    DataTable({ data }: { data: Data[] }) {
                     <div className="capitalize">{row.getValue("type")}</div>
                 ),
                 filterFn: (row, columnId, filterValue) => {
-                    if(!filterValue || filterValue==='') return true;
+                    if (!filterValue || filterValue === "") return true;
                     if (!filterValue || filterValue === "Total") {
-                        const type = row.getValue('type');
-                        if(type === 'Participant' || type==='Accompanist' || type==='Team Manager'){
+                        const type = row.getValue("type");
+                        if (
+                            type === "Participant" ||
+                            type === "Accompanist" ||
+                            type === "Team Manager"
+                        ) {
                             return true;
                         }
                     }
@@ -362,7 +369,7 @@ export function    DataTable({ data }: { data: Data[] }) {
                 },
             },
             {
-                accessorKey:"Action",
+                accessorKey: "Action",
                 id: "actions",
                 enableHiding: false,
                 cell: ({ row }) => {
@@ -429,33 +436,34 @@ export function    DataTable({ data }: { data: Data[] }) {
     const handleExportToPDF = () => {
         // Pull final rows from the table’s computed row model:
         const filteredSortedRows = table.getRowModel().rows;
-        
+
         // Prepare data for PDF
         const exportData = filteredSortedRows.map((row) => [
             row.getValue("name"),
             row.getValue("usn"),
             row.getValue("type"),
-            (row.getValue("events") as { eventName: string }[]).map((event) => event.eventName).join(", "),
-            
+            (row.getValue("events") as { eventName: string }[])
+                .map((event) => event.eventName)
+                .join(", "),
         ]);
-    
+
         // Column headers for PDF
         const headers = [["Name", "USN", "Type", "Events", "Status"]];
-    
+
         // Initialize jsPDF
         const doc = new jsPDF();
-    
+
         // Load the PNG template
-        const img = document.createElement('img');
+        const img = document.createElement("img");
         img.src = "/images/gatformat.jpg"; // Replace with the actual template path
-    
+
         img.onload = () => {
             const pageWidth = doc.internal.pageSize.getWidth();
             const pageHeight = doc.internal.pageSize.getHeight();
-    
+
             // Add the template as a background
             doc.addImage(img, "PNG", 0, 0, pageWidth, pageHeight);
-    
+
             // Add table
             autoTable(doc, {
                 head: headers,
@@ -464,21 +472,24 @@ export function    DataTable({ data }: { data: Data[] }) {
                 styles: { fontSize: 10, cellPadding: 3 },
                 headStyles: { fillColor: [26, 188, 156] }, // #1abc9c in RGB
             });
-    
+
             // Add signatures at the bottom
             doc.text("Principal's Signature", 14, pageHeight - 20);
-            doc.text("Coordinator's Signature", pageWidth - 80, pageHeight - 20);
-    
+            doc.text(
+                "Coordinator's Signature",
+                pageWidth - 80,
+                pageHeight - 20
+            );
+
             // Save the PDF
             doc.save("registrants.pdf");
         };
     };
 
-
     return (
-        <div className="w-full px-5 rounded-xl  h-[70rem] mt-10">
+        <div className="w-full px-5 rounded-xl my-12">
             <div className="flex items-center py-4 flex-wrap gap-3 ">
-                <div className="relative max-w-sm " >
+                <div className="relative max-w-sm ">
                     <Search className="absolute left-2 top-3 h-4 w-5 text-muted-foreground " />
                     <Input
                         placeholder="Search name..."
@@ -547,10 +558,10 @@ export function    DataTable({ data }: { data: Data[] }) {
                                         {header.isPlaceholder
                                             ? null
                                             : flexRender(
-                                                header.column.columnDef
-                                                    .header,
-                                                header.getContext()
-                                            )}
+                                                  header.column.columnDef
+                                                      .header,
+                                                  header.getContext()
+                                              )}
                                     </TableHead>
                                 ))}
                             </TableRow>
@@ -559,19 +570,30 @@ export function    DataTable({ data }: { data: Data[] }) {
                     <TableBody className="text-primary ">
                         {table.getRowModel().rows?.length ? (
                             table.getRowModel().rows.map((row) => (
-                                <TableRow className="hover:bg-blue-50"
+                                <TableRow
+                                    className="hover:bg-blue-50"
                                     key={row.id}
                                     data-state={
                                         row.getIsSelected() && "selected"
                                     }
                                 >
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id} onClick={() => {
-                                            if (cell.column.id === 'usn' || cell.column.id==='name' || cell.column.id === "photo") {
-                                                const cellValue = row.getValue('usn');
-                                                router.push(`/register/getregister/${cellValue}`);
-                                            }
-                                        }}>
+                                        <TableCell
+                                            key={cell.id}
+                                            onClick={() => {
+                                                if (
+                                                    cell.column.id === "usn" ||
+                                                    cell.column.id === "name" ||
+                                                    cell.column.id === "photo"
+                                                ) {
+                                                    const cellValue =
+                                                        row.getValue("usn");
+                                                    router.push(
+                                                        `/register/getregister/${cellValue}`
+                                                    );
+                                                }
+                                            }}
+                                        >
                                             {flexRender(
                                                 cell.column.columnDef.cell,
                                                 cell.getContext()
@@ -605,7 +627,7 @@ export function    DataTable({ data }: { data: Data[] }) {
                         onClick={() => table.previousPage()}
                         disabled={!table.getCanPreviousPage()}
                     >
-                        <ArrowLeft className="mr-2 h-4 w-4"/> Previous
+                        <ArrowLeft className="mr-2 h-4 w-4" /> Previous
                     </Button>
                     <Button
                         variant="outline"
