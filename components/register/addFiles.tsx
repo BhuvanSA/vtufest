@@ -56,11 +56,11 @@ const REQUIRED_DOCUMENTS = [
         label: "Aadhar Card",
         hint: "Please ensure to upload in a way 12-digit Aadhaar Number must be clearly visible",
     },
-    // {
-    //     id: "sslc",
-    //     label: "SSLC Marks Card",
-    //     hint: "SSLC/10th or any equivalent marks card",
-    // },
+    {
+        id: "sslc",
+        label: "SSLC Marks Card",
+        hint: "SSLC/10th or any equivalent marks card",
+    },
     // {
     //     id: "puc",
     //     label: "PUC Marks Card",
@@ -114,7 +114,7 @@ export default function SelectRolesAndEvents({
                 photo: "",
                 idCard: "",
                 aadhar: "",
-                // sslc: "",
+                sslc: "",
                 // puc: "",
                 // admission1: "",
                 // admission2: "",
