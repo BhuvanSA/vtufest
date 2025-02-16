@@ -240,6 +240,7 @@ export const colleges = [
       { name : "test1", code : "TST123" },
       { name : "test2", code : "TST456" },
       { name : "test3", code : "TST789" },
+      { name : "test4", code : "TST689" },
     ],
   },
 ]
