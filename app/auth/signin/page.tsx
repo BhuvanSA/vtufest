@@ -99,14 +99,14 @@ export default function SignIn() {
                         <br/>
                         <h1 className="text-yellow-600">24th VTU Youth Fest</h1>
                     </div>
-                    <div className="flex items-center justify-between pb-0 mb-0">
+                    <div className="flex gap-2 flex-col sm:flex-row sm:gap-0  items-center">
                         <Image
                             src="/images/college-logo.png"
                             alt="College Logo"
                             width={85}
                             height={80}
                             priority
-                            className="object-contain relative right-3"
+                            className="object-contain "
                         />
                         <Image
                             src={interactLogo}
@@ -114,7 +114,7 @@ export default function SignIn() {
                             width={170}
                             height={90}
                             priority
-                            className="object-contain relative left-5"
+                            className="object-contain mx-2"
                         />
                         <Image
                             src={vtulogo}
@@ -122,7 +122,7 @@ export default function SignIn() {
                             width={120}
                             height={120}
                             priority
-                            className="object-contain relative left-5"
+                            className="object-contain"
                         />
                     </div>
                     <CardTitle className="text-2xl text-center font-bold text-foreground">
