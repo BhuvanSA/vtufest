@@ -63,7 +63,7 @@ model Registrants {
   phone              String                     @unique
   teamManager        Boolean                    @default(false)
   photoUrl           String
-  email              String
+  email              String                     @unique
   aadharUrl          String?
   sslcUrl            String?
   pucUrl             String?

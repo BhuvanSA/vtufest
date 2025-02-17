@@ -68,6 +68,16 @@ export async function POST(request: Request) {
             }
         );
     }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if(user.registrants.some((value: any) => value.email === data.email || value.phone === data.phone)){
+        return new Response(
+            JSON.stringify({ message: "Registrant with the same email or phone number already exists" }),
+            { status: 400, headers: { "Content-Type": "application/json" } }
+        );
+    }
+    
+
     if (data.teamManager === false) {
         const validation = participantFormSchema.safeParse(data);
         if (!validation.success) {
