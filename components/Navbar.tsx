@@ -120,7 +120,7 @@ const NavBar = () => {
                     <NavigationMenu>
                         <NavigationMenuList className="bg-inherit">
                             <NavigationMenuItem className="bg-inherit">
-                                <Link href="/" legacyBehavior passHref>
+                                <Link href="https://vtufestinteract.com/" legacyBehavior passHref>
                                     <NavigationMenuLink
                                         className={cn(
                                             navigationMenuTriggerStyle(),
@@ -132,7 +132,7 @@ const NavBar = () => {
                                 </Link>
                             </NavigationMenuItem>
 
-                            <NavigationMenuItem>
+                            {/* <NavigationMenuItem>
                                 <NavigationMenuTrigger className="bg-inherit text-xl hover:text-blue-500 transition-colors duration-200">
                                     About
                                 </NavigationMenuTrigger>
@@ -231,7 +231,7 @@ const NavBar = () => {
                                         Contact Us
                                     </NavigationMenuLink>
                                 </Link>
-                            </NavigationMenuItem>
+                            </NavigationMenuItem> */}
 
                             {isLoggedIn ? (
                                 <>

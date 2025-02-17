@@ -59,7 +59,7 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onClose }) => {
                                 </Link>
 
                     </li>
-                    {navItems.map((item) => (
+                    {/* {navItems.map((item) => (
                         <li key={item.href}>
                             <Collapsible>
                                 <CollapsibleTrigger className="flex items-center justify-between w-full py-2 text-foreground hover:text-primary transition-colors">
@@ -89,8 +89,8 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onClose }) => {
                             </Collapsible>
                         </li>
                        
-                    ))}
-                     <li>
+                    ))} */}
+                     {/* <li>
                              <Link
                                     href="/contactus"
                                     className="block py-1 text-foreground hover:text-primary transition-colors"
@@ -105,7 +105,7 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({ isOpen, onClose }) => {
                                 >
                                     Schedule
                                 </Link>
-                    </li>
+                    </li> */}
                     {isLoggedIn ? (
                         <>
                             <li>
