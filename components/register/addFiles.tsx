@@ -268,7 +268,7 @@ export default function SelectRolesAndEvents({
             router.push("/register/getallregister");
         } catch (error: unknown) {
             if (error instanceof Error) {
-                console.error("Error registering:", error.message);
+                
                 toast.error(error.message || "An error occurred.");
             }
         }

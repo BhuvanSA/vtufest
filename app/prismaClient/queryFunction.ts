@@ -63,7 +63,7 @@ export async function insertRegistrant(
                 }
             }
         });
-        console.log(eventList);
+        console.log(eventList,arg);
 
         const result = await prisma.$transaction(
             async (prisma) => {
@@ -75,7 +75,7 @@ export async function insertRegistrant(
                         teamManager: false,
                         phone: arg.phone,
                         photoUrl: arg.photoUrl,
-                        sslcUrl: arg.sslcUrl || "",
+                        sslcUrl: arg.sslcUrl ,
                         pucUrl: arg.pucUrl || "",
                         aadharUrl: arg.aadharUrl || "",
                         admission1Url: arg.admission1Url || "",
