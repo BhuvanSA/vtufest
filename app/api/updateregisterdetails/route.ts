@@ -1,4 +1,4 @@
-import { updateRegisterDetails } from "@/app/prismaClient/queryFunction";
+import {  checkUnique, updateRegisterDetails } from "@/app/prismaClient/queryFunction";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -35,10 +35,17 @@ export async function PATCH(request: Request) {
 
     const result = await registerSchema.safeParse(data);
 
+    
     if(!result.success){
         return NextResponse.json({success:false,message:result.error.message},{status:400});
     }
-    console.log(data);
+    
+    const check = await checkUnique(result.data?.email as string, result.data?.phone as string);
+    
+    if(check){
+        return NextResponse.json({success : false, message : "email/phone number already exists"},{status : 500});
+    }
+
     try {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const updateDetails = await updateRegisterDetails(data);

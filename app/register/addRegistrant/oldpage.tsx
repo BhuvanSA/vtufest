@@ -125,7 +125,7 @@ const Register = () => {
         if (files && files[0]) {
             const file = files[0];
             const allowedTypes = ["image/jpeg", "image/png", "application/pdf"];
-            const maxSizeInKB = 150;
+            const maxSizeInKB = 256;
 
             if (!allowedTypes.includes(file.type)) {
                 setErrors((prev) => ({
