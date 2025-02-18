@@ -34,12 +34,14 @@ import { useAuthContext } from "@/contexts/auth-context";
 import { loginSchema } from "@/lib/schemas/auth";
 import { toast } from "sonner";
 import Link from "next/link";
+import { Eye, EyeClosed, EyeOff } from "lucide-react";
 
 export default function SignIn() {
     const router = useRouter();
     const [error, setError] = useState<string>("");
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const { setIsLoggedIn } = useAuthContext();
+    const [visibility, setVisibility] = useState<boolean>(false);
 
     const form = useForm<z.infer<typeof loginSchema>>({
         resolver: zodResolver(loginSchema),
@@ -81,6 +83,8 @@ export default function SignIn() {
         }
     }
 
+
+
     return (
         <div
             className="mt-10 min-h-screen flex items-center justify-center p-4 flex-wrap"
@@ -96,7 +100,7 @@ export default function SignIn() {
                 <CardHeader>
                     <div className="flex items-center flex-col text-blue-800 justify-center mb-6 font-bold text-2xl leading-6 tracking-wider">
                         <h1 className="text-wrap text-center">Global Academy of Technology</h1>
-                        <br/>
+                        <br />
                         <h1 className="text-yellow-600">24th VTU Youth Fest</h1>
                     </div>
                     <div className="flex gap-2 flex-col sm:flex-row sm:gap-0  items-center">
@@ -166,13 +170,27 @@ export default function SignIn() {
                                             Password
                                         </FormLabel>
                                         <FormControl>
-                                            <Input
-                                                className="bg-background border-input"
-                                                type="password"
-                                                placeholder="Enter your password"
-                                                {...field}
-                                            />
+                                            <div className="relative">
+                                                <Input
+                                                    className="bg-background border-input pr-10"
+                                                    type={visibility ? "text" : "password"}
+                                                    placeholder="Enter your password"
+                                                    {...field}
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setVisibility(prev => !prev)}
+                                                    className="absolute right-2 top-2.5 text-muted-foreground hover:text-foreground"
+                                                >
+                                                    {visibility ? (
+                                                        <EyeOff className="h-5 w-5" />
+                                                    ) : (
+                                                        <Eye className="h-5 w-5" />
+                                                    )}
+                                                </button>
+                                            </div>
                                         </FormControl>
+
                                         <FormMessage className="text-destructive" />
                                     </FormItem>
                                 )}
