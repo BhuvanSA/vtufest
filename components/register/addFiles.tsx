@@ -714,14 +714,14 @@ export default function SelectRolesAndEvents({
                                 <h2 className="text-2xl font-semibold mb-4">
                                     Upload Documents
                                 </h2>
-                                <p className="mb-4 text-muted-foreground text-red-600">
-                                    Note : Students are required to submit valid
-                                    documents for verification. In case any
-                                    document/documents fail the verification
-                                    process, participants will be asked to
-                                    reupload the documents. Failure to meet the
-                                    requirements after re-uploading may result
-                                    in disqualification.
+                                <p className="mb-4 text-muted-foreground text-red-500">
+                                    <span className="font-semibold text-red-600">Note:</span> Students are required to submit valid documents for verification.
+                                    All documents must be uploaded in<span className="text-red-600 font-bold"> PNG or JPG</span>  format, with a file size not
+                                    exceeding <span className="font-bold text-red-600">256 KB</span>. If any document fails the verification process, participants
+                                    will be notified and given an opportunity to reupload the corrected file.
+                                    Failure to meet the specified format, size, or authenticity requirements
+                                    after re-uploading may result in disqualification. Ensure all submissions
+                                    are clear, legible, and comply with the guidelines provided.
                                 </p>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                     {REQUIRED_DOCUMENTS.map((doc) => {
@@ -736,7 +736,7 @@ export default function SelectRolesAndEvents({
                                                     }`}
                                             >
                                                 <Label htmlFor={doc.id}>
-                                                    {doc.label}
+                                                    {doc.label} <span className="text-red-600 text-xs font-bold">* (PNG / JPG) </span>
                                                 </Label>
                                                 <p className="text-sm text-muted-foreground mb-2">
                                                     {doc.hint}
@@ -744,9 +744,9 @@ export default function SelectRolesAndEvents({
                                                 {isUploaded ? (
                                                     <div className="w-full h-[244px] flex flex-col rounded-[var(--radius)] items-center justify-end p-12 space-y-2 bg-gradient-to-t from-green-50 to-transparent">
                                                         <p className="text-green-500 flex flex-col justify-items-center items-center gap-2 pb-10">
-                                                            
+
                                                             <p className="flex  gap-2 items-center flex-row">Upload Complete <VerifiedIcon /></p>
-                                                            
+
                                                             <Image
                                                                 src={`https://${process.env.UPLOADTHING_APP_ID}.ufs.sh/f/${documentUrls[doc.id]}`}
                                                                 width={60}
@@ -1065,24 +1065,24 @@ export default function SelectRolesAndEvents({
                                                     }`}
                                             >
                                                 <Label htmlFor={doc.id}>
-                                                    {doc.label}
+                                                    {doc.label}  <span className="text-red-500 font-bold text-xs">* (PNG / JPG)</span>
                                                 </Label>
                                                 <p className="text-sm text-muted-foreground mb-2">
-                                                    {doc.hint}
+                                                    {doc.hint.replace('student', 'Team Manager')}
                                                 </p>
                                                 {isUploaded ? (
                                                     <div className="w-full h-[244px] flex flex-col rounded-[var(--radius)] items-center justify-end p-12 space-y-2 bg-gradient-to-t from-green-50 to-transparent">
-                                                        <p className="text-green-500 flex flex-col justify-items-center items-center gap-2 pb-10">
-                                                            
+                                                        <div className="text-green-500 flex flex-col justify-items-center items-center gap-2 pb-10">
+
                                                             <p className="flex  gap-2 items-center flex-row">Upload Complete <VerifiedIcon /></p>
-                                                            
+
                                                             <Image
-                                                                src={`https://${process.env.UPLOADTHING_APP_ID}.ufs.sh/f/${documentUrls[doc.id]}`}
+                                                                src={`https://${process.env.UPLOADTHING_APP_ID}.ufs.sh/f/${managerDocumentUrls[doc.id]}`}
                                                                 width={60}
                                                                 height={60}
                                                                 alt="uplaoded image"
                                                             />
-                                                        </p>
+                                                        </div>
                                                         <Button
                                                             type="button"
                                                             variant="outline"

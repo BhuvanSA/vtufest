@@ -149,7 +149,7 @@ export default async function Page() {
         //         events: participantAccompanistEvents,
         //         status: docStatusMap[row.docStatus],
         //     });
-    
+
         // }
 
     }
@@ -184,13 +184,13 @@ export default async function Page() {
                 </Link>
 
             </div>
-            
+
             <DataTable data={results} />
-           
-                <div className="flex justify-center items-center">
-                    <PaymentDialog/>
-                </div>
-   
+
+            <div className="flex justify-center items-center">
+                <PaymentDialog />
+            </div>
+
 
         </div>
     );
