@@ -42,6 +42,7 @@ import {
     managerFormSchema,
 } from "@/lib/schemas/register";
 import Link from "next/link";
+import Image from "next/image";
 
 // Required Documents
 const REQUIRED_DOCUMENTS = [
@@ -151,18 +152,18 @@ export default function SelectRolesAndEvents({
     });
     const [isOther, setIsOther] = useState(false);
 
-  // Watch the current value of designation
-  const selectedDesignation = watchManager("designation");
-  const handleDesignationChange = (value: string) => {
-    if (value === "others") {
-      setIsOther(true);
-      // Clear the field to let the user type a custom value
-      setValueManager("designation", "");
-    } else {
-      setIsOther(false);
-      setValueManager("designation", value);
-    }
-  };
+    // Watch the current value of designation
+    const selectedDesignation = watchManager("designation");
+    const handleDesignationChange = (value: string) => {
+        if (value === "others") {
+            setIsOther(true);
+            // Clear the field to let the user type a custom value
+            setValueManager("designation", "");
+        } else {
+            setIsOther(false);
+            setValueManager("designation", value);
+        }
+    };
 
     const [collegeRegion, setCollegeRegion] = useState<string>("");
     const [disbaled, setDisabled] = useState<boolean>(false);
@@ -268,7 +269,7 @@ export default function SelectRolesAndEvents({
             router.push("/register/getallregister");
         } catch (error: unknown) {
             if (error instanceof Error) {
-                
+
                 toast.error(error.message || "An error occurred.");
             }
         }
@@ -742,9 +743,16 @@ export default function SelectRolesAndEvents({
                                                 </p>
                                                 {isUploaded ? (
                                                     <div className="w-full h-[244px] flex flex-col rounded-[var(--radius)] items-center justify-end p-12 space-y-2 bg-gradient-to-t from-green-50 to-transparent">
-                                                        <p className="text-green-500 flex items-center gap-1 pb-10">
-                                                            Upload Complete
-                                                            <VerifiedIcon />
+                                                        <p className="text-green-500 flex flex-col justify-items-center items-center gap-2 pb-10">
+                                                            
+                                                            <p className="flex  gap-2 items-center flex-row">Upload Complete <VerifiedIcon /></p>
+                                                            
+                                                            <Image
+                                                                src={`https://${process.env.UPLOADTHING_APP_ID}.ufs.sh/f/${documentUrls[doc.id]}`}
+                                                                width={60}
+                                                                height={60}
+                                                                alt="uplaoded image"
+                                                            />
                                                         </p>
                                                         <LoadingButton
                                                             type="button"
@@ -868,63 +876,63 @@ export default function SelectRolesAndEvents({
                                     </div>
 
                                     <div className="w-full md:w-1/3 space-y-1.5">
-        <Label htmlFor="managerdesignation">
-          Designation <small className="text-red-600">*</small>
-        </Label>
+                                        <Label htmlFor="managerdesignation">
+                                            Designation <small className="text-red-600">*</small>
+                                        </Label>
 
-        {/* Render either the Select dropdown or an Input based on isOther */}
-        {!isOther ? (
-          <Select onValueChange={handleDesignationChange}>
-            <SelectTrigger id="managerdesignation">
-              <SelectValue placeholder="Select Designation" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Designation</SelectLabel>
-                <SelectItem value="Professor">Professor</SelectItem>
-                                  <SelectItem value="Associate Professor">
-                                    Associate Professor
-                                  </SelectItem>
-                                  <SelectItem value="Assistant Professor">
-                                    Assistant Professor
-                                  </SelectItem>
-                                  <SelectItem value="P.E.Director">
-                                   P.E.Director
-                                  </SelectItem>
-                                  <SelectItem value="others">Others</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        ) : (
-            <>
-          <Input
-            id="managerdesignation"
-            // Notice that the input’s value is taken from the same field
-            value={selectedDesignation}
-            // Instead of using the register spread, we update the field directly.
-            onChange={(e) => setValueManager("designation", e.target.value)}
-            placeholder="Please specify your designation"
-          />
-          <button
-        type="button"
-        onClick={() => {
-          // Optionally, clear the designation field before switching back.
-          setValueManager("designation", "");
-          setIsOther(false);
-        }}
-        className="text-sm text-blue-600 underline mt-1"
-      >
-        Back to selection
-      </button>
-         </>
-        )}
+                                        {/* Render either the Select dropdown or an Input based on isOther */}
+                                        {!isOther ? (
+                                            <Select onValueChange={handleDesignationChange}>
+                                                <SelectTrigger id="managerdesignation">
+                                                    <SelectValue placeholder="Select Designation" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectGroup>
+                                                        <SelectLabel>Designation</SelectLabel>
+                                                        <SelectItem value="Professor">Professor</SelectItem>
+                                                        <SelectItem value="Associate Professor">
+                                                            Associate Professor
+                                                        </SelectItem>
+                                                        <SelectItem value="Assistant Professor">
+                                                            Assistant Professor
+                                                        </SelectItem>
+                                                        <SelectItem value="P.E.Director">
+                                                            P.E.Director
+                                                        </SelectItem>
+                                                        <SelectItem value="others">Others</SelectItem>
+                                                    </SelectGroup>
+                                                </SelectContent>
+                                            </Select>
+                                        ) : (
+                                            <>
+                                                <Input
+                                                    id="managerdesignation"
+                                                    // Notice that the input’s value is taken from the same field
+                                                    value={selectedDesignation}
+                                                    // Instead of using the register spread, we update the field directly.
+                                                    onChange={(e) => setValueManager("designation", e.target.value)}
+                                                    placeholder="Please specify your designation"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        // Optionally, clear the designation field before switching back.
+                                                        setValueManager("designation", "");
+                                                        setIsOther(false);
+                                                    }}
+                                                    className="text-sm text-blue-600 underline mt-1"
+                                                >
+                                                    Back to selection
+                                                </button>
+                                            </>
+                                        )}
 
-        {errorsManager.designation && (
-          <p className="text-red-500 text-sm">
-            {errorsManager.designation.message}
-          </p>
-        )}
-      </div>
+                                        {errorsManager.designation && (
+                                            <p className="text-red-500 text-sm">
+                                                {errorsManager.designation.message}
+                                            </p>
+                                        )}
+                                    </div>
 
                                     <div className="w-full md:w-1/3 space-y-1.5">
                                         <Label htmlFor="managerPhone">
@@ -1064,9 +1072,16 @@ export default function SelectRolesAndEvents({
                                                 </p>
                                                 {isUploaded ? (
                                                     <div className="w-full h-[244px] flex flex-col rounded-[var(--radius)] items-center justify-end p-12 space-y-2 bg-gradient-to-t from-green-50 to-transparent">
-                                                        <p className="text-green-500 flex items-center gap-1 pb-10">
-                                                            Upload Complete
-                                                            <VerifiedIcon />
+                                                        <p className="text-green-500 flex flex-col justify-items-center items-center gap-2 pb-10">
+                                                            
+                                                            <p className="flex  gap-2 items-center flex-row">Upload Complete <VerifiedIcon /></p>
+                                                            
+                                                            <Image
+                                                                src={`https://${process.env.UPLOADTHING_APP_ID}.ufs.sh/f/${documentUrls[doc.id]}`}
+                                                                width={60}
+                                                                height={60}
+                                                                alt="uplaoded image"
+                                                            />
                                                         </p>
                                                         <Button
                                                             type="button"
@@ -1128,7 +1143,7 @@ export default function SelectRolesAndEvents({
                             </div>
                         </CardContent>
                         <CardFooter className="w-full text-center flex gap-3 justify-center">
-                        <Button className="px-8 text-xl" type="submit" disabled={disbaled}>
+                            <Button className="px-8 text-xl" type="submit" disabled={disbaled}>
                                 <Save className="w-5 h-5 mr-2" /> Save
                             </Button>
 
