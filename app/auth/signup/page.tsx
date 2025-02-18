@@ -447,7 +447,7 @@ export default function SignUp() {
                             className="w-full border-border hover:bg-secondary"
                             onClick={() => router.push("/auth/signin")}
                         >
-                            Sign In
+                            Log In
                         </Button>
                     </CardFooter>
                 </Card>
