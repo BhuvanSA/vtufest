@@ -67,12 +67,59 @@ export async function POST(request: Request) {
             },
         });
 
-        // Email content
+        // Email content with updated CSS theme and copy button for OTP
         const mailOptions = {
             from: process.env.EMAIL_USER, // Sender email address
             to: email, // Receiver email address
             subject: "Your OTP for Verification",
-            text: `Your OTP is: ${otp}. It is valid for 5 minutes.`,
+            html: `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Your OTP for Verification</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #ffffff; /* Changed body background to white */
+    }
+    .container {
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+      color: #262626;
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 20px;
+      border: 1px solid #CFA000; /* Dark yellow border */
+      border-radius: 8px;
+      background-color: #FFF9DB; /* Light yellow background for inner container */
+    }
+    .otp {
+      font-size: 24px;
+      font-weight: bold;
+      color: #ffffff;
+      background-color: #FFC107;
+      padding: 10px 20px;
+      border-radius: 8px;
+      display: inline-block;
+      letter-spacing: 3px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2 style="margin-bottom:16px;">Your OTP for Verification</h2>
+    <p style="margin-bottom:16px;">Use the following One-Time Password (OTP) to complete your verification process:</p>
+    <div style="margin-bottom:16px; text-align: center;">
+      <span class="otp">${otp}</span>
+    </div>
+    <p style="margin-bottom:16px;">This OTP is valid for 10 minutes. Do not share it with anyone.</p>
+    <p style="margin-top:20px; font-size:14px; color:#6c757d;">If you did not request this, please ignore this email.</p>
+  </div>
+  <!-- Removed JavaScript as email clients do not support JS -->
+</body>
+</html>`,
         };
 
         // Send email

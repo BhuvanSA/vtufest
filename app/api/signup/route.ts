@@ -158,45 +158,65 @@ export async function POST(request: Request) {
                 subject:
                     "Login Credentials for Interact-2025 Registration Portal",
                 html: `
-                <div style="
-                    font-family: 'Inter', Arial, sans-serif;
-                    font-size: 16px;
-                    line-height: 1.5;
-                    color: #262626; /* Adjusted foreground color */
-                    background-color: #FFF9DB; /* Light yellow background */
-                    max-width: 600px;
-                    margin: 0 auto;
-                    padding: 20px;
-                    border: 1px solid #e5e7eb;
-                    border-radius: 8px;">
-                    <p style="margin-bottom: 16px;">Respect Principal,</p>
-                    <p style="margin-bottom: 16px;"><strong>${newUser.collegeName}</strong></p>
-                    <p style="margin-bottom: 16px;">Greetings from Global Academy of Technology.</p>
-                    <p style="margin-bottom: 16px;">
-                        We are pleased to inform you that your institution’s registration on the official website for Interact-2025 – The 24th VTU Youth Fest has been successfully created. Below are your login credentials to access the portal:
-                    </p>
-                    <ul style="margin-bottom: 16px; padding-left: 20px;">
-                        <li style="margin-bottom: 8px;"><strong>Username:</strong> ${newUser.email}</li>
-                        <li><strong>Password:</strong> ${password}</li>
-                    </ul>
-                    <p style="margin-bottom: 16px;">Please use these credentials to log in and complete the participant registration process for the fest.</p>
-                    <p style="margin-bottom: 16px;">
-                        <strong>Website Link:</strong> 
-                        <a href="https://vtufestinteract.com" target="_blank" style="color: #2563eb; text-decoration: none;">
-                            vtufestinteract.com
-                        </a>
-                    </p>
-                    <p style="margin-bottom: 16px;">
-                        We look forward to your institution’s active participation in this grand cultural event. Should you require any assistance, feel free to reach out to us.
-                    </p>
-                    <p style="margin-bottom: 16px;">
-                        For any queries, contact:<br/>
-                        • Mr. Abhishek, Junior Cultural Coordinator – 📞 <a href="tel:8660041943">8660041943</a><br/>
-                        • Akshith M, Student Convener – 📞 <a href="tel:9945864767">9945864767</a>
-                    </p>
-                    <p style="margin-bottom: 16px;">Thank you for your support and cooperation.</p>
-                    <p style="margin-bottom: 0;">Warm regards,<br/>Team Interact<br/>Global Academy of Technology</p>
-                </div>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Registration Successful</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #ffffff;
+    }
+    .container {
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+      color: #262626;
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 20px;
+      border: 1px solid #CFA000; /* Dark yellow border */
+      border-radius: 8px;
+      background-color: #FFF9DB; /* Light yellow background */
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <p style="margin-bottom: 16px;">Respect Principal,</p>
+    <p style="margin-bottom: 16px;"><strong>${newUser.collegeName}</strong></p>
+    <p style="margin-bottom: 16px;">Greetings from Global Academy of Technology.</p>
+    <p style="margin-bottom: 16px;">
+      We are pleased to inform you that your institution’s registration on the official website for Interact-2025 – The 24th VTU Youth Fest has been successfully created.
+      Below are your login credentials to access the portal:
+    </p>
+    <ul style="margin-bottom: 16px; padding-left: 20px;">
+      <li style="margin-bottom: 8px;"><strong>Username:</strong> ${newUser.email}</li>
+      <li><strong>Password:</strong> ${password}</li>
+    </ul>
+    <p style="margin-bottom: 16px;">Please use these credentials to log in and complete the participant registration process for the fest.</p>
+    <p style="margin-bottom: 16px;">
+      <strong>Website Link:</strong>
+      <a href="https://vtufestinteract.com" target="_blank" style="color: #2563eb; text-decoration: none;">
+        vtufestinteract.com
+      </a>
+    </p>
+    <p style="margin-bottom: 16px;">
+      We look forward to your institution’s active participation in this grand cultural event.
+      Should you require any assistance, feel free to reach out to us.
+    </p>
+    <p style="margin-bottom: 16px;">
+      For any queries, contact:<br/>
+      • Mr. Abhishek, Junior Cultural Coordinator – 📞 <a href="tel:8660041943">8660041943</a><br/>
+      • Akshith M, Student Convener – 📞 <a href="tel:9945864767">9945864767</a>
+    </p>
+    <p style="margin-bottom: 16px;">Thank you for your support and cooperation.</p>
+    <p style="margin-bottom: 0;">Warm regards,<br/>Team Interact<br/>Global Academy of Technology</p>
+  </div>
+</body>
+</html>
                 `,
             };
 
