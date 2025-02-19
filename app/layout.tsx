@@ -67,7 +67,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                 <ThemeProvider>
                     <AuthContextProvider>
                         <Navbar />
-                        <main className="mt-36 my-10 py-[5rem]  ">
+                        <main className="mt-0 my-0 py-[0rem]  ">
                             {children}
                             <Analytics />
                             <SpeedInsights />

@@ -3,146 +3,211 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
 import * as z from "zod";
+import { useRouter } from "next/navigation";
 import axios from "axios";
-import vtulogo from "@/public/images/vtulogo.png";
+import Image from "next/image";
 import { toast } from "sonner";
-import interactLogo from "@/public/images/INTERACT-4.png";
-import bgImage from "../../../components/images/GATBGIMG.png"; // Your background image import
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { emailList } from "@/data/emailList";
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { LoadingButton } from "@/components/LoadingButton";
 import {
-    InputOTP,
-    InputOTPGroup,
-    InputOTPSeparator,
-    InputOTPSlot,
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
 } from "@/components/ui/input-otp";
-import Image from "next/image";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { colleges } from "@/data/colleges";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-const signupSchema = z
-    .object({
-        collegeName: z
-            .string()
-            .min(3, "College name must be at least 3 characters"),
-        collegeCode: z
-            .string()
-            .min(3, "College name must be at least 3 characters")
-            .max(3),
-        region: z
-            .string()
-            .min(3, "College name must be at least 3 characters"),
-        phone: z
-            .string()
-            .min(10, "Phone number must be at least 10 digits")
-            .max(15, "Phone number must be at most 15 digits"),
-        email: z.string().email("Invalid email address"),
-        otp: z
-            .string()
-            .length(6, "OTP must be 6 digits")
-            .regex(/^\d{6}$/, "OTP must be numeric"),
-    })
-    .refine((data) => data.password === data.confirmPassword, {
-        message: "Passwords do not match",
-        path: ["confirmPassword"],
-    });
+import { colleges } from "@/data/colleges";
+import { emailList } from "@/data/emailList";
+
+// Import images (ensure these paths are correct)
+import gatLogo from "@/public/images/gat-logo.png";
+import vtulogo from "@/public/images/vtulogo.png";
+import bgImage from "@/public/images/GAT IMAGE.png";
+
+// Define the sign-up schema
+const signupSchema = z.object({
+  collegeName: z.string().min(3, "College name must be at least 3 characters"),
+  collegeCode: z
+    .string()
+    .min(3, "College code must be at least 3 characters")
+    .max(3),
+  region: z.string().min(3, "Region must be at least 3 characters"),
+  phone: z
+    .string()
+    .min(10, "Phone number must be at least 10 digits")
+    .max(15, "Phone number must be at most 15 digits"),
+  email: z.string().email("Invalid email address"),
+  otp: z
+    .string()
+    .length(6, "OTP must be 6 digits")
+    .regex(/^\d{6}$/, "OTP must be numeric"),
+});
 
 export default function SignUp() {
-    const router = useRouter();
-    const [isSendingOTP, setIsSendingOTP] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-    const [resendTimer, setResendTimer] = useState(0);
+  const router = useRouter();
+  const [isSendingOTP, setIsSendingOTP] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [resendTimer, setResendTimer] = useState(0);
 
-    const form = useForm<z.infer<typeof signupSchema>>({
-        resolver: zodResolver(signupSchema),
-        defaultValues: {
-            collegeName: "",
-            collegeCode: "",
-            region: "",
-            phone: "",
-            email: "",
-            otp: "",
-        },
-    });
+  const form = useForm<z.infer<typeof signupSchema>>({
+    resolver: zodResolver(signupSchema),
+    defaultValues: {
+      collegeName: "",
+      collegeCode: "",
+      region: "",
+      phone: "",
+      email: "",
+      otp: "",
+    },
+  });
 
-    useEffect(() => {
-        let timer: NodeJS.Timeout;
-        if (resendTimer > 0) {
-            timer = setInterval(() => {
-                setResendTimer((prev) => prev - 1);
-            }, 1000);
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (resendTimer > 0) {
+      timer = setInterval(() => {
+        setResendTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [resendTimer]);
+
+  const sendOTP = async () => {
+    const email = form.getValues("email");
+    if (!email) {
+      form.setError("email", { message: "Please enter your email" });
+      return;
+    }
+    setIsSendingOTP(true);
+    try {
+      const response = await axios.post("/api/sendEmailOtp", { email });
+      if (response.data.success) {
+        form.clearErrors("email");
+        toast.success("OTP sent successfully! Check your email. OTP is valid for 5 minutes.");
+        setResendTimer(60); // 60 seconds cooldown
+      } else {
+        form.setError("email", { message: response.data.message || "Failed to send OTP." });
+        toast.error(response.data.message || "Failed to send OTP. Please try again.");
+      }
+    } catch (error: unknown) {
+      console.error("Failed to send OTP:", error);
+      form.setError("email", { message: "Failed to send OTP. Please try again." });
+      toast.error("Failed to send OTP. Please try again.");
+    } finally {
+      setIsSendingOTP(false);
+    }
+  };
+
+  const onSubmit = async (values: z.infer<typeof signupSchema>) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+      const data = await response.json();
+      if (data.success) {
+        toast.success("Signup successful! Redirecting to login...");
+        router.push("/auth/signin");
+      } else {
+        const { errors } = data;
+        if (errors) {
+          for (const field in errors) {
+            form.setError(field as any, { message: errors[field] });
+          }
         }
-        return () => clearInterval(timer);
-    }, [resendTimer]);
+        toast.error("Signup failed. Please try again.");
+      }
+    } catch (error: unknown) {
+      console.error("Signup failed:", error);
+      toast.error("An error occurred during signup.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    const sendOTP = async () => {
-        const email = form.getValues("email");
-        if (!email) {
-            form.setError("email", { message: "Please enter your email" });
-            return;
-        }
-        setIsSendingOTP(true);
-        try {
-            const response = await axios.post("/api/sendEmailOtp", { email });
-            if (response.data.success) {
-                form.clearErrors("email");
-                toast.success(
-                    "OTP sent successfully! Check your email. OTP is valid for 5 minutes."
-                );
-                setResendTimer(60); // 60 seconds cooldown
-            } else {
-                form.setError("email", {
-                    message: response.data.message || "Failed to send OTP.",
-                });
-                toast.error(
-                    response.data.message ||
-                    "Failed to send OTP. Please try again."
-                );
-            }
-        } catch (error: unknown) {
-            console.error("Failed to send OTP:", error);
-            form.setError("email", {
-                message: "Failed to send OTP. Please try again.",
-            });
-            toast.error("Failed to send OTP. Please try again.");
-        } finally {
-            setIsSendingOTP(false);
-        }
-    };
+  return (
+    <div
+      className="relative min-h-screen flex items-center justify-center p-4"
+      style={{ backgroundColor: "#FF0000" }}
+    >
+      {/* Background Image Overlay */}
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage: `url('${bgImage.src}')`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          opacity: 0.9,
+        }}
+      />
 
-    const onSubmit = async (values: z.infer<typeof signupSchema>) => {
-        setIsLoading(true);
-        console.log("Form values", values);
-        try {
-            const response = await fetch("/api/signup", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(values),
-            });
+      {/* Content Container */}
+      <div className="relative z-10">
+        <Card className="w-full max-w-md rounded-lg shadow-2xl overflow-hidden border-0 transition-shadow duration-300 hover:shadow-3xl">
+          {/* Header */}
+          <CardHeader className="bg-gradient-to-r from-yellow-300 to-yellow-500 p-6 text-center">
+            <div className="flex items-center justify-center gap-8 mb-4">
+              <div className="transition-transform duration-300 hover:scale-105">
+                <Image
+                  src={gatLogo}
+                  alt="GAT Logo"
+                  width={100}
+                  height={100}
+                  style={{ objectFit: "contain" }}
+                  className="drop-shadow-lg"
+                />
+              </div>
+              <div className="transition-transform duration-300 hover:scale-105">
+                <Image
+                  src={vtulogo}
+                  alt="VTU Logo"
+                  width={100}
+                  height={100}
+                  style={{ objectFit: "contain" }}
+                  className="drop-shadow-lg"
+                />
+              </div>
+            </div>
+            <div className="transition-transform duration-300 hover:scale-105">
+              <CardTitle className="text-6xl font-extrabold uppercase tracking-wide bg-gradient-to-r from-red-600 via-[#800000] to-red-900 bg-clip-text text-transparent drop-shadow-lg">
+                INTERACT
+              </CardTitle>
+            </div>
+            <CardDescription className="mt-4 text-4xl font-extrabold text-[#1e3a8a] uppercase tracking-wide drop-shadow-lg animate-bounce">
+              24
+              <sub className="text-lg align-top font-semibold text-[#1e3a8a]">th</sub> VTU YOUTH FEST
+            </CardDescription>
+          </CardHeader>
 
-            const data = await response.json();
 
             if (data.success) {
                 toast("Signup successful! Redirecting to login...");
@@ -413,39 +478,136 @@ export default function SignUp() {
                                 )}
                             /> */}
 
-                                <LoadingButton
-                                    type="submit"
-                                    loading={isLoading}
-                                    className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
-                                >
-                                    Sign Up
-                                </LoadingButton>
-                            </form>
-                        </Form>
-                    </CardContent>
-                    <CardFooter className="flex flex-col space-y-4">
-                        <div className="relative w-full">
-                            <div className="absolute inset-0 flex items-center">
-                                <span className="w-full border-t border-border" />
-                            </div>
-                            <div className="relative flex justify-center text-xs uppercase">
-                                {/* Optional Divider Text */}
-                            </div>
+
+                {/* Phone Number */}
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-yellow-300 font-bold">Phone Number</FormLabel>
+                      <FormControl>
+                        <Input
+                          className="bg-gray-200 border border-gray-400 text-black placeholder-yellow-300 text-lg rounded-lg w-full"
+                          placeholder="Enter your phone number"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-black" />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Email Selection */}
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-yellow-300 font-bold">Email</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            disabled={isSendingOTP}
+                          >
+                            <SelectTrigger className="bg-gray-200 border border-gray-400 text-black text-lg rounded-lg">
+                              <SelectValue placeholder="Select an email" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-gray-200 border border-gray-400 text-black">
+                              {emailList.map((email) => (
+                                <SelectItem key={email} value={email}>
+                                  {email}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Button
+                            type="button"
+                            onClick={sendOTP}
+                            disabled={isSendingOTP || resendTimer > 0}
+                            className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-yellow-300 text-extrabold hover:bg-yellow-400"
+                          >
+                            {isSendingOTP
+                              ? "Sending..."
+                              : resendTimer > 0
+                              ? `Resend OTP (${resendTimer}s)`
+                              : "Send OTP"}
+                          </Button>
                         </div>
-                        <Button
-                            variant="outline"
-                            className="w-full border-border hover:bg-secondary"
-                            onClick={() => router.push("/auth/signin")}
-                        >
-                            Log In
-                        </Button>
-                    </CardFooter>
-                </Card>
+                      </FormControl>
+                      <FormMessage className="text-yellow-300" />
+                    </FormItem>
+                  )}
+                />
+
+                {/* OTP Input */}
+                <FormField
+                  control={form.control}
+                  name="otp"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-yellow-300 font-bold">Enter OTP Number</FormLabel>
+                      <FormControl>
+                        <div className="flex justify-center">
+                          <InputOTP
+                            maxLength={6}
+                            value={field.value}
+                            onChange={field.onChange}
+                            className="bg-gray-200"
+                          >
+                            <InputOTPGroup>
+                              <InputOTPSlot index={0} className="bg-gray-200 border border-gray-400 text-black text-xl rounded-sm" />
+                              <InputOTPSlot index={1} className="bg-gray-200 border border-gray-400 text-black text-xl rounded-sm" />
+                            
+                              <InputOTPSlot index={2} className="bg-gray-200 border border-gray-400 text-black text-xl rounded-sm" />
+                              <InputOTPSlot index={3} className="bg-gray-200 border border-gray-400 text-black text-xl rounded-sm" />
+                           
+                              <InputOTPSlot index={4} className="bg-gray-200 border border-gray-400 text-black text-xl rounded-sm" />
+                              <InputOTPSlot index={5} className="bg-gray-200 border border-gray-400 text-black text-xl rounded-sm" />
+                            </InputOTPGroup>
+                          </InputOTP>
+                        </div>
+                      </FormControl>
+                      <FormMessage className="text-yellow-300" />
+                    </FormItem>
+                  )}
+                />
+
+                <LoadingButton
+                  type="submit"
+                  loading={isLoading}
+                  className="w-full bg-yellow-300 hover:bg-yellow-400 text-[#1f1f1f] font-bold transition-transform duration-300 hover:scale-105 text-l py-3 rounded-lg"
+                >
+                  Sign Up
+                </LoadingButton>
+              </form>
+            </Form>
+          </CardContent>
+
+          {/* Footer */}
+          <CardFooter className="bg-[#990000] p-4 flex flex-col gap-6">
+            <div className="relative w-full">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-yellow-400" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-[#990000] px-2 text-yellow-300">
+                  Already Registered?
+                </span>
+              </div>
             </div>
-        </>
-    );
+            <Button
+              variant="outline"
+              className="w-full bg-yellow-300 font-bold text-l text-black-300 hover:bg-yellow-400 hover:text-[#990000] transition-colors duration-300"
+              onClick={() => router.push("/auth/signin")}
+            >
+              Log In
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
+    </div>
+  );
 }
-
-
-
-
