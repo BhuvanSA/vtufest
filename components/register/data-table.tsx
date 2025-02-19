@@ -580,19 +580,19 @@ export function DataTable({ data }: { data: Data[] }) {
                                     {row.getVisibleCells().map((cell) => (
                                         <TableCell
                                             key={cell.id}
-                                            onClick={() => {
-                                                if (
-                                                    cell.column.id === "usn" ||
-                                                    cell.column.id === "name" ||
-                                                    cell.column.id === "photo"
-                                                ) {
-                                                    const cellValue =
-                                                        row.getValue("usn");
-                                                    router.push(
-                                                        `/register/getregister/${cellValue}`
-                                                    );
-                                                }
-                                            }}
+                                            // onClick={() => {
+                                            //     if (
+                                            //         cell.column.id === "usn" ||
+                                            //         cell.column.id === "name" ||
+                                            //         cell.column.id === "photo"
+                                            //     ) {
+                                            //         const cellValue =
+                                            //             row.getValue("usn");
+                                            //         router.push(
+                                            //             `/register/getregister/${cellValue}`
+                                            //         );
+                                            //     }
+                                            // }}
                                         >
                                             {flexRender(
                                                 cell.column.columnDef.cell,
