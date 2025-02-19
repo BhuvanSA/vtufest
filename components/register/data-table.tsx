@@ -506,17 +506,17 @@ export function DataTable({ data }: { data: Data[] }) {
                         className="pl-10 w-[26rem]"
                     />
                 </div>
-                <Button
+                {/* <Button
                     variant="outline"
                     className="ml-auto bg-[#00B140] text-white hover:scale-105 hover:bg-[#00B140] hover:text-white "
                     onClick={handleExportToPDF}
                 >
                     <FileDown className="mr-2 h-4 w-4" />
                     Download current view as PDF
-                </Button>
+                </Button> */}
                 <Button
                     variant="outline"
-                    className="ml-2 bg-red-500 text-white hover:scale-105 hover:bg-red-500 hover:text-primary-foreground"
+                    className="ml-auto bg-red-500 text-white hover:scale-105 hover:bg-red-500 hover:text-primary-foreground"
                     onClick={() => handleDeleteSelected()}
                 >
                     <Trash2 className="mr-2 h-4 w-4" />

@@ -4,7 +4,7 @@ import {
     participantFormSchema,
     managerFormSchema,
 } from "@/lib/schemas/register";
-import { getUser, insertRegistrant } from "@/app/prismaClient/queryFunction";
+import { checkUnique, checkUsnUnique, getUser, insertRegistrant } from "@/app/prismaClient/queryFunction";
 
 export const maxDuration = 60; // This function can run for a maximum of 5 seconds
 
@@ -69,10 +69,19 @@ export async function POST(request: Request) {
         );
     }
 
+    const checkEmailAndPhone = await checkUnique(data.email as string, data.phone as string);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if(user.registrants.some((value: any) => value.email === data.email || value.phone === data.phone)){
+    if(checkEmailAndPhone){
         return new Response(
             JSON.stringify({ message: "Registrant with the same email or phone number already exists" }),
+            { status: 400, headers: { "Content-Type": "application/json" } }
+        );
+    }
+
+    const checkUsn = await checkUsnUnique(data.usn as string);
+    if(checkUsn){
+        return new Response(
+            JSON.stringify({ message: "Registrant with the same USN/ ID Number already exists" }),
             { status: 400, headers: { "Content-Type": "application/json" } }
         );
     }

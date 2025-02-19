@@ -196,12 +196,14 @@ const UpdateRegister: React.FC<UpdateRegisterProps> = ({ params }) => {
     const data = await response.json();
     fetchRegistrant();
     setEditOne(false);
-    toast.success('Register Details updated')
+    
     if (!data.success) {
-      const errorMessage = JSON.parse(data.message);
-      errorMessage.forEach((message: { message: string }) => {
-        toast.error(message.message);
-      });
+      const errorMessage = data.message;
+    
+        toast.error(errorMessage);
+    }
+    else{
+      toast.success('Register Details updated');
     }
   };
 

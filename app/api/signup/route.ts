@@ -91,7 +91,7 @@ export async function POST(request: Request) {
 
         if (checkEmail === -1) {
             return NextResponse.json(
-                { success: false, message: "email is not registered" },
+                { success: false, errors:{email: "email is not registered in our database. please contact support to register"} },
                 { status: 400 }
             );
         }

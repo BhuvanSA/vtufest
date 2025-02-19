@@ -1115,3 +1115,91 @@ export async function saveDateTimeOfArrival(
         handlePrismaError(error);
     }
 }
+
+
+export async function checkUnique(email : string, phone: string){
+    try{
+        const check = await prisma.registrants.findFirst({
+            where:{
+                OR:[
+                    {email},
+                    {phone}
+                ]
+            },
+            select:{
+                id: true
+            }
+        });
+        if(check){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }catch(error: unknown){
+        handlePrismaError(error);
+    }
+}
+
+export async function checkUsnUnique(usn : string){
+    try{
+        const check = await prisma.registrants.findFirst({
+            where:{
+                usn 
+            },
+            select:{
+                id : true
+            }
+        });
+        if(check){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }catch(error: unknown){
+        handlePrismaError(error);
+    }
+}
+
+export async function checkEmailUnique(email:string) {
+    try{
+        const check = await prisma.registrants.findFirst({
+            where:{
+                email
+            },
+            select:{
+                id:true
+            }
+        });
+        if(check){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }catch(error:unknown){
+        handlePrismaError(error);
+    }
+}
+
+export async function checkPhoneUnique(phone : string){
+    try{
+        const check = await prisma.registrants.findFirst({
+            where:{
+                phone
+            },
+            select:{
+                id:true
+            }
+        });
+        if(check){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }catch(error:unknown){
+        handlePrismaError(error);
+    }
+}

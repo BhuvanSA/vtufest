@@ -208,55 +208,276 @@ export default function SignUp() {
             </CardDescription>
           </CardHeader>
 
-          {/* Form Content */}
-          <CardContent className="bg-[#990000] p-6">
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                {/* College Selection */}
-                <FormField
-                  control={form.control}
-                  name="collegeCode"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-yellow-300 font-bold">College</FormLabel>
-                      <Select
-                        onValueChange={(value) => {
-                          const selectedRegion = colleges.find((region) =>
-                            region.colleges.some((college) => college.code === value)
-                          );
-                          const selectedCollege = selectedRegion?.colleges.find(
-                            (college) => college.code === value
-                          );
-                          form.setValue("collegeCode", value);
-                          form.setValue("collegeName", selectedCollege?.name || "");
-                          form.setValue("region", selectedRegion?.region || "");
-                        }}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="bg-gray-200 border border-gray-400 text-gray-900 text-lg rounded-lg">
-                            <SelectValue placeholder="Select your college" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="bg-gray-200 border-gray-400 text-black">
-                          {colleges.map((region) => (
-                            <SelectGroup key={region.region}>
-                              <SelectLabel className="text-black">
-                                {region.region}
-                              </SelectLabel>
-                              {region.colleges.map((college) => (
-                                <SelectItem key={college.code} value={college.code}>
-                                  {college.name}
-                                </SelectItem>
-                              ))}
-                            </SelectGroup>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage className="text-black" />
-                    </FormItem>
-                  )}
-                />
+
+            if (data.success) {
+                toast("Signup successful! Redirecting to login...");
+                router.push("/auth/signin");
+            } else {
+                const { errors } = data;
+                if (errors) {
+                    for (const field in errors) {
+                        if (field === "general") {
+                            toast.error(errors[field]);
+                        } else {
+                            form.setError(field as keyof typeof form.control, {
+                                message: errors[field],
+                            });
+                            toast.error(errors[field]);
+                        }
+                    }
+                } else {
+                    toast.error("Signup failed. Please try again.");
+                }
+            }
+        } catch (error: unknown) {
+            console.error("Signup failed:", error);
+            toast.error("An error occurred during signup.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+    // from-background
+    return (
+        <>
+            <div className="pt-24 min-h-screen flex items-center justify-center bg-gradient-to-br  to-secondary p-4"
+                style={{
+                    backgroundImage: `url(${bgImage.src})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    backgroundRepeat: "no-repeat",
+                    backgroundAttachment: "fixed",
+                }}
+            >
+                <Card className="w-full max-w-md bg-card text-card-foreground" >
+                    <CardHeader className="space-y-1">
+                        <div className="flex items-center flex-col text-blue-800 justify-center mb-6 font-bold text-2xl leading-6 tracking-wider">
+                            <h1 className="text-wrap text-center">Global Academy of Technology</h1>
+                            <br />
+                            <h1 className="text-yellow-600">24th VTU Youth Fest</h1>
+                        </div>
+                        <div className="flex gap-2 flex-col sm:flex-row sm:gap-0 items-center">
+                            <Image
+                                src="/images/college-logo.png"
+                                alt="College Logo"
+                                width={85}
+                                height={80}
+                                priority
+                                className="object-contain "
+                            />
+                            <Image
+                                src={interactLogo}
+                                alt="College Logo"
+                                width={170}
+                                height={90}
+                                priority
+                                className="object-contain mx-2"
+                            />
+                            <Image
+                                src={vtulogo}
+                                alt="College Logo"
+                                width={120}
+                                height={120}
+                                priority
+                                className="object-contain "
+                            />
+                        </div>
+                        <CardTitle className="text-2xl text-center font-bold text-foreground">
+                            Sign Up
+                        </CardTitle>
+                        <CardDescription className="text-center text-muted-foreground">
+                            Enter your details to create an account
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <Form {...form}>
+                            <form
+                                onSubmit={form.handleSubmit(onSubmit)}
+                                className="space-y-4"
+                            >
+                                <FormField
+                                    control={form.control}
+                                    name="collegeCode"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-foreground">College</FormLabel>
+                                            <Select onValueChange={(value) => {
+                                                // Find the selected college and region
+                                                const selectedRegion = colleges.find(region =>
+                                                    region.colleges.some(college => college.code === value)
+                                                );
+                                                const selectedCollege = selectedRegion?.colleges.find(
+                                                    college => college.code === value
+                                                );
+                                                // Up date collegeCode and region in the form
+                                                form.setValue("collegeCode", value);
+                                                form.setValue("collegeName", selectedCollege?.name as string);
+                                                form.setValue("region", selectedRegion?.region || "");
+                                            }} defaultValue={field.value}>
+                                                <FormControl>
+                                                    <SelectTrigger className="bg-background border-input">
+                                                        <SelectValue placeholder="Select your college" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    {colleges.map((region) => (
+                                                        <SelectGroup key={region.region}>
+                                                            <SelectLabel>{region.region}</SelectLabel>
+                                                            {region.colleges.map((college) => (
+                                                                <SelectItem key={college.code} value={college.code}>
+                                                                    {college.name}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectGroup>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage className="text-destructive" />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="phone"
+                                    render={({ field, fieldState }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-foreground">
+                                                Phone Number
+                                            </FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    className="bg-background border-input"
+                                                    placeholder="Enter your phone number"
+                                                    {...field}
+                                                />
+                                            </FormControl>
+                                            <FormMessage className="text-destructive" />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="email"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-foreground">
+                                                Email
+                                            </FormLabel>
+                                            <FormControl>
+                                                <div className="relative">
+                                                <Input
+                                                    className="bg-background border-input"
+                                                    placeholder="example@domain.com"
+                                                    {...field}
+                                                    disabled={isSendingOTP}
+                                                />
+                                                    <Button
+                                                        type="button"
+                                                        onClick={sendOTP}
+                                                        disabled={isSendingOTP || resendTimer > 0}
+                                                        className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-primary text-primary-foreground hover:bg-primary/90"
+                                                    >
+                                                        {isSendingOTP
+                                                            ? "Sending..."
+                                                            : resendTimer > 0
+                                                                ? `Resend OTP (${resendTimer}s)`
+                                                                : "Send OTP"}
+                                                    </Button>
+                                                </div>
+                                            </FormControl>
+                                            <FormMessage className="text-destructive" />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="otp"
+                                    render={({ field, fieldState }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-foreground">
+                                                Enter OTP Number
+                                            </FormLabel>
+                                            <FormControl>
+                                                <div className="flex justify-center">
+                                                    <InputOTP
+                                                        maxLength={6}
+                                                        value={field.value}
+                                                        onChange={field.onChange}
+                                                        className="bg-background"
+                                                    >
+                                                        <InputOTPGroup>
+                                                            <InputOTPSlot
+                                                                index={0}
+                                                            />
+                                                            <InputOTPSlot
+                                                                index={1}
+                                                            />
+                                                        </InputOTPGroup>
+                                                        <InputOTPSeparator />
+                                                        <InputOTPGroup>
+                                                            <InputOTPSlot
+                                                                index={2}
+                                                            />
+                                                            <InputOTPSlot
+                                                                index={3}
+                                                            />
+                                                        </InputOTPGroup>
+                                                        <InputOTPSeparator />
+                                                        <InputOTPGroup>
+                                                            <InputOTPSlot
+                                                                index={4}
+                                                            />
+                                                            <InputOTPSlot
+                                                                index={5}
+                                                            />
+                                                        </InputOTPGroup>
+                                                    </InputOTP>
+                                                </div>
+                                            </FormControl>
+                                            <FormMessage className="text-destructive" />
+                                        </FormItem>
+                                    )}
+                                />
+                                {/* <FormField
+                                control={form.control}
+                                name="password"
+                                render={({ field, fieldState }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-foreground">
+                                            Password
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type="password"
+                                                className="bg-background border-input"
+                                                placeholder="Enter your password"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage className="text-destructive" />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="confirmPassword"
+                                render={({ field, fieldState }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-foreground">
+                                            Confirm Password
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                type="password"
+                                                className="bg-background border-input"
+                                                placeholder="Confirm your password"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage className="text-destructive" />
+                                    </FormItem>
+                                )}
+                            /> */}
+
 
                 {/* Phone Number */}
                 <FormField
