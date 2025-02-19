@@ -96,26 +96,53 @@ export default function SignIn() {
           backgroundImage: `url('${bgImage.src}')`,
           backgroundSize: "cover",
           backgroundPosition: "center",
-          opacity: 0.7,
+          opacity: 0.9,
         }}
       />
+
       {/* Content over the background */}
       <div className="relative z-10">
-        <Card className="w-full max-w-md rounded-lg shadow-2xl overflow-hidden">
-          {/* Header with logos on either side of the title */}
-          <CardHeader className="bg-white p-6 text-center">
-            <div className="flex items-center justify-center gap-0 mb-0 ">
-              <Image src={gatLogo} alt="GAT Logo" width={100} height={100} />
-              <CardTitle className="text-2xl font-bold text-[#003366]">
-                INTERACT-2025
-              </CardTitle>
-              <Image src={vtulogo} alt="VTU Logo" width={110} height={120} />
+        <Card className="w-full max-w-md rounded-lg shadow-2xl overflow-hidden border-0 transition-shadow duration-300 hover:shadow-3xl">
+          {/* Header */}
+          <CardHeader className="bg-gradient-to-r from-yellow-300 to-yellow-500 p-6 text-center">
+            {/* Logos placed above the title */}
+            <div className="flex items-center justify-center gap-8 mb-4">
+              <div className="transition-transform duration-300 hover:scale-105">
+                <Image
+                  src={gatLogo}
+                  alt="GAT Logo"
+                  width={100}
+                  height={100}
+                  style={{ objectFit: "contain" }}
+                  className="drop-shadow-lg"
+                />
+              </div>
+              <div className="transition-transform duration-300 hover:scale-105">
+                <Image
+                  src={vtulogo}
+                  alt="VTU Logo"
+                  width={100}
+                  height={100}
+                  style={{ objectFit: "contain" }}
+                  className="drop-shadow-lg"
+                />
+              </div>
             </div>
-            <CardDescription className="text-4xl font-extrabold text-[#D32F23] uppercase tracking-wide drop-shadow-lg animate-bounce">
-               24<sub className="text-lg align-top font-semibold text-[#B71C1C]">th</sub> VTU YOUTH FEST
+            {/* INTERACT Title */}
+            <div className="transition-transform duration-300 hover:scale-105">
+              <CardTitle className="text-6xl font-extrabold uppercase tracking-wide bg-gradient-to-r from-red-600 via-[#800000] to-red-900 bg-clip-text text-transparent drop-shadow-lg">
+                INTERACT
+              </CardTitle>
+            </div>
+            <CardDescription className="mt-4 text-4xl font-extrabold text-[#1e3a8a] uppercase tracking-wide drop-shadow-lg animate-bounce">
+              24
+              <sub className="text-lg align-top font-semibold text-[#1e3a8a]">
+                th
+              </sub>{" "}
+              VTU YOUTH FEST
             </CardDescription>
-
           </CardHeader>
+
           {/* Form content */}
           <CardContent className="bg-[#990000] p-6">
             <Form {...form}>
@@ -125,12 +152,12 @@ export default function SignIn() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-yellow-300 font-bold ">
+                      <FormLabel className="text-yellow-300 font-bold">
                         Registered Email ID
                       </FormLabel>
                       <FormControl>
                         <Input
-                          className="bg-gray-200 border-gray-400 focus:border-yellow-400 text-gray-900"
+                          className="bg-gray-200 border-gray-400 focus:border-yellow-400 text-gray-900 focus:ring-2 focus:ring-yellow-400"
                           placeholder="Enter your email"
                           {...field}
                         />
@@ -144,11 +171,13 @@ export default function SignIn() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-yellow-300 font-bold">Password</FormLabel>
+                      <FormLabel className="text-yellow-300 font-bold">
+                        Password
+                      </FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
-                            className="bg-gray-200 border-black-400 focus:border-yellow-400 pr-10 text-gray-900"
+                            className="bg-gray-200 border-black-400 focus:border-yellow-400 pr-10 text-gray-900 focus:ring-2 focus:ring-yellow-400"
                             type={visibility ? "text" : "password"}
                             placeholder="Enter your password"
                             {...field}
@@ -176,18 +205,19 @@ export default function SignIn() {
                 <LoadingButton
                   type="submit"
                   loading={isLoading}
-                  className="w-full bg-yellow-300 hover:bg-yellow-450 text-[#1f1f1f] font-bold"
+                  className="w-full bg-yellow-300 hover:bg-yellow-450 text-[#1f1f1f] font-bold transition-transform duration-300 hover:scale-105"
                 >
                   Log in
                 </LoadingButton>
               </form>
             </Form>
           </CardContent>
-          {/* Footer with additional links */}
-          <CardFooter className="bg-[#990000] p-6 flex flex-col gap-2">
+
+          {/* Footer */}
+          <CardFooter className="bg-[#990000] p-4 flex flex-col gap-6">
             <Button
               variant="link"
-              className="w-full text-yellow-300 hover:text-yellow-400"
+              className="w-full text-yellow-300 hover:text-yellow-400 transition-colors duration-300"
               onClick={() => router.push("/auth/forgotpassword")}
             >
               Forgot Password?
@@ -204,7 +234,7 @@ export default function SignIn() {
             </div>
             <Button
               variant="outline"
-              className="w-full bg-yellow-300 text-black-300 hover:bg-yellow-400 hover:text-[#990000]"
+              className="w-full bg-yellow-300 text-black-300 hover:bg-yellow-400 hover:text-[#990000] transition-colors duration-300"
               onClick={() => router.push("/auth/signup")}
             >
               Sign Up
@@ -212,7 +242,7 @@ export default function SignIn() {
             <Link className="w-full" href="/link/to/how/to/register">
               <Button
                 variant="outline"
-                className="w-full bg-yellow-300 text-black-300 hover:bg-yellow-400 hover:text-[#990000]"
+                className="w-full bg-yellow-300 text-black-300 hover:bg-yellow-400 hover:text-[#990000] transition-colors duration-300"
               >
                 Registration Instructions
               </Button>
