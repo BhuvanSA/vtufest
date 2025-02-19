@@ -238,7 +238,7 @@ const Home = () => {
                 by the essence of Namma Karnataka and Namma Bengaluru.
               </p>
               <p className="text-xl text-[#003366] mb-4">
-                <strong>Date:</strong> 24th March 2025 • <strong>Venue:</strong> Global Academy
+                <strong>Date:</strong> 24th - 27th March 2025  • <strong>Venue:</strong> Global Academy
                 of Technology, Bengaluru
               </p>
               <p className="text-xl text-justify text-[#003366]">

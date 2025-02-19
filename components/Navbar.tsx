@@ -7,8 +7,9 @@ import Image from "next/image";
 import { ThemeToggler } from "@/contexts/theme-provider";
 import { Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
-import vtulogo from "@/public/images/vtulogo.png";
+import vtulogo from "@/public/images/vtu-wide-logo.png";
 import MobileSidebar from "./MobileSidebar";
+import gatlogo from "@/public/images/college-wide-logo.png"
 
 import {
     NavigationMenu,
@@ -80,28 +81,18 @@ const NavBar = () => {
             <div className="container mx-auto px-4 md:px-16">
                 <div className="flex items-center justify-between mt-1 mb-1">
                     <div className="flex items-center gap-3">
-                        <Image
-                            src="/images/college-logo.png"
-                            alt="GAT Logo"
-                            width={60}
-                            height={60}
-                            priority
-                        />
-                        <div className="flex flex-col items-start text-left">
-                            <h1 className="text-blue-700 font-bold tracking-wide transition-colors text-2xl">
-                                Global Academy of Technology
-                            </h1>
-                            <div className="text-red-600 text-lg font-semibold">
-                                An Autonomous Institute, Affiliated to VTU
-                            </div>
-                        </div>
+                    <div style={{textAlign: 'left'}}>
+                    <Image src={gatlogo} alt="GAT Logo" width={800} height={200} priority />
+                    </div>
+
+                        
                     </div>
                     <div className="hidden md:block">
                         <Image
-                            src={vtulogo || "/placeholder.svg"}
+                            src={vtulogo}
                             alt="VTU Logo"
-                            width={80}
-                            height={80}
+                            width={800}
+                            height={100}
                             priority
                         />
                     </div>

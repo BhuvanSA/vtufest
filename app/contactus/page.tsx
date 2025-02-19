@@ -183,17 +183,47 @@ const ContactUs: React.FC = () => {
                   <p>
                     <strong>Phone:</strong>
                   </p>
-                  {/* Two separate phone tiles */}
-                  <div className="flex flex-col gap-4">
+                  {/* 2×2 grid for phone numbers */}
+                  <div className="grid grid-cols-2 gap-4">
                     <div className="p-4 border rounded-md shadow-sm">
-                      <p className="text-lg font-semibold">+91 9986770082</p>
-                      <p className="text-sm text-gray-600">Lt. Saravannan R</p>
+                      <a
+                        href="tel:+919986770082"
+                        className="text-lg font-semibold text-blue-700 hover:underline"
+                      >
+                        +91 9986770082
+                      </a>
+                      <p className="text-sm font-bold text-gray-600">Lt. Saravannan R</p>
                       <p className="text-sm text-gray-600">Physical Education Director</p>
                     </div>
                     <div className="p-4 border rounded-md shadow-sm">
-                      <p className="text-lg font-semibold">+91 8660041943</p>
-                      <p className="text-sm text-gray-600">Mr. Abhishek</p>
+                      <a
+                        href="tel:+918660041943"
+                        className="text-lg font-semibold text-blue-700 hover:underline"
+                      >
+                        +91 8660041943
+                      </a>
+                      <p className="text-sm font-bold text-gray-600">Mr. Abhishek</p>
                       <p className="text-sm text-gray-600">Junior Cultural Coordinator</p>
+                    </div>
+                    <div className="p-4 border rounded-md shadow-sm">
+                      <a
+                        href="tel:+919945864767"
+                        className="text-lg font-semibold text-blue-700 hover:underline"
+                      >
+                        +91 9945864767
+                      </a>
+                      <p className="text-sm font-bold text-gray-600">Akshith M</p>
+                      <p className="text-sm text-gray-600">Student Convenor</p>
+                    </div>
+                    <div className="p-4 border rounded-md shadow-sm">
+                      <a
+                        href="tel:+919916380153"
+                        className="text-lg font-semibold text-blue-700 hover:underline"
+                      >
+                        +91 9916380153
+                      </a>
+                      <p className="text-sm font-bold text-gray-600">Chalana B Arun</p>
+                      <p className="text-sm text-gray-600">Student Co-Convenor</p>
                     </div>
                   </div>
                   <p>
@@ -202,7 +232,7 @@ const ContactUs: React.FC = () => {
                   </p>
                   <div className="mt-4">
                     <iframe
-                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3888.7548449596075!2d77.52525822409484!3d12.923472037387445!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae3e4df6c0dca1%3A0x83c84d9e506b84b4!2sGlobal%20Academy%20Of%20Technology%2C%204%2C%20Bangarappanagar%20Main%20Rd%2C%20Bangarappanagar%2C%20Rajarajeshwari%20Nagar%2C%20Bengaluru%2C%20Karnataka%20560098!5e0!3m2!1sen!2sin!4v1737016725143!5m2!1sen!2sin"
+                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3886.007864162512!2d77.5220369!3d12.9274286!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae3e51e9d44b57%3A0x7306c680a9673b5a!2sGlobal%20Academy%20of%20Technology!5e0!3m2!1sen!2sin!4v1632442165123!5m2!1sen!2sin"
                       width="100%"
                       height="250"
                       style={{ border: 0 }}

@@ -35,8 +35,8 @@ async function verifyOtp(
         const storedOtp = await redis.get<string>(`otp:${email}`);
 
         // Debug Logs
-        console.log(`Stored OTP for ${email}: ${storedOtp}`);
-        console.log(`Received OTP for ${email}: ${otp}`);
+        // console.log(`Stored OTP for ${email}: ${storedOtp}`);
+        // console.log(`Received OTP for ${email}: ${otp}`);
 
         if (!storedOtp) {
             console.log("OTP has expired or does not exist.");
@@ -85,11 +85,15 @@ export async function POST(request: Request) {
             validation.data;
         console.log(collegeName, email, otp, phone);
 
+        const checkEmail = emailList.findIndex(
+            (value: string) => value === email
+        );
 
-        const checkEmail = emailList.findIndex((value:string)=> value===email);
-
-        if(checkEmail===-1){
-            return NextResponse.json({success:false, message:"email is not registered"},{status:400});
+        if (checkEmail === -1) {
+            return NextResponse.json(
+                { success: false, errors:{email: "email is not registered in our database. please contact support to register"} },
+                { status: 400 }
+            );
         }
 
         // Check if the user already exists in the database (by email or phone)
@@ -119,13 +123,13 @@ export async function POST(request: Request) {
                 },
             });
         }
-        console.log("the otp is success", otpValidation.success);
+        // console.log("the otp is success", otpValidation.success);
 
         const password: string = generatePassword(12) as string;
         // Hash the user's provided password
         const hashedPassword = await bcrypt.hash(password, 13);
 
-        console.log("hashed password", hashedPassword);
+        // console.log("hashed password", hashedPassword);
 
         // Create the user in the database
         const newUser = await prisma.users.create({
@@ -149,27 +153,70 @@ export async function POST(request: Request) {
             });
 
             const mailOptions = {
-                from: process.env.EMAIL_USER, // Sender's email
-                to: email, // Receiver's email
+                from: process.env.EMAIL_USER,
+                to: email,
                 subject:
-                    "Your Login Credentials for VTU Youth Fest at Global Academy of Technology",
+                    "Login Credentials for Interact-2025 Registration Portal",
                 html: `
-                    <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
-                        <h2 style="color: #007bff; text-align: center;">VTU Youth Fest - Login Credentials</h2>
-                        <p>Dear principal of <strong>${newUser.collegeName}</strong>,</p>
-                        <p>Thank you for registering for the VTU Youth Fest at <strong>Global Academy of Technology</strong>. Below are your login credentials:</p>
-                        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0;">
-                            <p><strong>Login Email:</strong> ${newUser.email}</p>
-                            <p><strong>Password:</strong> ${password}</p>
-                        </div>
-                        <p>You can log in using the credentials above at the following link:</p>
-                        <p style="text-align: center;">
-                            <a href="https://vtufestinteract.com" target="_blank" style="background-color: #007bff; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; display: inline-block;">Login Now</a>
-                        </p>
-                        <p>If you have any issues logging in, please contact support.</p>
-                        <p>Best regards,</p>
-                        <p><strong>VTU Youth Fest Team</strong></p>
-                    </div>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Registration Successful</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #ffffff;
+    }
+    .container {
+      font-family: 'Inter', Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+      color: #262626;
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 20px;
+      border: 1px solid #CFA000; /* Dark yellow border */
+      border-radius: 8px;
+      background-color: #FFF9DB; /* Light yellow background */
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <p style="margin-bottom: 16px;">Respect Principal,</p>
+    <p style="margin-bottom: 16px;"><strong>${newUser.collegeName}</strong></p>
+    <p style="margin-bottom: 16px;">Greetings from Global Academy of Technology.</p>
+    <p style="margin-bottom: 16px;">
+      We are pleased to inform you that your institution’s registration on the official website for Interact-2025 – The 24th VTU Youth Fest has been successfully created.
+      Below are your login credentials to access the portal:
+    </p>
+    <ul style="margin-bottom: 16px; padding-left: 20px;">
+      <li style="margin-bottom: 8px;"><strong>Username:</strong> ${newUser.email}</li>
+      <li><strong>Password:</strong> ${password}</li>
+    </ul>
+    <p style="margin-bottom: 16px;">Please use these credentials to log in and complete the participant registration process for the fest.</p>
+    <p style="margin-bottom: 16px;">
+      <strong>Website Link:</strong>
+      <a href="https://vtufestinteract.com" target="_blank" style="color: #2563eb; text-decoration: none;">
+        vtufestinteract.com
+      </a>
+    </p>
+    <p style="margin-bottom: 16px;">
+      We look forward to your institution’s active participation in this grand cultural event.
+      Should you require any assistance, feel free to reach out to us.
+    </p>
+    <p style="margin-bottom: 16px;">
+      For any queries, contact:<br/>
+      • Mr. Abhishek, Junior Cultural Coordinator – 📞 <a href="tel:8660041943">8660041943</a><br/>
+      • Akshith M, Student Convener – 📞 <a href="tel:9945864767">9945864767</a>
+    </p>
+    <p style="margin-bottom: 16px;">Thank you for your support and cooperation.</p>
+    <p style="margin-bottom: 0;">Warm regards,<br/>Team Interact<br/>Global Academy of Technology</p>
+  </div>
+</body>
+</html>
                 `,
             };
 

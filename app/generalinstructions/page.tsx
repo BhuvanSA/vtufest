@@ -23,7 +23,7 @@ const Page = () => {
             <li>An additional refundable caution deposit of ₹3,000/- shall be paid at the registration desk along with the documents of the students.</li>
             <li>
               <strong>Accommodation Facilities:</strong> <br />
-              Provided for contingents opting for it on a need basis only. Contingents are advised to bring light bedding and locks. Accommodation will only be provided to the
+              Provided for contingents opting for it on a need basis only. Accommodation will only be provided to the
               registered contingent members during the dates of the fest.
             </li>
             <li><strong>Food Arrangements:</strong> <br />
@@ -44,6 +44,9 @@ const Page = () => {
             <li>
               Submission of an Authorization Letter from the authorities of participating institutions for both participants
               and accompanists is mandatory during registration.
+            </li>
+            <li>
+             Or
             </li>
           </ol>
         </CardContent>

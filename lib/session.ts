@@ -75,7 +75,7 @@ export async function createSession(token: SessionPayload) {
 }
 
 export const verifySession = cache(async () => {
-    console.log("verifying session is called");
+    // console.log("verifying session is called");
     const cookie = (await cookies()).get("session")?.value;
     const session = await decrypt(cookie);
 

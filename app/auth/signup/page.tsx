@@ -299,22 +299,12 @@ export default function SignUp() {
                                             </FormLabel>
                                             <FormControl>
                                                 <div className="relative">
-                                                    <Select
-                                                        onValueChange={field.onChange}
-                                                        defaultValue={field.value}
-                                                        disabled={isSendingOTP}
-                                                    >
-                                                        <SelectTrigger className="bg-background border-input">
-                                                            <SelectValue placeholder="Select an email" />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            {emailList.map((email) => (
-                                                                <SelectItem key={email} value={email}>
-                                                                    {email}
-                                                                </SelectItem>
-                                                            ))}
-                                                        </SelectContent>
-                                                    </Select>
+                                                <Input
+                                                    className="bg-background border-input"
+                                                    placeholder="example@domain.com"
+                                                    {...field}
+                                                    disabled={isSendingOTP}
+                                                />
                                                     <Button
                                                         type="button"
                                                         onClick={sendOTP}
@@ -447,7 +437,7 @@ export default function SignUp() {
                             className="w-full border-border hover:bg-secondary"
                             onClick={() => router.push("/auth/signin")}
                         >
-                            Sign In
+                            Log In
                         </Button>
                     </CardFooter>
                 </Card>

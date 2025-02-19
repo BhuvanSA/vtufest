@@ -2,6 +2,7 @@ import Image from "next/image";
 import insta from "@/public/images/instalogo.png";
 import yt from "@/public/images/youtube_1384060.png";
 import facebook from "@/public/images/facebook_logo_icon_147291.png";
+import Link from "next/link";
 
 const Footer = () => {
     return (
@@ -98,12 +99,16 @@ const Footer = () => {
                 <div className="mt-12 border-t border-border pt-6">
                     <p className="text-center text-sm text-muted-foreground">
                         <a
-                            href="/ourteam"
                             className="hover:text-primary transition"
                         >
                             &copy; {new Date().getFullYear()} Global Academy of
                             Technology
                         </a>
+                        <br />
+                        <br />
+                        <Link href={"/developer"} className=" text-xl text-red-400 hover:text-red-600 transition ">
+                            @ Developed By Students Of Global Academy Of Technology
+                        </Link>
                     </p>
                 </div>
             </div>
