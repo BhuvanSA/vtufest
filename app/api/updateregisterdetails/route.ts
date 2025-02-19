@@ -1,4 +1,4 @@
-import {  checkUnique, updateRegisterDetails } from "@/app/prismaClient/queryFunction";
+import {  checkUnique, checkUsnUnique, updateRegisterDetails } from "@/app/prismaClient/queryFunction";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -44,6 +44,12 @@ export async function PATCH(request: Request) {
     
     if(check){
         return NextResponse.json({success : false, message : "email/phone number already exists"},{status : 500});
+    }
+
+    const checkUsn = await checkUsnUnique(result.data.usn);
+
+    if(checkUsn){
+        return NextResponse.json({success : false, message : "usn already exists"},{status : 500});
     }
 
     try {
