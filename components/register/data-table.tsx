@@ -60,8 +60,9 @@ export type Data = {
     photo: string;
     name: string;
     usn: string;
-    type: "Team Manager" | "Participant/Accompanist" | "";
-    events: { eventName: string }[];
+    type: "Team Manager" | "Participant/Accompanist" | "Participant" | "Accompanist" | "";
+    // Each event now may include a role to drive its colour:
+    events: { eventName: string; role?: "Participant" | "Accompanist" }[];
     status: "Pending" | "Processing" | "Success" | "Failed";
 };
 
@@ -229,7 +230,7 @@ export function DataTable({ data }: { data: Data[] }) {
                             alt="Profile"
                             width={80}
                             height={80}
-                            className="rounded-full"
+                            className="rounded-full object-cover"
                         />
                     );
                 },
@@ -275,6 +276,8 @@ export function DataTable({ data }: { data: Data[] }) {
                         "",
                         "Team Manager",
                         "Participant/Accompanist",
+                        "Participant",
+                        "Accompanist",
                     ];
                     const currentFilter =
                         (column.getFilterValue() as string) ?? "";
@@ -302,16 +305,7 @@ export function DataTable({ data }: { data: Data[] }) {
                 ),
                 filterFn: (row, columnId, filterValue) => {
                     if (!filterValue || filterValue === "") return true;
-                    if (!filterValue || filterValue === "Total") {
-                        const type = row.getValue("type");
-                        if (
-                            type === "Participant" ||
-                            type === "Accompanist" ||
-                            type === "Team Manager"
-                        ) {
-                            return true;
-                        }
-                    }
+
                     const type = row.getValue(columnId);
                     return type === filterValue;
                 },
@@ -351,10 +345,22 @@ export function DataTable({ data }: { data: Data[] }) {
                 cell: ({ row }) => {
                     const events = row.getValue("events") as {
                         eventName: string;
+                        role: string;
                     }[];
+                    const type = row.getValue("type");
                     return (
                         <div className="capitalize">
-                            {events.map((e) => e.eventName).join(", ")}
+                            {type !== "Participant/Accompanist" ?
+                                events.map((e) => e.eventName).join(", ") :
+                                (<>
+                                    <div className="mb-3  text-black">
+                                        <span className="font-bold">Participant :</span> {events.filter((value)=> value.role === "Participant").map((e)=> e.eventName).join(", ") }
+                                    </div>
+
+                                    <div className="text-black">
+                                        <span className="font-bold">Accompanist : </span>{events.filter((value)=> value.role === "Accompanist").map((e)=> e.eventName).join(", ")}
+                                    </div>
+                                </>)}
                         </div>
                     );
                 },
@@ -484,6 +490,8 @@ export function DataTable({ data }: { data: Data[] }) {
         };
     };
 
+
+
     return (
         <div className="w-full px-5 rounded-xl my-12">
             <div className="flex items-center py-4 flex-wrap gap-3 ">
@@ -556,20 +564,21 @@ export function DataTable({ data }: { data: Data[] }) {
                                         {header.isPlaceholder
                                             ? null
                                             : flexRender(
-                                                  header.column.columnDef
-                                                      .header,
-                                                  header.getContext()
-                                              )}
+                                                header.column.columnDef
+                                                    .header,
+                                                header.getContext()
+                                            )}
                                     </TableHead>
                                 ))}
                             </TableRow>
                         ))}
+                        {/* ${row.getValue('type') === 'Participant' ? 'text-blue-500' : row.getValue('type') === 'Accompanist'? 'text-teal-600': row.getValue('type')=== 'Team Manager'? 'text-violet-800':'text-rose-700'}` */}
                     </TableHeader>
                     <TableBody className="text-primary ">
                         {table.getRowModel().rows?.length ? (
                             table.getRowModel().rows.map((row) => (
                                 <TableRow
-                                    className="hover:bg-blue-50"
+                                    className={`hover:bg-blue-50 text-black `}
                                     key={row.id}
                                     data-state={
                                         row.getIsSelected() && "selected"
@@ -578,19 +587,19 @@ export function DataTable({ data }: { data: Data[] }) {
                                     {row.getVisibleCells().map((cell) => (
                                         <TableCell
                                             key={cell.id}
-                                            // onClick={() => {
-                                            //     if (
-                                            //         cell.column.id === "usn" ||
-                                            //         cell.column.id === "name" ||
-                                            //         cell.column.id === "photo"
-                                            //     ) {
-                                            //         const cellValue =
-                                            //             row.getValue("usn");
-                                            //         router.push(
-                                            //             `/register/getregister/${cellValue}`
-                                            //         );
-                                            //     }
-                                            // }}
+                                        // onClick={() => {
+                                        //     if (
+                                        //         cell.column.id === "usn" ||
+                                        //         cell.column.id === "name" ||
+                                        //         cell.column.id === "photo"
+                                        //     ) {
+                                        //         const cellValue =
+                                        //             row.getValue("usn");
+                                        //         router.push(
+                                        //             `/register/getregister/${cellValue}`
+                                        //         );
+                                        //     }
+                                        // }}
                                         >
                                             {flexRender(
                                                 cell.column.columnDef.cell,

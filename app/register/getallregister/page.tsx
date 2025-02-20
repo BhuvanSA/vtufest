@@ -5,9 +5,9 @@ import Link from "next/link";
 import { Type } from "@prisma/client";
 import { verifySession } from "@/lib/session";
 import { redirect } from "next/navigation";
-import { PenSquare, UserPlus, CreditCard } from "lucide-react";
+import { PenSquare, UserPlus} from "lucide-react";
 import { PaymentDialog } from "@/components/getRegister/paymentDialog";
-import { Suspense } from "react";
+
 // import DataTableSkeleton from "@/components/register/data-table-skeleton";
 
 export const docStatusMap = {
@@ -85,18 +85,25 @@ export default async function Page() {
         // Otherwise gather participant + accompanist events
         const participantEvents = row.registrations
             .filter((r) => r.type === "PARTICIPANT" && r.eventName)
-            .map((r) => ({ eventName: r.eventName! }));
+            .map((r) => ({ eventName: r.eventName!, role: "Participant" as const }));
 
         const accompanistEvents = row.registrations
             .filter((r) => r.type === "ACCOMPANIST" && r.eventName)
-            .map((r) => ({ eventName: r.eventName! }));
+            .map((r) => ({ eventName: r.eventName!, role: "Accompanist" as const }));
 
-        const participantAccompanistEvents = row.registrations
-            .filter((r) => r.type === "ACCOMPANIST" || r.type === "PARTICIPANT")
-            .map((r) => ({ eventName: r.eventName }));
 
-        // If no events at all, push a single blank record
-        if (!hasEvents) {
+        // Determine type label based on available events
+        let typeLabel = "";
+        if (participantEvents.length > 0 && accompanistEvents.length > 0) {
+            typeLabel = "Participant/Accompanist";
+        } else if (participantEvents.length > 0) {
+            typeLabel = "Participant";
+        } else if (accompanistEvents.length > 0) {
+            typeLabel = "Accompanist";
+        }
+
+        // If no events or type not determined, push a blank record
+        if (!hasEvents || typeLabel === "") {
             results.push({
                 id: row.registrantId,
                 name: row.name,
@@ -109,81 +116,56 @@ export default async function Page() {
             continue;
         }
 
-        //If participant
-        // if (participantEvents.length > 0) {
-        //     results.push({
-        //         id: `${row.registrantId}#PARTICIPANT`,
-        //         name: row.name,
-        //         usn: row.usn,
-        //         photo: row.photoUrl,
-        //         type: "Participant",
-        //         events: participantEvents,
-        //         status: docStatusMap[row.docStatus],
-        //     });
-        // }
+        // Combine events with role information
+        const combinedEvents = [...participantEvents, ...accompanistEvents];
 
-        // If accompanist
-        // if (accompanistEvents.length > 0) {
-        //     results.push({
-        //         id: `${row.registrantId}#ACCOMPANIST`,
-        //         name: row.name,
-        //         usn: row.usn,
-        //         photo: row.photoUrl,
-        //         type: "Accompanist",
-        //         events: accompanistEvents,
-        //         status: docStatusMap[row.docStatus],
-        //     });
-        // }
-        if (participantAccompanistEvents.length > 0) {
-            results.push({
-                id: `${row.registrantId}#PARTICIPANT/ACCOMPANIST`,
-                name: row.name,
-                usn: row.usn,
-                photo: row.photoUrl,
-                type: "Participant/Accompanist",
-                events: participantAccompanistEvents,
-                status: docStatusMap[row.docStatus],
-            });
-        }
-    }
+        results.push({
+            id: `${row.registrantId}#${typeLabel.toUpperCase()}`,
+            name: row.name,
+            usn: row.usn,
+            photo: row.photoUrl,
+            type: typeLabel,
+            events: combinedEvents,
+            status: docStatusMap[row.docStatus],
+        });
 
-    return (
-        <div className="bg-background min-h-screen pt-10">
-            <div className="mt-4 justify-center flex flex-col gap-4">
-                <div className="max-w-4xl mx-auto p-4">
-                    <h1 className="text-primary font-bold text-5xl md:text-5xl xl:text-5xl mb-6">
-                        Registration List
-                    </h1>
-                </div>
-            </div>
-            <div className="flex justify-center mt-4 gap-4 mb-3 flex-wrap ">
-                <Link href="/register/modifyevents">
-                    <Button
-                        variant="outline"
-                        className="border bg-primary text-white hover:bg-primary hover:text-white hover:scale-105 transition-all"
-                    >
-                        <PenSquare className="mr-2 h-4 w-4" />
-                        Modify Events
-                    </Button>
-                </Link>
-                <Link href="/register/addRegistrant">
-                    <Button
-                        variant="outline"
-                        className="border bg-primary text-white hover:bg-primary hover:text-white hover:scale-105 transition-all"
-                    >
-                        <UserPlus className="mr-2 h-4 w-4" />
-                        Add Registrant
-                    </Button>
-                </Link>
-            </div>
+}
 
-            {/* <Suspense fallback={<DataTableSkeleton />}> */}
-            <DataTable data={results} />
-            {/* </Suspense> */}
-
-            <div className="flex justify-center items-center">
-                <PaymentDialog />
+return (
+    <div className="bg-background min-h-screen pt-10">
+        <div className="mt-4 justify-center flex flex-col gap-4">
+            <div className="max-w-4xl mx-auto p-4">
+                <h1 className="text-primary font-bold text-5xl md:text-5xl xl:text-5xl mb-6">
+                    Registration List
+                </h1>
             </div>
         </div>
-    );
+        <div className="flex justify-center mt-4 gap-4 mb-3 flex-wrap ">
+            <Link href="/register/modifyevents">
+                <Button
+                    variant="outline"
+                    className="border bg-primary text-white hover:bg-primary hover:text-white hover:scale-105 transition-all"
+                >
+                    <PenSquare className="mr-2 h-4 w-4" />
+                    Modify Events
+                </Button>
+            </Link>
+            <Link href="/register/addRegistrant">
+                <Button
+                    variant="outline"
+                    className="border bg-primary text-white hover:bg-primary hover:text-white hover:scale-105 transition-all"
+                >
+                    <UserPlus className="mr-2 h-4 w-4" />
+                    Add Registrant
+                </Button>
+            </Link>
+        </div>
+
+        <DataTable data={results} />
+
+        <div className="flex justify-center items-center mb-5">
+            <PaymentDialog />
+        </div>
+    </div>
+);
 }

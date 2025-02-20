@@ -1143,9 +1143,9 @@ export async function checkUnique(email : string, phone: string){
 
 export async function checkUsnUnique(usn : string){
     try{
-        const check = await prisma.registrants.findFirst({
+        const check = await prisma.registrants.findUnique({
             where:{
-                usn 
+                usn :usn
             },
             select:{
                 id : true
