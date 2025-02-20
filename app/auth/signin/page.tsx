@@ -86,12 +86,12 @@ export default function SignIn() {
 
   return (
     <div
-      className="relative min-h-screen flex items-center justify-center p-4"
+      className="relative min-h-screen flex items-center justify-center p-10"
       style={{ backgroundColor: "#FF0000" }}
     >
       {/* Background Image with reduced opacity */}
       <div
-        className="absolute inset-0"
+        className="absolute inset-0 w-full h-full bg-cover bg-center"
         style={{
           backgroundImage: `url('${bgImage.src}')`,
           backgroundSize: "cover",
@@ -239,14 +239,15 @@ export default function SignIn() {
             >
               Sign Up
             </Button>
-            <Link className="w-full" href="/link/to/how/to/register">
+            
               <Button
                 variant="outline"
                 className="w-full bg-yellow-300 text-black-300 hover:bg-yellow-400 hover:text-[#990000] transition-colors duration-300"
+                onClick={() => router.push("/auth/instructions")}
               >
                 Registration Instructions
               </Button>
-            </Link>
+           
           </CardFooter>
         </Card>
       </div>

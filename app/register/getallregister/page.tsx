@@ -5,8 +5,10 @@ import Link from "next/link";
 import { Type } from "@prisma/client";
 import { verifySession } from "@/lib/session";
 import { redirect } from "next/navigation";
-import { PenSquare, UserPlus, CreditCard } from "lucide-react";
+import { PenSquare, UserPlus} from "lucide-react";
 import { PaymentDialog } from "@/components/getRegister/paymentDialog";
+
+// import DataTableSkeleton from "@/components/register/data-table-skeleton";
 
 export const docStatusMap = {
     PENDING: "Pending",
@@ -161,7 +163,7 @@ return (
 
         <DataTable data={results} />
 
-        <div className="flex justify-center items-center">
+        <div className="flex justify-center items-center mb-5">
             <PaymentDialog />
         </div>
     </div>

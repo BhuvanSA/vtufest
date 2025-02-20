@@ -30,11 +30,12 @@ const TableBody = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <tbody
     ref={ref}
-    className={cn('[&_tr:last-child]:border-0', className)}
+    className={cn('[&_tr:last-child]:border-0 text-black', className)}
     {...props}
   />
 ));
 TableBody.displayName = 'TableBody';
+
 
 const TableFooter = React.forwardRef<
   HTMLTableSectionElement,
