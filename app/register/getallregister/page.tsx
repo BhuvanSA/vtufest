@@ -7,6 +7,8 @@ import { verifySession } from "@/lib/session";
 import { redirect } from "next/navigation";
 import { PenSquare, UserPlus, CreditCard } from "lucide-react";
 import { PaymentDialog } from "@/components/getRegister/paymentDialog";
+import { Suspense } from "react";
+// import DataTableSkeleton from "@/components/register/data-table-skeleton";
 
 export const docStatusMap = {
     PENDING: "Pending",
@@ -175,7 +177,9 @@ export default async function Page() {
                 </Link>
             </div>
 
+            {/* <Suspense fallback={<DataTableSkeleton />}> */}
             <DataTable data={results} />
+            {/* </Suspense> */}
 
             <div className="flex justify-center items-center">
                 <PaymentDialog />
