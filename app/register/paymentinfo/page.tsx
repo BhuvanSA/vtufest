@@ -239,7 +239,7 @@ export default function EventsPage() {
                                     : paymentStatusInfo==="COMPLETED"? <h2 className="text-lg text-green-500 text-center"> Payment Verification is {paymentStatusInfo}</h2>:
                                     <h2 className="text-lg text-red-500 text-center">Payment Verification is {paymentStatusInfo}</h2> 
                                 }</>}
-                        <p className="text-sm text-red-500 text-center mt-0" >It will take time to verify the status usually 2 days</p>
+                        <p className="text-sm text-red-500 text-center mt-0" >Confirmation mail will be sent to your registered E-mail ID</p>
                 </CardContent>
             </Card>
         </div>
@@ -301,12 +301,10 @@ function BankDetails() {
                 Academy Of Technology
             </p>
             <p>
-                <span className="font-medium">Account Number:</span>{" "}
-                1234567891021
+                <span className="font-medium">UPI ID:</span>{" "}
+                71159801@ubin
             </p>
-            <p>
-                <span className="font-medium">IFSC Code:</span> AB565652
-            </p>
+           
         </div>
     );
 }
