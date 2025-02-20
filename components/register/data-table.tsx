@@ -60,8 +60,9 @@ export type Data = {
     photo: string;
     name: string;
     usn: string;
-    type: "Participant" | "Accompanist" | "Team Manager" | "";
-    events: { eventName: string }[];
+    type: "Team Manager" | "Participant/Accompanist" | "Participant" | "Accompanist" | "";
+    // Each event now may include a role to drive its colour:
+    events: { eventName: string; role?: "Participant" | "Accompanist" }[];  
     status: "Pending" | "Processing" | "Success" | "Failed";
 };
 
@@ -229,7 +230,7 @@ export function DataTable({ data }: { data: Data[] }) {
                             alt="Profile"
                             width={80}
                             height={80}
-                            className="rounded-full"
+                            className="rounded-full object-cover"
                         />
                     );
                 },
@@ -274,9 +275,9 @@ export function DataTable({ data }: { data: Data[] }) {
                     const filterCycle = [
                         "",
                         "Team Manager",
+                        "Participant/Accompanist",
                         "Participant",
-                        "Accompanist",
-                        "Total",
+                        "Accompanist",            
                     ];
                     const currentFilter =
                         (column.getFilterValue() as string) ?? "";
