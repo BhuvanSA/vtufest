@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -9,11 +9,21 @@ import gatLogo from "@/public/images/gat-logo.png";
 import vtulogo from "@/public/images/vtulogo.png";
 
 const Navbar = () => {
-  // Simulated authentication state (replace with your auth logic)
+  // Manage authentication state based on a token (or your auth logic)
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  // Check for an authentication token when the component mounts
+  useEffect(() => {
+    // Replace this with your actual auth check logic
+    const token = localStorage.getItem("token");
+    if (token) {
+      setIsLoggedIn(true);
+    }
+  }, []);
+
   const handleLogout = () => {
-    // Add your logout logic here.
+    // Replace with your logout logic (e.g., clearing cookies or context)
+    localStorage.removeItem("token");
     setIsLoggedIn(false);
   };
 
@@ -37,7 +47,7 @@ const Navbar = () => {
         />
         <Link
           href="https://vtufestinteract.com"
-          className="ml-2 px-4 py-2 bg-gradient-to-r from-red-600 via-[#800000] to-red-900  text-yellow-300 font-bold rounded-lg text-base"
+          className="ml-2 px-4 py-2 bg-gradient-to-r from-red-600 via-[#800000] to-red-900 text-yellow-300 font-bold rounded-lg text-base"
         >
           Back to Home
         </Link>
@@ -63,7 +73,7 @@ const Navbar = () => {
         ) : (
           <Link
             href="/auth/signin"
-            className="px-4 py-2 bg-gradient-to-r from-red-600 via-[#800000] to-red-900  text-yellow-300 font-bold rounded-lg text-base"
+            className="px-4 py-2 bg-gradient-to-r from-red-600 via-[#800000] to-red-900 text-yellow-300 font-bold rounded-lg text-base"
           >
             Login
           </Link>
@@ -74,3 +84,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+

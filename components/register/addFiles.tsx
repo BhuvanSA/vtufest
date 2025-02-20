@@ -545,6 +545,13 @@ export default function SelectRolesAndEvents({
                                     Select the events that you are Participating
                                     / Accompanying in
                                 </h2>
+                                <h2
+                                    className="text-xl font-semibold text-foreground mb-4"
+                                    aria-label="Available events"
+                                    tabIndex={0}
+                                >
+                                    click on the event tile to confirm selection of the event
+                                </h2>
 
                                 {allEvents.length === 0 ? (
                                     <p
