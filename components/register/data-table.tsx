@@ -60,7 +60,7 @@ export type Data = {
     photo: string;
     name: string;
     usn: string;
-    type: "Participant" | "Accompanist" | "Team Manager" | "";
+    type: "Team Manager" | "Participant/Accompanist" | "";
     events: { eventName: string }[];
     status: "Pending" | "Processing" | "Success" | "Failed";
 };
@@ -274,9 +274,7 @@ export function DataTable({ data }: { data: Data[] }) {
                     const filterCycle = [
                         "",
                         "Team Manager",
-                        "Participant",
-                        "Accompanist",
-                        "Total",
+                        "Participant/Accompanist",
                     ];
                     const currentFilter =
                         (column.getFilterValue() as string) ?? "";
