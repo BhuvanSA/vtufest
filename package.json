@@ -91,6 +91,7 @@
     "tailwindcss-animate": "^1.0.7",
     "tsparticles": "^3.8.1",
     "uploadthing": "^7.4.4",
+    "vtu-fest": "file:",
     "xlsx": "^0.18.5",
     "zod": "^3.24.1"
   },
