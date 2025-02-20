@@ -29,19 +29,29 @@ const LoginLogoutButton = () => {
     return (
         <div>
             {isLoggedIn ? (
-                <button
-                    onClick={handleLogout}
-                    className="px-4 py-2 bg-gradient-to-r from-red-600 via-[#800000] to-red-900 text-yellow-300 font-bold rounded-lg text-base"
-                >
-                    Logout
-                </button>
+                <>
+                    <Link
+                        href="/register/getallregister"
+                        className="px-4 py-2 bg-gradient-to-r from-red-600 via-[#800000] to-red-900 text-yellow-300 font-bold rounded-lg text-base"
+                    >
+                        Dashboard
+                    </Link>
+                    <Link
+                        href="/auth/logout"
+                        className="mx-2 px-4 py-2 bg-gradient-to-r from-red-600 via-[#800000] to-red-900 text-yellow-300 font-bold rounded-lg text-base"
+                    >
+                        Logout
+                    </Link>
+                </>
             ) : (
-                <Link
-                    href="/auth/signin"
-                    className="px-4 py-2 bg-gradient-to-r from-red-600 via-[#800000] to-red-900 text-yellow-300 font-bold rounded-lg text-base"
-                >
-                    Login
-                </Link>
+                <>
+                    <Link
+                        href="/auth/signin"
+                        className="px-4 py-2 bg-gradient-to-r from-red-600 via-[#800000] to-red-900 text-yellow-300 font-bold rounded-lg text-base"
+                    >
+                        Login
+                    </Link>
+                </>
             )}
         </div>
     );
