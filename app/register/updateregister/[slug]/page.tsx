@@ -199,8 +199,7 @@ const UpdateRegister: React.FC<UpdateRegisterProps> = ({ params }) => {
     
     if (!data.success) {
       const errorMessage = data.message;
-    
-        toast.error(errorMessage);
+      toast.error(errorMessage);
     }
     else{
       toast.success('Register Details updated');

@@ -48,9 +48,8 @@ export async function POST(request: Request) {
         redirect("/auth/signin");
     }
     const data = await request.json();
-    console.log(data.usn+"this is lower");
     data.usn = String(data.usn).toUpperCase();
-    console.log(data.usn , " this is usn is upper case")
+    data.email = String(data.email).toUpperCase();
     // Fetch user events from db
     const userId = session.id as string;
     const user = await getUser(userId);
