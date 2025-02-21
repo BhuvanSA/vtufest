@@ -36,8 +36,10 @@ export interface RegistrantDetailUpdate {
 
 export async function PATCH(request: Request) {
     const data = await request.json();
-
-    const result = await registerSchema.safeParse(data);
+    data.usn = String(data.usn).toUpperCase();
+    data.email = String(data.email).toUpperCase();
+    
+    const result =  registerSchema.safeParse(data);
 
 
     if (!result.success) {
@@ -47,14 +49,17 @@ export async function PATCH(request: Request) {
         }));
         console.log(errors);
 
-        return new Response(JSON.stringify({ errors }), {
-            status: 400,
-            headers: { "Content-Type": "application/json" },
-        });
+        return NextResponse.json({
+            success:false, message : errors
+        },{status:400});
     }
     try {
 
         const findRegistrant = await getRegistrantById(result.data.id);
+
+        if(!findRegistrant){
+            return NextResponse.json({success:false, message:"User Not found"},{status:400});
+        }
 
         const checkPhone = await checkPhoneUnique(result.data.phone);
 
