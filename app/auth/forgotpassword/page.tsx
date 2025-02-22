@@ -179,7 +179,7 @@ export default function ResetPassword() {
           </CardHeader>
 
           {/* Form content */}
-          <CardContent className="bg-gradient-to-r from-red-600 via-[#800000] to-red-900 p-6">
+          <CardContent className="bg-[#990000] p-7">
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 {/* Email Field */}
@@ -344,7 +344,7 @@ export default function ResetPassword() {
           </CardContent>
 
           {/* Footer */}
-          <CardFooter className="bg-gradient-to-r from-red-600 via-[#800000] to-red-900 p-4 flex flex-col gap-6">
+          <CardFooter className="bg-[#990000] p-5 flex flex-col gap-6">
             <Button
               variant="outline"
               className="w-full bg-yellow-300 hover:bg-yellow-450 text-[#1f1f1f] font-bold transition-transform duration-300 hover:scale-105"
