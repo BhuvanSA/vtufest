@@ -26,6 +26,7 @@ export async function POST(request: NextRequest) {
                 email: true,
                 password: true,
                 role: true,
+                paymentUrl : true,
             },
         });
 
@@ -42,6 +43,7 @@ export async function POST(request: NextRequest) {
             id: db.id,
             email: db.email,
             role: db.role,
+            paymentUrl : db.paymentUrl? true : false
         };
         await createSession(token);
 

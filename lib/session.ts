@@ -30,6 +30,7 @@ export type SessionPayload = {
     id: string;
     email: string;
     role: string;
+    paymentUrl : boolean;
 };
 
 export async function encrypt(payload: SessionPayload) {
@@ -112,6 +113,7 @@ export async function testEncryptDecrypt() {
         id: "123",
         email: "jaime",
         role: "admin",
+        paymentUrl : false
     };
     const session = await encrypt(token);
     console.log("encrypted", session);

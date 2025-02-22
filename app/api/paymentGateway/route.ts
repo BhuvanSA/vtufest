@@ -1,4 +1,4 @@
-import { savePayment } from "@/app/prismaClient/queryFunction";
+import { getAllEventsByUser, PaymentValid, savePayment } from "@/app/prismaClient/queryFunction";
 import { decrypt } from "@/lib/session";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
@@ -16,23 +16,38 @@ export async function POST(request: Request) {
     const userId: string = session.id as string;
 
     const { txnNumber, paymentUrl, Amount } = await request.json();
-    // console.log(txnNumber,paymentUrl,Amount,userId);
+    // console.log(txnNumber,paymentUrl,userId);
+
 
     try {
+
+        const eventNotRegisterList = await PaymentValid(userId);
+
+        const userEvents = await getAllEventsByUser(userId);
+        
+        const amount:number = userEvents.length > 10? 8000 : 4000;
+        console.log(amount);
+        
+
+        if(eventNotRegisterList.length>0){
+            return NextResponse.json({success : false, message : `There are zero Registrations for these events : ${eventNotRegisterList.map(value => value.eventName).join(', ')}`}, {status:400});
+        }
+
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const paymentResult = await savePayment(
             userId,
             txnNumber,
             paymentUrl,
-            parseInt(Amount)
+            amount
         );
         return NextResponse.json(
             { success: true, message: "Payment Details are saved" },
             { status: 200 }
         );
-    } catch (err) {
+    } catch (err:unknown) {
+        console.log(err);
         return NextResponse.json(
-            { success: false, message: err },
+            { success: false, message: "payment error" },
             { status: 500 }
         );
     }

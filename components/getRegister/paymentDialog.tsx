@@ -8,6 +8,8 @@ import { CalendarClock, CreditCard } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Label } from "../ui/label";
+import { toast } from "sonner";
+
 
 export function PaymentDialog() {
     const [isOpen, setIsOpen] = useState(false);
@@ -17,6 +19,7 @@ export function PaymentDialog() {
     const [time, setTime] = useState({ hours: "12", minutes: "00", ampm: "AM" });
 
     const handleProceed = async () => {
+        
         if (!arrivalDate || !time) {
             alert("Please enter both date and time of arrival.");
             return;
@@ -52,12 +55,36 @@ export function PaymentDialog() {
         }
     };
 
+
+    const handlePaymentValid = async()=>{
+        try{
+            const request = await fetch("/api/paymentValidate");
+            
+            const data = await request.json();
+            console.log(data);
+            if(data.type === "text"){
+                toast.error(data.message);
+            }
+            else if(data.message.length == 0 && data.type==="array"){
+                console.log("safe");
+                setIsOpen((prev)=> !prev);
+            }else{
+                console.log("unsafe");
+                toast.error(`There are zero Registrations for these events : ${data.message.map((value) => value.eventName).join(', ')}`);
+            }
+        }
+        catch(error:unknown){
+            console.log(error);
+            toast.error('something went wrong');
+        }
+    }
+
     return (
         <>
             <Button
                 variant="default"
                 className="border bg-primary relative text-white hover:bg-primary hover:text-white hover:scale-105 transition-all"
-                onClick={() => setIsOpen(true)}
+                onClick={() => handlePaymentValid()}
             >
                 <CreditCard className="mr-2 h-4 w-4" />
                 Go to payments
