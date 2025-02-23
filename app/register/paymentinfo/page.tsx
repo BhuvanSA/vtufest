@@ -124,7 +124,7 @@ export default function EventsPage() {
             toast.error(responseData.message);
         }
         setPaymentStatus(true);
-        router.push("auth/logout")
+        router.push("/auth/logout")
     };
 
     return (
@@ -252,7 +252,7 @@ export default function EventsPage() {
                                         <DialogTitle>Confirm Payment Submission</DialogTitle>
                                     </DialogHeader>
                                     <p>Are you sure you want to submit the payment details?</p>
-                                    <p>Once After Payment, You cannot make Changes</p>
+                                    <p className="text-red-500">Once After Payment, You cannot make Changes</p>
                                     <DialogFooter>
                                         <Button variant="outline" onClick={() => setIsOpen(false)}>Cancel</Button>
                                         <Button onClick={handleSubmit(onSubmit)}>Confirm</Button>

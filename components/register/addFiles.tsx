@@ -750,7 +750,7 @@ export default function SelectRolesAndEvents({
                                                 </p>
                                                 {isUploaded ? (
                                                     <div className="w-full h-[244px] flex flex-col rounded-[var(--radius)] items-center justify-end p-12 space-y-2 bg-gradient-to-t from-green-50 to-transparent">
-                                                        <p className="text-green-500 flex flex-col justify-items-center items-center gap-2 pb-10">
+                                                        <div className="text-green-500 flex flex-col justify-items-center items-center gap-2 pb-10">
 
                                                             <p className="flex  gap-2 items-center flex-row">Upload Complete <VerifiedIcon /></p>
 
@@ -760,7 +760,7 @@ export default function SelectRolesAndEvents({
                                                                 height={60}
                                                                 alt="uplaoded image"
                                                             />
-                                                        </p>
+                                                        </div>
                                                         <LoadingButton
                                                             type="button"
                                                             onClick={async () => {
