@@ -1,8 +1,8 @@
 import Image from "next/image";
-import insta from "@/public/images/instalogo.png";
-import yt from "@/public/images/youtube_1384060.png";
-import facebook from "@/public/images/facebook_logo_icon_147291.png";
-import linkedin from "@/public/images/linkedin-logo.png";
+import insta from "@/public/images/logo2.png";
+import yt from "@/public/images/logo1.png";
+import facebook from "@/public/images/logo3.png";
+import linkedin from "@/public/images/logo4.png";
 import Link from "next/link";
 
 const Footer = () => {
@@ -39,7 +39,7 @@ const Footer = () => {
         </div>
 
         {/* Social Media Links */}
-        <ul className="mt-12 flex justify-center gap-6">
+        <ul className="mt-12 flex justify-center items-center gap-6">
           <li>
             <a
               href="https://www.youtube.com/@GATINTERACT"
@@ -50,8 +50,8 @@ const Footer = () => {
             >
               <Image
                 src={yt}
-                width={40}
-                height={40}
+                width={50}
+                height={50}
                 alt="YouTube"
                 className="object-contain"
               />
@@ -68,8 +68,8 @@ const Footer = () => {
             >
               <Image
                 src={insta}
-                width={40}
-                height={40}
+                width={50}
+                height={50}
                 alt="Instagram"
                 className="object-contain"
               />
@@ -86,8 +86,8 @@ const Footer = () => {
             >
               <Image
                 src={facebook}
-                width={40}
-                height={40}
+                width={50}
+                height={50}
                 alt="Facebook"
                 className="object-contain"
               />
@@ -104,8 +104,8 @@ const Footer = () => {
             >
               <Image
                 src={linkedin}
-                width={40}
-                height={40}
+                width={50}
+                height={50}
                 alt="LinkedIn"
                 className="object-contain"
               />
@@ -115,10 +115,10 @@ const Footer = () => {
 
         {/* Footer Bottom Section */}
         <div className="mt-12 border-t border-gray-300 pt-6 flex flex-col sm:flex-row justify-between items-center">
-          <p className="text-sm text-gray-800 font-medium">
+          <p className="text-lg text-gray-900 font-bold text-center">
             © 2025 Global Academy of Technology
           </p>
-          <p className="text-sm text-gray-800 font-medium">
+          <p className="text-lg text-gray-900 font-bold text-center">
             Developed by Interact-2025 Technical Team
           </p>
         </div>
