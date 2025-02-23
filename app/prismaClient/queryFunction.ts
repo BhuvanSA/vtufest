@@ -961,7 +961,7 @@ export async function savePayment(
     userId: string,
     txnNumber: string,
     paymentUrl: string,
-    Amount: number
+    amount: number
 ) {
     try {
         await prisma.users.update({
@@ -971,7 +971,7 @@ export async function savePayment(
             data: {
                 txnNumber,
                 paymentUrl,
-                Amount,
+                Amount:amount,
             },
         });
     } catch (err: unknown) {
@@ -1087,6 +1087,7 @@ export async function getPaymentInfo(userId: string) {
             select: {
                 paymentUrl: true,
                 PaymentVerified: true,
+                Amount : true
             },
         });
         return payment;
@@ -1199,6 +1200,32 @@ export async function checkPhoneUnique(phone : string){
         else{
             return false;
         }
+    }catch(error:unknown){
+        handlePrismaError(error);
+    }
+}
+
+export async function PaymentValid(userId : string){
+    try{
+        const eventList = await prisma.events.findMany({
+            where:{
+                userId : userId
+            },
+            select:{
+                registrants: true,
+                eventName:true
+            }
+        });
+    
+        const eventRegistrantList = eventList.map((event)=> ({
+            eventName : event.eventName,
+            count : event.registrants.length
+        }));
+    
+        const FilteredNotRegister = eventRegistrantList.filter((value)=>
+            value.count === 0
+        )
+        return FilteredNotRegister;
     }catch(error:unknown){
         handlePrismaError(error);
     }

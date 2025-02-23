@@ -13,6 +13,8 @@ import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import Link from "next/link";
 import { LoadingButton } from "@/components/LoadingButton";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useRouter } from "next/navigation";
 
 interface MyCustomEvent {
     id: number;
@@ -27,6 +29,8 @@ interface PaymentInput {
 
 export default function EventsPage() {
     const [events, setEvents] = useState<MyCustomEvent[]>([]);
+
+    const router = useRouter();
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [paymentUrl, setPaymentUrl] = useState<string>("");
     const [isUploaded, setIsUploaded] = useState<boolean>(false);
@@ -88,6 +92,8 @@ export default function EventsPage() {
         }
     }
 
+    const [isOpen,setIsOpen] = useState<boolean>(false);
+
     const {
         control,
         handleSubmit,
@@ -115,13 +121,15 @@ export default function EventsPage() {
         if (responseData.success) {
             toast.success("Submitted");
         } else {
-            toast.error("Internal Server Error");
+            toast.error(responseData.message);
         }
         setPaymentStatus(true);
+        router.push("auth/logout")
     };
 
     return (
         <div className="min-h-screen mt-16 py-10 flex items-center justify-center bg-gradient-to-br from-background to-secondary p-4">
+            
             <Card className="w-full max-w-4xl bg-card text-card-foreground">
                 <CardHeader className="text-center">
                     <CardTitle className="text-2xl text-yellow-500 font-semibold">
@@ -137,9 +145,10 @@ export default function EventsPage() {
                         />
                     </div>
                     {!paymentDone ?
+                    <>
                         <form
                             className="space-y-4"
-                            onSubmit={handleSubmit(onSubmit)}
+                            
                         >
                             <div className="space-y-2">
                                 <Label htmlFor="txnNumber">
@@ -223,8 +232,10 @@ export default function EventsPage() {
                                     )}
                                 </div>
                             </div>
-                            <Button className="w-full my-2" type="submit" disabled={paymentStatus}>
-                                {paymentDone ? "Submit" : "Payment Done"}
+                            
+                        </form>
+                        <Button className="w-full my-2" onClick={()=>setIsOpen((prev)=> !prev)} >
+                                Submit
                             </Button>
                             <Link href="getallregister">
                                 <Button
@@ -235,7 +246,20 @@ export default function EventsPage() {
                                     Go Back
                                 </Button>
                             </Link>
-                        </form> : <>{paymentStatusInfo==="PENDING"? <h2 className="text-lg text-primary text-center">Payment Verification is {paymentStatusInfo}</h2>
+                        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                                <DialogContent>
+                                    <DialogHeader>
+                                        <DialogTitle>Confirm Payment Submission</DialogTitle>
+                                    </DialogHeader>
+                                    <p>Are you sure you want to submit the payment details?</p>
+                                    <p>Once After Payment, You cannot make Changes</p>
+                                    <DialogFooter>
+                                        <Button variant="outline" onClick={() => setIsOpen(false)}>Cancel</Button>
+                                        <Button onClick={handleSubmit(onSubmit)}>Confirm</Button>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
+                         </>: <>{paymentStatusInfo==="PENDING"? <h2 className="text-lg text-primary text-center">Payment Verification is {paymentStatusInfo}</h2>
                                     : paymentStatusInfo==="COMPLETED"? <h2 className="text-lg text-green-500 text-center"> Payment Verification is {paymentStatusInfo}</h2>:
                                     <h2 className="text-lg text-red-500 text-center">Payment Verification is {paymentStatusInfo}</h2> 
                                 }</>}
