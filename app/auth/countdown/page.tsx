@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
+import Link from "next/link";
 
 export default function CountdownTimer() {
   const [timeLeft, setTimeLeft] = useState({
@@ -40,7 +41,7 @@ export default function CountdownTimer() {
       {/* Updated Heading Section */}
       <div className="space-y-2">
         <h1 className="text-4xl leading-loose font-bold ">Thanks for registering for </h1>
-        <h1 className="text-5xl animate-bounce leading-loose font-bold ">VTU YOUTH FEST</h1>
+        <h1 className="text-5xl text-blue-900 animate-bounce leading-loose font-bold ">VTU YOUTH FEST</h1>
         <p className="text-muted-foreground text-white text-xl">Event starts on March 24, 2025</p>
       </div>
 
@@ -50,6 +51,10 @@ export default function CountdownTimer() {
         <TimeBlock value={timeLeft.hours} label="Hours" />
         <TimeBlock value={timeLeft.minutes} label="Minutes" />
         <TimeBlock value={timeLeft.seconds} label="Seconds" />
+      </div>
+
+      <div>
+        <Link href={"/register/getregisterview"} className="text-red-600 text-lg hover:underline"> Click Here To View Registered List</Link>
       </div>
     </Card>
   );
