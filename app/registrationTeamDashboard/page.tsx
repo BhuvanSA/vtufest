@@ -1,8 +1,9 @@
 import prisma from "@/lib/db";
-import { DataTable, Data } from "@/components/register/admin-table";
+import {  Data } from "@/components/register/registrations-view-table";
 import { Type } from "@prisma/client";
 import { verifySession } from "@/lib/session";
 import { redirect } from "next/navigation";
+import { DataTable} from "@/components/register/registrations-view-table";
 
 // import DataTableSkeleton from "@/components/register/data-table-skeleton";
 
@@ -19,6 +20,17 @@ interface AggregatedRow {
     usn: string;
     collegeName: string;
     photoUrl: string;
+    email: string;
+    phone: string;
+    collegeRegion: string;
+    collegeCode: string;
+    designation?: string;
+    addharUrl: string;
+    sslcUrl?: string;
+    idcardUrl : string;
+    dateOfBirth: string;
+    gender: string;
+    accomodation: boolean;
     teamManager: boolean;
     docStatus: keyof typeof docStatusMap;
     registrations: Array<{
@@ -28,10 +40,10 @@ interface AggregatedRow {
 }
 
 export default async function Page() {
-    const session = await verifySession();
-    if (!session || session.role != "ADMIN") {
-        redirect("/auth/signin");
-    }
+    // const session = await verifySession();
+    // if (!session || session.role != "ADMIN") {
+    //     redirect("/auth/signin");
+    // }
 
     // Single query with JSON aggregation + user filtering
     const aggregatedData: AggregatedRow[] = await prisma.$queryRaw`
@@ -43,6 +55,17 @@ export default async function Page() {
       r."teamManager",
       r."docStatus",
       u."collegeName" AS "collegeName",
+      u."region" AS "collegeRegion",
+      u."collegeCode" AS "collegeCode",
+      r."designation" AS "designation",
+      r."email" AS "email",
+      r."phone" AS "phone",
+      r."aadharUrl" AS "aadharUrl",
+      r."sslcUrl" AS "sslcUrl",
+      r."idcardUrl" AS "idcardUrl", 
+      r.gender,
+      r.accomodation,
+      r."blood" AS "dateOfBirth",
       COALESCE(
         json_agg(
           json_build_object('type', er.type, 'eventName', e."eventName")
@@ -54,7 +77,7 @@ export default async function Page() {
     LEFT JOIN "Users" u ON r."userId" = u.id
     LEFT JOIN "EventRegistrations" er ON r.id = er."registrantId"
     LEFT JOIN "Events" e ON er."eventId" = e.id
-    GROUP BY r.id, u."collegeName"
+    GROUP BY r.id, u."collegeName" , u."region" , u."collegeCode" 
     ORDER BY r.usn
   `;
     console.log(aggregatedData);
@@ -71,6 +94,17 @@ export default async function Page() {
                 collegeName: row.collegeName,
                 name: row.name,
                 usn: row.usn,
+                email : row.email,
+                phone : row.phone,
+                accomodation: row.accomodation,
+                collegeRegion: row.collegeRegion,
+                collegeCode: row.collegeCode,
+                designation: row.designation,
+                addharUrl: row.addharUrl,
+                sslcUrl: row.sslcUrl,
+                gender: row.gender,
+                idcardUrl: row.idcardUrl,
+                dateOfBirth: row.dateOfBirth,
                 photo: row.photoUrl,
                 type: "Team Manager",
                 events: [],
@@ -113,6 +147,17 @@ export default async function Page() {
                 usn: row.usn,
                 collegeName: row.collegeName,
                 photo: row.photoUrl,
+                email : row.email,
+                phone : row.phone,
+                accomodation: row.accomodation,
+                collegeRegion: row.collegeRegion,
+                collegeCode: row.collegeCode,
+                designation: row.designation,
+                addharUrl: row.addharUrl,
+                sslcUrl: row.sslcUrl,
+                gender : row.gender,
+                idcardUrl: row.idcardUrl,
+                dateOfBirth: row.dateOfBirth,
                 type: "",
                 events: [],
                 status: docStatusMap[row.docStatus],
@@ -130,6 +175,17 @@ export default async function Page() {
             collegeName: row.collegeName,
             photo: row.photoUrl,
             type: typeLabel,
+            email : row.email,
+            phone : row.phone,
+            accomodation: row.accomodation,
+            collegeRegion: row.collegeRegion,
+            collegeCode: row.collegeCode,
+            designation: row.designation,
+            addharUrl: row.addharUrl,
+            sslcUrl: row.sslcUrl,
+            gender: row.gender,
+            idcardUrl: row.idcardUrl,
+            dateOfBirth: row.dateOfBirth,
             events: combinedEvents,
             status: docStatusMap[row.docStatus],
         });
@@ -140,15 +196,16 @@ export default async function Page() {
             <div className="mt-4 justify-center flex flex-col gap-4">
                 <div className="max-w-4xl mx-auto p-4">
                     <h1 className="text-primary font-bold text-5xl md:text-5xl xl:text-5xl mb-6">
-                        Admin: All registrants
+                        Registration Team : All registrants
                     </h1>
                 </div>
             </div>
             <div className="flex justify-center mt-4 gap-4 mb-3 flex-wrap ">
+          
             </div>
 
             <DataTable data={results} />
-           
+    
         </div>
     );
 }
