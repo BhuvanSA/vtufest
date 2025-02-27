@@ -5,40 +5,40 @@ import Link from "next/link";
 import { Type } from "@prisma/client";
 import { verifySession } from "@/lib/session";
 import { redirect } from "next/navigation";
-import { PenSquare, UserPlus} from "lucide-react";
+import { PenSquare, UserPlus } from "lucide-react";
 import { PaymentDialog } from "@/components/getRegister/paymentDialog";
 
 // import DataTableSkeleton from "@/components/register/data-table-skeleton";
 
 export const docStatusMap = {
-    PENDING: "Pending",
-    PROCESSING: "Processing",
-    APPROVED: "Success",
-    REJECTED: "Failed",
+  PENDING: "Pending",
+  PROCESSING: "Processing",
+  APPROVED: "Success",
+  REJECTED: "Failed",
 } as const;
 
 interface AggregatedRow {
-    registrantId: string;
-    name: string;
-    usn: string;
-    photoUrl: string;
-    teamManager: boolean;
-    docStatus: keyof typeof docStatusMap;
-    registrations: Array<{
-        type: Type | null;
-        eventName: string | null;
-    }>;
+  registrantId: string;
+  name: string;
+  usn: string;
+  photoUrl: string;
+  teamManager: boolean;
+  docStatus: keyof typeof docStatusMap;
+  registrations: Array<{
+    type: Type | null;
+    eventName: string | null;
+  }>;
 }
 
 export default async function Page() {
-    const session = await verifySession();
-    if (!session) {
-        redirect("/auth/signin");
-    }
-    const userIdFromSession = session.id as string;
+  const session = await verifySession();
+  if (!session) {
+    redirect("/auth/signin");
+  }
+  const userIdFromSession = session.id as string;
 
-    // Single query with JSON aggregation + user filtering
-    const aggregatedData: AggregatedRow[] = await prisma.$queryRaw`
+  // Single query with JSON aggregation + user filtering
+  const aggregatedData: AggregatedRow[] = await prisma.$queryRaw`
     SELECT
       r.id AS "registrantId",
       r.name,
@@ -61,111 +61,116 @@ export default async function Page() {
     ORDER BY r.usn
   `;
 
-    // Build final rows for table
-    const results: Data[] = [];
+  // Build final rows for table
+  const results: Data[] = [];
 
-    for (const row of aggregatedData) {
-        const hasEvents = row.registrations && row.registrations.length > 0;
+  for (const row of aggregatedData) {
+    const hasEvents = row.registrations && row.registrations.length > 0;
 
-        // If Team Manager => single "Team Manager" row
-        if (row.teamManager) {
-            results.push({
-                id: `${row.registrantId}#TEAMMANAGER`,
-                name: row.name,
-                usn: row.usn,
-                photo: row.photoUrl,
-                type: "Team Manager",
-                events: [],
-                status: docStatusMap[row.docStatus],
-            });
-            console.log(row.registrantId, "is a team manager");
-            continue;
-        }
+    // If Team Manager => single "Team Manager" row
+    if (row.teamManager) {
+      results.push({
+        id: `${row.registrantId}#TEAMMANAGER`,
+        name: row.name,
+        usn: row.usn,
+        photo: row.photoUrl,
+        type: "Team Manager",
+        events: [],
+        status: docStatusMap[row.docStatus],
+      });
+      console.log(row.registrantId, "is a team manager");
+      continue;
+    }
 
-        // Otherwise gather participant + accompanist events
-        const participantEvents = row.registrations
-            .filter((r) => r.type === "PARTICIPANT" && r.eventName)
-            .map((r) => ({ eventName: r.eventName!, role: "Participant" as const }));
+    // Otherwise gather participant + accompanist events
+    const participantEvents = row.registrations
+      .filter((r) => r.type === "PARTICIPANT" && r.eventName)
+      .map((r) => ({ eventName: r.eventName!, role: "Participant" as const }));
 
-        const accompanistEvents = row.registrations
-            .filter((r) => r.type === "ACCOMPANIST" && r.eventName)
-            .map((r) => ({ eventName: r.eventName!, role: "Accompanist" as const }));
+    const accompanistEvents = row.registrations
+      .filter((r) => r.type === "ACCOMPANIST" && r.eventName)
+      .map((r) => ({ eventName: r.eventName!, role: "Accompanist" as const }));
 
+    // Determine type label based on available events
+    let typeLabel = "";
+    if (participantEvents.length > 0 && accompanistEvents.length > 0) {
+      typeLabel = "Participant/Accompanist";
+    } else if (participantEvents.length > 0) {
+      typeLabel = "Participant";
+    } else if (accompanistEvents.length > 0) {
+      typeLabel = "Accompanist";
+    }
 
-        // Determine type label based on available events
-        let typeLabel = "";
-        if (participantEvents.length > 0 && accompanistEvents.length > 0) {
-            typeLabel = "Participant/Accompanist";
-        } else if (participantEvents.length > 0) {
-            typeLabel = "Participant";
-        } else if (accompanistEvents.length > 0) {
-            typeLabel = "Accompanist";
-        }
+    // If no events or type not determined, push a blank record
+    if (!hasEvents || typeLabel === "") {
+      results.push({
+        id: row.registrantId,
+        name: row.name,
+        usn: row.usn,
+        photo: row.photoUrl,
+        type: "",
+        events: [],
+        status: docStatusMap[row.docStatus],
+      });
+      continue;
+    }
 
-        // If no events or type not determined, push a blank record
-        if (!hasEvents || typeLabel === "") {
-            results.push({
-                id: row.registrantId,
-                name: row.name,
-                usn: row.usn,
-                photo: row.photoUrl,
-                type: "",
-                events: [],
-                status: docStatusMap[row.docStatus],
-            });
-            continue;
-        }
+    // Combine events with role information
+    const combinedEvents = [...participantEvents, ...accompanistEvents];
 
-        // Combine events with role information
-        const combinedEvents = [...participantEvents, ...accompanistEvents];
+    results.push({
+      id: `${row.registrantId}#${typeLabel.toUpperCase()}`,
+      name: row.name,
+      usn: row.usn,
+      photo: row.photoUrl,
+      type: typeLabel,
+      events: combinedEvents,
+      status: docStatusMap[row.docStatus],
+    });
+  }
 
-        results.push({
-            id: `${row.registrantId}#${typeLabel.toUpperCase()}`,
-            name: row.name,
-            usn: row.usn,
-            photo: row.photoUrl,
-            type: typeLabel,
-            events: combinedEvents,
-            status: docStatusMap[row.docStatus],
-        });
-
-}
-
-return (
+  return (
     <div className="bg-background min-h-screen pt-10">
-        <div className="mt-4 justify-center flex flex-col gap-4">
-            <div className="max-w-4xl mx-auto p-4">
-                <h1 className="text-primary font-bold text-5xl md:text-5xl xl:text-5xl mb-6">
-                    Registration List
-                </h1>
-            </div>
+      <div className="mt-4 justify-center flex flex-col gap-4">
+        <div className="max-w-4xl mx-auto p-4">
+          <h1 className="text-black font-bold text-5xl md:text-5xl xl:text-5xl mb-6">
+            Registration List
+          </h1>
         </div>
-        <div className="flex justify-center mt-4 gap-4 mb-3 flex-wrap ">
-            <Link href="/register/modifyevents">
-                <Button
-                    variant="outline"
-                    className="border bg-primary text-white hover:bg-primary hover:text-white hover:scale-105 transition-all"
-                >
-                    <PenSquare className="mr-2 h-4 w-4" />
-                    Modify Events
-                </Button>
-            </Link>
-            <Link href="/register/addRegistrant">
-                <Button
-                    variant="outline"
-                    className="border bg-primary text-white hover:bg-primary hover:text-white hover:scale-105 transition-all"
-                >
-                    <UserPlus className="mr-2 h-4 w-4" />
-                    Add Registrant
-                </Button>
-            </Link>
-        </div>
+      </div>
+      <div className="flex justify-center mt-4 gap-4 mb-3 flex-wrap">
+        <Link href="/register/modifyevents">
+          <Button
+            variant="outline"
+            className="border border-transparent bg-gradient-to-r from-red-500 to-red-700 text-white transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg"
+          >
+            <PenSquare className="mr-2 h-4 w-4" />
+            Modify Events
+          </Button>
+        </Link>
+        <Link href="/register/addRegistrant">
+          <Button
+            variant="outline"
+            className="border border-transparent bg-gradient-to-r from-red-500 to-red-700 text-white transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg"
+          >
+            <UserPlus className="mr-2 h-4 w-4" />
+            Add Registrant
+          </Button>
+        </Link>
+      </div>
 
-        <DataTable data={results} />
+      <DataTable data={results} />
 
-        <div className="flex justify-center items-center mb-5">
-            <PaymentDialog />
-        </div>
+      <div className="flex flex-col items-center mt-8 mb-5 gap-4">
+        <Button
+          variant="outline"
+          className="border border-transparent bg-gradient-to-r from-green-500 to-green-700 text-white transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg"
+        >
+          Go to Payments
+        </Button>
+        <PaymentDialog />
+      </div>
     </div>
-);
+  );
 }
+

@@ -139,15 +139,7 @@ export default async function Page() {
   return (
     <div className="relative bg-background min-h-screen pt-10">
       {/* Watermark */}
-      <div className="absolute inset-0 flex justify-center items-center pointer-events-none">
-        <Image
-          src="/public/images/gat-logo.png" // Ensure the path is correct
-          alt="GAT Logo Watermark"
-          width={500}
-          height={500}
-          className="opacity-10"
-        />
-      </div>
+      
 
       {/* Main Content */}
       <div className="relative z-10">
