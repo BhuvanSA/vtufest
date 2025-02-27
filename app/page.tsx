@@ -53,7 +53,7 @@ const Home = () => {
                     institution fosters an ambience and culture that accelerates
                     learning. The Management, Principal, and Staff believe in the
                     overall development of students, encouraging active
-                    participation in co‑curricular, extra‑curricular, and sports
+                    participation in co‑curricular, extra‑curricular, and sport
                     events.
                   </p>
                 </div>
