@@ -34,7 +34,7 @@ const Home = () => {
             </div>
 
             {/* Text Content with a floated image on medium screens and above */}
-            <div className="text-left text-xl space-y-6">
+            <div className="text-left text-xl space-y-6"> 
               <div>
                 <p className="font-semibold">-- WHO WE ARE</p>
                 <div className="relative">
