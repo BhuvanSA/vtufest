@@ -328,6 +328,18 @@ function BankDetails() {
                 <span className="font-medium">UPI ID:</span>{" "}
                 71159801@ubin
             </p>
+            <p>
+                <span className="font-medium">Account Number:</span>{" "}
+                143510100026360
+            </p>
+            <p>
+                <span className="font-medium">IFSC Code:</span>{" "}
+                UBIN0814351
+            </p>
+            
+
+            
+
            
         </div>
     );
