@@ -76,7 +76,6 @@ type CollegeNameFilterProps = {
 };
 
 const CollegeNameFilter: React.FC<CollegeNameFilterProps> = ({ column, table }) => {
-  // Ensure we treat collegeName as string
   const allRows = table.getPreFilteredRowModel().rows;
   const allColleges = allRows.map((row: any) => row.original.collegeName as string);
   const uniqueColleges = Array.from(new Set(allColleges));
@@ -168,6 +167,64 @@ const TypeFilter: React.FC<TypeFilterProps> = ({ column, table }) => {
             className="cursor-pointer"
           >
             {t}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+
+//////////////////////////
+// Events Column Filter //
+//////////////////////////
+
+type EventFilterProps = {
+  column: any;
+  table: any;
+};
+
+const EventFilter: React.FC<EventFilterProps> = ({ column, table }) => {
+  const allRows = table.getPreFilteredRowModel().rows;
+  // Flatten all event names
+  const allEvents = allRows.flatMap((row: any) =>
+    (row.original.events as { eventName: string }[]).map((e) => e.eventName)
+  );
+  const uniqueEvents = Array.from(new Set(allEvents));
+  const [searchQuery, setSearchQuery] = React.useState("");
+
+  const filteredOptions = uniqueEvents.filter((event) =>
+    event.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost">
+          Events
+          <ChevronDown className="ml-1 h-4 w-4" />
+          {column.getFilterValue() ? `: ${column.getFilterValue() as string}` : ""}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56 p-2">
+        <Input
+          placeholder="Search event..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="mb-2"
+        />
+        <DropdownMenuItem
+          onClick={() => column.setFilterValue(undefined)}
+          className="cursor-pointer"
+        >
+          All
+        </DropdownMenuItem>
+        {filteredOptions.map((event) => (
+          <DropdownMenuItem
+            key={event}
+            onClick={() => column.setFilterValue(event)}
+            className="cursor-pointer"
+          >
+            {event}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
@@ -311,7 +368,7 @@ export function DataTable({ data }: { data: Data[] }) {
         header: "SL No",
         cell: ({ row, table }) => {
           const { pagination } = table.getState();
-          return (pagination.pageIndex * pagination.pageSize) + row.index + 1;
+          return pagination.pageIndex * pagination.pageSize + row.index + 1;
         },
       },
       {
@@ -367,7 +424,9 @@ export function DataTable({ data }: { data: Data[] }) {
       },
       {
         accessorKey: "collegeName",
-        header: ({ column, table }) => <CollegeNameFilter column={column} table={table} />,
+        header: ({ column, table }) => (
+          <CollegeNameFilter column={column} table={table} />
+        ),
         cell: ({ row }) => (
           <div className="capitalize">{row.getValue("collegeName") as string}</div>
         ),
@@ -391,36 +450,9 @@ export function DataTable({ data }: { data: Data[] }) {
       },
       {
         accessorKey: "events",
-        header: ({ column, table }) => {
-          const allRows = table.getPreFilteredRowModel().rows;
-          const allEvents = allRows.flatMap((row: any) =>
-            (row.original.events as { eventName: string }[]).map((e) => e.eventName)
-          );
-          const uniqueEvents = Array.from(new Set(allEvents));
-          const filterCycle = ["ALL", ...uniqueEvents];
-          const currentFilter = (column.getFilterValue() as string) ?? "ALL";
-          const currentIndex = filterCycle.indexOf(currentFilter);
-          const nextIndex = (currentIndex + 1) % filterCycle.length;
-          const nextFilter = filterCycle[nextIndex];
-
-          const handleFilterChange = () => {
-            if (nextFilter === "ALL") {
-              column.setFilterValue(undefined);
-            } else {
-              column.setFilterValue(nextFilter);
-            }
-          };
-
-          return (
-            <Button variant="ghost" onClick={handleFilterChange}>
-              Events
-              <ChevronDown className="ml-1 h-4 w-4" />
-              {currentFilter !== "ALL" ? `: ${currentFilter}` : ""}
-            </Button>
-          );
-        },
+        header: ({ column, table }) => <EventFilter column={column} table={table} />,
         cell: ({ row }) => {
-          const events = row.getValue("events") as { eventName: string; role: string }[];
+          const events = row.getValue("events") as { eventName: string; role?: string }[];
           const type = row.getValue("type") as string;
           return (
             <div className="capitalize">
@@ -428,17 +460,17 @@ export function DataTable({ data }: { data: Data[] }) {
                 events.map((e) => e.eventName).join(", ")
               ) : (
                 <>
-                  <div className="mb-3 text-black">
-                    <span className="font-bold">Participant :</span>{" "}
+                  <div className="mb-1 text-black">
+                    <span className="font-bold">Participant: </span>
                     {events
-                      .filter((value) => value.role === "Participant")
+                      .filter((v) => v.role === "Participant")
                       .map((e) => e.eventName)
                       .join(", ")}
                   </div>
                   <div className="text-black">
-                    <span className="font-bold">Accompanist : </span>
+                    <span className="font-bold">Accompanist: </span>
                     {events
-                      .filter((value) => value.role === "Accompanist")
+                      .filter((v) => v.role === "Accompanist")
                       .map((e) => e.eventName)
                       .join(", ")}
                   </div>
@@ -476,7 +508,9 @@ export function DataTable({ data }: { data: Data[] }) {
                   Update
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() => handleDeleteSelected([(data.id as string).split("#")[0]])}
+                  onClick={() =>
+                    handleDeleteSelected([(data.id as string).split("#")[0]])
+                  }
                   className="text-red-500"
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
@@ -494,7 +528,7 @@ export function DataTable({ data }: { data: Data[] }) {
   const table = useReactTable({
     data: rows,
     columns,
-    initialState: { pagination: { pageSize: 10 } },
+    initialState: { pagination: { pageSize: 50 } }, // default to 50 rows per page
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -547,9 +581,9 @@ export function DataTable({ data }: { data: Data[] }) {
 
   return (
     <div className="w-full px-5 rounded-xl my-12">
-      <div className="flex items-center py-4 flex-wrap gap-3 ">
-        <div className="relative max-w-sm ">
-          <Search className="absolute left-2 top-3 h-4 w-5 text-muted-foreground " />
+      <div className="flex flex-wrap items-center gap-3 py-4">
+        <div className="relative max-w-sm">
+          <Search className="absolute left-2 top-3 h-4 w-5 text-muted-foreground" />
           <Input
             placeholder="Search name..."
             value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
@@ -561,7 +595,7 @@ export function DataTable({ data }: { data: Data[] }) {
         </div>
         <Button
           variant="outline"
-          className="ml-auto bg-[#00B140] text-white hover:scale-105 hover:bg-[#00B140] hover:text-white "
+          className="ml-auto bg-[#00B140] text-white hover:scale-105 hover:bg-[#00B140] hover:text-white"
           onClick={handleExportToPDF}
         >
           <FileDown className="mr-2 h-4 w-4" />
@@ -599,7 +633,7 @@ export function DataTable({ data }: { data: Data[] }) {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className="rounded-md border overflow-auto min-h-[18rem]">
+      <div className="rounded-md border overflow-auto min-h-[18rem] shadow-lg">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -639,12 +673,22 @@ export function DataTable({ data }: { data: Data[] }) {
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s)
-          selected.
+      {/* Advanced Pagination & Page Size Selector */}
+      <div className="flex flex-col md:flex-row items-center justify-between py-4">
+        <div className="flex items-center gap-2">
+          <span>Rows per page:</span>
+          <select
+            value={table.getState().pagination.pageSize}
+            onChange={(e) => table.setPageSize(Number(e.target.value))}
+            className="border rounded p-1"
+          >
+            <option value={10}>10</option>
+            <option value={25}>25</option>
+            <option value={50}>50</option>
+            <option value={100}>100</option>
+          </select>
         </div>
-        <div className="space-x-2">
+        <div className="flex items-center gap-4">
           <Button
             variant="outline"
             size="sm"
@@ -653,6 +697,9 @@ export function DataTable({ data }: { data: Data[] }) {
           >
             <ArrowLeft className="mr-2 h-4 w-4" /> Previous
           </Button>
+          <span>
+            Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+          </span>
           <Button
             variant="outline"
             size="sm"
@@ -666,3 +713,4 @@ export function DataTable({ data }: { data: Data[] }) {
     </div>
   );
 }
+
