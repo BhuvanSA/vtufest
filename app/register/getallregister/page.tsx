@@ -8,8 +8,6 @@ import { redirect } from "next/navigation";
 import { PenSquare, UserPlus } from "lucide-react";
 import { PaymentDialog } from "@/components/getRegister/paymentDialog";
 
-// import DataTableSkeleton from "@/components/register/data-table-skeleton";
-
 export const docStatusMap = {
   PENDING: "Pending",
   PROCESSING: "Processing",
@@ -142,18 +140,18 @@ export default async function Page() {
         <Link href="/register/modifyevents">
           <Button
             variant="outline"
-            className="border border-transparent bg-gradient-to-r from-red-500 to-red-700 text-white transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg"
+            className="border border-transparent bg-gradient-to-r from-[#8B0000] to-[#B22222] text-yellow-300 text-lg py-3 px-6 transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl"
           >
-            <PenSquare className="mr-2 h-4 w-4" />
+            <PenSquare className="mr-2 h-5 w-5" />
             Modify Events
           </Button>
         </Link>
         <Link href="/register/addRegistrant">
           <Button
             variant="outline"
-            className="border border-transparent bg-gradient-to-r from-red-500 to-red-700 text-white transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg"
+            className="border border-transparent bg-gradient-to-r from-[#8B0000] to-[#B22222] text-yellow-300 text-lg py-3 px-6 transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-xl"
           >
-            <UserPlus className="mr-2 h-4 w-4" />
+            <UserPlus className="mr-2 h-5 w-5" />
             Add Registrant
           </Button>
         </Link>
@@ -162,15 +160,11 @@ export default async function Page() {
       <DataTable data={results} />
 
       <div className="flex flex-col items-center mt-8 mb-5 gap-4">
-        <Button
-          variant="outline"
-          className="border border-transparent bg-gradient-to-r from-green-500 to-green-700 text-white transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg"
-        >
-          Go to Payments
-        </Button>
-        <PaymentDialog />
+        {/* Render PaymentDialog only once. Assume PaymentDialog uses the trigger passed via children or className. */}
+        <PaymentDialog
+          className="border border-transparent bg-gradient-to-r from-green-500 to-green-700 text-white text-lg py-3 px-6 transition-all duration-300 ease-in-out transform hover:scale-110 hover:shadow-2xl"
+        />
       </div>
     </div>
   );
 }
-
