@@ -40,10 +40,10 @@ interface AggregatedRow {
 }
 
 export default async function Page() {
-    // const session = await verifySession();
-    // if (!session || session.role != "ADMIN") {
-    //     redirect("/auth/signin");
-    // }
+    const session = await verifySession();
+    if (!session || session.role != "REGISTRATION_TEAM") {
+        redirect("/auth/signin");
+    }
 
     // Single query with JSON aggregation + user filtering
     const aggregatedData: AggregatedRow[] = await prisma.$queryRaw`

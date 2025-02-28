@@ -5,7 +5,7 @@ import convener2 from "@/public/images/convener2.png";
 import convener3 from "@/public/images/IMG_0101 - Akshith M.jpeg";
 import convener5 from "@/public/images/Screenshot_20241112_141230_Instagram - Bhuvan Sudhakar.jpg";
 import domain1 from "@/public/images/1710529304549.jpeg.jpg"
-import domain2 from "@/public/images/1713973297954.jpeg.jpg"
+import domain2 from "@/public/images/image4 (2).jpg"
 import domain3 from ""
 import domain4 from "@/public/images/WhatsApp Image 2025-02-28 at 11.30.48.jpeg"
 import domain5 from "@/public/images/IMG_20250228_112313.jpg"
