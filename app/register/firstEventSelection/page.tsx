@@ -17,6 +17,14 @@ export default async function Page() {
         redirect("/auth/signin");
     }
 
+    if(session && session.role === "ADMIN") {
+        redirect("/adminDashboard");
+    }
+
+    if(session && session.role === "REGISTRATION_TEAM") {
+        redirect("/registrationTeamDashboard");
+    }
+
     const registered: RegisteredEvent[] = await prisma.events.findMany({
         select: { id: true, eventNo: true, eventName: true },
         where: { userId: session.id as string },
