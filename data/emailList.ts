@@ -189,6 +189,7 @@ export const emailList = [
     "sv_gorabal@rediffmail.com",
     "srikantappaarakere@gmail.com",
     "principal_nmamit@nitte.edu.in",
+    "principal@ssit.edu.in",
     "principal@kvgengg.com",
     "principalsit@srinivasgroup.com",
     "principal@bldeacet.ac.in",
