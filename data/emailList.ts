@@ -1,5 +1,4 @@
 export const emailList = [
-    
     "principal@drhnnce.org.in",
     "principalubdt@gmail.com",
     "hvbyregowda@gmail.com",
@@ -27,6 +26,7 @@ export const emailList = [
     "thippeswamy@vtu.ac.in",
     "guru14swamy@gmail.com",
     "aswathmu@gmail.com",
+    "principal@bgscet.ac.in",
     "dbit.principal@gmail.com",
     "ppl-dsce@dayanandasagar.edu",
     "vsramamurthy@yahoo.com",
@@ -183,11 +183,13 @@ export const emailList = [
     "kvsreenivasarao@yahoo.com",
     "principalgce@gmail.com",
     "principal@bmsit.in",
+    "principal.rvca@rvei.edu.in",
     "2ganeshvbhat@gmail.com",
     "mane.suresh@gmail.com",
     "sv_gorabal@rediffmail.com",
     "srikantappaarakere@gmail.com",
     "principal_nmamit@nitte.edu.in",
+    "principal@ssit.edu.in",
     "principal@kvgengg.com",
     "principalsit@srinivasgroup.com",
     "principal@bldeacet.ac.in",
@@ -245,5 +247,5 @@ export const emailList = [
     "akshithm05@gmail.com",
     "akshithm0505@gmail.com",
     "bhuvansa@icloud.com",
-    "sohankalburgi2004@gmail.com"
+    "sohankalburgi2004@gmail.com",
 ];
