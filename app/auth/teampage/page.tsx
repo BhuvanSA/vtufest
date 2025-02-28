@@ -10,8 +10,10 @@ import domain3 from ""
 import domain4 from "@/public/images/WhatsApp Image 2025-02-28 at 11.30.48.jpeg"
 import domain5 from "@/public/images/IMG_20250228_112313.jpg"
 import faculty1 from"@/public/dignitaries/snr.jpeg"
+import faculty2 from"@/public/images/300048.jpg"
 import faculty3 from "@/public/images/anand.png"
 import faculty4 from"@/public/images/Shyam.jpg"
+import faculty5 from"@/public/images/WhatsApp Image 2025-02-28 at 12.32.21.jpeg"
 import placeholder from "@/public/images/placeholder.jpg";
 
 // Define the Member type to accept StaticImageData
@@ -49,10 +51,10 @@ const subCoreCommittee: Member[] = [
 
 const facultyCoordinators: Member[] = [
   { name: "Lt. Saravanan R", designation: "Organizing Secretary", image: faculty1 },
-  { name: "Dr. Girish Rao Salnke", designation: "Faculty Co-Convener", image: placeholder },
+  { name: "Dr. Girish Rao Salnke", designation: "Faculty Co-Convener", image: faculty2 },
   { name: "Prof. Anand Panduranga", designation: "Faculty Co-Convener", image: faculty3 },
   { name: "Prof. Shyam Sundar Bhushan", designation: "Faculty Co-Convener", image: faculty4 },
-  { name: "Dr. Vimuktha E. Salis", designation: "Faculty Co-Convener", image: placeholder },
+  { name: "Dr Vimuktha Evangeleen Salis", designation: "Faculty Co-Convener", image: faculty5 },
 ];
 
 interface TeamSectionProps {

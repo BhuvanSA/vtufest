@@ -84,7 +84,7 @@ const Navbar = () => {
       {isMobileMenuOpen && (
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <Link href="/our-team" className={`${buttonClasses} block`}>
+            <Link href="/auth/teampage" className={`${buttonClasses} block`}>
               Our Team
             </Link>
             <Link href="/auth/instructions" className={`${buttonClasses} block`}>
