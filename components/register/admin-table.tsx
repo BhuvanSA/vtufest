@@ -545,6 +545,17 @@ export function DataTable({ data }: { data: Data[] }) {
     },
   });
 
+  // Compute the current (filtered) total of registrants
+  const totalRegistrants = table.getFilteredRowModel().rows.length;
+
+  // Handler to clear all filters and sorting
+  const clearAllFilters = () => {
+    setColumnFilters([]);
+    setSorting([]);
+    table.resetColumnFilters();
+    table.resetSorting();
+  };
+
   const handleExportToPDF = () => {
     const filteredSortedRows = table.getRowModel().rows;
     const exportData: string[][] = filteredSortedRows.map((row) => [
@@ -581,6 +592,7 @@ export function DataTable({ data }: { data: Data[] }) {
 
   return (
     <div className="w-full px-5 rounded-xl my-12">
+      {/* Top Controls */}
       <div className="flex flex-wrap items-center gap-3 py-4">
         <div className="relative max-w-sm">
           <Search className="absolute left-2 top-3 h-4 w-5 text-muted-foreground" />
@@ -595,6 +607,13 @@ export function DataTable({ data }: { data: Data[] }) {
         </div>
         <Button
           variant="outline"
+          onClick={clearAllFilters}
+          className="ml-2"
+        >
+          Clear Filters
+        </Button>
+        <Button
+          variant="outline"
           className="ml-auto bg-[#00B140] text-white hover:scale-105 hover:bg-[#00B140] hover:text-white"
           onClick={handleExportToPDF}
         >
@@ -603,7 +622,7 @@ export function DataTable({ data }: { data: Data[] }) {
         </Button>
         <Button
           variant="outline"
-          className="ml-auto bg-red-500 text-white hover:scale-105 hover:bg-red-500 hover:text-primary-foreground"
+          className="bg-red-500 text-white hover:scale-105 hover:bg-red-500 hover:text-primary-foreground"
           onClick={() => handleDeleteSelected()}
         >
           <Trash2 className="mr-2 h-4 w-4" />
@@ -633,6 +652,13 @@ export function DataTable({ data }: { data: Data[] }) {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+
+      {/* Display total registrants */}
+      <div className="mb-2 text-sm text-gray-700">
+        Total Registrants: {totalRegistrants}
+      </div>
+
+      {/* Table */}
       <div className="rounded-md border overflow-auto min-h-[18rem] shadow-lg">
         <Table>
           <TableHeader>
@@ -673,6 +699,7 @@ export function DataTable({ data }: { data: Data[] }) {
           </TableBody>
         </Table>
       </div>
+
       {/* Advanced Pagination & Page Size Selector */}
       <div className="flex flex-col md:flex-row items-center justify-between py-4">
         <div className="flex items-center gap-2">
@@ -713,4 +740,3 @@ export function DataTable({ data }: { data: Data[] }) {
     </div>
   );
 }
-
