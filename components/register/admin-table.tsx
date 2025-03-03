@@ -94,7 +94,7 @@ const CollegeNameFilter: React.FC<CollegeNameFilterProps> = ({ column, table }) 
           {column.getFilterValue() ? `: ${column.getFilterValue() as string}` : ""}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56 p-2">
+      <DropdownMenuContent className="w-56 p-2 max-h-60 overflow-y-auto">
         <Input
           placeholder="Search college..."
           value={searchQuery}
@@ -147,7 +147,7 @@ const TypeFilter: React.FC<TypeFilterProps> = ({ column, table }) => {
           {column.getFilterValue() ? `: ${column.getFilterValue() as string}` : ""}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56 p-2">
+      <DropdownMenuContent className="w-56 p-2 max-h-60 overflow-y-auto">
         <Input
           placeholder="Search type..."
           value={searchQuery}
@@ -205,7 +205,7 @@ const EventFilter: React.FC<EventFilterProps> = ({ column, table }) => {
           {column.getFilterValue() ? `: ${column.getFilterValue() as string}` : ""}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56 p-2">
+      <DropdownMenuContent className="w-56 p-2 max-h-60 overflow-y-auto">
         <Input
           placeholder="Search event..."
           value={searchQuery}
