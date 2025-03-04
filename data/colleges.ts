@@ -381,6 +381,7 @@ export const colleges = [
             { name: "test2", code: "456" },
             { name: "test3", code: "789" },
             { name: "test4", code: "689" },
+            { name: "test5", code: "532"}
         ],
     },
 ];

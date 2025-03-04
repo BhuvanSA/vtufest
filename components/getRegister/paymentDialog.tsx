@@ -103,6 +103,7 @@ export function PaymentDialog() {
                                 <SelectValue placeholder="Select Date of Arrival" />
                             </SelectTrigger>
                             <SelectContent>
+                                <SelectItem value="2025-03-23">23 March 2025</SelectItem>
                                 <SelectItem value="2025-03-24">24 March 2025</SelectItem>
                                 <SelectItem value="2025-03-25">25 March 2025</SelectItem>
                                 <SelectItem value="2025-03-26">26 March 2025</SelectItem>
