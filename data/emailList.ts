@@ -252,4 +252,5 @@ export const emailList = [
     "bhuvansa@icloud.com",
     "sohankalburgi2004@gmail.com",
     "ag.adityasingh@gmail.com",
+    "principal@knsit.com",
 ];
