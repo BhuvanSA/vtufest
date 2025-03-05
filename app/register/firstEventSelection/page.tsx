@@ -22,7 +22,7 @@ export default async function Page() {
     }
 
     if(session && session.role === "REGISTRATION_TEAM") {
-        redirect("/registrationTeamDashboard");
+        redirect("/registrationTeamDashboard/registrationdetails");
     }
 
     const registered: RegisteredEvent[] = await prisma.events.findMany({
