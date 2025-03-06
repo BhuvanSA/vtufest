@@ -58,7 +58,7 @@ export async function POST(request: Request) {
             status: 404,
         });
     }
-    if (user.registrants.length > 45) {
+    if (user.registrants.length >= 45) {
         return new Response(
             JSON.stringify({
                 message:
