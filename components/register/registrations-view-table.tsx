@@ -68,7 +68,7 @@ export type Data = {
     collegeRegion: string;
     collegeCode: string;
     designation?: string;
-    addharUrl: string;
+    aadharUrl: string;
     sslcUrl?: string;
     idcardUrl: string;
     gender: string;
@@ -352,7 +352,7 @@ export function DataTable({ data }: { data: Data[] }) {
                 accessorKey: "addharUrl",
                 header: "Aadhar Card",
                 cell: ({ row }) => {
-                    const imageKey = row.getValue("addharUrl");
+                    const imageKey = row.getValue("aadharUrl");
                     const imageUrl = `https://${process.env.UPLOADTHING_APP_ID}.ufs.sh/f/${imageKey}`;
                     return (
                         <Link href={imageUrl} target="_blank">
