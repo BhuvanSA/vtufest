@@ -192,9 +192,9 @@ export function DataTable({ data }: { data: Data[] }) {
                 header: ({ column, table }) => {
                     // Collect distinct college names from the pre-filtered rows
                     const allRows = table.getPreFilteredRowModel().rows;
-                    const allColleges = allRows.map(
-                        (row) => row.original.collegeName
-                    );
+                    const allColleges = allRows
+                        .map((row) => row.original.collegeName)
+                        .sort((a, b) => a.localeCompare(b));
                     const uniqueColleges = Array.from(new Set(allColleges));
                     const filterCycle = ["ALL", ...uniqueColleges];
                     const currentFilter =
@@ -649,6 +649,13 @@ export function DataTable({ data }: { data: Data[] }) {
                 >
                     <FileDown className="mr-2 h-4 w-4" />
                     Download current view as Excel
+                </Button>
+                <Button
+                    variant="outline"
+                    className="ml-auto bg-[#00B140] text-white hover:scale-105 hover:bg-[#00B140] hover:text-white "
+                        onClick={()=> router.push("/registrationTeamDashboard/collegeDetails")}
+                >
+                    Go To College List
                 </Button>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
