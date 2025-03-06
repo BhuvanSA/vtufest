@@ -25,7 +25,7 @@ interface AggregatedRow {
     collegeRegion: string;
     collegeCode: string;
     designation?: string;
-    addharUrl: string;
+    aadharUrl: string;
     sslcUrl?: string;
     idcardUrl : string;
     dateOfBirth: string;
@@ -100,7 +100,7 @@ export default async function Page() {
                 collegeRegion: row.collegeRegion,
                 collegeCode: row.collegeCode,
                 designation: row.designation,
-                addharUrl: row.addharUrl,
+                aadharUrl: row.aadharUrl,
                 sslcUrl: row.sslcUrl,
                 gender: row.gender,
                 idcardUrl: row.idcardUrl,
@@ -153,7 +153,7 @@ export default async function Page() {
                 collegeRegion: row.collegeRegion,
                 collegeCode: row.collegeCode,
                 designation: row.designation,
-                addharUrl: row.addharUrl,
+                aadharUrl: row.aadharUrl,
                 sslcUrl: row.sslcUrl,
                 gender : row.gender,
                 idcardUrl: row.idcardUrl,
@@ -181,7 +181,7 @@ export default async function Page() {
             collegeRegion: row.collegeRegion,
             collegeCode: row.collegeCode,
             designation: row.designation,
-            addharUrl: row.addharUrl,
+            aadharUrl: row.aadharUrl,
             sslcUrl: row.sslcUrl,
             gender: row.gender,
             idcardUrl: row.idcardUrl,
