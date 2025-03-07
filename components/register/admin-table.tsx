@@ -41,6 +41,19 @@ export type Data = {
   designation?: string;
 };
 
+// -------------------- Helper: Convert Image URL to Base64 --------------------
+async function getBase64ImageFromURL(url: string): Promise<string> {
+  const res = await fetch(url);
+  const blob = await res.blob();
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+// -------------------- Main DataTable Component --------------------
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -53,18 +66,6 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-
-// Utility function to load an image from URL and convert to base64.
-async function getBase64ImageFromURL(url: string): Promise<string> {
-  const res = await fetch(url);
-  const blob = await res.blob();
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result as string);
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-}
 
 export function DataTable({ data }: { data: Data[] }) {
   const router = useRouter();
@@ -206,6 +207,7 @@ export function DataTable({ data }: { data: Data[] }) {
         header: "Photo",
         cell: ({ row }) => {
           const photoUrl = row.getValue("photo") as string;
+          // Build photo URL using your UPLOADTHING_APP_ID
           const imageUrl = `https://${process.env.UPLOADTHING_APP_ID}.ufs.sh/f/${photoUrl}`;
           return (
             <Image
@@ -375,10 +377,8 @@ export function DataTable({ data }: { data: Data[] }) {
     },
   });
 
-  // Compute current (filtered) total
   const totalRegistrants = table.getFilteredRowModel().rows.length;
 
-  // Clear filters/sorting handler
   const clearAllFilters = () => {
     setColumnFilters([]);
     setSorting([]);
@@ -386,14 +386,14 @@ export function DataTable({ data }: { data: Data[] }) {
     table.resetSorting();
   };
 
-  // ----------------- PDF Export -----------------
+  // --------------------- PDF Export (Landscape) ---------------------
   const handleExportToPDF = async () => {
     const filteredRows = table.getRowModel().rows;
     const doc = new jsPDF({ orientation: "landscape" });
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
 
-    // Load logos (replace with your actual URLs)
+    // Load logos (replace these URLs with your actual logo URLs)
     const gatLogoURL = "https://example.com/gat_logo.png";
     const vtuLogoURL = "https://example.com/vtu_logo.png";
     const gatLogoData = await getBase64ImageFromURL(gatLogoURL);
@@ -403,7 +403,7 @@ export function DataTable({ data }: { data: Data[] }) {
     doc.addImage(gatLogoData, "PNG", 10, 10, logoWidth, logoHeight);
     doc.addImage(vtuLogoData, "PNG", pageWidth - logoWidth - 10, 10, logoWidth, logoHeight);
 
-    // Center header text
+    // Center header text between logos
     doc.setFontSize(12);
     const headerText =
       "Visveraya technological university in association with Global Academy of technology";
@@ -428,9 +428,9 @@ export function DataTable({ data }: { data: Data[] }) {
       collegeData[collegeName].push(row.original);
     });
 
-    let currentY = 40; // Starting Y after header
+    let currentY = 40; // starting Y after header
 
-    // Helper to add a table with image hooks
+    // Helper to add a table with image hooks for the "Photo" column (assumed to be index 1)
     const addTableWithImages = (head: any, body: any) => {
       autoTable(doc, {
         head,
@@ -440,6 +440,8 @@ export function DataTable({ data }: { data: Data[] }) {
         styles: { fontSize: 10, cellPadding: 3 },
         headStyles: { fillColor: [26, 188, 156] },
         didParseCell: function (data) {
+          // If this is the Photo column and the raw value is a base64 image string,
+          // remove any text so that only the image is rendered.
           if (
             data.column.index === 1 &&
             data.cell.raw &&
@@ -463,13 +465,13 @@ export function DataTable({ data }: { data: Data[] }) {
       currentY = doc.lastAutoTable.finalY + 10;
     };
 
-    // Loop through each college group and add sections
+    // For each college, add sections and tables
     for (const collegeName of Object.keys(collegeData)) {
       const rowsForCollege = collegeData[collegeName];
       const vtucode = rowsForCollege[0].vtucode || "N/A";
       const accommodation = rowsForCollege[0].accommodation || "N/A";
 
-      // College info
+      // College header info
       doc.setFontSize(12);
       doc.text(`College: ${collegeName}`, 10, currentY);
       currentY += 7;
@@ -478,12 +480,13 @@ export function DataTable({ data }: { data: Data[] }) {
       doc.text(`Accommodation: ${accommodation}`, 10, currentY);
       currentY += 10;
 
-      // STUDENT TABLE (non-team managers)
+      // STUDENT TABLE (exclude team managers)
       const studentRows = rowsForCollege.filter((r) => r.type !== "Team Manager");
       if (studentRows.length > 0) {
-        const studentData = [];
+        const studentData: any[] = [];
         for (let i = 0; i < studentRows.length; i++) {
           const row = studentRows[i];
+          // Build photo URL from UPLOADTHING_APP_ID and convert to base64
           const photoUrl = row.photo;
           const imageUrl = `https://${process.env.UPLOADTHING_APP_ID}.ufs.sh/f/${photoUrl}`;
           let photoBase64 = "";
@@ -512,7 +515,7 @@ export function DataTable({ data }: { data: Data[] }) {
       // TEAM MANAGER TABLE
       const teamManagerRows = rowsForCollege.filter((r) => r.type === "Team Manager");
       if (teamManagerRows.length > 0) {
-        const teamManagerData = [];
+        const teamManagerData: any[] = [];
         for (let i = 0; i < teamManagerRows.length; i++) {
           const row = teamManagerRows[i];
           const photoUrl = row.photo;
@@ -540,7 +543,7 @@ export function DataTable({ data }: { data: Data[] }) {
         addTableWithImages(teamManagerHeaders, teamManagerData);
       }
 
-      // EVENT REGISTRATION TABLE
+      // EVENT REGISTRATION TABLE (group by event)
       const eventsMap: Record<string, { name: string; role: string }[]> = {};
       rowsForCollege.forEach((row) => {
         if (row.events && Array.isArray(row.events)) {
@@ -578,7 +581,7 @@ export function DataTable({ data }: { data: Data[] }) {
         currentY = doc.lastAutoTable.finalY + 10;
       }
 
-      // Spacing between colleges
+      // Add extra spacing between college groups
       currentY += 10;
       if (currentY > pageHeight - 30) {
         doc.addPage();
@@ -589,7 +592,7 @@ export function DataTable({ data }: { data: Data[] }) {
     doc.save("registrants.pdf");
   };
 
-  // ----------------- Excel Export -----------------
+  // --------------------- Excel Export ---------------------
   const handleExportToExcel = () => {
     const filteredRows = table.getRowModel().rows;
     const collegeData: Record<string, Data[]> = {};
@@ -774,7 +777,7 @@ export function DataTable({ data }: { data: Data[] }) {
         Total Registrants: {totalRegistrants}
       </div>
 
-      {/* Table */}
+      {/* Data Table */}
       <div className="rounded-md border overflow-auto min-h-[18rem] shadow-lg">
         <Table>
           <TableHeader>
@@ -857,9 +860,7 @@ export function DataTable({ data }: { data: Data[] }) {
   );
 }
 
-//////////////////////////
-// Filter Components
-//////////////////////////
+// -------------------- Filter Components --------------------
 
 type CollegeNameFilterProps = {
   column: any;
