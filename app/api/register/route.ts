@@ -5,6 +5,7 @@ import {
     managerFormSchema,
 } from "@/lib/schemas/register";
 import { checkUnique, checkUsnUnique, getUser, insertRegistrant } from "@/app/prismaClient/queryFunction";
+import { NextResponse } from "next/server";
 
 export const maxDuration = 60; // This function can run for a maximum of 5 seconds
 
@@ -87,7 +88,19 @@ export async function POST(request: Request) {
             { status: 400, headers: { "Content-Type": "application/json" } }
         );
     }
-    
+
+
+    if(user.region === "Bengaluru Region (1)" && data.accomodation==="yes"){
+        return new Response(
+            JSON.stringify({
+            message: "Accommodation is not allowed for Bengaluru Region participants",
+            }),
+            {
+            status: 400,
+            headers: { "Content-Type": "application/json" },
+            }
+        );
+    }
 
     if (data.teamManager === false) {
         const validation = participantFormSchema.safeParse(data);
