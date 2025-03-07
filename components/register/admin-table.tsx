@@ -394,8 +394,8 @@ export function DataTable({ data }: { data: Data[] }) {
     const pageHeight = doc.internal.pageSize.getHeight();
 
     // Load logos (replace these URLs with your actual logo URLs)
-    const gatLogoURL = "https://example.com/gat_logo.png";
-    const vtuLogoURL = "https://example.com/vtu_logo.png";
+    const gatLogoURL = "@/public/images/gat-logo.png";
+    const vtuLogoURL = "@/public/images/vtulogo.png";
     const gatLogoData = await getBase64ImageFromURL(gatLogoURL);
     const vtuLogoData = await getBase64ImageFromURL(vtuLogoURL);
     const logoWidth = 40;
