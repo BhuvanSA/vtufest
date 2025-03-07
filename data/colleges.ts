@@ -111,6 +111,7 @@ export const colleges = [
             { name: "R.R. SCHOOL OF ARCHITECTURE", code: "1 RR" },
             { name: "RV COLLEGE OF ARCHITECTURE", code: "1RW" },
             { name: "R.V.COLLEGE OF ENGINEERING", code: "1RV" },
+            { name: "RV Institute of Technology and Management", code: "1RF" },
             { name: "RAJARAJESWARI COLLEGE OF ENGINEERING", code: "1RR" },
             { name: "RAJIV GANDHI INSTITUTE OF TECHNOLOGY", code: "1RG" },
             { name: "REVA INSTITUTE OF TECHNOLOGY & MANAGEMENT", code: "1RE" },
