@@ -66,10 +66,8 @@ export function PaymentDialog() {
                 toast.error(data.message);
             }
             else if(data.message.length == 0 && data.type==="array"){
-                console.log("safe");
                 setIsOpen((prev)=> !prev);
             }else{
-                console.log("unsafe");
                 toast.error(`There are zero Registrations for these events : ${data.message.map((value) => value.eventName).join(', ')}`);
             }
         }
