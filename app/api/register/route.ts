@@ -89,6 +89,7 @@ export async function POST(request: Request) {
         );
     }
 
+
     if(user.region === "Bengaluru Region (1)" && data.accomodation==="yes"){
         return new Response(
             JSON.stringify({
