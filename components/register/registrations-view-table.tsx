@@ -626,11 +626,12 @@ export function DataTable({ data }: { data: Data[] }) {
                                 .getColumn(selectedField ?? "name")
                                 ?.getFilterValue() as string) ?? "".toUpperCase()
                         }
-                        onChange={(event) =>
-                            table
-                                .getColumn(selectedField ?? "name").toUp
-                                ?.setFilterValue(event.target.value)
-                        }
+                        onChange={(event) => {
+                            const column = table.getColumn(selectedField ?? "name");
+                            if (column) {
+                                column.setFilterValue(event.target.value);
+                            }
+                        }}
                         className="pl-10 w-[26rem] text-black"
                     />
                 </div>
