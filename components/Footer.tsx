@@ -1,8 +1,8 @@
 import Image from "next/image";
-import insta from "@/public/images/logo2.png";
-import yt from "@/public/images/logo1.png";
-import facebook from "@/public/images/logo3.png";
-import linkedin from "@/public/images/logo4.png";
+import insta from "@/public/images/flogo2.png";
+import yt from "@/public/images/flogo1.png";
+import facebook from "@/public/images/flogo3.png";
+import linkedin from "@/public/images/flogo4.png";
 import Link from "next/link";
 
 const Footer = () => {

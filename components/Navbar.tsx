@@ -54,7 +54,7 @@ const Navbar = () => {
             <Link href="/auth/instructions" className={buttonClasses}>
               Registration Instructions
             </Link>
-            <Link href="/faqs" className={buttonClasses}>
+            <Link href="/auth/results" className={buttonClasses}>
               FAQs
             </Link>
           </div>
@@ -90,7 +90,7 @@ const Navbar = () => {
             <Link href="/auth/instructions" className={`${buttonClasses} block`}>
               Registration Instructions
             </Link>
-            <Link href="/faqs" className={`${buttonClasses} block`}>
+            <Link href="/auth/results" className={`${buttonClasses} block`}>
               FAQs
             </Link>
             <div className="pt-2">
