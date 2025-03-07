@@ -1,4 +1,4 @@
-import { getAllEventsByUser, PaymentValid } from "@/app/prismaClient/queryFunction";
+import { EmptyRegisterValidate, getAllEventsByUser, PaymentValid } from "@/app/prismaClient/queryFunction";
 import { decrypt } from "@/lib/session";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
@@ -18,6 +18,14 @@ export async function GET(){
     try{
         const eventNotRegisterList = await PaymentValid(userId);
         const userEvents = await getAllEventsByUser(userId);
+
+        const checkEmptyRegister = await EmptyRegisterValidate(userId);
+
+        if(checkEmptyRegister === true){
+            console.log("helfjdlaksjdf")
+            return NextResponse.json({success:false,type:"text", message : "Participant without event registration exist, Please add the events to such registrant"},{status:400});
+        }
+
         if(userEvents.length === 0){
             return NextResponse.json({success:false,type:"text", message : "You have not registered the Events"},{status:400});
         }

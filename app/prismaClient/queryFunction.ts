@@ -1230,3 +1230,32 @@ export async function PaymentValid(userId : string){
         handlePrismaError(error);
     }
 }
+
+export async function EmptyRegisterValidate(userId : string){
+    try{
+        const validateRegister = await prisma.registrants.findMany(
+            {
+                where : {
+                    userId : userId,
+                    teamManager : false
+                },
+                select : {
+                    _count : {
+                        select:{
+                            eventRegistrations : true,
+                            events : true
+                        }
+                    }
+                }
+            }
+        )
+        for(let i=0; i<validateRegister.length ; i++){
+            if((validateRegister[i]._count.eventRegistrations === 0) || (validateRegister[i]._count.events === 0)){
+                return true;
+            }
+        }
+        return false;
+    }catch(error : unknown){
+        handlePrismaError(error);
+    }
+}
