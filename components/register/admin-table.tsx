@@ -49,7 +49,6 @@ import {
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Image from "next/image";
-import Link from "next/link";
 import {
   Select,
   SelectContent,
@@ -71,12 +70,9 @@ export type Data = {
   phone: string;
   collegeRegion: string;
   designation?: string;
-  aadharUrl: string;
-  sslcUrl?: string;
-  idcardUrl: string;
+  dateOfBirth: string;
   gender: string;
   accomodation: boolean;
-  dateOfBirth: string;
   type:
     | "Team Manager"
     | "Participant/Accompanist"
@@ -125,9 +121,7 @@ export function DataTable({ data }: { data: Data[] }) {
         const response = await fetch("/api/deleteregister", {
           method: "DELETE",
           body: JSON.stringify({ registrantId: originId }),
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           credentials: "include",
         });
         const data = await response.json();
@@ -207,7 +201,7 @@ export function DataTable({ data }: { data: Data[] }) {
     }
   };
 
-  // --- Column Definitions ---
+  // --- Column Definitions (without extra buttons) ---
   const columns = React.useMemo<ColumnDef<Data>[]>(
     () => [
       {
@@ -222,13 +216,7 @@ export function DataTable({ data }: { data: Data[] }) {
           const photoUrl = row.getValue("photo") as string;
           const imageUrl = `https://${process.env.UPLOADTHING_APP_ID}.ufs.sh/f/${photoUrl}`;
           return (
-            <Image
-              src={imageUrl}
-              alt="Profile"
-              width={80}
-              height={80}
-              className="rounded-full object-cover"
-            />
+            <Image src={imageUrl} alt="Profile" width={80} height={80} className="rounded-full object-cover" />
           );
         },
       },
@@ -274,8 +262,9 @@ export function DataTable({ data }: { data: Data[] }) {
         accessorKey: "collegeName",
         header: ({ column, table }) => {
           const allRows = table.getPreFilteredRowModel().rows;
-          const allColleges = allRows.map((row) => row.original.collegeName as string).sort((a, b) => a.localeCompare(b));
-          // Explicitly cast to Set<string> to ensure TS knows these are strings
+          const allColleges = allRows
+            .map((row) => row.original.collegeName as string)
+            .sort((a, b) => a.localeCompare(b));
           const uniqueColleges = Array.from(new Set<string>(allColleges));
           const filterCycle = ["ALL", ...uniqueColleges];
           const currentFilter = (column.getFilterValue() as string) ?? "ALL";
@@ -344,51 +333,6 @@ export function DataTable({ data }: { data: Data[] }) {
             events.some((e) => e.eventName === val)
           );
         },
-      },
-      {
-        accessorKey: "idcardUrl",
-        header: "ID Card",
-        cell: ({ row }) => {
-          const imageKey = row.getValue("idcardUrl") as string;
-          const imageUrl = `https://${process.env.UPLOADTHING_APP_ID}.ufs.sh/f/${imageKey}`;
-          return (
-            <Link href={imageUrl} target="_blank">
-              <Button>IDCARD</Button>
-            </Link>
-          );
-        },
-      },
-      {
-        accessorKey: "aadharUrl",
-        header: "Aadhar Card",
-        cell: ({ row }) => {
-          const imageKey = row.getValue("aadharUrl") as string;
-          const imageUrl = `https://${process.env.UPLOADTHING_APP_ID}.ufs.sh/f/${imageKey}`;
-          return (
-            <Link href={imageUrl} target="_blank">
-              <Button>AADHAR</Button>
-            </Link>
-          );
-        },
-      },
-      {
-        accessorKey: "sslcUrl",
-        header: "SSLC Certificate",
-        cell: ({ row }) => {
-          const imageKey = row.getValue("sslcUrl") as string;
-          const type = row.getValue("type") as string;
-          const imageUrl = `https://${process.env.UPLOADTHING_APP_ID}.ufs.sh/f/${imageKey}`;
-          return type === "Team Manager" ? "N/A" : (
-            <Link href={imageUrl} target="_blank">
-              <Button>SSLC</Button>
-            </Link>
-          );
-        },
-      },
-      {
-        accessorKey: "designation",
-        header: "Designation",
-        cell: ({ row }) => row.getValue("designation") || "N/A",
       },
       {
         accessorKey: "Action",
@@ -460,10 +404,9 @@ export function DataTable({ data }: { data: Data[] }) {
     });
 
     const excelData: any[][] = [];
-    excelData.push([
-      "Visveraya technological university in association with Global Academy of technology",
-    ]);
-    excelData.push(["24th VTU Youth Fest @ GAT"]);
+    // Overall header rows
+    excelData.push(["Visveraya technological university in association with Global Academy of technology"]);
+    excelData.push(["24th VTU Youth Fest - INTERACT"]);
     excelData.push([]); // blank row
 
     for (const collegeName of Object.keys(collegeData)) {
@@ -477,24 +420,14 @@ export function DataTable({ data }: { data: Data[] }) {
       excelData.push([`College Assigned Code: ${collegeAssignedCode}`]);
       excelData.push([`VTU Code: ${vtuCode}`]);
       excelData.push([`Accomodation: ${accomodationCollege}`]);
-      excelData.push([`Accommodation Allocated: N/A`]);
+      excelData.push([`Accommodation Allocated: N/A`]); // Placeholder; update if needed
       excelData.push([]);
 
-      // Student details (exclude Team Manager)
+      // Student Details Table (exclude Team Manager)
       const studentRows = rowsForCollege.filter((r) => r.type !== "Team Manager");
       if (studentRows.length > 0) {
         excelData.push(["Student Details"]);
-        excelData.push([
-          "SL No",
-          "Student Code",
-          "Name",
-          "USN",
-          "Phone",
-          "Email",
-          "Gender",
-          "DOB",
-          "Accomodation",
-        ]);
+        excelData.push(["SL No", "Student Code", "Name", "USN", "Phone", "Email", "Gender", "DOB", "Accomodation"]);
         studentRows.forEach((row, index) => {
           const studentCode = row.usn || "";
           excelData.push([
@@ -512,19 +445,11 @@ export function DataTable({ data }: { data: Data[] }) {
         excelData.push([]);
       }
 
-      // Team Manager details
+      // Team Manager Details Table
       const teamManagerRows = rowsForCollege.filter((r) => r.type === "Team Manager");
       if (teamManagerRows.length > 0) {
         excelData.push(["Team Manager Details"]);
-        excelData.push([
-          "SL No",
-          "Name",
-          "Designation",
-          "Phone",
-          "Email",
-          "Gender",
-          "DOB",
-        ]);
+        excelData.push(["SL No", "Name", "Designation", "Phone", "Email", "Gender", "DOB"]);
         teamManagerRows.forEach((row, index) => {
           excelData.push([
             index + 1,
@@ -539,7 +464,7 @@ export function DataTable({ data }: { data: Data[] }) {
         excelData.push([]);
       }
 
-      // Event registration details
+      // Event Registration Table
       const eventsMap: Record<string, { name: string; role: string }[]> = {};
       rowsForCollege.forEach((row) => {
         if (row.events && Array.isArray(row.events)) {
@@ -580,7 +505,7 @@ export function DataTable({ data }: { data: Data[] }) {
       { wch: 15 },
     ];
 
-    // Apply basic cell styling (if supported)
+    // Optional: Apply basic cell styling (if supported)
     const headerTitles = new Set([
       "SL No",
       "Student Code",
@@ -646,53 +571,26 @@ export function DataTable({ data }: { data: Data[] }) {
             <Trash2 className="mr-2 h-4 w-4" />
             Delete Selected
           </Button>
-          <Button
-            variant="outline"
-            className="bg-[#00B140] text-white hover:scale-105 hover:bg-[#00B140] hover:text-white px-4"
-            onClick={() => router.push("/registrationTeamDashboard/collegeDetails")}
-          >
-            Go To College List
-          </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="ml-2 px-4">
-                <Columns className="mr-2 h-4 w-4" />
-                Columns <ChevronDown />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {table.getAllColumns().filter((column) => column.getCanHide()).map((column) => (
-                <DropdownMenuCheckboxItem
-                  key={column.id}
-                  className="capitalize"
-                  checked={column.getIsVisible()}
-                  onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                >
-                  {column.id}
-                </DropdownMenuCheckboxItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
       </div>
 
       {/* Total Registrants */}
-      <div className="mb-2 text-sm text-gray-700">
-        Total Registrants: {totalRegistrants}
-      </div>
+      <div className="mb-2 text-sm text-gray-700">Total Registrants: {totalRegistrants}</div>
 
       {/* Data Table */}
-      <div className="rounded-md border overflow-auto min-h-[18rem] shadow-lg" ref={scrollContainerRef}
-           onMouseDown={handleMouseDown} onMouseLeave={handleMouseLeave} onMouseUp={handleMouseUp} onMouseMove={handleMouseMove}>
+      <div className="rounded-md border overflow-auto min-h-[18rem] shadow-lg"
+           ref={scrollContainerRef}
+           onMouseDown={handleMouseDown}
+           onMouseLeave={handleMouseLeave}
+           onMouseUp={handleMouseUp}
+           onMouseMove={handleMouseMove}>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
                   <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
+                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
                 ))}
               </TableRow>
@@ -703,9 +601,7 @@ export function DataTable({ data }: { data: Data[] }) {
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} className="hover:bg-blue-50 text-black" data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
+                    <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
                   ))}
                 </TableRow>
               ))
@@ -753,9 +649,7 @@ const CollegeNameFilter: React.FC<CollegeNameFilterProps> = ({ column, table }) 
       <DropdownMenuTrigger asChild>
         <Button variant="ghost">
           College Name <ChevronDown className="ml-1 h-4 w-4" />{" "}
-          {Array.isArray(column.getFilterValue()) && column.getFilterValue().length > 0
-            ? `: ${column.getFilterValue()[0]}`
-            : ""}
+          {Array.isArray(column.getFilterValue()) && column.getFilterValue().length > 0 ? `: ${column.getFilterValue()[0]}` : ""}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 p-2 max-h-60 overflow-y-auto">
@@ -785,9 +679,7 @@ const TypeFilter: React.FC<TypeFilterProps> = ({ column, table }) => {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost">
           Type <ChevronDown className="ml-1 h-4 w-4" />{" "}
-          {Array.isArray(column.getFilterValue()) && column.getFilterValue().length > 0
-            ? `: ${column.getFilterValue()[0]}`
-            : ""}
+          {Array.isArray(column.getFilterValue()) && column.getFilterValue().length > 0 ? `: ${column.getFilterValue()[0]}` : ""}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 p-2 max-h-60 overflow-y-auto">
@@ -821,9 +713,7 @@ const EventFilter: React.FC<EventFilterProps> = ({ column, table }) => {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost">
           Events <ChevronDown className="ml-1 h-4 w-4" />{" "}
-          {Array.isArray(column.getFilterValue()) && column.getFilterValue().length > 0
-            ? `: ${column.getFilterValue()[0]}`
-            : ""}
+          {Array.isArray(column.getFilterValue()) && column.getFilterValue().length > 0 ? `: ${column.getFilterValue()[0]}` : ""}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 p-2 max-h-60 overflow-y-auto">
