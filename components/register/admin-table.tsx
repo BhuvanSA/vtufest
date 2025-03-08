@@ -52,7 +52,7 @@ import {
 // Updated Data type based on your Prisma schema.
 export type Data = {
   id: string;
-  photo: string; // identifier used to construct the photo URL
+  photo: string; // used to construct the photo URL
   name: string;
   collegeName: string;
   collegeCode?: string; // from Users.collegeCode
@@ -70,8 +70,7 @@ export type Data = {
   gender: string;
   accomodation: boolean; // from Registrants.accomodation
   designation?: string;
-  // Added dateOfBirth field to match data extracted in the page.
-  dateOfBirth?: string;
+  dateOfBirth?: string; // extracted from database (DOB)
 };
 
 // -------------------- Helper: Convert Image URL to Base64 --------------------
@@ -175,6 +174,7 @@ export function DataTable({ data }: { data: Data[] }) {
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
+  // --- Updated Columns: now including Phone, Email, Gender, and DOB ---
   const columns = React.useMemo<ColumnDef<Data>[]>(
     () => [
       {
@@ -256,9 +256,7 @@ export function DataTable({ data }: { data: Data[] }) {
             <ArrowUpDown className="p-1" />
           </Button>
         ),
-        cell: ({ row }) => (
-          <div className="capitalize">{row.getValue("name") as string}</div>
-        ),
+        cell: ({ row }) => <div className="capitalize">{row.getValue("name") as string}</div>,
       },
       {
         accessorKey: "usn",
@@ -273,18 +271,34 @@ export function DataTable({ data }: { data: Data[] }) {
             <ArrowUpDown className="p-1" />
           </Button>
         ),
-        cell: ({ row }) => (
-          <div className="uppercase">{row.getValue("usn") as string}</div>
-        ),
+        cell: ({ row }) => <div className="uppercase">{row.getValue("usn") as string}</div>,
+      },
+      {
+        accessorKey: "phone",
+        header: "Phone",
+        cell: ({ row }) => <div>{row.getValue("phone") as string}</div>,
+      },
+      {
+        accessorKey: "email",
+        header: "Email",
+        cell: ({ row }) => <div>{row.getValue("email") as string}</div>,
+      },
+      {
+        accessorKey: "gender",
+        header: "Gender",
+        cell: ({ row }) => <div>{row.getValue("gender") as string}</div>,
+      },
+      {
+        accessorKey: "dateOfBirth",
+        header: "DOB",
+        cell: ({ row }) => <div>{row.getValue("dateOfBirth") as string}</div>,
       },
       {
         accessorKey: "collegeName",
         header: ({ column, table }) => (
           <CollegeNameFilter column={column} table={table} />
         ),
-        cell: ({ row }) => (
-          <div className="capitalize">{row.getValue("collegeName") as string}</div>
-        ),
+        cell: ({ row }) => <div className="capitalize">{row.getValue("collegeName") as string}</div>,
         filterFn: (row, columnId, filterValue) => {
           if (!filterValue || (Array.isArray(filterValue) && filterValue.length === 0))
             return true;
@@ -294,12 +308,8 @@ export function DataTable({ data }: { data: Data[] }) {
       },
       {
         accessorKey: "type",
-        header: ({ column, table }) => (
-          <TypeFilter column={column} table={table} />
-        ),
-        cell: ({ row }) => (
-          <div className="capitalize">{row.getValue("type") as string}</div>
-        ),
+        header: ({ column, table }) => <TypeFilter column={column} table={table} />,
+        cell: ({ row }) => <div className="capitalize">{row.getValue("type") as string}</div>,
         filterFn: (row, columnId, filterValue) => {
           if (!filterValue || (Array.isArray(filterValue) && filterValue.length === 0))
             return true;
@@ -309,9 +319,7 @@ export function DataTable({ data }: { data: Data[] }) {
       },
       {
         accessorKey: "events",
-        header: ({ column, table }) => (
-          <EventFilter column={column} table={table} />
-        ),
+        header: ({ column, table }) => <EventFilter column={column} table={table} />,
         cell: ({ row }) => {
           const events = row.getValue("events") as { eventName: string; role?: string }[];
           const type = row.getValue("type") as string;
@@ -364,17 +372,13 @@ export function DataTable({ data }: { data: Data[] }) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuLabel className="text-primary text-l">
-                  Actions
-                </DropdownMenuLabel>
+                <DropdownMenuLabel className="text-primary text-l">Actions</DropdownMenuLabel>
                 <DropdownMenuItem onClick={() => handleUpdate(data.id)}>
                   <Pencil className="mr-2 h-4 w-4" />
                   Update
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() =>
-                    handleDeleteSelected([(data.id as string).split("#")[0]])
-                  }
+                  onClick={() => handleDeleteSelected([(data.id as string).split("#")[0]])}
                   className="text-red-500"
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
@@ -401,12 +405,7 @@ export function DataTable({ data }: { data: Data[] }) {
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      rowSelection,
-    },
+    state: { sorting, columnFilters, columnVisibility, rowSelection },
   });
 
   const totalRegistrants = table.getFilteredRowModel().rows.length;
@@ -543,83 +542,96 @@ export function DataTable({ data }: { data: Data[] }) {
       excelData.push([]);
     }
 
+    // Create worksheet from array
     const ws = XLSX.utils.aoa_to_sheet(excelData);
+
     // Set default column widths for better readability.
-    // Note: This applies to the first 9 columns; team manager tables use 7 columns.
+    // Note: Adjusting widths for both student and team manager tables.
     ws["!cols"] = [
       { wch: 8 },  // SL No
       { wch: 20 }, // Student Code / Name
-      { wch: 30 }, // Name (for student table) or Designation (for team manager)
-      { wch: 20 }, // USN / Phone
-      { wch: 20 }, // Phone / Email
-      { wch: 30 }, // Email / Gender
-      { wch: 15 }, // Gender / DOB
-      { wch: 20 }, // DOB / Accomodation
+      { wch: 30 }, // Name or Designation
+      { wch: 20 }, // USN or Phone
+      { wch: 20 }, // Phone or Email
+      { wch: 30 }, // Email or Gender
+      { wch: 15 }, // Gender or DOB
+      { wch: 20 }, // DOB or Accomodation
       { wch: 15 }, // Accomodation (only for student table)
     ];
+
+    // ----- Apply overall cell styling (requires a version supporting cell styles) -----
+    // This loop sets all cells to use Calibri font, size 12.
+    // Additionally, if a cell's value matches known header titles, set bold.
+    const headerTitles = new Set([
+      "SL No",
+      "Student Code",
+      "Name",
+      "USN",
+      "Phone",
+      "Email",
+      "Gender",
+      "DOB",
+      "Accomodation",
+      "Designation",
+    ]);
+    for (let cell in ws) {
+      if (ws.hasOwnProperty(cell) && cell[0] !== "!") {
+        if (!ws[cell].s) ws[cell].s = {};
+        ws[cell].s.font = { sz: 12, name: "Calibri" };
+        if (headerTitles.has(ws[cell].v)) {
+          ws[cell].s.font.bold = true;
+        }
+      }
+    }
+
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Registrants");
-    const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array", cellStyles: true });
     saveAs(new Blob([wbout], { type: "application/octet-stream" }), "registrants.xlsx");
   };
 
   return (
     <div className="w-full px-5 rounded-xl my-12">
       {/* Top Controls */}
-      <div className="flex flex-wrap items-center gap-3 py-4">
-        <div className="relative max-w-sm">
-          <Search className="absolute left-2 top-3 h-4 w-5 text-muted-foreground" />
-          <Input
-            placeholder="Search name..."
-            value={(table.getColumn("name")?.getFilterValue() as string[])?.[0] ?? ""}
-            onChange={(event) =>
-              table.getColumn("name")?.setFilterValue([event.target.value])
-            }
-            className="pl-10 w-[26rem]"
-          />
+      <div className="flex flex-col md:flex-row justify-between items-center py-4">
+        <div className="flex-1">
+          <div className="relative max-w-sm">
+            <Search className="absolute left-2 top-3 h-4 w-5 text-muted-foreground" />
+            <Input
+              placeholder="Search name..."
+              value={(table.getColumn("name")?.getFilterValue() as string[])?.[0] ?? ""}
+              onChange={(event) =>
+                table.getColumn("name")?.setFilterValue([event.target.value])
+              }
+              className="pl-10 w-[26rem]"
+            />
+          </div>
         </div>
-        <Button variant="outline" onClick={clearAllFilters} className="ml-2">
-          Clear Filters
-        </Button>
-        <Button
-          variant="outline"
-          className="bg-blue-500 text-white hover:scale-105 hover:bg-blue-500 hover:text-white"
-          onClick={handleExportToExcel}
-        >
-          <FileDown className="mr-2 h-4 w-4" />
-          Download as Excel
-        </Button>
-        <Button
-          variant="outline"
-          className="bg-red-500 text-white hover:scale-105 hover:bg-red-500 hover:text-primary-foreground"
-          onClick={() => handleDeleteSelected()}
-        >
-          <Trash2 className="mr-2 h-4 w-4" />
-          Delete Selected
-        </Button>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-2">
-              <Columns className="mr-2 h-4 w-4" />
-              Columns <ChevronDown />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => (
-                <DropdownMenuCheckboxItem
-                  key={String(column.id)}
-                  className="capitalize"
-                  checked={column.getIsVisible()}
-                  onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                >
-                  {column.id}
-                </DropdownMenuCheckboxItem>
-              ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex gap-3 mt-4 md:mt-0">
+          <Button
+            variant="outline"
+            onClick={clearAllFilters}
+            className="px-4"
+          >
+            Clear Filters
+          </Button>
+          <Button
+            variant="outline"
+            className="bg-blue-500 text-white hover:scale-105 hover:bg-blue-500 hover:text-white px-4"
+            onClick={handleExportToExcel}
+          >
+            <FileDown className="mr-2 h-4 w-4" />
+            Download as Excel
+          </Button>
+          <Button
+            variant="outline"
+            className="bg-red-500 text-white hover:scale-105 hover:bg-red-500 hover:text-primary-foreground px-4"
+            onClick={() => handleDeleteSelected()}
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            Delete Selected
+          </Button>
+        </div>
       </div>
 
       {/* Display total registrants */}
@@ -743,10 +755,7 @@ const CollegeNameFilter: React.FC<CollegeNameFilterProps> = ({ column, table }) 
           onChange={(e) => setSearchQuery(e.target.value)}
           className="mb-2"
         />
-        <DropdownMenuItem
-          onClick={() => (column as any).setFilterValue([])}
-          className="cursor-pointer"
-        >
+        <DropdownMenuItem onClick={() => (column as any).setFilterValue([])} className="cursor-pointer">
           All
         </DropdownMenuItem>
         {filteredOptions.map((college: string) => (
@@ -792,18 +801,11 @@ const TypeFilter: React.FC<TypeFilterProps> = ({ column, table }) => {
           onChange={(e) => setSearchQuery(e.target.value)}
           className="mb-2"
         />
-        <DropdownMenuItem
-          onClick={() => (column as any).setFilterValue([])}
-          className="cursor-pointer"
-        >
+        <DropdownMenuItem onClick={() => (column as any).setFilterValue([])} className="cursor-pointer">
           All
         </DropdownMenuItem>
         {filteredTypes.map((t: string) => (
-          <DropdownMenuItem
-            key={t}
-            onClick={() => (column as any).setFilterValue([t])}
-            className="cursor-pointer"
-          >
+          <DropdownMenuItem key={t} onClick={() => (column as any).setFilterValue([t])} className="cursor-pointer">
             {t}
           </DropdownMenuItem>
         ))}
@@ -845,18 +847,11 @@ const EventFilter: React.FC<EventFilterProps> = ({ column, table }) => {
           onChange={(e) => setSearchQuery(e.target.value)}
           className="mb-2"
         />
-        <DropdownMenuItem
-          onClick={() => (column as any).setFilterValue([])}
-          className="cursor-pointer"
-        >
+        <DropdownMenuItem onClick={() => (column as any).setFilterValue([])} className="cursor-pointer">
           All
         </DropdownMenuItem>
         {filteredOptions.map((event: string) => (
-          <DropdownMenuItem
-            key={event}
-            onClick={() => (column as any).setFilterValue([event])}
-            className="cursor-pointer"
-          >
+          <DropdownMenuItem key={event} onClick={() => (column as any).setFilterValue([event])} className="cursor-pointer">
             {event}
           </DropdownMenuItem>
         ))}
