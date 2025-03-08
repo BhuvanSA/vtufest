@@ -256,7 +256,9 @@ export function DataTable({ data }: { data: Data[] }) {
             <ArrowUpDown className="p-1" />
           </Button>
         ),
-        cell: ({ row }) => <div className="capitalize">{row.getValue("name") as string}</div>,
+        cell: ({ row }) => (
+          <div className="capitalize">{row.getValue("name") as string}</div>
+        ),
       },
       {
         accessorKey: "usn",
@@ -271,7 +273,9 @@ export function DataTable({ data }: { data: Data[] }) {
             <ArrowUpDown className="p-1" />
           </Button>
         ),
-        cell: ({ row }) => <div className="uppercase">{row.getValue("usn") as string}</div>,
+        cell: ({ row }) => (
+          <div className="uppercase">{row.getValue("usn") as string}</div>
+        ),
       },
       {
         accessorKey: "phone",
@@ -298,7 +302,9 @@ export function DataTable({ data }: { data: Data[] }) {
         header: ({ column, table }) => (
           <CollegeNameFilter column={column} table={table} />
         ),
-        cell: ({ row }) => <div className="capitalize">{row.getValue("collegeName") as string}</div>,
+        cell: ({ row }) => (
+          <div className="capitalize">{row.getValue("collegeName") as string}</div>
+        ),
         filterFn: (row, columnId, filterValue) => {
           if (!filterValue || (Array.isArray(filterValue) && filterValue.length === 0))
             return true;
@@ -309,7 +315,9 @@ export function DataTable({ data }: { data: Data[] }) {
       {
         accessorKey: "type",
         header: ({ column, table }) => <TypeFilter column={column} table={table} />,
-        cell: ({ row }) => <div className="capitalize">{row.getValue("type") as string}</div>,
+        cell: ({ row }) => (
+          <div className="capitalize">{row.getValue("type") as string}</div>
+        ),
         filterFn: (row, columnId, filterValue) => {
           if (!filterValue || (Array.isArray(filterValue) && filterValue.length === 0))
             return true;
@@ -321,7 +329,10 @@ export function DataTable({ data }: { data: Data[] }) {
         accessorKey: "events",
         header: ({ column, table }) => <EventFilter column={column} table={table} />,
         cell: ({ row }) => {
-          const events = row.getValue("events") as { eventName: string; role?: string }[];
+          const events = row.getValue("events") as {
+            eventName: string;
+            role?: string;
+          }[];
           const type = row.getValue("type") as string;
           return (
             <div className="capitalize">
@@ -372,13 +383,17 @@ export function DataTable({ data }: { data: Data[] }) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuLabel className="text-primary text-l">Actions</DropdownMenuLabel>
+                <DropdownMenuLabel className="text-primary text-l">
+                  Actions
+                </DropdownMenuLabel>
                 <DropdownMenuItem onClick={() => handleUpdate(data.id)}>
                   <Pencil className="mr-2 h-4 w-4" />
                   Update
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() => handleDeleteSelected([(data.id as string).split("#")[0]])}
+                  onClick={() =>
+                    handleDeleteSelected([(data.id as string).split("#")[0]])
+                  }
                   className="text-red-500"
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
@@ -546,7 +561,6 @@ export function DataTable({ data }: { data: Data[] }) {
     const ws = XLSX.utils.aoa_to_sheet(excelData);
 
     // Set default column widths for better readability.
-    // Note: Adjusting widths for both student and team manager tables.
     ws["!cols"] = [
       { wch: 8 },  // SL No
       { wch: 20 }, // Student Code / Name
@@ -559,9 +573,7 @@ export function DataTable({ data }: { data: Data[] }) {
       { wch: 15 }, // Accomodation (only for student table)
     ];
 
-    // ----- Apply overall cell styling (requires a version supporting cell styles) -----
-    // This loop sets all cells to use Calibri font, size 12.
-    // Additionally, if a cell's value matches known header titles, set bold.
+    // ----- Apply overall cell styling (if supported by your XLSX version) -----
     const headerTitles = new Set([
       "SL No",
       "Student Code",
