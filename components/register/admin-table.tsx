@@ -1,5 +1,6 @@
 "use client";
-import React from "react";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 import {
   ArrowLeft,
   ArrowRight,
@@ -9,7 +10,20 @@ import {
   Search,
   Trash2,
 } from "lucide-react";
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
+import * as React from "react";
+import {
+  ColumnDef,
+  ColumnFiltersState,
+  SortingState,
+  VisibilityState,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import { ArrowUpDown, ChevronDown, MoreHorizontal, ListFilterIcon } from "lucide-react";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 
@@ -35,28 +49,34 @@ import {
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Image from "next/image";
-
+import Link from "next/link";
 import {
-  ColumnDef,
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
-// Updated Data type based on your Prisma schema.
 export type Data = {
   id: string;
-  photo: string; // used to construct the photo URL
+  photo: string;
   name: string;
   collegeName: string;
-  collegeCode?: string; // from Users.collegeCode
+  collegeCode?: string;
   usn: string;
+  email: string;
+  phone: string;
+  collegeRegion: string;
+  designation?: string;
+  aadharUrl: string;
+  sslcUrl?: string;
+  idcardUrl: string;
+  gender: string;
+  accomodation: boolean;
+  dateOfBirth: string;
   type:
     | "Team Manager"
     | "Participant/Accompanist"
@@ -65,12 +85,6 @@ export type Data = {
     | "";
   events: { eventName: string; role?: "Participant" | "Accompanist" }[];
   status: "Pending" | "Processing" | "Success" | "Failed";
-  phone: string;
-  email: string;
-  gender: string;
-  accomodation: boolean; // from Registrants.accomodation
-  designation?: string;
-  dateOfBirth?: string; // extracted from database (DOB)
 };
 
 // -------------------- Helper: Convert Image URL to Base64 --------------------
@@ -149,14 +163,10 @@ export function DataTable({ data }: { data: Data[] }) {
         const response = await fetch("/api/deleteregister", {
           method: "DELETE",
           body: JSON.stringify({ registrantIds }),
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
         });
         const data = await response.json();
-        if (!response.ok) {
-          throw new Error(data.message);
-        }
+        if (!response.ok) throw new Error(data.message);
         toast.success(data.message);
         setRows((prev) =>
           prev.filter((row) => !registrantIds.includes((row.id as string).split("#")[0]))
@@ -173,58 +183,37 @@ export function DataTable({ data }: { data: Data[] }) {
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const [selectedField, setSelectedField] = React.useState<string | null>(null);
+  const scrollContainerRef = React.useRef<HTMLDivElement>(null);
+  let isDragging = false;
+  let startX = 0;
+  let scrollLeft = 0;
 
-  // --- Updated Columns: now including Phone, Email, Gender, and DOB ---
+  const handleMouseDown = (e: React.MouseEvent) => {
+    isDragging = true;
+    startX = e.pageX - (scrollContainerRef.current?.offsetLeft || 0);
+    scrollLeft = scrollContainerRef.current?.scrollLeft || 0;
+  };
+
+  const handleMouseLeave = () => { isDragging = false; };
+  const handleMouseUp = () => { isDragging = false; };
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    const x = e.pageX - (scrollContainerRef.current?.offsetLeft || 0);
+    const walk = (x - startX) * 2;
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollLeft = scrollLeft - walk;
+    }
+  };
+
+  // --- Column Definitions ---
   const columns = React.useMemo<ColumnDef<Data>[]>(
     () => [
       {
-        id: "select",
-        header: ({ table }) => (
-          <Checkbox
-            checked={
-              table.getIsAllPageRowsSelected() ||
-              (table.getIsSomePageRowsSelected() && "indeterminate")
-            }
-            onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-            aria-label="Select all"
-          />
-        ),
-        cell: ({ row, table }) => {
-          const rowRegistrantId = (row.original.id as string).split("#")[0];
-          const handleCheck = (checked: boolean) => {
-            const matchingRows = table
-              .getRowModel()
-              .rows.filter(
-                (r) => (r.original.id as string).split("#")[0] === rowRegistrantId
-              )
-              .map((r) => r.id);
-            table.setRowSelection((prev) => {
-              const newSelection = { ...prev };
-              matchingRows.forEach((idx) => {
-                newSelection[idx] = checked;
-              });
-              return newSelection;
-            });
-          };
-
-          return (
-            <Checkbox
-              checked={row.getIsSelected()}
-              onCheckedChange={handleCheck}
-              aria-label="Select row"
-            />
-          );
-        },
-        enableSorting: false,
-        enableHiding: false,
-      },
-      {
         accessorKey: "slno",
         header: "SL No",
-        cell: ({ row, table }) => {
-          const { pagination } = table.getState();
-          return pagination.pageIndex * pagination.pageSize + row.index + 1;
-        },
+        cell: ({ row }) => row.index + 1,
       },
       {
         accessorKey: "photo",
@@ -246,36 +235,20 @@ export function DataTable({ data }: { data: Data[] }) {
       {
         accessorKey: "name",
         header: ({ column }) => (
-          <Button
-            variant="ghost"
-            onClick={() =>
-              column.toggleSorting((column.getIsSorted() as string) === "asc")
-            }
-          >
-            Name
-            <ArrowUpDown className="p-1" />
+          <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+            Name <ArrowUpDown className="p-1" />
           </Button>
         ),
-        cell: ({ row }) => (
-          <div className="capitalize">{row.getValue("name") as string}</div>
-        ),
+        cell: ({ row }) => <div className="capitalize">{row.getValue("name") as string}</div>,
       },
       {
         accessorKey: "usn",
         header: ({ column }) => (
-          <Button
-            variant="ghost"
-            onClick={() =>
-              column.toggleSorting((column.getIsSorted() as string) === "asc")
-            }
-          >
-            USN
-            <ArrowUpDown className="p-1" />
+          <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+            USN <ArrowUpDown className="p-1" />
           </Button>
         ),
-        cell: ({ row }) => (
-          <div className="uppercase">{row.getValue("usn") as string}</div>
-        ),
+        cell: ({ row }) => <div className="uppercase">{row.getValue("usn") as string}</div>,
       },
       {
         accessorKey: "phone",
@@ -299,40 +272,51 @@ export function DataTable({ data }: { data: Data[] }) {
       },
       {
         accessorKey: "collegeName",
-        header: ({ column, table }) => (
-          <CollegeNameFilter column={column} table={table} />
-        ),
-        cell: ({ row }) => (
-          <div className="capitalize">{row.getValue("collegeName") as string}</div>
-        ),
+        header: ({ column, table }) => {
+          const allRows = table.getPreFilteredRowModel().rows;
+          const allColleges = allRows.map((row) => row.original.collegeName as string).sort((a, b) => a.localeCompare(b));
+          // Explicitly cast to Set<string> to ensure TS knows these are strings
+          const uniqueColleges = Array.from(new Set<string>(allColleges));
+          const filterCycle = ["ALL", ...uniqueColleges];
+          const currentFilter = (column.getFilterValue() as string) ?? "ALL";
+          const currentIndex = filterCycle.indexOf(currentFilter);
+          const nextIndex = (currentIndex + 1) % filterCycle.length;
+          const nextFilter = filterCycle[nextIndex];
+          const handleFilterChange = () => {
+            if (nextFilter === "ALL") {
+              column.setFilterValue(undefined);
+            } else {
+              column.setFilterValue(nextFilter);
+            }
+          };
+          return (
+            <Button variant="ghost" onClick={handleFilterChange}>
+              College Name <ListFilterIcon className="p-1" /> {currentFilter !== "ALL" ? `: ${currentFilter}` : ""}
+            </Button>
+          );
+        },
+        cell: ({ row }) => <div className="capitalize">{row.getValue("collegeName") as string}</div>,
         filterFn: (row, columnId, filterValue) => {
-          if (!filterValue || (Array.isArray(filterValue) && filterValue.length === 0))
-            return true;
+          if (!filterValue || filterValue === "ALL") return true;
           const collegeName = row.getValue(columnId) as string;
-          return (filterValue as string[]).includes(collegeName);
+          return collegeName === filterValue;
         },
       },
       {
         accessorKey: "type",
         header: ({ column, table }) => <TypeFilter column={column} table={table} />,
-        cell: ({ row }) => (
-          <div className="capitalize">{row.getValue("type") as string}</div>
-        ),
+        cell: ({ row }) => <div className="capitalize">{row.getValue("type") as string}</div>,
         filterFn: (row, columnId, filterValue) => {
-          if (!filterValue || (Array.isArray(filterValue) && filterValue.length === 0))
-            return true;
+          if (!filterValue || filterValue === "") return true;
           const type = row.getValue(columnId) as string;
-          return (filterValue as string[]).includes(type);
+          return type === filterValue;
         },
       },
       {
         accessorKey: "events",
         header: ({ column, table }) => <EventFilter column={column} table={table} />,
         cell: ({ row }) => {
-          const events = row.getValue("events") as {
-            eventName: string;
-            role?: string;
-          }[];
+          const events = row.getValue("events") as { eventName: string; role?: string }[];
           const type = row.getValue("type") as string;
           return (
             <div className="capitalize">
@@ -342,17 +326,11 @@ export function DataTable({ data }: { data: Data[] }) {
                 <>
                   <div className="mb-1 text-black">
                     <span className="font-bold">Participant: </span>
-                    {events
-                      .filter((v) => v.role === "Participant")
-                      .map((e) => e.eventName)
-                      .join(", ")}
+                    {events.filter((v) => v.role === "Participant").map((e) => e.eventName).join(", ")}
                   </div>
                   <div className="text-black">
                     <span className="font-bold">Accompanist: </span>
-                    {events
-                      .filter((v) => v.role === "Accompanist")
-                      .map((e) => e.eventName)
-                      .join(", ")}
+                    {events.filter((v) => v.role === "Accompanist").map((e) => e.eventName).join(", ")}
                   </div>
                 </>
               )}
@@ -360,13 +338,57 @@ export function DataTable({ data }: { data: Data[] }) {
           );
         },
         filterFn: (row, columnId, filterValue) => {
-          if (!filterValue || (Array.isArray(filterValue) && filterValue.length === 0))
-            return true;
+          if (!filterValue || filterValue === "ALL") return true;
           const events = row.getValue(columnId) as { eventName: string }[];
           return (filterValue as string[]).some((val) =>
             events.some((e) => e.eventName === val)
           );
         },
+      },
+      {
+        accessorKey: "idcardUrl",
+        header: "ID Card",
+        cell: ({ row }) => {
+          const imageKey = row.getValue("idcardUrl") as string;
+          const imageUrl = `https://${process.env.UPLOADTHING_APP_ID}.ufs.sh/f/${imageKey}`;
+          return (
+            <Link href={imageUrl} target="_blank">
+              <Button>IDCARD</Button>
+            </Link>
+          );
+        },
+      },
+      {
+        accessorKey: "aadharUrl",
+        header: "Aadhar Card",
+        cell: ({ row }) => {
+          const imageKey = row.getValue("aadharUrl") as string;
+          const imageUrl = `https://${process.env.UPLOADTHING_APP_ID}.ufs.sh/f/${imageKey}`;
+          return (
+            <Link href={imageUrl} target="_blank">
+              <Button>AADHAR</Button>
+            </Link>
+          );
+        },
+      },
+      {
+        accessorKey: "sslcUrl",
+        header: "SSLC Certificate",
+        cell: ({ row }) => {
+          const imageKey = row.getValue("sslcUrl") as string;
+          const type = row.getValue("type") as string;
+          const imageUrl = `https://${process.env.UPLOADTHING_APP_ID}.ufs.sh/f/${imageKey}`;
+          return type === "Team Manager" ? "N/A" : (
+            <Link href={imageUrl} target="_blank">
+              <Button>SSLC</Button>
+            </Link>
+          );
+        },
+      },
+      {
+        accessorKey: "designation",
+        header: "Designation",
+        cell: ({ row }) => row.getValue("designation") || "N/A",
       },
       {
         accessorKey: "Action",
@@ -383,21 +405,15 @@ export function DataTable({ data }: { data: Data[] }) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuLabel className="text-primary text-l">
-                  Actions
-                </DropdownMenuLabel>
+                <DropdownMenuLabel className="text-primary text-l">Actions</DropdownMenuLabel>
                 <DropdownMenuItem onClick={() => handleUpdate(data.id)}>
-                  <Pencil className="mr-2 h-4 w-4" />
-                  Update
+                  <Pencil className="mr-2 h-4 w-4" /> Update
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() =>
-                    handleDeleteSelected([(data.id as string).split("#")[0]])
-                  }
+                  onClick={() => handleDeleteSelected([(data.id as string).split("#")[0]])}
                   className="text-red-500"
                 >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Delete
+                  <Trash2 className="mr-2 h-4 w-4" /> Delete
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -424,7 +440,6 @@ export function DataTable({ data }: { data: Data[] }) {
   });
 
   const totalRegistrants = table.getFilteredRowModel().rows.length;
-
   const clearAllFilters = () => {
     setColumnFilters([]);
     setSorting([]);
@@ -445,33 +460,30 @@ export function DataTable({ data }: { data: Data[] }) {
     });
 
     const excelData: any[][] = [];
-    // Overall header rows
     excelData.push([
       "Visveraya technological university in association with Global Academy of technology",
     ]);
     excelData.push(["24th VTU Youth Fest @ GAT"]);
     excelData.push([]); // blank row
 
-    // Loop through each college group
     for (const collegeName of Object.keys(collegeData)) {
       const rowsForCollege = collegeData[collegeName];
       const collegeAssignedCode = rowsForCollege[0].collegeCode || "N/A";
       const vtuCode = (rowsForCollege[0] as any).vtuCode || "N/A";
       const accomodationCollege = rowsForCollege[0].accomodation ? "Yes" : "No";
 
-      // Five detail header rows for the college
+      // College header rows
       excelData.push([`College: ${collegeName}`]);
       excelData.push([`College Assigned Code: ${collegeAssignedCode}`]);
       excelData.push([`VTU Code: ${vtuCode}`]);
       excelData.push([`Accomodation: ${accomodationCollege}`]);
-      excelData.push([`Accommodation Allocated: N/A`]); // Placeholder; update as needed
-      excelData.push([]); // blank row
+      excelData.push([`Accommodation Allocated: N/A`]);
+      excelData.push([]);
 
-      // STUDENT TABLE (exclude Team Manager)
+      // Student details (exclude Team Manager)
       const studentRows = rowsForCollege.filter((r) => r.type !== "Team Manager");
       if (studentRows.length > 0) {
         excelData.push(["Student Details"]);
-        // Columns: SL No, Student Code, Name, USN, Phone, Email, Gender, DOB, Accomodation
         excelData.push([
           "SL No",
           "Student Code",
@@ -497,14 +509,13 @@ export function DataTable({ data }: { data: Data[] }) {
             row.accomodation ? "Yes" : "No",
           ]);
         });
-        excelData.push([]); // blank row
+        excelData.push([]);
       }
 
-      // TEAM MANAGER TABLE
+      // Team Manager details
       const teamManagerRows = rowsForCollege.filter((r) => r.type === "Team Manager");
       if (teamManagerRows.length > 0) {
         excelData.push(["Team Manager Details"]);
-        // Columns: SL No, Name, Designation, Phone, Email, Gender, DOB
         excelData.push([
           "SL No",
           "Name",
@@ -525,10 +536,10 @@ export function DataTable({ data }: { data: Data[] }) {
             row.dateOfBirth || "",
           ]);
         });
-        excelData.push([]); // blank row
+        excelData.push([]);
       }
 
-      // EVENT REGISTRATION TABLE
+      // Event registration details
       const eventsMap: Record<string, { name: string; role: string }[]> = {};
       rowsForCollege.forEach((row) => {
         if (row.events && Array.isArray(row.events)) {
@@ -551,29 +562,25 @@ export function DataTable({ data }: { data: Data[] }) {
         eventsMap[eventName].forEach((entry, index) => {
           excelData.push([index + 1, entry.name, entry.role]);
         });
-        excelData.push([]); // blank row
+        excelData.push([]);
       }
-      // Extra blank row between colleges
       excelData.push([]);
     }
 
-    // Create worksheet from array
     const ws = XLSX.utils.aoa_to_sheet(excelData);
-
-    // Set default column widths for better readability.
     ws["!cols"] = [
-      { wch: 8 },  // SL No
-      { wch: 20 }, // Student Code / Name
-      { wch: 30 }, // Name or Designation
-      { wch: 20 }, // USN or Phone
-      { wch: 20 }, // Phone or Email
-      { wch: 30 }, // Email or Gender
-      { wch: 15 }, // Gender or DOB
-      { wch: 20 }, // DOB or Accomodation
-      { wch: 15 }, // Accomodation (only for student table)
+      { wch: 8 },
+      { wch: 20 },
+      { wch: 30 },
+      { wch: 20 },
+      { wch: 20 },
+      { wch: 30 },
+      { wch: 15 },
+      { wch: 20 },
+      { wch: 15 },
     ];
 
-    // ----- Apply overall cell styling (if supported by your XLSX version) -----
+    // Apply basic cell styling (if supported)
     const headerTitles = new Set([
       "SL No",
       "Student Code",
@@ -620,11 +627,7 @@ export function DataTable({ data }: { data: Data[] }) {
           </div>
         </div>
         <div className="flex gap-3 mt-4 md:mt-0">
-          <Button
-            variant="outline"
-            onClick={clearAllFilters}
-            className="px-4"
-          >
+          <Button variant="outline" onClick={clearAllFilters} className="px-4">
             Clear Filters
           </Button>
           <Button
@@ -643,16 +646,44 @@ export function DataTable({ data }: { data: Data[] }) {
             <Trash2 className="mr-2 h-4 w-4" />
             Delete Selected
           </Button>
+          <Button
+            variant="outline"
+            className="bg-[#00B140] text-white hover:scale-105 hover:bg-[#00B140] hover:text-white px-4"
+            onClick={() => router.push("/registrationTeamDashboard/collegeDetails")}
+          >
+            Go To College List
+          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="ml-2 px-4">
+                <Columns className="mr-2 h-4 w-4" />
+                Columns <ChevronDown />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {table.getAllColumns().filter((column) => column.getCanHide()).map((column) => (
+                <DropdownMenuCheckboxItem
+                  key={column.id}
+                  className="capitalize"
+                  checked={column.getIsVisible()}
+                  onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                >
+                  {column.id}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
-      {/* Display total registrants */}
+      {/* Total Registrants */}
       <div className="mb-2 text-sm text-gray-700">
         Total Registrants: {totalRegistrants}
       </div>
 
       {/* Data Table */}
-      <div className="rounded-md border overflow-auto min-h-[18rem] shadow-lg">
+      <div className="rounded-md border overflow-auto min-h-[18rem] shadow-lg" ref={scrollContainerRef}
+           onMouseDown={handleMouseDown} onMouseLeave={handleMouseLeave} onMouseUp={handleMouseUp} onMouseMove={handleMouseMove}>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -670,11 +701,7 @@ export function DataTable({ data }: { data: Data[] }) {
           <TableBody className="text-primary">
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
-                  className="hover:bg-blue-50 text-black"
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
+                <TableRow key={row.id} className="hover:bg-blue-50 text-black" data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -693,39 +720,16 @@ export function DataTable({ data }: { data: Data[] }) {
         </Table>
       </div>
 
-      {/* Pagination & Page Size */}
-      <div className="flex flex-col md:flex-row items-center justify-between py-4">
-        <div className="flex items-center gap-2">
-          <span>Rows per page:</span>
-          <select
-            value={table.getState().pagination.pageSize}
-            onChange={(e) => table.setPageSize(Number(e.target.value))}
-            className="border rounded p-1"
-          >
-            <option value={10}>10</option>
-            <option value={25}>25</option>
-            <option value={50}>50</option>
-            <option value={100}>100</option>
-          </select>
+      {/* Pagination */}
+      <div className="flex flex-col md:flex-row items-center justify-end space-x-2 py-4">
+        <div className="flex-1 text-sm text-muted-foreground">
+          {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
-        <div className="flex items-center gap-4">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
+        <div className="space-x-2">
+          <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
             <ArrowLeft className="mr-2 h-4 w-4" /> Previous
           </Button>
-          <span>
-            Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
-          </span>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
+          <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
             Next <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </div>
@@ -735,47 +739,32 @@ export function DataTable({ data }: { data: Data[] }) {
 }
 
 // -------------------- Filter Components --------------------
-
-type CollegeNameFilterProps = {
-  column: any;
-  table: any;
-};
-
+type CollegeNameFilterProps = { column: any; table: any; };
 const CollegeNameFilter: React.FC<CollegeNameFilterProps> = ({ column, table }) => {
   const allRows = table.getPreFilteredRowModel().rows;
   const allColleges = allRows.map((row: any) => row.original.collegeName as string);
-  const uniqueColleges = Array.from(new Set(allColleges)) as string[];
+  const uniqueColleges = Array.from(new Set<string>(allColleges));
   const [searchQuery, setSearchQuery] = React.useState("");
-  const filteredOptions: string[] = uniqueColleges.filter((college: string) =>
+  const filteredOptions = uniqueColleges.filter((college: string) =>
     college.toLowerCase().includes(searchQuery.toLowerCase())
   );
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost">
-          College Name
-          <ChevronDown className="ml-1 h-4 w-4" />
+          College Name <ChevronDown className="ml-1 h-4 w-4" />{" "}
           {Array.isArray(column.getFilterValue()) && column.getFilterValue().length > 0
             ? `: ${column.getFilterValue()[0]}`
             : ""}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 p-2 max-h-60 overflow-y-auto">
-        <Input
-          placeholder="Search college..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="mb-2"
-        />
+        <Input placeholder="Search college..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="mb-2" />
         <DropdownMenuItem onClick={() => (column as any).setFilterValue([])} className="cursor-pointer">
           All
         </DropdownMenuItem>
         {filteredOptions.map((college: string) => (
-          <DropdownMenuItem
-            key={college}
-            onClick={() => (column as any).setFilterValue([college])}
-            className="cursor-pointer"
-          >
+          <DropdownMenuItem key={college} onClick={() => (column as any).setFilterValue([college])} className="cursor-pointer">
             {college}
           </DropdownMenuItem>
         ))}
@@ -784,35 +773,25 @@ const CollegeNameFilter: React.FC<CollegeNameFilterProps> = ({ column, table }) 
   );
 };
 
-type TypeFilterProps = {
-  column: any;
-  table: any;
-};
-
+type TypeFilterProps = { column: any; table: any; };
 const TypeFilter: React.FC<TypeFilterProps> = ({ column, table }) => {
-  const types: string[] = ["Team Manager", "Participant/Accompanist", "Participant", "Accompanist"];
+  const types = ["Team Manager", "Participant/Accompanist", "Participant", "Accompanist"];
   const [searchQuery, setSearchQuery] = React.useState("");
-  const filteredTypes: string[] = types.filter((t: string) =>
+  const filteredTypes = types.filter((t: string) =>
     t.toLowerCase().includes(searchQuery.toLowerCase())
   );
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost">
-          Type
-          <ChevronDown className="ml-1 h-4 w-4" />
+          Type <ChevronDown className="ml-1 h-4 w-4" />{" "}
           {Array.isArray(column.getFilterValue()) && column.getFilterValue().length > 0
             ? `: ${column.getFilterValue()[0]}`
             : ""}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 p-2 max-h-60 overflow-y-auto">
-        <Input
-          placeholder="Search type..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="mb-2"
-        />
+        <Input placeholder="Search type..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="mb-2" />
         <DropdownMenuItem onClick={() => (column as any).setFilterValue([])} className="cursor-pointer">
           All
         </DropdownMenuItem>
@@ -826,39 +805,29 @@ const TypeFilter: React.FC<TypeFilterProps> = ({ column, table }) => {
   );
 };
 
-type EventFilterProps = {
-  column: any;
-  table: any;
-};
-
+type EventFilterProps = { column: any; table: any; };
 const EventFilter: React.FC<EventFilterProps> = ({ column, table }) => {
   const allRows = table.getPreFilteredRowModel().rows;
   const allEvents = allRows.flatMap((row: any) =>
     (row.original.events as { eventName: string }[]).map((e) => e.eventName)
-  ) as string[];
-  const uniqueEvents = Array.from(new Set(allEvents)) as string[];
+  );
+  const uniqueEvents = Array.from(new Set<string>(allEvents));
   const [searchQuery, setSearchQuery] = React.useState("");
-  const filteredOptions: string[] = uniqueEvents.filter((event: string) =>
+  const filteredOptions = uniqueEvents.filter((event: string) =>
     event.toLowerCase().includes(searchQuery.toLowerCase())
   );
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost">
-          Events
-          <ChevronDown className="ml-1 h-4 w-4" />
+          Events <ChevronDown className="ml-1 h-4 w-4" />{" "}
           {Array.isArray(column.getFilterValue()) && column.getFilterValue().length > 0
             ? `: ${column.getFilterValue()[0]}`
             : ""}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 p-2 max-h-60 overflow-y-auto">
-        <Input
-          placeholder="Search event..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="mb-2"
-        />
+        <Input placeholder="Search event..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="mb-2" />
         <DropdownMenuItem onClick={() => (column as any).setFilterValue([])} className="cursor-pointer">
           All
         </DropdownMenuItem>
