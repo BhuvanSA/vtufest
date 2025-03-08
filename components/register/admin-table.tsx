@@ -70,6 +70,8 @@ export type Data = {
   gender: string;
   accomodation: boolean; // from Registrants.accomodation
   designation?: string;
+  // Added dateOfBirth field to match data extracted in the page.
+  dateOfBirth?: string;
 };
 
 // -------------------- Helper: Convert Image URL to Base64 --------------------
@@ -455,16 +457,16 @@ export function DataTable({ data }: { data: Data[] }) {
       const studentRows = rowsForCollege.filter((r) => r.type !== "Team Manager");
       if (studentRows.length > 0) {
         excelData.push(["Student Details"]);
-        // Added "Student Code" next to SL No (using 'usn' field)
+        // Columns: SL No, Student Code, Name, USN, Phone, Email, Gender, DOB, Accomodation
         excelData.push([
           "SL No",
           "Student Code",
-          "Photo",
           "Name",
           "USN",
           "Phone",
           "Email",
           "Gender",
+          "DOB",
           "Accomodation",
         ]);
         studentRows.forEach((row, index) => {
@@ -472,12 +474,12 @@ export function DataTable({ data }: { data: Data[] }) {
           excelData.push([
             index + 1,
             studentCode,
-            "", // omit photo in Excel
             row.name || "",
             row.usn || "",
             row.phone || "",
             row.email || "",
             row.gender || "",
+            row.dateOfBirth || "",
             row.accomodation ? "Yes" : "No",
           ]);
         });
@@ -488,24 +490,25 @@ export function DataTable({ data }: { data: Data[] }) {
       const teamManagerRows = rowsForCollege.filter((r) => r.type === "Team Manager");
       if (teamManagerRows.length > 0) {
         excelData.push(["Team Manager Details"]);
+        // Columns: SL No, Name, Designation, Phone, Email, Gender, DOB
         excelData.push([
           "SL No",
-          "Photo",
           "Name",
           "Designation",
           "Phone",
           "Email",
           "Gender",
+          "DOB",
         ]);
         teamManagerRows.forEach((row, index) => {
           excelData.push([
             index + 1,
-            "", // omit photo
             row.name || "",
             row.designation || "",
             row.phone || "",
             row.email || "",
             row.gender || "",
+            row.dateOfBirth || "",
           ]);
         });
         excelData.push([]); // blank row
@@ -541,17 +544,18 @@ export function DataTable({ data }: { data: Data[] }) {
     }
 
     const ws = XLSX.utils.aoa_to_sheet(excelData);
-    // Set default column widths for better readability
+    // Set default column widths for better readability.
+    // Note: This applies to the first 9 columns; team manager tables use 7 columns.
     ws["!cols"] = [
-      { wch: 10 }, // SL No
-      { wch: 20 }, // Student Code
-      { wch: 20 }, // Photo
-      { wch: 30 }, // Name
-      { wch: 20 }, // USN
-      { wch: 20 }, // Phone
-      { wch: 30 }, // Email
-      { wch: 15 }, // Gender
-      { wch: 15 }, // Accomodation
+      { wch: 8 },  // SL No
+      { wch: 20 }, // Student Code / Name
+      { wch: 30 }, // Name (for student table) or Designation (for team manager)
+      { wch: 20 }, // USN / Phone
+      { wch: 20 }, // Phone / Email
+      { wch: 30 }, // Email / Gender
+      { wch: 15 }, // Gender / DOB
+      { wch: 20 }, // DOB / Accomodation
+      { wch: 15 }, // Accomodation (only for student table)
     ];
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Registrants");
