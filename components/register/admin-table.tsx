@@ -49,6 +49,7 @@ import {
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Image from "next/image";
+import Link from "next/link";
 import {
   Select,
   SelectContent,
@@ -138,7 +139,6 @@ export function DataTable({ data }: { data: Data[] }) {
   const handleDeleteSelected = React.useCallback(
     async (providedRegistrants?: string[]) => {
       let registrantIds: string[] = [];
-
       if (providedRegistrants && providedRegistrants.length > 0) {
         registrantIds = providedRegistrants;
       } else {
@@ -147,12 +147,10 @@ export function DataTable({ data }: { data: Data[] }) {
           new Set(selectedRows.map((r) => (r.original.id as string).split("#")[0]))
         );
       }
-
       if (!registrantIds.length) {
         toast.error("No rows selected");
         return;
       }
-
       try {
         const response = await fetch("/api/deleteregister", {
           method: "DELETE",
@@ -182,13 +180,11 @@ export function DataTable({ data }: { data: Data[] }) {
   let isDragging = false;
   let startX = 0;
   let scrollLeft = 0;
-
   const handleMouseDown = (e: React.MouseEvent) => {
     isDragging = true;
     startX = e.pageX - (scrollContainerRef.current?.offsetLeft || 0);
     scrollLeft = scrollContainerRef.current?.scrollLeft || 0;
   };
-
   const handleMouseLeave = () => { isDragging = false; };
   const handleMouseUp = () => { isDragging = false; };
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -201,7 +197,7 @@ export function DataTable({ data }: { data: Data[] }) {
     }
   };
 
-  // --- Column Definitions (without extra buttons) ---
+  // --- Column Definitions ---
   const columns = React.useMemo<ColumnDef<Data>[]>(
     () => [
       {
@@ -260,30 +256,7 @@ export function DataTable({ data }: { data: Data[] }) {
       },
       {
         accessorKey: "collegeName",
-        header: ({ column, table }) => {
-          const allRows = table.getPreFilteredRowModel().rows;
-          const allColleges = allRows
-            .map((row) => row.original.collegeName as string)
-            .sort((a, b) => a.localeCompare(b));
-          const uniqueColleges = Array.from(new Set<string>(allColleges));
-          const filterCycle = ["ALL", ...uniqueColleges];
-          const currentFilter = (column.getFilterValue() as string) ?? "ALL";
-          const currentIndex = filterCycle.indexOf(currentFilter);
-          const nextIndex = (currentIndex + 1) % filterCycle.length;
-          const nextFilter = filterCycle[nextIndex];
-          const handleFilterChange = () => {
-            if (nextFilter === "ALL") {
-              column.setFilterValue(undefined);
-            } else {
-              column.setFilterValue(nextFilter);
-            }
-          };
-          return (
-            <Button variant="ghost" onClick={handleFilterChange}>
-              College Name <ListFilterIcon className="p-1" /> {currentFilter !== "ALL" ? `: ${currentFilter}` : ""}
-            </Button>
-          );
-        },
+        header: ({ column, table }) => <CollegeNameFilter column={column} table={table} />,
         cell: ({ row }) => <div className="capitalize">{row.getValue("collegeName") as string}</div>,
         filterFn: (row, columnId, filterValue) => {
           if (!filterValue || filterValue === "ALL") return true;
@@ -353,10 +326,7 @@ export function DataTable({ data }: { data: Data[] }) {
                 <DropdownMenuItem onClick={() => handleUpdate(data.id)}>
                   <Pencil className="mr-2 h-4 w-4" /> Update
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => handleDeleteSelected([(data.id as string).split("#")[0]])}
-                  className="text-red-500"
-                >
+                <DropdownMenuItem onClick={() => handleDeleteSelected([(data.id as string).split("#")[0]])} className="text-red-500">
                   <Trash2 className="mr-2 h-4 w-4" /> Delete
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -406,7 +376,7 @@ export function DataTable({ data }: { data: Data[] }) {
     const excelData: any[][] = [];
     // Overall header rows
     excelData.push(["Visveraya technological university in association with Global Academy of technology"]);
-    excelData.push(["24th VTU Youth Fest - INTERACT"]);
+    excelData.push(["24th VTU Youth Fest @ GAT"]);
     excelData.push([]); // blank row
 
     for (const collegeName of Object.keys(collegeData)) {
@@ -420,7 +390,7 @@ export function DataTable({ data }: { data: Data[] }) {
       excelData.push([`College Assigned Code: ${collegeAssignedCode}`]);
       excelData.push([`VTU Code: ${vtuCode}`]);
       excelData.push([`Accomodation: ${accomodationCollege}`]);
-      excelData.push([`Accommodation Allocated: N/A`]); // Placeholder; update if needed
+      excelData.push([`Accommodation Allocated: N/A`]);
       excelData.push([]);
 
       // Student Details Table (exclude Team Manager)
@@ -505,7 +475,7 @@ export function DataTable({ data }: { data: Data[] }) {
       { wch: 15 },
     ];
 
-    // Optional: Apply basic cell styling (if supported)
+    // Apply basic cell styling (if supported)
     const headerTitles = new Set([
       "SL No",
       "Student Code",
