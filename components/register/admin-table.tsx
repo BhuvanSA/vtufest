@@ -1,7 +1,5 @@
 "use client";
 import React from "react";
-import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
 import {
   ArrowLeft,
   ArrowRight,
@@ -37,6 +35,19 @@ import {
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Image from "next/image";
+
+import {
+  ColumnDef,
+  ColumnFiltersState,
+  SortingState,
+  VisibilityState,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
 
 // Updated Data type based on your Prisma schema.
 export type Data = {
@@ -79,19 +90,6 @@ async function getBase64ImageFromURL(url: string): Promise<string> {
 }
 
 // -------------------- Main DataTable Component --------------------
-import {
-  ColumnDef,
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-
 export function DataTable({ data }: { data: Data[] }) {
   const router = useRouter();
   const [rows, setRows] = React.useState<Data[]>(data);
@@ -418,216 +416,6 @@ export function DataTable({ data }: { data: Data[] }) {
     table.resetSorting();
   };
 
-  // --------------------- PDF Export (Landscape) ---------------------
-  const handleExportToPDF = async () => {
-    const filteredRows = table.getRowModel().rows;
-    const doc = new jsPDF({ orientation: "landscape" });
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-
-    // Load logos from repository (ensure these images exist in /public/images)
-    const gatLogoURL = `${window.location.origin}/images/gat_logo.png`;
-    const vtuLogoURL = `${window.location.origin}/images/vtu_logo.png`;
-    const gatLogoData = await getBase64ImageFromURL(gatLogoURL);
-    const vtuLogoData = await getBase64ImageFromURL(vtuLogoURL);
-    const logoWidth = 40;
-    const logoHeight = 20;
-    doc.addImage(gatLogoData, "PNG", 10, 10, logoWidth, logoHeight);
-    doc.addImage(vtuLogoData, "PNG", pageWidth - logoWidth - 10, 10, logoWidth, logoHeight);
-
-    // Center header text between logos
-    doc.setFontSize(12);
-    const headerText =
-      "Visveraya technological university in association with Global Academy of technology";
-    const headerTextWidth = doc.getTextWidth(headerText);
-    const headerX = (pageWidth - headerTextWidth) / 2;
-    doc.text(headerText, headerX, 20);
-
-    // Fest Heading
-    doc.setFontSize(16);
-    const festHeading = "24th VTU Youth Fest @ GAT";
-    const festHeadingWidth = doc.getTextWidth(festHeading);
-    const festX = (pageWidth - festHeadingWidth) / 2;
-    doc.text(festHeading, festX, 30);
-
-    // Group data by college (using collegeName as key)
-    const collegeData: Record<string, Data[]> = {};
-    filteredRows.forEach((row) => {
-      const collegeName = row.getValue("collegeName") as string;
-      if (!collegeData[collegeName]) {
-        collegeData[collegeName] = [];
-      }
-      collegeData[collegeName].push(row.original);
-    });
-
-    let currentY = 40; // starting Y after header
-
-    // Helper to add a table with image hooks for the "Photo" column (index 1)
-    const addTableWithImages = (head: any, body: any) => {
-      autoTable(doc, {
-        head,
-        body,
-        startY: currentY,
-        margin: { left: 10, right: 10 },
-        styles: { fontSize: 10, cellPadding: 3 },
-        headStyles: { fillColor: [26, 188, 156] },
-        didParseCell: function (data) {
-          if (
-            data.column.index === 1 &&
-            data.cell.raw &&
-            typeof data.cell.raw === "string" &&
-            data.cell.raw.startsWith("data:image")
-          ) {
-            data.cell.text = "";
-          }
-        },
-        didDrawCell: function (data) {
-          if (
-            data.column.index === 1 &&
-            data.cell.raw &&
-            typeof data.cell.raw === "string" &&
-            data.cell.raw.startsWith("data:image")
-          ) {
-            (doc as any).addImage(
-              data.cell.raw,
-              "PNG",
-              data.cell.x + 2,
-              data.cell.y + 2,
-              15,
-              15
-            );
-          }
-        },
-      });
-      currentY = (doc as any).lastAutoTable.finalY + 10;
-    };
-
-    // Loop through each college group
-    for (const collegeName of Object.keys(collegeData)) {
-      const rowsForCollege = collegeData[collegeName];
-      // Extract collegeCode and accomodation status
-      const collegeCode = rowsForCollege[0].collegeCode || "N/A";
-      const accomodationText = rowsForCollege[0].accomodation ? "Yes" : "No";
-
-      // College header info
-      doc.setFontSize(12);
-      doc.text(`College: ${collegeName}`, 10, currentY);
-      currentY += 7;
-      doc.text(`College Code: ${collegeCode}`, 10, currentY);
-      currentY += 7;
-      doc.text(`Accomodation: ${accomodationText}`, 10, currentY);
-      currentY += 10;
-
-      // STUDENT TABLE (exclude team managers)
-      const studentRows = rowsForCollege.filter((r) => r.type !== "Team Manager");
-      if (studentRows.length > 0) {
-        const studentData: any[] = [];
-        for (let i = 0; i < studentRows.length; i++) {
-          const row = studentRows[i];
-          const photoUrl = row.photo;
-          const imageUrl = `https://${process.env.UPLOADTHING_APP_ID}.ufs.sh/f/${photoUrl}`;
-          let photoBase64 = "";
-          try {
-            photoBase64 = await getBase64ImageFromURL(imageUrl);
-          } catch (error) {
-            console.error("Error fetching image for", row.name, error);
-          }
-          studentData.push([
-            i + 1,
-            photoBase64,
-            row.name || "",
-            row.usn || "",
-            row.phone || "",
-            row.email || "",
-            row.gender || "",
-            row.accomodation ? "Yes" : "No",
-          ]);
-        }
-        const studentHeaders = [
-          ["SL No", "Photo", "Name", "USN", "Phone", "Email", "Gender", "Accomodation"],
-        ];
-        addTableWithImages(studentHeaders, studentData);
-      }
-
-      // TEAM MANAGER TABLE
-      const teamManagerRows = rowsForCollege.filter((r) => r.type === "Team Manager");
-      if (teamManagerRows.length > 0) {
-        const teamManagerData: any[] = [];
-        for (let i = 0; i < teamManagerRows.length; i++) {
-          const row = teamManagerRows[i];
-          const photoUrl = row.photo;
-          const imageUrl = `https://${process.env.UPLOADTHING_APP_ID}.ufs.sh/f/${photoUrl}`;
-          let photoBase64 = "";
-          try {
-            photoBase64 = await getBase64ImageFromURL(imageUrl);
-          } catch (error) {
-            console.error("Error fetching image for", row.name, error);
-          }
-          teamManagerData.push([
-            i + 1,
-            photoBase64,
-            row.name || "",
-            row.designation || "",
-            row.phone || "",
-            row.email || "",
-            row.gender || "",
-          ]);
-        }
-        const teamManagerHeaders = [
-          ["SL No", "Photo", "Name", "Designation", "Phone", "Email", "Gender"],
-        ];
-        addTableWithImages(teamManagerHeaders, teamManagerData);
-      }
-
-      // EVENT REGISTRATION TABLE (group by event)
-      const eventsMap: Record<string, { name: string; role: string }[]> = {};
-      rowsForCollege.forEach((row) => {
-        if (row.events && Array.isArray(row.events)) {
-          row.events.forEach((ev: { eventName: string; role?: string }) => {
-            if (ev.eventName) {
-              if (!eventsMap[ev.eventName]) {
-                eventsMap[ev.eventName] = [];
-              }
-              eventsMap[ev.eventName].push({
-                name: row.name,
-                role: ev.role || "",
-              });
-            }
-          });
-        }
-      });
-      for (const eventName of Object.keys(eventsMap)) {
-        doc.setFontSize(12);
-        doc.text(`Event: ${eventName}`, 10, currentY);
-        currentY += 7;
-        const eventData = eventsMap[eventName].map((entry, index) => [
-          index + 1,
-          entry.name,
-          entry.role,
-        ]);
-        const eventHeaders = [["SL No", "Name", "Role"]];
-        autoTable(doc, {
-          head: eventHeaders,
-          body: eventData,
-          startY: currentY,
-          margin: { left: 10, right: 10 },
-          styles: { fontSize: 10, cellPadding: 3 },
-          headStyles: { fillColor: [26, 188, 156] },
-        });
-        currentY = (doc as any).lastAutoTable.finalY + 10;
-      }
-
-      // Add spacing between colleges
-      currentY += 10;
-      if (currentY > pageHeight - 30) {
-        doc.addPage();
-        currentY = 20;
-      }
-    }
-
-    doc.save("registrants.pdf");
-  };
-
   // --------------------- Excel Export ---------------------
   const handleExportToExcel = () => {
     const filteredRows = table.getRowModel().rows;
@@ -648,24 +436,43 @@ export function DataTable({ data }: { data: Data[] }) {
     excelData.push(["24th VTU Youth Fest @ GAT"]);
     excelData.push([]); // blank row
 
+    // Loop through each college group
     for (const collegeName of Object.keys(collegeData)) {
       const rowsForCollege = collegeData[collegeName];
-      const collegeCode = rowsForCollege[0].collegeCode || "N/A";
-      const accomodationText = rowsForCollege[0].accomodation ? "Yes" : "No";
+      const collegeAssignedCode = rowsForCollege[0].collegeCode || "N/A";
+      const vtuCode = (rowsForCollege[0] as any).vtuCode || "N/A";
+      const accomodationCollege = rowsForCollege[0].accomodation ? "Yes" : "No";
+
+      // Five detail header rows for the college
       excelData.push([`College: ${collegeName}`]);
-      excelData.push([`College Code: ${collegeCode}`]);
-      excelData.push([`Accomodation: ${accomodationText}`]);
+      excelData.push([`College Assigned Code: ${collegeAssignedCode}`]);
+      excelData.push([`VTU Code: ${vtuCode}`]);
+      excelData.push([`Accomodation: ${accomodationCollege}`]);
+      excelData.push([`Accommodation Allocated: N/A`]); // Placeholder; update as needed
       excelData.push([]); // blank row
 
-      // Student table
+      // STUDENT TABLE (exclude Team Manager)
       const studentRows = rowsForCollege.filter((r) => r.type !== "Team Manager");
       if (studentRows.length > 0) {
         excelData.push(["Student Details"]);
-        excelData.push(["SL No", "Photo", "Name", "USN", "Phone", "Email", "Gender", "Accomodation"]);
+        // Added "Student Code" next to SL No (using 'usn' field)
+        excelData.push([
+          "SL No",
+          "Student Code",
+          "Photo",
+          "Name",
+          "USN",
+          "Phone",
+          "Email",
+          "Gender",
+          "Accomodation",
+        ]);
         studentRows.forEach((row, index) => {
+          const studentCode = row.usn || "";
           excelData.push([
             index + 1,
-            "", // omit photos in Excel
+            studentCode,
+            "", // omit photo in Excel
             row.name || "",
             row.usn || "",
             row.phone || "",
@@ -677,15 +484,23 @@ export function DataTable({ data }: { data: Data[] }) {
         excelData.push([]); // blank row
       }
 
-      // Team Manager table
+      // TEAM MANAGER TABLE
       const teamManagerRows = rowsForCollege.filter((r) => r.type === "Team Manager");
       if (teamManagerRows.length > 0) {
         excelData.push(["Team Manager Details"]);
-        excelData.push(["SL No", "Photo", "Name", "Designation", "Phone", "Email", "Gender"]);
+        excelData.push([
+          "SL No",
+          "Photo",
+          "Name",
+          "Designation",
+          "Phone",
+          "Email",
+          "Gender",
+        ]);
         teamManagerRows.forEach((row, index) => {
           excelData.push([
             index + 1,
-            "", // omit photos
+            "", // omit photo
             row.name || "",
             row.designation || "",
             row.phone || "",
@@ -696,7 +511,7 @@ export function DataTable({ data }: { data: Data[] }) {
         excelData.push([]); // blank row
       }
 
-      // Event Registration table
+      // EVENT REGISTRATION TABLE
       const eventsMap: Record<string, { name: string; role: string }[]> = {};
       rowsForCollege.forEach((row) => {
         if (row.events && Array.isArray(row.events)) {
@@ -721,10 +536,23 @@ export function DataTable({ data }: { data: Data[] }) {
         });
         excelData.push([]); // blank row
       }
-      excelData.push([]); // extra blank row between colleges
+      // Extra blank row between colleges
+      excelData.push([]);
     }
 
     const ws = XLSX.utils.aoa_to_sheet(excelData);
+    // Set default column widths for better readability
+    ws["!cols"] = [
+      { wch: 10 }, // SL No
+      { wch: 20 }, // Student Code
+      { wch: 20 }, // Photo
+      { wch: 30 }, // Name
+      { wch: 20 }, // USN
+      { wch: 20 }, // Phone
+      { wch: 30 }, // Email
+      { wch: 15 }, // Gender
+      { wch: 15 }, // Accomodation
+    ];
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Registrants");
     const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
@@ -748,14 +576,6 @@ export function DataTable({ data }: { data: Data[] }) {
         </div>
         <Button variant="outline" onClick={clearAllFilters} className="ml-2">
           Clear Filters
-        </Button>
-        <Button
-          variant="outline"
-          className="ml-auto bg-[#00B140] text-white hover:scale-105 hover:bg-[#00B140] hover:text-white"
-          onClick={handleExportToPDF}
-        >
-          <FileDown className="mr-2 h-4 w-4" />
-          Download as PDF
         </Button>
         <Button
           variant="outline"
