@@ -23,7 +23,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal, ListFilterIcon } from "lucide-react";
+import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 
@@ -49,59 +49,199 @@ import {
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Image from "next/image";
-import Link from "next/link";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
 
 export type Data = {
   id: string;
+  accomodation : string;
+  collegeCode : string;
   photo: string;
   name: string;
   collegeName: string;
-  collegeCode?: string;
   usn: string;
-  email: string;
   phone: string;
-  collegeRegion: string;
-  designation?: string;
-  dateOfBirth: string;
+  email: string;
+  blood: string;
   gender: string;
-  accomodation: boolean;
   type:
-    | "Team Manager"
-    | "Participant/Accompanist"
-    | "Participant"
-    | "Accompanist"
-    | "";
+  | "Team Manager"
+  | "Participant/Accompanist"
+  | "Participant"
+  | "Accompanist"
+  | "";
   events: { eventName: string; role?: "Participant" | "Accompanist" }[];
   status: "Pending" | "Processing" | "Success" | "Failed";
 };
 
-// -------------------- Helper: Convert Image URL to Base64 --------------------
-async function getBase64ImageFromURL(url: string): Promise<string> {
-  try {
-    const res = await fetch(url);
-    const blob = await res.blob();
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result as string);
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
-  } catch (error) {
-    console.error("Error in getBase64ImageFromURL:", error);
-    return "";
-  }
-}
+//////////////////////////
+// College Name Filter  //
+//////////////////////////
 
-// -------------------- Main DataTable Component --------------------
+type CollegeNameFilterProps = {
+  column: any;
+  table: any;
+};
+
+const CollegeNameFilter: React.FC<CollegeNameFilterProps> = ({ column, table }) => {
+  const allRows = table.getPreFilteredRowModel().rows;
+  const allColleges = allRows.map((row: any) => row.original.collegeName as string);
+  const uniqueColleges = Array.from(new Set(allColleges));
+  const [searchQuery, setSearchQuery] = React.useState("");
+
+  const filteredOptions = uniqueColleges.filter((college) =>
+    college.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost">
+          College Name
+          <ChevronDown className="ml-1 h-4 w-4" />
+          {column.getFilterValue() ? `: ${column.getFilterValue() as string}` : ""}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56 p-2 max-h-60 overflow-y-auto">
+        <Input
+          placeholder="Search college..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="mb-2"
+        />
+        <DropdownMenuItem
+          onClick={() => column.setFilterValue(undefined)}
+          className="cursor-pointer"
+        >
+          All
+        </DropdownMenuItem>
+        {filteredOptions.map((college) => (
+          <DropdownMenuItem
+            key={college}
+            onClick={() => column.setFilterValue(college)}
+            className="cursor-pointer"
+          >
+            {college}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+
+//////////////////////////
+// Type Column Filter   //
+//////////////////////////
+
+type TypeFilterProps = {
+  column: any;
+  table: any;
+};
+
+const TypeFilter: React.FC<TypeFilterProps> = ({ column, table }) => {
+  const types = ["Team Manager", "Participant/Accompanist", "Participant", "Accompanist"];
+  const [searchQuery, setSearchQuery] = React.useState("");
+
+  const filteredTypes = types.filter((t) =>
+    t.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost">
+          Type
+          <ChevronDown className="ml-1 h-4 w-4" />
+          {column.getFilterValue() ? `: ${column.getFilterValue() as string}` : ""}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56 p-2 max-h-60 overflow-y-auto">
+        <Input
+          placeholder="Search type..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="mb-2"
+        />
+        <DropdownMenuItem
+          onClick={() => column.setFilterValue(undefined)}
+          className="cursor-pointer"
+        >
+          All
+        </DropdownMenuItem>
+        {filteredTypes.map((t) => (
+          <DropdownMenuItem
+            key={t}
+            onClick={() => column.setFilterValue(t)}
+            className="cursor-pointer"
+          >
+            {t}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+
+//////////////////////////
+// Events Column Filter //
+//////////////////////////
+
+type EventFilterProps = {
+  column: any;
+  table: any;
+};
+
+const EventFilter: React.FC<EventFilterProps> = ({ column, table }) => {
+  const allRows = table.getPreFilteredRowModel().rows;
+  // Flatten all event names
+  const allEvents = allRows.flatMap((row: any) =>
+    (row.original.events as { eventName: string }[]).map((e) => e.eventName)
+  );
+  const uniqueEvents = Array.from(new Set(allEvents));
+  const [searchQuery, setSearchQuery] = React.useState("");
+
+  const filteredOptions = uniqueEvents.filter((event) =>
+    event.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost">
+          Events
+          <ChevronDown className="ml-1 h-4 w-4" />
+          {column.getFilterValue() ? `: ${column.getFilterValue() as string}` : ""}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56 p-2 max-h-60 overflow-y-auto">
+        <Input
+          placeholder="Search event..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="mb-2"
+        />
+        <DropdownMenuItem
+          onClick={() => column.setFilterValue(undefined)}
+          className="cursor-pointer"
+        >
+          All
+        </DropdownMenuItem>
+        {filteredOptions.map((event) => (
+          <DropdownMenuItem
+            key={event}
+            onClick={() => column.setFilterValue(event)}
+            className="cursor-pointer"
+          >
+            {event}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+
+//////////////////////////
+//      DataTable       //
+//////////////////////////
+
 export function DataTable({ data }: { data: Data[] }) {
   const router = useRouter();
   const [rows, setRows] = React.useState<Data[]>(data);
@@ -122,9 +262,12 @@ export function DataTable({ data }: { data: Data[] }) {
         const response = await fetch("/api/deleteregister", {
           method: "DELETE",
           body: JSON.stringify({ registrantId: originId }),
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+          },
           credentials: "include",
         });
+
         const data = await response.json();
         toast.success(data.message);
         setRows(updatedRows);
@@ -139,6 +282,7 @@ export function DataTable({ data }: { data: Data[] }) {
   const handleDeleteSelected = React.useCallback(
     async (providedRegistrants?: string[]) => {
       let registrantIds: string[] = [];
+
       if (providedRegistrants && providedRegistrants.length > 0) {
         registrantIds = providedRegistrants;
       } else {
@@ -147,18 +291,24 @@ export function DataTable({ data }: { data: Data[] }) {
           new Set(selectedRows.map((r) => (r.original.id as string).split("#")[0]))
         );
       }
+
       if (!registrantIds.length) {
         toast.error("No rows selected");
         return;
       }
+
       try {
         const response = await fetch("/api/deleteregister", {
           method: "DELETE",
           body: JSON.stringify({ registrantIds }),
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+          },
         });
         const data = await response.json();
-        if (!response.ok) throw new Error(data.message);
+        if (!response.ok) {
+          throw new Error(data.message);
+        }
         toast.success(data.message);
         setRows((prev) =>
           prev.filter((row) => !registrantIds.includes((row.id as string).split("#")[0]))
@@ -175,35 +325,57 @@ export function DataTable({ data }: { data: Data[] }) {
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
-  const [selectedField, setSelectedField] = React.useState<string | null>(null);
-  const scrollContainerRef = React.useRef<HTMLDivElement>(null);
-  let isDragging = false;
-  let startX = 0;
-  let scrollLeft = 0;
-  const handleMouseDown = (e: React.MouseEvent) => {
-    isDragging = true;
-    startX = e.pageX - (scrollContainerRef.current?.offsetLeft || 0);
-    scrollLeft = scrollContainerRef.current?.scrollLeft || 0;
-  };
-  const handleMouseLeave = () => { isDragging = false; };
-  const handleMouseUp = () => { isDragging = false; };
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging) return;
-    e.preventDefault();
-    const x = e.pageX - (scrollContainerRef.current?.offsetLeft || 0);
-    const walk = (x - startX) * 2;
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollLeft = scrollLeft - walk;
-    }
-  };
 
-  // --- Column Definitions ---
   const columns = React.useMemo<ColumnDef<Data>[]>(
     () => [
       {
+        id: "select",
+        header: ({ table }) => (
+          <Checkbox
+            checked={
+              table.getIsAllPageRowsSelected() ||
+              (table.getIsSomePageRowsSelected() && "indeterminate")
+            }
+            onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+            aria-label="Select all"
+          />
+        ),
+        cell: ({ row, table }) => {
+          const rowRegistrantId = (row.original.id as string).split("#")[0];
+          const handleCheck = (checked: boolean) => {
+            const matchingRows = table
+              .getRowModel()
+              .rows.filter(
+                (r) => (r.original.id as string).split("#")[0] === rowRegistrantId
+              )
+              .map((r) => r.id);
+            table.setRowSelection((prev) => {
+              const newSelection = { ...prev };
+              matchingRows.forEach((idx) => {
+                newSelection[idx] = checked;
+              });
+              return newSelection;
+            });
+          };
+
+          return (
+            <Checkbox
+              checked={row.getIsSelected()}
+              onCheckedChange={handleCheck}
+              aria-label="Select row"
+            />
+          );
+        },
+        enableSorting: false,
+        enableHiding: false,
+      },
+      {
         accessorKey: "slno",
         header: "SL No",
-        cell: ({ row }) => row.index + 1,
+        cell: ({ row, table }) => {
+          const { pagination } = table.getState();
+          return pagination.pageIndex * pagination.pageSize + row.index + 1;
+        },
       },
       {
         accessorKey: "photo",
@@ -212,27 +384,49 @@ export function DataTable({ data }: { data: Data[] }) {
           const photoUrl = row.getValue("photo") as string;
           const imageUrl = `https://${process.env.UPLOADTHING_APP_ID}.ufs.sh/f/${photoUrl}`;
           return (
-            <Image src={imageUrl} alt="Profile" width={80} height={80} className="rounded-full object-cover" />
+            <Image
+              src={imageUrl}
+              alt="Profile"
+              width={80}
+              height={80}
+              className="rounded-full object-cover"
+            />
           );
         },
       },
       {
         accessorKey: "name",
         header: ({ column }) => (
-          <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-            Name <ArrowUpDown className="p-1" />
+          <Button
+            variant="ghost"
+            onClick={() =>
+              column.toggleSorting((column.getIsSorted() as string) === "asc")
+            }
+          >
+            Name
+            <ArrowUpDown className="p-1" />
           </Button>
         ),
-        cell: ({ row }) => <div className="capitalize">{row.getValue("name") as string}</div>,
+        cell: ({ row }) => (
+          <div className="capitalize">{row.getValue("name") as string}</div>
+        ),
       },
       {
         accessorKey: "usn",
         header: ({ column }) => (
-          <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-            USN <ArrowUpDown className="p-1" />
+          <Button
+            variant="ghost"
+            onClick={() =>
+              column.toggleSorting((column.getIsSorted() as string) === "asc")
+            }
+          >
+            USN
+            <ArrowUpDown className="p-1" />
           </Button>
         ),
-        cell: ({ row }) => <div className="uppercase">{row.getValue("usn") as string}</div>,
+        cell: ({ row }) => (
+          <div className="uppercase">{row.getValue("usn") as string}</div>
+        ),
       },
       {
         accessorKey: "phone",
@@ -250,16 +444,20 @@ export function DataTable({ data }: { data: Data[] }) {
         cell: ({ row }) => <div>{row.getValue("gender") as string}</div>,
       },
       {
-        accessorKey: "dateOfBirth",
+        accessorKey: "blood",
         header: "DOB",
-        cell: ({ row }) => <div>{row.getValue("dateOfBirth") as string}</div>,
+        cell: ({ row }) => <div>{row.getValue("blood") as string}</div>,
       },
       {
         accessorKey: "collegeName",
-        header: ({ column, table }) => <CollegeNameFilter column={column} table={table} />,
-        cell: ({ row }) => <div className="capitalize">{row.getValue("collegeName") as string}</div>,
+        header: ({ column, table }) => (
+          <CollegeNameFilter column={column} table={table} />
+        ),
+        cell: ({ row }) => (
+          <div className="capitalize">{row.getValue("collegeName") as string}</div>
+        ),
         filterFn: (row, columnId, filterValue) => {
-          if (!filterValue || filterValue === "ALL") return true;
+          if (!filterValue) return true;
           const collegeName = row.getValue(columnId) as string;
           return collegeName === filterValue;
         },
@@ -267,9 +465,11 @@ export function DataTable({ data }: { data: Data[] }) {
       {
         accessorKey: "type",
         header: ({ column, table }) => <TypeFilter column={column} table={table} />,
-        cell: ({ row }) => <div className="capitalize">{row.getValue("type") as string}</div>,
+        cell: ({ row }) => (
+          <div className="capitalize">{row.getValue("type") as string}</div>
+        ),
         filterFn: (row, columnId, filterValue) => {
-          if (!filterValue || filterValue === "") return true;
+          if (!filterValue) return true;
           const type = row.getValue(columnId) as string;
           return type === filterValue;
         },
@@ -288,11 +488,17 @@ export function DataTable({ data }: { data: Data[] }) {
                 <>
                   <div className="mb-1 text-black">
                     <span className="font-bold">Participant: </span>
-                    {events.filter((v) => v.role === "Participant").map((e) => e.eventName).join(", ")}
+                    {events
+                      .filter((v) => v.role === "Participant")
+                      .map((e) => e.eventName)
+                      .join(", ")}
                   </div>
                   <div className="text-black">
                     <span className="font-bold">Accompanist: </span>
-                    {events.filter((v) => v.role === "Accompanist").map((e) => e.eventName).join(", ")}
+                    {events
+                      .filter((v) => v.role === "Accompanist")
+                      .map((e) => e.eventName)
+                      .join(", ")}
                   </div>
                 </>
               )}
@@ -300,11 +506,9 @@ export function DataTable({ data }: { data: Data[] }) {
           );
         },
         filterFn: (row, columnId, filterValue) => {
-          if (!filterValue || filterValue === "ALL") return true;
+          if (!filterValue) return true;
           const events = row.getValue(columnId) as { eventName: string }[];
-          return (filterValue as string[]).some((val) =>
-            events.some((e) => e.eventName === val)
-          );
+          return events.some((e) => e.eventName === filterValue);
         },
       },
       {
@@ -322,12 +526,21 @@ export function DataTable({ data }: { data: Data[] }) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuLabel className="text-primary text-l">Actions</DropdownMenuLabel>
+                <DropdownMenuLabel className="text-primary text-l">
+                  Actions
+                </DropdownMenuLabel>
                 <DropdownMenuItem onClick={() => handleUpdate(data.id)}>
-                  <Pencil className="mr-2 h-4 w-4" /> Update
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Update
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleDeleteSelected([(data.id as string).split("#")[0]])} className="text-red-500">
-                  <Trash2 className="mr-2 h-4 w-4" /> Delete
+                <DropdownMenuItem
+                  onClick={() =>
+                    handleDeleteSelected([(data.id as string).split("#")[0]])
+                  }
+                  className="text-red-500"
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -341,7 +554,7 @@ export function DataTable({ data }: { data: Data[] }) {
   const table = useReactTable({
     data: rows,
     columns,
-    initialState: { pagination: { pageSize: 50 } },
+    initialState: { pagination: { pageSize: 50 } }, // default to 50 rows per page
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -350,10 +563,18 @@ export function DataTable({ data }: { data: Data[] }) {
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
-    state: { sorting, columnFilters, columnVisibility, rowSelection },
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
+    },
   });
 
+  // Compute the current (filtered) total of registrants
   const totalRegistrants = table.getFilteredRowModel().rows.length;
+
+  // Handler to clear all filters and sorting
   const clearAllFilters = () => {
     setColumnFilters([]);
     setSorting([]);
@@ -361,7 +582,41 @@ export function DataTable({ data }: { data: Data[] }) {
     table.resetSorting();
   };
 
-  // --------------------- Excel Export ---------------------
+  const handleExportToPDF = () => {
+    const filteredSortedRows = table.getRowModel().rows;
+    const exportData: string[][] = filteredSortedRows.map((row) => [
+      (row.getValue("name") as string) || "",
+      (row.getValue("usn") as string) || "",
+      (row.getValue("collegeName") as string) || "",
+      (row.getValue("type") as string) || "",
+      ((row.getValue("events") as { eventName: string }[])
+        ?.map((event) => event.eventName)
+        .join(", ")) || "",
+      (row.getValue("status") as string) || "",
+    ]);
+
+    const headers = [["Name", "USN", "College Name", "Type", "Events", "Status"]];
+    const doc = new jsPDF();
+    const img = document.createElement("img");
+    img.src = "/images/gatformat.jpg";
+    img.onload = () => {
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      doc.addImage(img, "PNG", 0, 0, pageWidth, pageHeight);
+      autoTable(doc, {
+        head: headers as any,
+        body: exportData as any,
+        startY: 80,
+        styles: { fontSize: 10, cellPadding: 3 },
+        headStyles: { fillColor: [26, 188, 156] },
+      });
+      doc.text("Principal's Signature", 14, pageHeight - 20);
+      doc.text("Coordinator's Signature", pageWidth - 80, pageHeight - 20);
+      doc.save("registrants.pdf");
+    };
+  };
+
+
   const handleExportToExcel = () => {
     const filteredRows = table.getRowModel().rows;
     const collegeData: Record<string, Data[]> = {};
@@ -408,7 +663,7 @@ export function DataTable({ data }: { data: Data[] }) {
             row.phone || "",
             row.email || "",
             row.gender || "",
-            row.dateOfBirth || "",
+            row.blood|| "",
             row.accomodation ? "Yes" : "No",
           ]);
         });
@@ -504,63 +759,94 @@ export function DataTable({ data }: { data: Data[] }) {
     saveAs(new Blob([wbout], { type: "application/octet-stream" }), "registrants.xlsx");
   };
 
+
   return (
     <div className="w-full px-5 rounded-xl my-12">
       {/* Top Controls */}
-      <div className="flex flex-col md:flex-row justify-between items-center py-4">
-        <div className="flex-1">
-          <div className="relative max-w-sm">
-            <Search className="absolute left-2 top-3 h-4 w-5 text-muted-foreground" />
-            <Input
-              placeholder="Search name..."
-              value={(table.getColumn("name")?.getFilterValue() as string[])?.[0] ?? ""}
-              onChange={(event) =>
-                table.getColumn("name")?.setFilterValue([event.target.value])
-              }
-              className="pl-10 w-[26rem]"
-            />
-          </div>
+      <div className="flex flex-wrap items-center gap-3 py-4">
+        <div className="relative max-w-sm">
+          <Search className="absolute left-2 top-3 h-4 w-5 text-muted-foreground" />
+          <Input
+            placeholder="Search name..."
+            value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+            onChange={(event) =>
+              table.getColumn("name")?.setFilterValue(event.target.value)
+            }
+            className="pl-10 w-[26rem]"
+          />
         </div>
-        <div className="flex gap-3 mt-4 md:mt-0">
-          <Button variant="outline" onClick={clearAllFilters} className="px-4">
-            Clear Filters
-          </Button>
-          <Button
-            variant="outline"
-            className="bg-blue-500 text-white hover:scale-105 hover:bg-blue-500 hover:text-white px-4"
-            onClick={handleExportToExcel}
-          >
-            <FileDown className="mr-2 h-4 w-4" />
-            Download as Excel
-          </Button>
-          <Button
-            variant="outline"
-            className="bg-red-500 text-white hover:scale-105 hover:bg-red-500 hover:text-primary-foreground px-4"
-            onClick={() => handleDeleteSelected()}
-          >
-            <Trash2 className="mr-2 h-4 w-4" />
-            Delete Selected
-          </Button>
-        </div>
+        <Button
+          variant="outline"
+          onClick={clearAllFilters}
+          className="ml-2"
+        >
+          Clear Filters
+        </Button>
+        <Button
+          variant="outline"
+          className="ml-auto bg-[#00B140] text-white hover:scale-105 hover:bg-[#00B140] hover:text-white"
+          onClick={handleExportToPDF}
+        >
+          <FileDown className="mr-2 h-4 w-4" />
+          Download current view as PDF
+        </Button>
+        <Button
+          variant="outline"
+          className="ml-auto bg-primary text-white hover:scale-105  hover:text-white"
+          onClick={handleExportToExcel}
+        >
+          <FileDown className="mr-2 h-4 w-4" />
+          Download current view as excel
+        </Button>
+        <Button
+          variant="outline"
+          className="bg-red-500 text-white hover:scale-105 hover:bg-red-500 hover:text-primary-foreground"
+          onClick={() => handleDeleteSelected()}
+        >
+          <Trash2 className="mr-2 h-4 w-4" />
+          Delete Selected
+        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="ml-2">
+              <Columns className="mr-2 h-4 w-4" />
+              Columns <ChevronDown />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {table
+              .getAllColumns()
+              .filter((column) => column.getCanHide())
+              .map((column) => (
+                <DropdownMenuCheckboxItem
+                  key={column.id}
+                  className="capitalize"
+                  checked={column.getIsVisible()}
+                  onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                >
+                  {column.id}
+                </DropdownMenuCheckboxItem>
+              ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
-      {/* Total Registrants */}
-      <div className="mb-2 text-sm text-gray-700">Total Registrants: {totalRegistrants}</div>
+      {/* Display total registrants */}
+      <div className="mb-2 text-sm text-gray-700">
+        Total Registrants: {totalRegistrants}
+      </div>
 
-      {/* Data Table */}
-      <div className="rounded-md border overflow-auto min-h-[18rem] shadow-lg"
-           ref={scrollContainerRef}
-           onMouseDown={handleMouseDown}
-           onMouseLeave={handleMouseLeave}
-           onMouseUp={handleMouseUp}
-           onMouseMove={handleMouseMove}>
+      {/* Table */}
+      <div className="rounded-md border overflow-auto min-h-[18rem] shadow-lg">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
                   <TableHead key={header.id}>
-                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
                 ))}
               </TableRow>
@@ -569,9 +855,15 @@ export function DataTable({ data }: { data: Data[] }) {
           <TableBody className="text-primary">
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} className="hover:bg-blue-50 text-black" data-state={row.getIsSelected() && "selected"}>
+                <TableRow
+                  className="hover:bg-blue-50 text-black"
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+                    <TableCell key={cell.id}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
                   ))}
                 </TableRow>
               ))
@@ -586,16 +878,39 @@ export function DataTable({ data }: { data: Data[] }) {
         </Table>
       </div>
 
-      {/* Pagination */}
-      <div className="flex flex-col md:flex-row items-center justify-end space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s) selected.
+      {/* Advanced Pagination & Page Size Selector */}
+      <div className="flex flex-col md:flex-row items-center justify-between py-4">
+        <div className="flex items-center gap-2">
+          <span>Rows per page:</span>
+          <select
+            value={table.getState().pagination.pageSize}
+            onChange={(e) => table.setPageSize(Number(e.target.value))}
+            className="border rounded p-1"
+          >
+            <option value={10}>10</option>
+            <option value={25}>25</option>
+            <option value={50}>50</option>
+            <option value={100}>100</option>
+          </select>
         </div>
-        <div className="space-x-2">
-          <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
+        <div className="flex items-center gap-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
             <ArrowLeft className="mr-2 h-4 w-4" /> Previous
           </Button>
-          <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
+          <span>
+            Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
             Next <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </div>
@@ -603,100 +918,3 @@ export function DataTable({ data }: { data: Data[] }) {
     </div>
   );
 }
-
-// -------------------- Filter Components --------------------
-type CollegeNameFilterProps = { column: any; table: any; };
-const CollegeNameFilter: React.FC<CollegeNameFilterProps> = ({ column, table }) => {
-  const allRows = table.getPreFilteredRowModel().rows;
-  const allColleges = allRows.map((row: any) => row.original.collegeName as string);
-  const uniqueColleges = Array.from(new Set<string>(allColleges));
-  const [searchQuery, setSearchQuery] = React.useState("");
-  const filteredOptions = uniqueColleges.filter((college: string) =>
-    college.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost">
-          College Name <ChevronDown className="ml-1 h-4 w-4" />{" "}
-          {Array.isArray(column.getFilterValue()) && column.getFilterValue().length > 0 ? `: ${column.getFilterValue()[0]}` : ""}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56 p-2 max-h-60 overflow-y-auto">
-        <Input placeholder="Search college..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="mb-2" />
-        <DropdownMenuItem onClick={() => (column as any).setFilterValue([])} className="cursor-pointer">
-          All
-        </DropdownMenuItem>
-        {filteredOptions.map((college: string) => (
-          <DropdownMenuItem key={college} onClick={() => (column as any).setFilterValue([college])} className="cursor-pointer">
-            {college}
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-};
-
-type TypeFilterProps = { column: any; table: any; };
-const TypeFilter: React.FC<TypeFilterProps> = ({ column, table }) => {
-  const types = ["Team Manager", "Participant/Accompanist", "Participant", "Accompanist"];
-  const [searchQuery, setSearchQuery] = React.useState("");
-  const filteredTypes = types.filter((t: string) =>
-    t.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost">
-          Type <ChevronDown className="ml-1 h-4 w-4" />{" "}
-          {Array.isArray(column.getFilterValue()) && column.getFilterValue().length > 0 ? `: ${column.getFilterValue()[0]}` : ""}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56 p-2 max-h-60 overflow-y-auto">
-        <Input placeholder="Search type..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="mb-2" />
-        <DropdownMenuItem onClick={() => (column as any).setFilterValue([])} className="cursor-pointer">
-          All
-        </DropdownMenuItem>
-        {filteredTypes.map((t: string) => (
-          <DropdownMenuItem key={t} onClick={() => (column as any).setFilterValue([t])} className="cursor-pointer">
-            {t}
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-};
-
-type EventFilterProps = { column: any; table: any; };
-const EventFilter: React.FC<EventFilterProps> = ({ column, table }) => {
-  const allRows = table.getPreFilteredRowModel().rows;
-  const allEvents = allRows.flatMap((row: any) =>
-    (row.original.events as { eventName: string }[]).map((e) => e.eventName)
-  );
-  const uniqueEvents = Array.from(new Set<string>(allEvents));
-  const [searchQuery, setSearchQuery] = React.useState("");
-  const filteredOptions = uniqueEvents.filter((event: string) =>
-    event.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost">
-          Events <ChevronDown className="ml-1 h-4 w-4" />{" "}
-          {Array.isArray(column.getFilterValue()) && column.getFilterValue().length > 0 ? `: ${column.getFilterValue()[0]}` : ""}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56 p-2 max-h-60 overflow-y-auto">
-        <Input placeholder="Search event..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="mb-2" />
-        <DropdownMenuItem onClick={() => (column as any).setFilterValue([])} className="cursor-pointer">
-          All
-        </DropdownMenuItem>
-        {filteredOptions.map((event: string) => (
-          <DropdownMenuItem key={event} onClick={() => (column as any).setFilterValue([event])} className="cursor-pointer">
-            {event}
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-};
