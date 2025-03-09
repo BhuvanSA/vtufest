@@ -1,6 +1,5 @@
 "use client";
-import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable";
+import React from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -10,19 +9,6 @@ import {
   Search,
   Trash2,
 } from "lucide-react";
-import * as React from "react";
-import {
-  ColumnDef,
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
 import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
@@ -50,6 +36,20 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Image from "next/image";
 
+import {
+  ColumnDef,
+  ColumnFiltersState,
+  SortingState,
+  VisibilityState,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+
+// Updated Data type based on your Prisma schema.
 export type Data = {
   id: string;
   accomodation : string;
@@ -57,6 +57,7 @@ export type Data = {
   photo: string;
   name: string;
   collegeName: string;
+  collegeCode?: string; // from Users.collegeCode
   usn: string;
   phone: string;
   email: string;
@@ -70,178 +71,33 @@ export type Data = {
   | "";
   events: { eventName: string; role?: "Participant" | "Accompanist" }[];
   status: "Pending" | "Processing" | "Success" | "Failed";
+  phone: string;
+  email: string;
+  gender: string;
+  accomodation: boolean; // from Registrants.accomodation
+  designation?: string;
+  // Added dateOfBirth field to match data extracted in the page.
+  dateOfBirth?: string;
 };
 
-//////////////////////////
-// College Name Filter  //
-//////////////////////////
+// -------------------- Helper: Convert Image URL to Base64 --------------------
+async function getBase64ImageFromURL(url: string): Promise<string> {
+  try {
+    const res = await fetch(url);
+    const blob = await res.blob();
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  } catch (error) {
+    console.error("Error in getBase64ImageFromURL:", error);
+    return "";
+  }
+}
 
-type CollegeNameFilterProps = {
-  column: any;
-  table: any;
-};
-
-const CollegeNameFilter: React.FC<CollegeNameFilterProps> = ({ column, table }) => {
-  const allRows = table.getPreFilteredRowModel().rows;
-  const allColleges = allRows.map((row: any) => row.original.collegeName as string);
-  const uniqueColleges = Array.from(new Set(allColleges));
-  const [searchQuery, setSearchQuery] = React.useState("");
-
-  const filteredOptions = uniqueColleges.filter((college) =>
-    college.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost">
-          College Name
-          <ChevronDown className="ml-1 h-4 w-4" />
-          {column.getFilterValue() ? `: ${column.getFilterValue() as string}` : ""}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56 p-2 max-h-60 overflow-y-auto">
-        <Input
-          placeholder="Search college..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="mb-2"
-        />
-        <DropdownMenuItem
-          onClick={() => column.setFilterValue(undefined)}
-          className="cursor-pointer"
-        >
-          All
-        </DropdownMenuItem>
-        {filteredOptions.map((college) => (
-          <DropdownMenuItem
-            key={college}
-            onClick={() => column.setFilterValue(college)}
-            className="cursor-pointer"
-          >
-            {college}
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-};
-
-//////////////////////////
-// Type Column Filter   //
-//////////////////////////
-
-type TypeFilterProps = {
-  column: any;
-  table: any;
-};
-
-const TypeFilter: React.FC<TypeFilterProps> = ({ column, table }) => {
-  const types = ["Team Manager", "Participant/Accompanist", "Participant", "Accompanist"];
-  const [searchQuery, setSearchQuery] = React.useState("");
-
-  const filteredTypes = types.filter((t) =>
-    t.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost">
-          Type
-          <ChevronDown className="ml-1 h-4 w-4" />
-          {column.getFilterValue() ? `: ${column.getFilterValue() as string}` : ""}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56 p-2 max-h-60 overflow-y-auto">
-        <Input
-          placeholder="Search type..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="mb-2"
-        />
-        <DropdownMenuItem
-          onClick={() => column.setFilterValue(undefined)}
-          className="cursor-pointer"
-        >
-          All
-        </DropdownMenuItem>
-        {filteredTypes.map((t) => (
-          <DropdownMenuItem
-            key={t}
-            onClick={() => column.setFilterValue(t)}
-            className="cursor-pointer"
-          >
-            {t}
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-};
-
-//////////////////////////
-// Events Column Filter //
-//////////////////////////
-
-type EventFilterProps = {
-  column: any;
-  table: any;
-};
-
-const EventFilter: React.FC<EventFilterProps> = ({ column, table }) => {
-  const allRows = table.getPreFilteredRowModel().rows;
-  // Flatten all event names
-  const allEvents = allRows.flatMap((row: any) =>
-    (row.original.events as { eventName: string }[]).map((e) => e.eventName)
-  );
-  const uniqueEvents = Array.from(new Set(allEvents));
-  const [searchQuery, setSearchQuery] = React.useState("");
-
-  const filteredOptions = uniqueEvents.filter((event) =>
-    event.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost">
-          Events
-          <ChevronDown className="ml-1 h-4 w-4" />
-          {column.getFilterValue() ? `: ${column.getFilterValue() as string}` : ""}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56 p-2 max-h-60 overflow-y-auto">
-        <Input
-          placeholder="Search event..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="mb-2"
-        />
-        <DropdownMenuItem
-          onClick={() => column.setFilterValue(undefined)}
-          className="cursor-pointer"
-        >
-          All
-        </DropdownMenuItem>
-        {filteredOptions.map((event) => (
-          <DropdownMenuItem
-            key={event}
-            onClick={() => column.setFilterValue(event)}
-            className="cursor-pointer"
-          >
-            {event}
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-};
-
-//////////////////////////
-//      DataTable       //
-//////////////////////////
-
+// -------------------- Main DataTable Component --------------------
 export function DataTable({ data }: { data: Data[] }) {
   const router = useRouter();
   const [rows, setRows] = React.useState<Data[]>(data);
@@ -267,7 +123,6 @@ export function DataTable({ data }: { data: Data[] }) {
           },
           credentials: "include",
         });
-
         const data = await response.json();
         toast.success(data.message);
         setRows(updatedRows);
@@ -457,26 +312,32 @@ export function DataTable({ data }: { data: Data[] }) {
           <div className="capitalize">{row.getValue("collegeName") as string}</div>
         ),
         filterFn: (row, columnId, filterValue) => {
-          if (!filterValue) return true;
+          if (!filterValue || (Array.isArray(filterValue) && filterValue.length === 0))
+            return true;
           const collegeName = row.getValue(columnId) as string;
-          return collegeName === filterValue;
+          return (filterValue as string[]).includes(collegeName);
         },
       },
       {
         accessorKey: "type",
-        header: ({ column, table }) => <TypeFilter column={column} table={table} />,
+        header: ({ column, table }) => (
+          <TypeFilter column={column} table={table} />
+        ),
         cell: ({ row }) => (
           <div className="capitalize">{row.getValue("type") as string}</div>
         ),
         filterFn: (row, columnId, filterValue) => {
-          if (!filterValue) return true;
+          if (!filterValue || (Array.isArray(filterValue) && filterValue.length === 0))
+            return true;
           const type = row.getValue(columnId) as string;
-          return type === filterValue;
+          return (filterValue as string[]).includes(type);
         },
       },
       {
         accessorKey: "events",
-        header: ({ column, table }) => <EventFilter column={column} table={table} />,
+        header: ({ column, table }) => (
+          <EventFilter column={column} table={table} />
+        ),
         cell: ({ row }) => {
           const events = row.getValue("events") as { eventName: string; role?: string }[];
           const type = row.getValue("type") as string;
@@ -506,9 +367,12 @@ export function DataTable({ data }: { data: Data[] }) {
           );
         },
         filterFn: (row, columnId, filterValue) => {
-          if (!filterValue) return true;
+          if (!filterValue || (Array.isArray(filterValue) && filterValue.length === 0))
+            return true;
           const events = row.getValue(columnId) as { eventName: string }[];
-          return events.some((e) => e.eventName === filterValue);
+          return (filterValue as string[]).some((val) =>
+            events.some((e) => e.eventName === val)
+          );
         },
       },
       {
@@ -554,7 +418,7 @@ export function DataTable({ data }: { data: Data[] }) {
   const table = useReactTable({
     data: rows,
     columns,
-    initialState: { pagination: { pageSize: 50 } }, // default to 50 rows per page
+    initialState: { pagination: { pageSize: 50 } },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -571,10 +435,8 @@ export function DataTable({ data }: { data: Data[] }) {
     },
   });
 
-  // Compute the current (filtered) total of registrants
   const totalRegistrants = table.getFilteredRowModel().rows.length;
 
-  // Handler to clear all filters and sorting
   const clearAllFilters = () => {
     setColumnFilters([]);
     setSorting([]);
@@ -582,38 +444,149 @@ export function DataTable({ data }: { data: Data[] }) {
     table.resetSorting();
   };
 
-  const handleExportToPDF = () => {
-    const filteredSortedRows = table.getRowModel().rows;
-    const exportData: string[][] = filteredSortedRows.map((row) => [
-      (row.getValue("name") as string) || "",
-      (row.getValue("usn") as string) || "",
-      (row.getValue("collegeName") as string) || "",
-      (row.getValue("type") as string) || "",
-      ((row.getValue("events") as { eventName: string }[])
-        ?.map((event) => event.eventName)
-        .join(", ")) || "",
-      (row.getValue("status") as string) || "",
-    ]);
+  // --------------------- Excel Export ---------------------
+  const handleExportToExcel = () => {
+    const filteredRows = table.getRowModel().rows;
+    const collegeData: Record<string, Data[]> = {};
+    filteredRows.forEach((row) => {
+      const collegeName = row.getValue("collegeName") as string;
+      if (!collegeData[collegeName]) {
+        collegeData[collegeName] = [];
+      }
+      collegeData[collegeName].push(row.original);
+    });
 
-    const headers = [["Name", "USN", "College Name", "Type", "Events", "Status"]];
-    const doc = new jsPDF();
-    const img = document.createElement("img");
-    img.src = "/images/gatformat.jpg";
-    img.onload = () => {
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const pageHeight = doc.internal.pageSize.getHeight();
-      doc.addImage(img, "PNG", 0, 0, pageWidth, pageHeight);
-      autoTable(doc, {
-        head: headers as any,
-        body: exportData as any,
-        startY: 80,
-        styles: { fontSize: 10, cellPadding: 3 },
-        headStyles: { fillColor: [26, 188, 156] },
+    const excelData: any[][] = [];
+    // Overall header rows
+    excelData.push([
+      "Visveraya technological university in association with Global Academy of technology",
+    ]);
+    excelData.push(["24th VTU Youth Fest @ GAT"]);
+    excelData.push([]); // blank row
+
+    // Loop through each college group
+    for (const collegeName of Object.keys(collegeData)) {
+      const rowsForCollege = collegeData[collegeName];
+      const collegeAssignedCode = rowsForCollege[0].collegeCode || "N/A";
+      const vtuCode = (rowsForCollege[0] as any).vtuCode || "N/A";
+      const accomodationCollege = rowsForCollege[0].accomodation ? "Yes" : "No";
+
+      // Five detail header rows for the college
+      excelData.push([`College: ${collegeName}`]);
+      excelData.push([`College Assigned Code: ${collegeAssignedCode}`]);
+      excelData.push([`VTU Code: ${vtuCode}`]);
+      excelData.push([`Accomodation: ${accomodationCollege}`]);
+      excelData.push([`Accommodation Allocated: N/A`]); // Placeholder; update as needed
+      excelData.push([]); // blank row
+
+      // STUDENT TABLE (exclude Team Manager)
+      const studentRows = rowsForCollege.filter((r) => r.type !== "Team Manager");
+      if (studentRows.length > 0) {
+        excelData.push(["Student Details"]);
+        // Columns: SL No, Student Code, Name, USN, Phone, Email, Gender, DOB, Accomodation
+        excelData.push([
+          "SL No",
+          "Student Code",
+          "Name",
+          "USN",
+          "Phone",
+          "Email",
+          "Gender",
+          "DOB",
+          "Accomodation",
+        ]);
+        studentRows.forEach((row, index) => {
+          const studentCode = row.usn || "";
+          excelData.push([
+            index + 1,
+            studentCode,
+            row.name || "",
+            row.usn || "",
+            row.phone || "",
+            row.email || "",
+            row.gender || "",
+            row.dateOfBirth || "",
+            row.accomodation ? "Yes" : "No",
+          ]);
+        });
+        excelData.push([]); // blank row
+      }
+
+      // TEAM MANAGER TABLE
+      const teamManagerRows = rowsForCollege.filter((r) => r.type === "Team Manager");
+      if (teamManagerRows.length > 0) {
+        excelData.push(["Team Manager Details"]);
+        // Columns: SL No, Name, Designation, Phone, Email, Gender, DOB
+        excelData.push([
+          "SL No",
+          "Name",
+          "Designation",
+          "Phone",
+          "Email",
+          "Gender",
+          "DOB",
+        ]);
+        teamManagerRows.forEach((row, index) => {
+          excelData.push([
+            index + 1,
+            row.name || "",
+            row.designation || "",
+            row.phone || "",
+            row.email || "",
+            row.gender || "",
+            row.dateOfBirth || "",
+          ]);
+        });
+        excelData.push([]); // blank row
+      }
+
+      // EVENT REGISTRATION TABLE
+      const eventsMap: Record<string, { name: string; role: string }[]> = {};
+      rowsForCollege.forEach((row) => {
+        if (row.events && Array.isArray(row.events)) {
+          row.events.forEach((ev: { eventName: string; role?: string }) => {
+            if (ev.eventName) {
+              if (!eventsMap[ev.eventName]) {
+                eventsMap[ev.eventName] = [];
+              }
+              eventsMap[ev.eventName].push({
+                name: row.name,
+                role: ev.role || "",
+              });
+            }
+          });
+        }
       });
-      doc.text("Principal's Signature", 14, pageHeight - 20);
-      doc.text("Coordinator's Signature", pageWidth - 80, pageHeight - 20);
-      doc.save("registrants.pdf");
-    };
+      for (const eventName of Object.keys(eventsMap)) {
+        excelData.push([`Event: ${eventName}`]);
+        excelData.push(["SL No", "Name", "Role"]);
+        eventsMap[eventName].forEach((entry, index) => {
+          excelData.push([index + 1, entry.name, entry.role]);
+        });
+        excelData.push([]); // blank row
+      }
+      // Extra blank row between colleges
+      excelData.push([]);
+    }
+
+    const ws = XLSX.utils.aoa_to_sheet(excelData);
+    // Set default column widths for better readability.
+    // Note: This applies to the first 9 columns; team manager tables use 7 columns.
+    ws["!cols"] = [
+      { wch: 8 },  // SL No
+      { wch: 20 }, // Student Code / Name
+      { wch: 30 }, // Name (for student table) or Designation (for team manager)
+      { wch: 20 }, // USN / Phone
+      { wch: 20 }, // Phone / Email
+      { wch: 30 }, // Email / Gender
+      { wch: 15 }, // Gender / DOB
+      { wch: 20 }, // DOB / Accomodation
+      { wch: 15 }, // Accomodation (only for student table)
+    ];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Registrants");
+    const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    saveAs(new Blob([wbout], { type: "application/octet-stream" }), "registrants.xlsx");
   };
 
 
@@ -768,27 +741,23 @@ export function DataTable({ data }: { data: Data[] }) {
           <Search className="absolute left-2 top-3 h-4 w-5 text-muted-foreground" />
           <Input
             placeholder="Search name..."
-            value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+            value={(table.getColumn("name")?.getFilterValue() as string[])?.[0] ?? ""}
             onChange={(event) =>
-              table.getColumn("name")?.setFilterValue(event.target.value)
+              table.getColumn("name")?.setFilterValue([event.target.value])
             }
             className="pl-10 w-[26rem]"
           />
         </div>
-        <Button
-          variant="outline"
-          onClick={clearAllFilters}
-          className="ml-2"
-        >
+        <Button variant="outline" onClick={clearAllFilters} className="ml-2">
           Clear Filters
         </Button>
         <Button
           variant="outline"
-          className="ml-auto bg-[#00B140] text-white hover:scale-105 hover:bg-[#00B140] hover:text-white"
-          onClick={handleExportToPDF}
+          className="bg-blue-500 text-white hover:scale-105 hover:bg-blue-500 hover:text-white"
+          onClick={handleExportToExcel}
         >
           <FileDown className="mr-2 h-4 w-4" />
-          Download current view as PDF
+          Download as Excel
         </Button>
         <Button
           variant="outline"
@@ -819,7 +788,7 @@ export function DataTable({ data }: { data: Data[] }) {
               .filter((column) => column.getCanHide())
               .map((column) => (
                 <DropdownMenuCheckboxItem
-                  key={column.id}
+                  key={String(column.id)}
                   className="capitalize"
                   checked={column.getIsVisible()}
                   onCheckedChange={(value) => column.toggleVisibility(!!value)}
@@ -836,7 +805,7 @@ export function DataTable({ data }: { data: Data[] }) {
         Total Registrants: {totalRegistrants}
       </div>
 
-      {/* Table */}
+      {/* Data Table */}
       <div className="rounded-md border overflow-auto min-h-[18rem] shadow-lg">
         <Table>
           <TableHeader>
@@ -878,7 +847,7 @@ export function DataTable({ data }: { data: Data[] }) {
         </Table>
       </div>
 
-      {/* Advanced Pagination & Page Size Selector */}
+      {/* Pagination & Page Size */}
       <div className="flex flex-col md:flex-row items-center justify-between py-4">
         <div className="flex items-center gap-2">
           <span>Rows per page:</span>
@@ -918,3 +887,158 @@ export function DataTable({ data }: { data: Data[] }) {
     </div>
   );
 }
+
+// -------------------- Filter Components --------------------
+
+type CollegeNameFilterProps = {
+  column: any;
+  table: any;
+};
+
+const CollegeNameFilter: React.FC<CollegeNameFilterProps> = ({ column, table }) => {
+  const allRows = table.getPreFilteredRowModel().rows;
+  const allColleges = allRows.map((row: any) => row.original.collegeName as string);
+  const uniqueColleges = Array.from(new Set(allColleges)) as string[];
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const filteredOptions: string[] = uniqueColleges.filter((college: string) =>
+    college.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost">
+          College Name
+          <ChevronDown className="ml-1 h-4 w-4" />
+          {Array.isArray(column.getFilterValue()) && column.getFilterValue().length > 0
+            ? `: ${column.getFilterValue()[0]}`
+            : ""}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56 p-2 max-h-60 overflow-y-auto">
+        <Input
+          placeholder="Search college..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="mb-2"
+        />
+        <DropdownMenuItem
+          onClick={() => (column as any).setFilterValue([])}
+          className="cursor-pointer"
+        >
+          All
+        </DropdownMenuItem>
+        {filteredOptions.map((college: string) => (
+          <DropdownMenuItem
+            key={college}
+            onClick={() => (column as any).setFilterValue([college])}
+            className="cursor-pointer"
+          >
+            {college}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+
+type TypeFilterProps = {
+  column: any;
+  table: any;
+};
+
+const TypeFilter: React.FC<TypeFilterProps> = ({ column, table }) => {
+  const types: string[] = ["Team Manager", "Participant/Accompanist", "Participant", "Accompanist"];
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const filteredTypes: string[] = types.filter((t: string) =>
+    t.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost">
+          Type
+          <ChevronDown className="ml-1 h-4 w-4" />
+          {Array.isArray(column.getFilterValue()) && column.getFilterValue().length > 0
+            ? `: ${column.getFilterValue()[0]}`
+            : ""}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56 p-2 max-h-60 overflow-y-auto">
+        <Input
+          placeholder="Search type..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="mb-2"
+        />
+        <DropdownMenuItem
+          onClick={() => (column as any).setFilterValue([])}
+          className="cursor-pointer"
+        >
+          All
+        </DropdownMenuItem>
+        {filteredTypes.map((t: string) => (
+          <DropdownMenuItem
+            key={t}
+            onClick={() => (column as any).setFilterValue([t])}
+            className="cursor-pointer"
+          >
+            {t}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+
+type EventFilterProps = {
+  column: any;
+  table: any;
+};
+
+const EventFilter: React.FC<EventFilterProps> = ({ column, table }) => {
+  const allRows = table.getPreFilteredRowModel().rows;
+  const allEvents = allRows.flatMap((row: any) =>
+    (row.original.events as { eventName: string }[]).map((e) => e.eventName)
+  ) as string[];
+  const uniqueEvents = Array.from(new Set(allEvents)) as string[];
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const filteredOptions: string[] = uniqueEvents.filter((event: string) =>
+    event.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost">
+          Events
+          <ChevronDown className="ml-1 h-4 w-4" />
+          {Array.isArray(column.getFilterValue()) && column.getFilterValue().length > 0
+            ? `: ${column.getFilterValue()[0]}`
+            : ""}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56 p-2 max-h-60 overflow-y-auto">
+        <Input
+          placeholder="Search event..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="mb-2"
+        />
+        <DropdownMenuItem
+          onClick={() => (column as any).setFilterValue([])}
+          className="cursor-pointer"
+        >
+          All
+        </DropdownMenuItem>
+        {filteredOptions.map((event: string) => (
+          <DropdownMenuItem
+            key={event}
+            onClick={() => (column as any).setFilterValue([event])}
+            className="cursor-pointer"
+          >
+            {event}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
