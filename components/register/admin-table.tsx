@@ -52,8 +52,8 @@ import Image from "next/image";
 
 export type Data = {
   id: string;
-  accomodation : string;
-  collegeCode : string;
+  accomodation: string;
+  collegeCode: string;
   photo: string;
   name: string;
   collegeName: string;
@@ -63,11 +63,11 @@ export type Data = {
   blood: string;
   gender: string;
   type:
-  | "Team Manager"
-  | "Participant/Accompanist"
-  | "Participant"
-  | "Accompanist"
-  | "";
+    | "Team Manager"
+    | "Participant/Accompanist"
+    | "Participant"
+    | "Accompanist"
+    | "";
   events: { eventName: string; role?: "Participant" | "Accompanist" }[];
   status: "Pending" | "Processing" | "Success" | "Failed";
 };
@@ -97,7 +97,7 @@ const CollegeNameFilter: React.FC<CollegeNameFilterProps> = ({ column, table }) 
         <Button variant="ghost">
           College Name
           <ChevronDown className="ml-1 h-4 w-4" />
-          {column.getFilterValue() ? `: ${column.getFilterValue() as string}` : ""}
+          {column.getFilterValue() ? `: ${column.getFilterValue()}` : ""}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 p-2 max-h-60 overflow-y-auto">
@@ -150,7 +150,7 @@ const TypeFilter: React.FC<TypeFilterProps> = ({ column, table }) => {
         <Button variant="ghost">
           Type
           <ChevronDown className="ml-1 h-4 w-4" />
-          {column.getFilterValue() ? `: ${column.getFilterValue() as string}` : ""}
+          {column.getFilterValue() ? `: ${column.getFilterValue()}` : ""}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 p-2 max-h-60 overflow-y-auto">
@@ -208,7 +208,7 @@ const EventFilter: React.FC<EventFilterProps> = ({ column, table }) => {
         <Button variant="ghost">
           Events
           <ChevronDown className="ml-1 h-4 w-4" />
-          {column.getFilterValue() ? `: ${column.getFilterValue() as string}` : ""}
+          {column.getFilterValue() ? `: ${column.getFilterValue()}` : ""}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 p-2 max-h-60 overflow-y-auto">
@@ -239,12 +239,117 @@ const EventFilter: React.FC<EventFilterProps> = ({ column, table }) => {
 };
 
 //////////////////////////
+//    Colleges List     //
+//////////////////////////
+
+type CollegesListProps = {
+  data: Data[];
+  onBack: () => void;
+};
+
+const CollegesList: React.FC<CollegesListProps> = ({ data, onBack }) => {
+  // Group data by collegeName
+  const grouped = data.reduce((acc, curr) => {
+    const college = curr.collegeName;
+    if (!acc[college]) {
+      acc[college] = {
+        collegeName: college,
+        events: new Set<string>(),
+        collegeCode: curr.collegeCode,
+        accomodation: curr.accomodation,
+      };
+    }
+    curr.events.forEach((ev) => {
+      if (ev.eventName) acc[college].events.add(ev.eventName);
+    });
+    return acc;
+  }, {} as Record<string, { collegeName: string; events: Set<string>; collegeCode: string; accomodation: string }>);
+
+  // Convert to array with sorted events per college
+  let colleges: { collegeName: string; events: string[]; collegeCode: string; accomodation: string }[] =
+    Object.values(grouped).map((col) => ({
+      collegeName: col.collegeName,
+      events: Array.from(col.events).sort(),
+      collegeCode: col.collegeCode,
+      accomodation: col.accomodation,
+    }));
+
+  // Sorting state for colleges list
+  const [sortField, setSortField] = React.useState<"collegeName" | "eventCount">("collegeName");
+  const [sortOrder, setSortOrder] = React.useState<"asc" | "desc">("asc");
+
+  colleges.sort((a, b) => {
+    let compareVal = 0;
+    if (sortField === "collegeName") {
+      compareVal = a.collegeName.localeCompare(b.collegeName);
+    } else if (sortField === "eventCount") {
+      compareVal = a.events.length - b.events.length;
+    }
+    return sortOrder === "asc" ? compareVal : -compareVal;
+  });
+
+  return (
+    <div className="w-full px-5 rounded-xl my-12">
+      <div className="flex items-center justify-between py-4">
+        <h2 className="text-xl font-bold">Colleges List</h2>
+        <Button variant="outline" onClick={onBack}>
+          Back to Registrants
+        </Button>
+      </div>
+      <div className="flex gap-4 mb-4">
+        <div>
+          <span>Sort by: </span>
+          <select
+            value={sortField}
+            onChange={(e) => setSortField(e.target.value as "collegeName" | "eventCount")}
+          >
+            <option value="collegeName">College Name</option>
+            <option value="eventCount">Number of Events</option>
+          </select>
+        </div>
+        <div>
+          <span>Order: </span>
+          <select
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}
+          >
+            <option value="asc">Ascending</option>
+            <option value="desc">Descending</option>
+          </select>
+        </div>
+      </div>
+      <table className="min-w-full border-collapse border">
+        <thead>
+          <tr>
+            <th className="border p-2">College Name</th>
+            <th className="border p-2">College Code</th>
+            <th className="border p-2">Accommodation</th>
+            <th className="border p-2">Registered Events</th>
+          </tr>
+        </thead>
+        <tbody>
+          {colleges.map((college, index) => (
+            <tr key={index} className="border">
+              <td className="border p-2">{college.collegeName}</td>
+              <td className="border p-2">{college.collegeCode}</td>
+              <td className="border p-2">{college.accomodation ? "Yes" : "No"}</td>
+              <td className="border p-2">{college.events.join(", ")}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+//////////////////////////
 //      DataTable       //
 //////////////////////////
 
 export function DataTable({ data }: { data: Data[] }) {
   const router = useRouter();
   const [rows, setRows] = React.useState<Data[]>(data);
+  const [showCollegesList, setShowCollegesList] = React.useState(false);
 
   const handleUpdate = React.useCallback(
     (id: string) => {
@@ -616,7 +721,6 @@ export function DataTable({ data }: { data: Data[] }) {
     };
   };
 
-
   const handleExportToExcel = () => {
     const filteredRows = table.getRowModel().rows;
     const collegeData: Record<string, Data[]> = {};
@@ -759,6 +863,10 @@ export function DataTable({ data }: { data: Data[] }) {
     saveAs(new Blob([wbout], { type: "application/octet-stream" }), "registrants.xlsx");
   };
 
+  // If the Colleges List view is toggled, render that instead.
+  if (showCollegesList) {
+    return <CollegesList data={rows} onBack={() => setShowCollegesList(false)} />;
+  }
 
   return (
     <div className="w-full px-5 rounded-xl my-12">
@@ -775,12 +883,12 @@ export function DataTable({ data }: { data: Data[] }) {
             className="pl-10 w-[26rem]"
           />
         </div>
-        <Button
-          variant="outline"
-          onClick={clearAllFilters}
-          className="ml-2"
-        >
+        <Button variant="outline" onClick={clearAllFilters} className="ml-2">
           Clear Filters
+        </Button>
+        {/* New button to switch to Colleges List */}
+        <Button variant="outline" onClick={() => setShowCollegesList(true)}>
+          Go to Colleges List
         </Button>
         <Button
           variant="outline"
