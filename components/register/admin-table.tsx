@@ -191,7 +191,6 @@ type EventFilterProps = {
 
 const EventFilter: React.FC<EventFilterProps> = ({ column, table }) => {
   const allRows = table.getPreFilteredRowModel().rows;
-  // Flatten all event names
   const allEvents = allRows.flatMap((row: any) =>
     (row.original.events as { eventName: string }[]).map((e) => e.eventName)
   );
@@ -247,7 +246,7 @@ type CollegesListProps = {
   onBack: () => void;
 };
 
-const CollegesList: React.FC<CollegesListProps> = ({ data, onBack }) => {
+export const CollegesList: React.FC<CollegesListProps> = ({ data, onBack }) => {
   // Compute overall unique events from the registrants data
   const allEventsSet = new Set<string>();
   data.forEach((registrant) => {
@@ -291,7 +290,6 @@ const CollegesList: React.FC<CollegesListProps> = ({ data, onBack }) => {
     >
   );
 
-  // Convert to an array with sorted events per college
   let colleges: {
     collegeName: string;
     events: string[];
@@ -306,12 +304,10 @@ const CollegesList: React.FC<CollegesListProps> = ({ data, onBack }) => {
     registrantCount: col.registrantCount,
   }));
 
-  // Apply filter if a specific event is selected
   if (selectedEvent) {
     colleges = colleges.filter((col) => col.events.includes(selectedEvent));
   }
 
-  // Sorting state for colleges list
   const [sortField, setSortField] = React.useState<"collegeName" | "eventCount" | "registrantCount">("collegeName");
   const [sortOrder, setSortOrder] = React.useState<"asc" | "desc">("asc");
 
@@ -327,7 +323,6 @@ const CollegesList: React.FC<CollegesListProps> = ({ data, onBack }) => {
     return sortOrder === "asc" ? compareVal : -compareVal;
   });
 
-  // Download the current Colleges List as Excel
   const handleDownloadCollegesExcel = () => {
     const excelData: any[][] = [];
     excelData.push([
@@ -369,10 +364,7 @@ const CollegesList: React.FC<CollegesListProps> = ({ data, onBack }) => {
       <div className="flex flex-wrap items-center gap-4 mb-4">
         <div className="flex items-center gap-2">
           <span>Filter by Event:</span>
-          <select
-            value={selectedEvent}
-            onChange={(e) => setSelectedEvent(e.target.value)}
-          >
+          <select value={selectedEvent} onChange={(e) => setSelectedEvent(e.target.value)}>
             <option value="">All Events</option>
             {allEvents.map((event) => (
               <option key={event} value={event}>
@@ -396,10 +388,7 @@ const CollegesList: React.FC<CollegesListProps> = ({ data, onBack }) => {
         </div>
         <div className="flex items-center gap-2">
           <span>Order:</span>
-          <select
-            value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}
-          >
+          <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}>
             <option value="asc">Ascending</option>
             <option value="desc">Descending</option>
           </select>
@@ -447,8 +436,7 @@ type EventsListProps = {
   onBack: () => void;
 };
 
-const EventsList: React.FC<EventsListProps> = ({ data, onBack }) => {
-  // Compute all unique events from the data
+export const EventsList: React.FC<EventsListProps> = ({ data, onBack }) => {
   const allEventsSet = new Set<string>();
   data.forEach((registrant) => {
     registrant.events.forEach((ev) => {
@@ -458,17 +446,14 @@ const EventsList: React.FC<EventsListProps> = ({ data, onBack }) => {
   const allEvents = Array.from(allEventsSet).sort();
 
   const [selectedEvent, setSelectedEvent] = React.useState<string>("");
-  // This state keeps track of which college rows are expanded to show participant details.
   const [expandedColleges, setExpandedColleges] = React.useState<Record<string, boolean>>({});
 
-  // Filter data for the selected event
   const filteredData = selectedEvent
     ? data.filter((registrant) =>
         registrant.events.some((ev) => ev.eventName === selectedEvent)
       )
     : [];
 
-  // Group filtered registrants by college for the selected event
   const grouped = filteredData.reduce(
     (acc, curr) => {
       const college = curr.collegeName;
@@ -488,7 +473,6 @@ const EventsList: React.FC<EventsListProps> = ({ data, onBack }) => {
           }[],
         };
       }
-      // For each registrant, add only the event(s) matching the selected event.
       const relevantEvents = curr.events.filter((ev) => ev.eventName === selectedEvent);
       if (relevantEvents.length > 0) {
         acc[college].participants.push({
@@ -542,10 +526,7 @@ const EventsList: React.FC<EventsListProps> = ({ data, onBack }) => {
       <div className="flex flex-wrap items-center gap-4 mb-4">
         <div className="flex items-center gap-2">
           <span>Select Event:</span>
-          <select
-            value={selectedEvent}
-            onChange={(e) => setSelectedEvent(e.target.value)}
-          >
+          <select value={selectedEvent} onChange={(e) => setSelectedEvent(e.target.value)}>
             <option value="">-- Select an Event --</option>
             {allEvents.map((event) => (
               <option key={event} value={event}>
@@ -577,11 +558,7 @@ const EventsList: React.FC<EventsListProps> = ({ data, onBack }) => {
                   <td className="border p-2">{college.accomodation ? "Yes" : "No"}</td>
                   <td className="border p-2">{college.participants.length}</td>
                   <td className="border p-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => toggleExpand(college.collegeName)}
-                    >
+                    <Button variant="outline" size="sm" onClick={() => toggleExpand(college.collegeName)}>
                       {expandedColleges[college.collegeName]
                         ? "Hide Participants"
                         : "View Participants"}
@@ -640,6 +617,14 @@ export function DataTable({ data }: { data: Data[] }) {
   const [rows, setRows] = React.useState<Data[]>(data);
   const [showCollegesList, setShowCollegesList] = React.useState(false);
   const [showEventsList, setShowEventsList] = React.useState(false);
+
+  // Conditional rendering of alternative views
+  if (showCollegesList) {
+    return <CollegesList data={rows} onBack={() => setShowCollegesList(false)} />;
+  }
+  if (showEventsList) {
+    return <EventsList data={rows} onBack={() => setShowEventsList(false)} />;
+  }
 
   const handleUpdate = React.useCallback(
     (id: string) => {
@@ -949,7 +934,7 @@ export function DataTable({ data }: { data: Data[] }) {
   const table = useReactTable({
     data: rows,
     columns,
-    initialState: { pagination: { pageSize: 50 } }, // default to 50 rows per page
+    initialState: { pagination: { pageSize: 50 } },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -966,10 +951,8 @@ export function DataTable({ data }: { data: Data[] }) {
     },
   });
 
-  // Compute the current (filtered) total of registrants
   const totalRegistrants = table.getFilteredRowModel().rows.length;
 
-  // Handler to clear all filters and sorting
   const clearAllFilters = () => {
     setColumnFilters([]);
     setSorting([]);
@@ -1023,12 +1006,11 @@ export function DataTable({ data }: { data: Data[] }) {
     });
 
     const excelData: any[][] = [];
-    // Overall header rows
     excelData.push([
       "Visveraya Technological University in association with Global Academy of Technology",
     ]);
     excelData.push(["24th VTU Youth Fest @ GAT"]);
-    excelData.push([]); // blank row
+    excelData.push([]);
 
     for (const collegeName of Object.keys(collegeData)) {
       const rowsForCollege = collegeData[collegeName];
@@ -1036,7 +1018,6 @@ export function DataTable({ data }: { data: Data[] }) {
       const collegeAssignedCode = (rowsForCollege[0] as any).vtuCode || "N/A";
       const accomodationCollege = rowsForCollege[0].accomodation ? "Yes" : "No";
 
-      // College header rows
       excelData.push([`College: ${collegeName}`]);
       excelData.push([`College Assigned Code: ${collegeAssignedCode}`]);
       excelData.push([`VTU Code: ${vtuCode}`]);
@@ -1044,7 +1025,6 @@ export function DataTable({ data }: { data: Data[] }) {
       excelData.push([`Accommodation Allocated: N/A`]);
       excelData.push([]);
 
-      // Student Details Table (exclude Team Manager)
       const studentRows = rowsForCollege.filter((r) => r.type !== "Team Manager");
       if (studentRows.length > 0) {
         excelData.push(["Student Details"]);
@@ -1076,7 +1056,6 @@ export function DataTable({ data }: { data: Data[] }) {
         excelData.push([]);
       }
 
-      // Team Manager Details Table
       const teamManagerRows = rowsForCollege.filter((r) => r.type === "Team Manager");
       if (teamManagerRows.length > 0) {
         excelData.push(["Team Manager Details"]);
@@ -1095,7 +1074,6 @@ export function DataTable({ data }: { data: Data[] }) {
         excelData.push([]);
       }
 
-      // Event Registration Table
       const eventsMap: Record<string, { name: string; role: string }[]> = {};
       rowsForCollege.forEach((row) => {
         if (row.events && Array.isArray(row.events)) {
@@ -1136,7 +1114,6 @@ export function DataTable({ data }: { data: Data[] }) {
       { wch: 15 },
     ];
 
-    // Apply basic cell styling (if supported)
     const headerTitles = new Set([
       "SL No",
       "Student Code",
@@ -1167,7 +1144,6 @@ export function DataTable({ data }: { data: Data[] }) {
 
   return (
     <div className="w-full px-5 rounded-xl my-12">
-      {/* Top Controls */}
       <div className="flex flex-wrap items-center gap-3 py-4">
         <div className="relative max-w-sm">
           <Search className="absolute left-2 top-3 h-4 w-5 text-muted-foreground" />
@@ -1183,7 +1159,6 @@ export function DataTable({ data }: { data: Data[] }) {
         <Button variant="outline" onClick={clearAllFilters} className="ml-2">
           Clear Filters
         </Button>
-        {/* Buttons to switch views */}
         <Button variant="outline" onClick={() => setShowCollegesList(true)}>
           Go to Colleges List
         </Button>
@@ -1238,13 +1213,9 @@ export function DataTable({ data }: { data: Data[] }) {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-
-      {/* Display total registrants */}
       <div className="mb-2 text-sm text-gray-700">
         Total Registrants: {totalRegistrants}
       </div>
-
-      {/* Table */}
       <div className="rounded-md border overflow-auto min-h-[18rem] shadow-lg">
         <Table>
           <TableHeader>
@@ -1285,8 +1256,6 @@ export function DataTable({ data }: { data: Data[] }) {
           </TableBody>
         </Table>
       </div>
-
-      {/* Advanced Pagination & Page Size Selector */}
       <div className="flex flex-col md:flex-row items-center justify-between py-4">
         <div className="flex items-center gap-2">
           <span>Rows per page:</span>
