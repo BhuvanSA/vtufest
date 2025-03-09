@@ -191,6 +191,7 @@ type EventFilterProps = {
 
 const EventFilter: React.FC<EventFilterProps> = ({ column, table }) => {
   const allRows = table.getPreFilteredRowModel().rows;
+  // Flatten all event names
   const allEvents = allRows.flatMap((row: any) =>
     (row.original.events as { eventName: string }[]).map((e) => e.eventName)
   );
@@ -246,7 +247,7 @@ type CollegesListProps = {
   onBack: () => void;
 };
 
-export const CollegesList: React.FC<CollegesListProps> = ({ data, onBack }) => {
+const CollegesList: React.FC<CollegesListProps> = ({ data, onBack }) => {
   // Compute overall unique events from the registrants data
   const allEventsSet = new Set<string>();
   data.forEach((registrant) => {
@@ -326,7 +327,6 @@ export const CollegesList: React.FC<CollegesListProps> = ({ data, onBack }) => {
   const handleDownloadCollegesExcel = () => {
     const excelData: any[][] = [];
     excelData.push([
-      "SL No",
       "College Name",
       "College Code",
       "Accommodation",
@@ -334,9 +334,8 @@ export const CollegesList: React.FC<CollegesListProps> = ({ data, onBack }) => {
       "Event Count",
       "Registrant Count",
     ]);
-    colleges.forEach((col, index) => {
+    colleges.forEach((col) => {
       excelData.push([
-        index + 1,
         col.collegeName,
         col.collegeCode,
         col.accomodation ? "Yes" : "No",
@@ -364,7 +363,10 @@ export const CollegesList: React.FC<CollegesListProps> = ({ data, onBack }) => {
       <div className="flex flex-wrap items-center gap-4 mb-4">
         <div className="flex items-center gap-2">
           <span>Filter by Event:</span>
-          <select value={selectedEvent} onChange={(e) => setSelectedEvent(e.target.value)}>
+          <select
+            value={selectedEvent}
+            onChange={(e) => setSelectedEvent(e.target.value)}
+          >
             <option value="">All Events</option>
             {allEvents.map((event) => (
               <option key={event} value={event}>
@@ -388,7 +390,10 @@ export const CollegesList: React.FC<CollegesListProps> = ({ data, onBack }) => {
         </div>
         <div className="flex items-center gap-2">
           <span>Order:</span>
-          <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}>
+          <select
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}
+          >
             <option value="asc">Ascending</option>
             <option value="desc">Descending</option>
           </select>
@@ -400,7 +405,6 @@ export const CollegesList: React.FC<CollegesListProps> = ({ data, onBack }) => {
       <table className="min-w-full border-collapse border">
         <thead>
           <tr>
-            <th className="border p-2">SL No</th>
             <th className="border p-2">College Name</th>
             <th className="border p-2">College Code</th>
             <th className="border p-2">Accommodation</th>
@@ -412,7 +416,6 @@ export const CollegesList: React.FC<CollegesListProps> = ({ data, onBack }) => {
         <tbody>
           {colleges.map((college, index) => (
             <tr key={index} className="border">
-              <td className="border p-2">{index + 1}</td>
               <td className="border p-2">{college.collegeName}</td>
               <td className="border p-2">{college.collegeCode}</td>
               <td className="border p-2">{college.accomodation ? "Yes" : "No"}</td>
@@ -436,7 +439,7 @@ type EventsListProps = {
   onBack: () => void;
 };
 
-export const EventsList: React.FC<EventsListProps> = ({ data, onBack }) => {
+const EventsList: React.FC<EventsListProps> = ({ data, onBack }) => {
   const allEventsSet = new Set<string>();
   data.forEach((registrant) => {
     registrant.events.forEach((ev) => {
@@ -559,9 +562,7 @@ export const EventsList: React.FC<EventsListProps> = ({ data, onBack }) => {
                   <td className="border p-2">{college.participants.length}</td>
                   <td className="border p-2">
                     <Button variant="outline" size="sm" onClick={() => toggleExpand(college.collegeName)}>
-                      {expandedColleges[college.collegeName]
-                        ? "Hide Participants"
-                        : "View Participants"}
+                      {expandedColleges[college.collegeName] ? "Hide Participants" : "View Participants"}
                     </Button>
                   </td>
                 </tr>
@@ -1144,6 +1145,7 @@ export function DataTable({ data }: { data: Data[] }) {
 
   return (
     <div className="w-full px-5 rounded-xl my-12">
+      {/* Top Controls */}
       <div className="flex flex-wrap items-center gap-3 py-4">
         <div className="relative max-w-sm">
           <Search className="absolute left-2 top-3 h-4 w-5 text-muted-foreground" />
@@ -1159,9 +1161,11 @@ export function DataTable({ data }: { data: Data[] }) {
         <Button variant="outline" onClick={clearAllFilters} className="ml-2">
           Clear Filters
         </Button>
+        {/* Button to switch to Colleges List */}
         <Button variant="outline" onClick={() => setShowCollegesList(true)}>
           Go to Colleges List
         </Button>
+        {/* New Events List Button */}
         <Button variant="outline" onClick={() => setShowEventsList(true)}>
           Go to Events List
         </Button>
@@ -1175,11 +1179,11 @@ export function DataTable({ data }: { data: Data[] }) {
         </Button>
         <Button
           variant="outline"
-          className="ml-auto bg-primary text-white hover:scale-105  hover:text-white"
+          className="ml-auto bg-primary text-white hover:scale-105 hover:text-white"
           onClick={handleExportToExcel}
         >
           <FileDown className="mr-2 h-4 w-4" />
-          Download current view as Excel
+          Download current view as excel
         </Button>
         <Button
           variant="outline"
@@ -1213,9 +1217,13 @@ export function DataTable({ data }: { data: Data[] }) {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+
+      {/* Display total registrants */}
       <div className="mb-2 text-sm text-gray-700">
         Total Registrants: {totalRegistrants}
       </div>
+
+      {/* Table */}
       <div className="rounded-md border overflow-auto min-h-[18rem] shadow-lg">
         <Table>
           <TableHeader>
@@ -1256,6 +1264,8 @@ export function DataTable({ data }: { data: Data[] }) {
           </TableBody>
         </Table>
       </div>
+
+      {/* Advanced Pagination & Page Size Selector */}
       <div className="flex flex-col md:flex-row items-center justify-between py-4">
         <div className="flex items-center gap-2">
           <span>Rows per page:</span>
