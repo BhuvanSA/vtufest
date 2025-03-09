@@ -52,16 +52,22 @@ import Image from "next/image";
 
 export type Data = {
   id: string;
+  accomodation : string;
+  collegeCode : string;
   photo: string;
   name: string;
   collegeName: string;
   usn: string;
+  phone: string;
+  email: string;
+  blood: string;
+  gender: string;
   type:
-    | "Team Manager"
-    | "Participant/Accompanist"
-    | "Participant"
-    | "Accompanist"
-    | "";
+  | "Team Manager"
+  | "Participant/Accompanist"
+  | "Participant"
+  | "Accompanist"
+  | "";
   events: { eventName: string; role?: "Participant" | "Accompanist" }[];
   status: "Pending" | "Processing" | "Success" | "Failed";
 };
@@ -423,6 +429,26 @@ export function DataTable({ data }: { data: Data[] }) {
         ),
       },
       {
+        accessorKey: "phone",
+        header: "Phone",
+        cell: ({ row }) => <div>{row.getValue("phone") as string}</div>,
+      },
+      {
+        accessorKey: "email",
+        header: "Email",
+        cell: ({ row }) => <div>{row.getValue("email") as string}</div>,
+      },
+      {
+        accessorKey: "gender",
+        header: "Gender",
+        cell: ({ row }) => <div>{row.getValue("gender") as string}</div>,
+      },
+      {
+        accessorKey: "blood",
+        header: "DOB",
+        cell: ({ row }) => <div>{row.getValue("blood") as string}</div>,
+      },
+      {
         accessorKey: "collegeName",
         header: ({ column, table }) => (
           <CollegeNameFilter column={column} table={table} />
@@ -590,6 +616,150 @@ export function DataTable({ data }: { data: Data[] }) {
     };
   };
 
+
+  const handleExportToExcel = () => {
+    const filteredRows = table.getRowModel().rows;
+    const collegeData: Record<string, Data[]> = {};
+    filteredRows.forEach((row) => {
+      const collegeName = row.getValue("collegeName") as string;
+      if (!collegeData[collegeName]) {
+        collegeData[collegeName] = [];
+      }
+      collegeData[collegeName].push(row.original);
+    });
+
+    const excelData: any[][] = [];
+    // Overall header rows
+    excelData.push(["Visveraya technological university in association with Global Academy of technology"]);
+    excelData.push(["24th VTU Youth Fest @ GAT"]);
+    excelData.push([]); // blank row
+
+    for (const collegeName of Object.keys(collegeData)) {
+      const rowsForCollege = collegeData[collegeName];
+      const collegeAssignedCode = rowsForCollege[0].collegeCode || "N/A";
+      const vtuCode = (rowsForCollege[0] as any).vtuCode || "N/A";
+      const accomodationCollege = rowsForCollege[0].accomodation ? "Yes" : "No";
+
+      // College header rows
+      excelData.push([`College: ${collegeName}`]);
+      excelData.push([`College Assigned Code: ${collegeAssignedCode}`]);
+      excelData.push([`VTU Code: ${vtuCode}`]);
+      excelData.push([`Accomodation: ${accomodationCollege}`]);
+      excelData.push([`Accommodation Allocated: N/A`]);
+      excelData.push([]);
+
+      // Student Details Table (exclude Team Manager)
+      const studentRows = rowsForCollege.filter((r) => r.type !== "Team Manager");
+      if (studentRows.length > 0) {
+        excelData.push(["Student Details"]);
+        excelData.push(["SL No", "Student Code", "Name", "USN", "Phone", "Email", "Gender", "DOB", "Accomodation"]);
+        studentRows.forEach((row, index) => {
+          const studentCode = row.usn || "";
+          excelData.push([
+            index + 1,
+            studentCode,
+            row.name || "",
+            row.usn || "",
+            row.phone || "",
+            row.email || "",
+            row.gender || "",
+            row.blood|| "",
+            row.accomodation ? "Yes" : "No",
+          ]);
+        });
+        excelData.push([]);
+      }
+
+      // Team Manager Details Table
+      const teamManagerRows = rowsForCollege.filter((r) => r.type === "Team Manager");
+      if (teamManagerRows.length > 0) {
+        excelData.push(["Team Manager Details"]);
+        excelData.push(["SL No", "Name", "Designation", "Phone", "Email", "Gender", "DOB"]);
+        teamManagerRows.forEach((row, index) => {
+          excelData.push([
+            index + 1,
+            row.name || "",
+            row.designation || "",
+            row.phone || "",
+            row.email || "",
+            row.gender || "",
+            row.dateOfBirth || "",
+          ]);
+        });
+        excelData.push([]);
+      }
+
+      // Event Registration Table
+      const eventsMap: Record<string, { name: string; role: string }[]> = {};
+      rowsForCollege.forEach((row) => {
+        if (row.events && Array.isArray(row.events)) {
+          row.events.forEach((ev: { eventName: string; role?: string }) => {
+            if (ev.eventName) {
+              if (!eventsMap[ev.eventName]) {
+                eventsMap[ev.eventName] = [];
+              }
+              eventsMap[ev.eventName].push({
+                name: row.name,
+                role: ev.role || "",
+              });
+            }
+          });
+        }
+      });
+      for (const eventName of Object.keys(eventsMap)) {
+        excelData.push([`Event: ${eventName}`]);
+        excelData.push(["SL No", "Name", "Role"]);
+        eventsMap[eventName].forEach((entry, index) => {
+          excelData.push([index + 1, entry.name, entry.role]);
+        });
+        excelData.push([]);
+      }
+      excelData.push([]);
+    }
+
+    const ws = XLSX.utils.aoa_to_sheet(excelData);
+    ws["!cols"] = [
+      { wch: 8 },
+      { wch: 20 },
+      { wch: 30 },
+      { wch: 20 },
+      { wch: 20 },
+      { wch: 30 },
+      { wch: 15 },
+      { wch: 20 },
+      { wch: 15 },
+    ];
+
+    // Apply basic cell styling (if supported)
+    const headerTitles = new Set([
+      "SL No",
+      "Student Code",
+      "Name",
+      "USN",
+      "Phone",
+      "Email",
+      "Gender",
+      "DOB",
+      "Accomodation",
+      "Designation",
+    ]);
+    for (let cell in ws) {
+      if (ws.hasOwnProperty(cell) && cell[0] !== "!") {
+        if (!ws[cell].s) ws[cell].s = {};
+        ws[cell].s.font = { sz: 12, name: "Calibri" };
+        if (headerTitles.has(ws[cell].v)) {
+          ws[cell].s.font.bold = true;
+        }
+      }
+    }
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Registrants");
+    const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array", cellStyles: true });
+    saveAs(new Blob([wbout], { type: "application/octet-stream" }), "registrants.xlsx");
+  };
+
+
   return (
     <div className="w-full px-5 rounded-xl my-12">
       {/* Top Controls */}
@@ -619,6 +789,14 @@ export function DataTable({ data }: { data: Data[] }) {
         >
           <FileDown className="mr-2 h-4 w-4" />
           Download current view as PDF
+        </Button>
+        <Button
+          variant="outline"
+          className="ml-auto bg-primary text-white hover:scale-105  hover:text-white"
+          onClick={handleExportToExcel}
+        >
+          <FileDown className="mr-2 h-4 w-4" />
+          Download current view as excel
         </Button>
         <Button
           variant="outline"
