@@ -630,14 +630,14 @@ export function DataTable({ data }: { data: Data[] }) {
 
     const excelData: any[][] = [];
     // Overall header rows
-    excelData.push(["Visveraya technological university in association with Global Academy of technology"]);
+    excelData.push(["Visveraya Technological University in association with Global Academy of Technology"]);
     excelData.push(["24th VTU Youth Fest @ GAT"]);
     excelData.push([]); // blank row
 
     for (const collegeName of Object.keys(collegeData)) {
       const rowsForCollege = collegeData[collegeName];
-      const collegeAssignedCode = rowsForCollege[0].collegeCode || "N/A";
-      const vtuCode = (rowsForCollege[0] as any).vtuCode || "N/A";
+      const vtuCode = rowsForCollege[0].collegeCode || "N/A";
+      const collegeAssignedCode = (rowsForCollege[0] as any).vtuCode || "N/A";
       const accomodationCollege = rowsForCollege[0].accomodation ? "Yes" : "No";
 
       // College header rows
