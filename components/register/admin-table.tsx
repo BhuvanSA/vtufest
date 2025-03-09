@@ -248,34 +248,71 @@ type CollegesListProps = {
 };
 
 const CollegesList: React.FC<CollegesListProps> = ({ data, onBack }) => {
-  // Group data by collegeName
-  const grouped = data.reduce((acc, curr) => {
-    const college = curr.collegeName;
-    if (!acc[college]) {
-      acc[college] = {
-        collegeName: college,
-        events: new Set<string>(),
-        collegeCode: curr.collegeCode,
-        accomodation: curr.accomodation,
-      };
-    }
-    curr.events.forEach((ev) => {
-      if (ev.eventName) acc[college].events.add(ev.eventName);
+  // Compute overall unique events from the registrants data
+  const allEventsSet = new Set<string>();
+  data.forEach((registrant) => {
+    registrant.events.forEach((ev) => {
+      if (ev.eventName) allEventsSet.add(ev.eventName);
     });
-    return acc;
-  }, {} as Record<string, { collegeName: string; events: Set<string>; collegeCode: string; accomodation: string }>);
+  });
+  const allEvents = Array.from(allEventsSet).sort();
 
-  // Convert to array with sorted events per college
-  let colleges: { collegeName: string; events: string[]; collegeCode: string; accomodation: string }[] =
-    Object.values(grouped).map((col) => ({
-      collegeName: col.collegeName,
-      events: Array.from(col.events).sort(),
-      collegeCode: col.collegeCode,
-      accomodation: col.accomodation,
-    }));
+  // State for event filter (if empty, show all)
+  const [selectedEvent, setSelectedEvent] = React.useState<string>("");
+
+  // Group data by collegeName while collecting unique events and registrant count
+  const grouped = data.reduce(
+    (acc, curr) => {
+      const college = curr.collegeName;
+      if (!acc[college]) {
+        acc[college] = {
+          collegeName: college,
+          events: new Set<string>(),
+          collegeCode: curr.collegeCode,
+          accomodation: curr.accomodation,
+          registrantCount: 0,
+        };
+      }
+      curr.events.forEach((ev) => {
+        if (ev.eventName) acc[college].events.add(ev.eventName);
+      });
+      acc[college].registrantCount += 1;
+      return acc;
+    },
+    {} as Record<
+      string,
+      {
+        collegeName: string;
+        events: Set<string>;
+        collegeCode: string;
+        accomodation: string;
+        registrantCount: number;
+      }
+    >
+  );
+
+  // Convert to an array with sorted events per college
+  let colleges: {
+    collegeName: string;
+    events: string[];
+    collegeCode: string;
+    accomodation: string;
+    registrantCount: number;
+  }[] = Object.values(grouped).map((col) => ({
+    collegeName: col.collegeName,
+    events: Array.from(col.events).sort(),
+    collegeCode: col.collegeCode,
+    accomodation: col.accomodation,
+    registrantCount: col.registrantCount,
+  }));
+
+  // Apply filter if a specific event is selected
+  if (selectedEvent) {
+    colleges = colleges.filter((col) => col.events.includes(selectedEvent));
+  }
 
   // Sorting state for colleges list
-  const [sortField, setSortField] = React.useState<"collegeName" | "eventCount">("collegeName");
+  const [sortField, setSortField] = React.useState<"collegeName" | "eventCount" | "registrantCount">("collegeName");
   const [sortOrder, setSortOrder] = React.useState<"asc" | "desc">("asc");
 
   colleges.sort((a, b) => {
@@ -284,9 +321,40 @@ const CollegesList: React.FC<CollegesListProps> = ({ data, onBack }) => {
       compareVal = a.collegeName.localeCompare(b.collegeName);
     } else if (sortField === "eventCount") {
       compareVal = a.events.length - b.events.length;
+    } else if (sortField === "registrantCount") {
+      compareVal = a.registrantCount - b.registrantCount;
     }
     return sortOrder === "asc" ? compareVal : -compareVal;
   });
+
+  // Download the current Colleges List as Excel
+  const handleDownloadCollegesExcel = () => {
+    const excelData: any[][] = [];
+    excelData.push([
+      "College Name",
+      "College Code",
+      "Accommodation",
+      "Registered Events",
+      "Event Count",
+      "Registrant Count",
+    ]);
+    colleges.forEach((col) => {
+      excelData.push([
+        col.collegeName,
+        col.collegeCode,
+        col.accomodation ? "Yes" : "No",
+        col.events.join(", "),
+        col.events.length,
+        col.registrantCount,
+      ]);
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(excelData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Colleges");
+    const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    saveAs(new Blob([wbout], { type: "application/octet-stream" }), "colleges.xlsx");
+  };
 
   return (
     <div className="w-full px-5 rounded-xl my-12">
@@ -296,19 +364,36 @@ const CollegesList: React.FC<CollegesListProps> = ({ data, onBack }) => {
           Back to Registrants
         </Button>
       </div>
-      <div className="flex gap-4 mb-4">
-        <div>
-          <span>Sort by: </span>
+      <div className="flex flex-wrap items-center gap-4 mb-4">
+        <div className="flex items-center gap-2">
+          <span>Filter by Event:</span>
+          <select
+            value={selectedEvent}
+            onChange={(e) => setSelectedEvent(e.target.value)}
+          >
+            <option value="">All Events</option>
+            {allEvents.map((event) => (
+              <option key={event} value={event}>
+                {event}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="flex items-center gap-2">
+          <span>Sort by:</span>
           <select
             value={sortField}
-            onChange={(e) => setSortField(e.target.value as "collegeName" | "eventCount")}
+            onChange={(e) =>
+              setSortField(e.target.value as "collegeName" | "eventCount" | "registrantCount")
+            }
           >
             <option value="collegeName">College Name</option>
             <option value="eventCount">Number of Events</option>
+            <option value="registrantCount">Number of Registrants</option>
           </select>
         </div>
-        <div>
-          <span>Order: </span>
+        <div className="flex items-center gap-2">
+          <span>Order:</span>
           <select
             value={sortOrder}
             onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}
@@ -317,6 +402,9 @@ const CollegesList: React.FC<CollegesListProps> = ({ data, onBack }) => {
             <option value="desc">Descending</option>
           </select>
         </div>
+        <Button variant="outline" onClick={handleDownloadCollegesExcel}>
+          Download Colleges (Excel)
+        </Button>
       </div>
       <table className="min-w-full border-collapse border">
         <thead>
@@ -325,6 +413,8 @@ const CollegesList: React.FC<CollegesListProps> = ({ data, onBack }) => {
             <th className="border p-2">College Code</th>
             <th className="border p-2">Accommodation</th>
             <th className="border p-2">Registered Events</th>
+            <th className="border p-2">Event Count</th>
+            <th className="border p-2">Registrant Count</th>
           </tr>
         </thead>
         <tbody>
@@ -334,6 +424,8 @@ const CollegesList: React.FC<CollegesListProps> = ({ data, onBack }) => {
               <td className="border p-2">{college.collegeCode}</td>
               <td className="border p-2">{college.accomodation ? "Yes" : "No"}</td>
               <td className="border p-2">{college.events.join(", ")}</td>
+              <td className="border p-2">{college.events.length}</td>
+              <td className="border p-2">{college.registrantCount}</td>
             </tr>
           ))}
         </tbody>
@@ -734,7 +826,9 @@ export function DataTable({ data }: { data: Data[] }) {
 
     const excelData: any[][] = [];
     // Overall header rows
-    excelData.push(["Visveraya Technological University in association with Global Academy of Technology"]);
+    excelData.push([
+      "Visveraya Technological University in association with Global Academy of Technology",
+    ]);
     excelData.push(["24th VTU Youth Fest @ GAT"]);
     excelData.push([]); // blank row
 
@@ -756,7 +850,17 @@ export function DataTable({ data }: { data: Data[] }) {
       const studentRows = rowsForCollege.filter((r) => r.type !== "Team Manager");
       if (studentRows.length > 0) {
         excelData.push(["Student Details"]);
-        excelData.push(["SL No", "Student Code", "Name", "USN", "Phone", "Email", "Gender", "DOB", "Accomodation"]);
+        excelData.push([
+          "SL No",
+          "Student Code",
+          "Name",
+          "USN",
+          "Phone",
+          "Email",
+          "Gender",
+          "DOB",
+          "Accomodation",
+        ]);
         studentRows.forEach((row, index) => {
           const studentCode = row.usn || "";
           excelData.push([
@@ -767,7 +871,7 @@ export function DataTable({ data }: { data: Data[] }) {
             row.phone || "",
             row.email || "",
             row.gender || "",
-            row.blood|| "",
+            row.blood || "",
             row.accomodation ? "Yes" : "No",
           ]);
         });
@@ -886,7 +990,7 @@ export function DataTable({ data }: { data: Data[] }) {
         <Button variant="outline" onClick={clearAllFilters} className="ml-2">
           Clear Filters
         </Button>
-        {/* New button to switch to Colleges List */}
+        {/* Button to switch to Colleges List */}
         <Button variant="outline" onClick={() => setShowCollegesList(true)}>
           Go to Colleges List
         </Button>
