@@ -363,10 +363,7 @@ const CollegesList: React.FC<CollegesListProps> = ({ data, onBack }) => {
       <div className="flex flex-wrap items-center gap-4 mb-4">
         <div className="flex items-center gap-2">
           <span>Filter by Event:</span>
-          <select
-            value={selectedEvent}
-            onChange={(e) => setSelectedEvent(e.target.value)}
-          >
+          <select value={selectedEvent} onChange={(e) => setSelectedEvent(e.target.value)}>
             <option value="">All Events</option>
             {allEvents.map((event) => (
               <option key={event} value={event}>
@@ -390,10 +387,7 @@ const CollegesList: React.FC<CollegesListProps> = ({ data, onBack }) => {
         </div>
         <div className="flex items-center gap-2">
           <span>Order:</span>
-          <select
-            value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}
-          >
+          <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}>
             <option value="asc">Ascending</option>
             <option value="desc">Descending</option>
           </select>
@@ -619,7 +613,7 @@ export function DataTable({ data }: { data: Data[] }) {
   const [showCollegesList, setShowCollegesList] = React.useState(false);
   const [showEventsList, setShowEventsList] = React.useState(false);
 
-  // Conditional rendering of alternative views
+  // Conditional rendering for alternative views
   if (showCollegesList) {
     return <CollegesList data={rows} onBack={() => setShowCollegesList(false)} />;
   }
@@ -648,7 +642,6 @@ export function DataTable({ data }: { data: Data[] }) {
           },
           credentials: "include",
         });
-
         const data = await response.json();
         toast.success(data.message);
         setRows(updatedRows);
@@ -663,7 +656,6 @@ export function DataTable({ data }: { data: Data[] }) {
   const handleDeleteSelected = React.useCallback(
     async (providedRegistrants?: string[]) => {
       let registrantIds: string[] = [];
-
       if (providedRegistrants && providedRegistrants.length > 0) {
         registrantIds = providedRegistrants;
       } else {
@@ -672,12 +664,10 @@ export function DataTable({ data }: { data: Data[] }) {
           new Set(selectedRows.map((r) => (r.original.id as string).split("#")[0]))
         );
       }
-
       if (!registrantIds.length) {
         toast.error("No rows selected");
         return;
       }
-
       try {
         const response = await fetch("/api/deleteregister", {
           method: "DELETE",
@@ -738,7 +728,6 @@ export function DataTable({ data }: { data: Data[] }) {
               return newSelection;
             });
           };
-
           return (
             <Checkbox
               checked={row.getIsSelected()}
@@ -1165,7 +1154,7 @@ export function DataTable({ data }: { data: Data[] }) {
         <Button variant="outline" onClick={() => setShowCollegesList(true)}>
           Go to Colleges List
         </Button>
-        {/* New Events List Button */}
+        {/* Button to switch to Events List */}
         <Button variant="outline" onClick={() => setShowEventsList(true)}>
           Go to Events List
         </Button>
