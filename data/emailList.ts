@@ -271,4 +271,6 @@ export const emailList = [
     "Principal@agmrcet.com",
     "maheshg41189@gmail.com",
     "principal@shrideviengineering.org",
+    "info@recbhalki.org",
+    "principal@bce.org.in",
 ];
