@@ -107,7 +107,10 @@ const CollegeNameFilter: React.FC<CollegeNameFilterProps> = ({ column, table }) 
           onChange={(e) => setSearchQuery(e.target.value)}
           className="mb-2"
         />
-        <DropdownMenuItem onClick={() => column.setFilterValue(undefined)} className="cursor-pointer">
+        <DropdownMenuItem
+          onClick={() => column.setFilterValue(undefined)}
+          className="cursor-pointer"
+        >
           All
         </DropdownMenuItem>
         {filteredOptions.map((college) => (
@@ -157,7 +160,10 @@ const TypeFilter: React.FC<TypeFilterProps> = ({ column, table }) => {
           onChange={(e) => setSearchQuery(e.target.value)}
           className="mb-2"
         />
-        <DropdownMenuItem onClick={() => column.setFilterValue(undefined)} className="cursor-pointer">
+        <DropdownMenuItem
+          onClick={() => column.setFilterValue(undefined)}
+          className="cursor-pointer"
+        >
           All
         </DropdownMenuItem>
         {filteredTypes.map((t) => (
@@ -211,7 +217,10 @@ const EventFilter: React.FC<EventFilterProps> = ({ column, table }) => {
           onChange={(e) => setSearchQuery(e.target.value)}
           className="mb-2"
         />
-        <DropdownMenuItem onClick={() => column.setFilterValue(undefined)} className="cursor-pointer">
+        <DropdownMenuItem
+          onClick={() => column.setFilterValue(undefined)}
+          className="cursor-pointer"
+        >
           All
         </DropdownMenuItem>
         {filteredOptions.map((event) => (
@@ -423,22 +432,30 @@ export function DataTable({ data }: { data: Data[] }) {
       {
         accessorKey: "phone",
         header: "Phone",
-        cell: ({ row }) => <div className="text-black">{row.getValue("phone") as string}</div>,
+        cell: ({ row }) => (
+          <div className="text-black">{row.getValue("phone") as string}</div>
+        ),
       },
       {
         accessorKey: "email",
         header: "Email",
-        cell: ({ row }) => <div className="text-black">{row.getValue("email") as string}</div>,
+        cell: ({ row }) => (
+          <div className="text-black">{row.getValue("email") as string}</div>
+        ),
       },
       {
         accessorKey: "gender",
         header: "Gender",
-        cell: ({ row }) => <div className="text-black">{row.getValue("gender") as string}</div>,
+        cell: ({ row }) => (
+          <div className="text-black">{row.getValue("gender") as string}</div>
+        ),
       },
       {
         accessorKey: "blood",
         header: "DOB",
-        cell: ({ row }) => <div className="text-black">{row.getValue("blood") as string}</div>,
+        cell: ({ row }) => (
+          <div className="text-black">{row.getValue("blood") as string}</div>
+        ),
       },
       {
         accessorKey: "collegeName",
@@ -446,7 +463,9 @@ export function DataTable({ data }: { data: Data[] }) {
           <CollegeNameFilter column={column} table={table} />
         ),
         cell: ({ row }) => (
-          <div className="capitalize text-black">{row.getValue("collegeName") as string}</div>
+          <div className="capitalize text-black">
+            {row.getValue("collegeName") as string}
+          </div>
         ),
         filterFn: (row, columnId, filterValue) => {
           if (!filterValue) return true;
@@ -754,6 +773,51 @@ export function DataTable({ data }: { data: Data[] }) {
     saveAs(new Blob([wbout], { type: "application/octet-stream" }), "registrants.xlsx");
   };
 
+  // New download function for colleges view
+  const handleDownloadCollegesExcel = () => {
+    const excelData: any[][] = [];
+    // Header rows
+    excelData.push(["Colleges Report"]);
+    excelData.push([]);
+    excelData.push([
+      "College Name",
+      "College Code",
+      "Accommodation",
+      "Events",
+      "No. of Events",
+      "No. of Registrants",
+      "Male Participants",
+      "Female Participants",
+    ]);
+    collegesData.forEach((college) => {
+      excelData.push([
+        college.collegeName,
+        college.collegeCode,
+        college.accomodation ? "Yes" : "No",
+        (college.events as string[]).join(", "),
+        (college.events as string[]).length,
+        college.registrants,
+        college.maleCount,
+        college.femaleCount,
+      ]);
+    });
+    const ws = XLSX.utils.aoa_to_sheet(excelData);
+    ws["!cols"] = [
+      { wch: 20 },
+      { wch: 20 },
+      { wch: 15 },
+      { wch: 40 },
+      { wch: 15 },
+      { wch: 20 },
+      { wch: 20 },
+      { wch: 20 },
+    ];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Colleges");
+    const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    saveAs(new Blob([wbout], { type: "application/octet-stream" }), "colleges.xlsx");
+  };
+
   /////////////
   // COLLEGES VIEW: Aggregate colleges from rows
   /////////////
@@ -809,10 +873,20 @@ export function DataTable({ data }: { data: Data[] }) {
       {
         accessorKey: "collegeName",
         header: "College Name",
+        sortingFn: (a, b) => {
+          const aVal = a.getValue("collegeName") as string;
+          const bVal = b.getValue("collegeName") as string;
+          return aVal.localeCompare(bVal);
+        },
       },
       {
         accessorKey: "collegeCode",
         header: "College Code",
+        sortingFn: (a, b) => {
+          const aVal = a.getValue("collegeCode") as string;
+          const bVal = b.getValue("collegeCode") as string;
+          return aVal.localeCompare(bVal);
+        },
       },
       {
         accessorKey: "accomodation",
@@ -907,7 +981,7 @@ export function DataTable({ data }: { data: Data[] }) {
               onClick={handleExportToExcel}
             >
               <FileDown className="mr-2 h-4 w-4" />
-              Download current view as excel
+              Download current view as Excel
             </Button>
             <Button
               variant="outline"
@@ -919,20 +993,29 @@ export function DataTable({ data }: { data: Data[] }) {
             </Button>
           </>
         ) : (
-          // In the colleges view, add a filter for college name
-          <div className="relative max-w-sm">
-            <Search className="absolute left-2 top-3 h-4 w-5 text-black" />
-            <Input
-              placeholder="Search college name..."
-              value={
-                (collegeTable.getColumn("collegeName")?.getFilterValue() as string) ?? ""
-              }
-              onChange={(e) =>
-                collegeTable.getColumn("collegeName")?.setFilterValue(e.target.value)
-              }
-              className="pl-10 w-[26rem] text-black"
-            />
-          </div>
+          <>
+            <div className="relative max-w-sm">
+              <Search className="absolute left-2 top-3 h-4 w-5 text-black" />
+              <Input
+                placeholder="Search college name..."
+                value={
+                  (collegeTable.getColumn("collegeName")?.getFilterValue() as string) ?? ""
+                }
+                onChange={(e) =>
+                  collegeTable.getColumn("collegeName")?.setFilterValue(e.target.value)
+                }
+                className="pl-10 w-[26rem] text-black"
+              />
+            </div>
+            <Button
+              variant="outline"
+              className="ml-auto bg-primary text-white hover:scale-105 hover:text-white"
+              onClick={handleDownloadCollegesExcel}
+            >
+              <FileDown className="mr-2 h-4 w-4" />
+              Download Colleges as Excel
+            </Button>
+          </>
         )}
         <Button
           variant="outline"
