@@ -158,6 +158,11 @@ export const colleges = [
                 name: "AGM RURAL COLLEGE OF ENGINEERING &TECHNOLOGY",
                 code: "2AV",
             },
+            {
+
+                name: "VSM's Somashekar Institute Of Technology Nipani",
+                code: "2VS"
+            },
             { name: "ANGADI INSTITUTE OF TECHNOLOGY AND MGMT.", code: "2AG" },
             { name: "Angadi School of Architecture, Belgavi", code: "2IG" },
             {
@@ -378,11 +383,16 @@ export const colleges = [
                 name: "Sahyadri Institute of Tech. & Mgmt., Mangaluru",
                 code: "4SF",
             },
+            {
+                name: "Government Engineering College Mosalehosahalli Hassan",
+                code: "4HG",
+            },
+
             { name: "test1", code: "123" },
             { name: "test2", code: "456" },
             { name: "test3", code: "789" },
             { name: "test4", code: "689" },
-            { name: "test5", code: "532"}
+            { name: "test5", code: "532" }
         ],
     },
 ];
