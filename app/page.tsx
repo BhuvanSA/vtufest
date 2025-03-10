@@ -11,7 +11,7 @@ import collegeImg from "@/components/images/college.jpg";
 const Home = () => {
   return (
     <div className="bg-background sm:margins  md:pt-5 ">
-      {/* Carousel / Header Section in an elegant bordered container with extra shadow*/}
+      {/* Carousel / Header Section in an elegant bordered container with extra shadow */}
       <div className="max-w-5xl mx-auto border  border-gray-300 rounded-lg overflow-hidden shadow-2xl mb-8">
         <Header />
       </div>
@@ -47,7 +47,7 @@ const Home = () => {
                     />
                   </div>
                   <p>
-                    Global Academy of Technology is an A-grade College counted
+                    Global Academy of Technology is an A-grade Cooollege counted
                     among the bestesr engineering colleges in Bangalore. Equipped
                     with modern technology and top‑notch infrastructure, the
                     institution fosters an ambience and culture that accelerates

@@ -320,8 +320,35 @@ export function DataTable({ data }: { data: Data[] }) {
             },
             {
                 accessorKey: "accomodation",
-                header: "Accomodation",
+                header: ({ column }) => {
+                    const filterCycle = ["ALL", "Yes", "No"];
+                    const currentFilter =
+                        (column.getFilterValue() as string) ?? "ALL";
+                    const currentIndex = filterCycle.indexOf(currentFilter);
+                    const nextIndex = (currentIndex + 1) % filterCycle.length;
+                    const nextFilter = filterCycle[nextIndex];
+
+                    const handleFilterChange = () => {
+                        if (nextFilter === "ALL") {
+                            column.setFilterValue(undefined);
+                        } else {
+                            column.setFilterValue(nextFilter);
+                        }
+                    };
+
+                    return (
+                        <Button variant="ghost" onClick={handleFilterChange}>
+                            Accomodation <ListFilterIcon className="p-1" />{" "}
+                            {currentFilter !== "ALL" ? `: ${currentFilter}` : ""}
+                        </Button>
+                    );
+                },
                 cell: ({ row }) => row.getValue("accomodation") ? "Yes" : "No",
+                filterFn: (row, columnId, filterValue) => {
+                    if (!filterValue || filterValue === "ALL") return true;
+                    const accomodation = row.getValue(columnId) ? "Yes" : "No";
+                    return accomodation === filterValue;
+                },
             },
             {
                 accessorKey: "gender",
@@ -349,7 +376,7 @@ export function DataTable({ data }: { data: Data[] }) {
                 }
             },
             {
-                accessorKey: "addharUrl",
+                accessorKey: "aadharUrl",
                 header: "Aadhar Card",
                 cell: ({ row }) => {
                     const imageKey = row.getValue("aadharUrl");

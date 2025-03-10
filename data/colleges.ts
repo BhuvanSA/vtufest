@@ -379,15 +379,15 @@ export const colleges = [
                 code: "4SF",
             },
             {
-                name: "Government Engineering College Mosalehosahalli Hassan",
-                code: "4HG",
+                name : "Government Engineering College Mosalehosahalli Hassan",
+                code : "4HG",
             },
-
+            
             { name: "test1", code: "123" },
             { name: "test2", code: "456" },
             { name: "test3", code: "789" },
             { name: "test4", code: "689" },
-            { name: "test5", code: "532" }
+            { name: "test5", code: "532"}
         ],
     },
 ];
