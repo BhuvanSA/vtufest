@@ -158,11 +158,6 @@ export const colleges = [
                 name: "AGM RURAL COLLEGE OF ENGINEERING &TECHNOLOGY",
                 code: "2AV",
             },
-            {
-
-                name: "VSM's Somashekar Institute Of Technology Nipani",
-                code: "2VS"
-            },
             { name: "ANGADI INSTITUTE OF TECHNOLOGY AND MGMT.", code: "2AG" },
             { name: "Angadi School of Architecture, Belgavi", code: "2IG" },
             {
