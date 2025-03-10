@@ -1,5 +1,3 @@
-
-
 "use client";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -54,8 +52,8 @@ import Image from "next/image";
 
 export type Data = {
   id: string;
-  accomodation : string;
-  collegeCode : string;
+  accomodation: string;
+  collegeCode: string;
   photo: string;
   name: string;
   collegeName: string;
@@ -65,11 +63,11 @@ export type Data = {
   blood: string;
   gender: string;
   type:
-  | "Team Manager"
-  | "Participant/Accompanist"
-  | "Participant"
-  | "Accompanist"
-  | "";
+    | "Team Manager"
+    | "Participant/Accompanist"
+    | "Participant"
+    | "Accompanist"
+    | "";
   events: { eventName: string; role?: "Participant" | "Accompanist" }[];
   status: "Pending" | "Processing" | "Success" | "Failed";
 };
@@ -99,7 +97,7 @@ const CollegeNameFilter: React.FC<CollegeNameFilterProps> = ({ column, table }) 
         <Button variant="ghost">
           College Name
           <ChevronDown className="ml-1 h-4 w-4" />
-          {column.getFilterValue() ? `: ${column.getFilterValue() as string}` : ""}
+          {column.getFilterValue() ? `: ${column.getFilterValue()}` : ""}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 p-2 max-h-60 overflow-y-auto">
@@ -152,7 +150,7 @@ const TypeFilter: React.FC<TypeFilterProps> = ({ column, table }) => {
         <Button variant="ghost">
           Type
           <ChevronDown className="ml-1 h-4 w-4" />
-          {column.getFilterValue() ? `: ${column.getFilterValue() as string}` : ""}
+          {column.getFilterValue() ? `: ${column.getFilterValue()}` : ""}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 p-2 max-h-60 overflow-y-auto">
@@ -210,7 +208,7 @@ const EventFilter: React.FC<EventFilterProps> = ({ column, table }) => {
         <Button variant="ghost">
           Events
           <ChevronDown className="ml-1 h-4 w-4" />
-          {column.getFilterValue() ? `: ${column.getFilterValue() as string}` : ""}
+          {column.getFilterValue() ? `: ${column.getFilterValue()}` : ""}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 p-2 max-h-60 overflow-y-auto">
@@ -241,12 +239,390 @@ const EventFilter: React.FC<EventFilterProps> = ({ column, table }) => {
 };
 
 //////////////////////////
+//    Colleges List     //
+//////////////////////////
+
+type CollegesListProps = {
+  data: Data[];
+  onBack: () => void;
+};
+
+const CollegesList: React.FC<CollegesListProps> = ({ data, onBack }) => {
+  // Compute overall unique events from the registrants data
+  const allEventsSet = new Set<string>();
+  data.forEach((registrant) => {
+    registrant.events.forEach((ev) => {
+      if (ev.eventName) allEventsSet.add(ev.eventName);
+    });
+  });
+  const allEvents = Array.from(allEventsSet).sort();
+
+  // State for event filter (if empty, show all)
+  const [selectedEvent, setSelectedEvent] = React.useState<string>("");
+
+  // Group data by collegeName while collecting unique events and registrant count
+  const grouped = data.reduce(
+    (acc, curr) => {
+      const college = curr.collegeName;
+      if (!acc[college]) {
+        acc[college] = {
+          collegeName: college,
+          events: new Set<string>(),
+          collegeCode: curr.collegeCode,
+          accomodation: curr.accomodation,
+          registrantCount: 0,
+        };
+      }
+      curr.events.forEach((ev) => {
+        if (ev.eventName) acc[college].events.add(ev.eventName);
+      });
+      acc[college].registrantCount += 1;
+      return acc;
+    },
+    {} as Record<
+      string,
+      {
+        collegeName: string;
+        events: Set<string>;
+        collegeCode: string;
+        accomodation: string;
+        registrantCount: number;
+      }
+    >
+  );
+
+  let colleges: {
+    collegeName: string;
+    events: string[];
+    collegeCode: string;
+    accomodation: string;
+    registrantCount: number;
+  }[] = Object.values(grouped).map((col) => ({
+    collegeName: col.collegeName,
+    events: Array.from(col.events).sort(),
+    collegeCode: col.collegeCode,
+    accomodation: col.accomodation,
+    registrantCount: col.registrantCount,
+  }));
+
+  if (selectedEvent) {
+    colleges = colleges.filter((col) => col.events.includes(selectedEvent));
+  }
+
+  const [sortField, setSortField] = React.useState<"collegeName" | "eventCount" | "registrantCount">("collegeName");
+  const [sortOrder, setSortOrder] = React.useState<"asc" | "desc">("asc");
+
+  colleges.sort((a, b) => {
+    let compareVal = 0;
+    if (sortField === "collegeName") {
+      compareVal = a.collegeName.localeCompare(b.collegeName);
+    } else if (sortField === "eventCount") {
+      compareVal = a.events.length - b.events.length;
+    } else if (sortField === "registrantCount") {
+      compareVal = a.registrantCount - b.registrantCount;
+    }
+    return sortOrder === "asc" ? compareVal : -compareVal;
+  });
+
+  const handleDownloadCollegesExcel = () => {
+    const excelData: any[][] = [];
+    excelData.push([
+      "College Name",
+      "College Code",
+      "Accommodation",
+      "Registered Events",
+      "Event Count",
+      "Registrant Count",
+    ]);
+    colleges.forEach((col) => {
+      excelData.push([
+        col.collegeName,
+        col.collegeCode,
+        col.accomodation ? "Yes" : "No",
+        col.events.join(", "),
+        col.events.length,
+        col.registrantCount,
+      ]);
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(excelData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Colleges");
+    const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    saveAs(new Blob([wbout], { type: "application/octet-stream" }), "colleges.xlsx");
+  };
+
+  return (
+    <div className="w-full px-5 rounded-xl my-12">
+      <div className="flex items-center justify-between py-4">
+        <h2 className="text-xl font-bold">Colleges List</h2>
+        <Button variant="outline" onClick={onBack}>
+          Back to Registrants
+        </Button>
+      </div>
+      <div className="flex flex-wrap items-center gap-4 mb-4">
+        <div className="flex items-center gap-2">
+          <span>Filter by Event:</span>
+          <select
+            value={selectedEvent}
+            onChange={(e) => setSelectedEvent(e.target.value)}
+          >
+            <option value="">All Events</option>
+            {allEvents.map((event) => (
+              <option key={event} value={event}>
+                {event}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="flex items-center gap-2">
+          <span>Sort by:</span>
+          <select
+            value={sortField}
+            onChange={(e) =>
+              setSortField(e.target.value as "collegeName" | "eventCount" | "registrantCount")
+            }
+          >
+            <option value="collegeName">College Name</option>
+            <option value="eventCount">Number of Events</option>
+            <option value="registrantCount">Number of Registrants</option>
+          </select>
+        </div>
+        <div className="flex items-center gap-2">
+          <span>Order:</span>
+          <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}>
+            <option value="asc">Ascending</option>
+            <option value="desc">Descending</option>
+          </select>
+        </div>
+        <Button variant="outline" onClick={handleDownloadCollegesExcel}>
+          Download Colleges (Excel)
+        </Button>
+      </div>
+      <table className="min-w-full border-collapse border">
+        <thead>
+          <tr>
+            <th className="border p-2">College Name</th>
+            <th className="border p-2">College Code</th>
+            <th className="border p-2">Accommodation</th>
+            <th className="border p-2">Registered Events</th>
+            <th className="border p-2">Event Count</th>
+            <th className="border p-2">Registrant Count</th>
+          </tr>
+        </thead>
+        <tbody>
+          {colleges.map((college, index) => (
+            <tr key={index} className="border">
+              <td className="border p-2">{college.collegeName}</td>
+              <td className="border p-2">{college.collegeCode}</td>
+              <td className="border p-2">{college.accomodation ? "Yes" : "No"}</td>
+              <td className="border p-2">{college.events.join(", ")}</td>
+              <td className="border p-2">{college.events.length}</td>
+              <td className="border p-2">{college.registrantCount}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+//////////////////////////
+//      Events List     //
+//////////////////////////
+
+type EventsListProps = {
+  data: Data[];
+  onBack: () => void;
+};
+
+const EventsList: React.FC<EventsListProps> = ({ data, onBack }) => {
+  const allEventsSet = new Set<string>();
+  data.forEach((registrant) => {
+    registrant.events.forEach((ev) => {
+      if (ev.eventName) allEventsSet.add(ev.eventName);
+    });
+  });
+  const allEvents = Array.from(allEventsSet).sort();
+
+  const [selectedEvent, setSelectedEvent] = React.useState<string>("");
+  const [expandedColleges, setExpandedColleges] = React.useState<Record<string, boolean>>({});
+
+  const filteredData = selectedEvent
+    ? data.filter((registrant) =>
+        registrant.events.some((ev) => ev.eventName === selectedEvent)
+      )
+    : [];
+
+  const grouped = filteredData.reduce(
+    (acc, curr) => {
+      const college = curr.collegeName;
+      if (!acc[college]) {
+        acc[college] = {
+          collegeName: college,
+          collegeCode: curr.collegeCode,
+          accomodation: curr.accomodation,
+          participants: [] as {
+            id: string;
+            name: string;
+            usn: string;
+            type: string;
+            role: string;
+            phone: string;
+            email: string;
+          }[],
+        };
+      }
+      const relevantEvents = curr.events.filter((ev) => ev.eventName === selectedEvent);
+      if (relevantEvents.length > 0) {
+        acc[college].participants.push({
+          id: curr.id,
+          name: curr.name,
+          usn: curr.usn,
+          type: curr.type,
+          role: relevantEvents[0].role || "",
+          phone: curr.phone,
+          email: curr.email,
+        });
+      }
+      return acc;
+    },
+    {} as Record<
+      string,
+      {
+        collegeName: string;
+        collegeCode: string;
+        accomodation: string;
+        participants: {
+          id: string;
+          name: string;
+          usn: string;
+          type: string;
+          role: string;
+          phone: string;
+          email: string;
+        }[];
+      }
+    >
+  );
+
+  const colleges = Object.values(grouped);
+
+  const toggleExpand = (collegeName: string) => {
+    setExpandedColleges((prev) => ({
+      ...prev,
+      [collegeName]: !prev[collegeName],
+    }));
+  };
+
+  return (
+    <div className="w-full px-5 rounded-xl my-12">
+      <div className="flex items-center justify-between py-4">
+        <h2 className="text-xl font-bold">Events List</h2>
+        <Button variant="outline" onClick={onBack}>
+          Back
+        </Button>
+      </div>
+      <div className="flex flex-wrap items-center gap-4 mb-4">
+        <div className="flex items-center gap-2">
+          <span>Select Event:</span>
+          <select value={selectedEvent} onChange={(e) => setSelectedEvent(e.target.value)}>
+            <option value="">-- Select an Event --</option>
+            {allEvents.map((event) => (
+              <option key={event} value={event}>
+                {event}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+      {selectedEvent ? (
+        <table className="min-w-full border-collapse border">
+          <thead>
+            <tr>
+              <th className="border p-2">SL No</th>
+              <th className="border p-2">College Name</th>
+              <th className="border p-2">College Code</th>
+              <th className="border p-2">Accommodation</th>
+              <th className="border p-2">Participant Count</th>
+              <th className="border p-2">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {colleges.map((college, index) => (
+              <React.Fragment key={college.collegeName}>
+                <tr className="border">
+                  <td className="border p-2">{index + 1}</td>
+                  <td className="border p-2">{college.collegeName}</td>
+                  <td className="border p-2">{college.collegeCode}</td>
+                  <td className="border p-2">{college.accomodation ? "Yes" : "No"}</td>
+                  <td className="border p-2">{college.participants.length}</td>
+                  <td className="border p-2">
+                    <Button variant="outline" size="sm" onClick={() => toggleExpand(college.collegeName)}>
+                      {expandedColleges[college.collegeName] ? "Hide Participants" : "View Participants"}
+                    </Button>
+                  </td>
+                </tr>
+                {expandedColleges[college.collegeName] && (
+                  <tr>
+                    <td colSpan={6} className="p-2 bg-gray-50">
+                      <table className="min-w-full border-collapse border">
+                        <thead>
+                          <tr>
+                            <th className="border p-1">SL No</th>
+                            <th className="border p-1">Name</th>
+                            <th className="border p-1">USN</th>
+                            <th className="border p-1">Type</th>
+                            <th className="border p-1">Role</th>
+                            <th className="border p-1">Phone</th>
+                            <th className="border p-1">Email</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {college.participants.map((participant, idx) => (
+                            <tr key={participant.id} className="border">
+                              <td className="border p-1">{idx + 1}</td>
+                              <td className="border p-1">{participant.name}</td>
+                              <td className="border p-1">{participant.usn}</td>
+                              <td className="border p-1">{participant.type}</td>
+                              <td className="border p-1">{participant.role}</td>
+                              <td className="border p-1">{participant.phone}</td>
+                              <td className="border p-1">{participant.email}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <p className="text-gray-600">Please select an event to view details.</p>
+      )}
+    </div>
+  );
+};
+
+//////////////////////////
 //      DataTable       //
 //////////////////////////
 
 export function DataTable({ data }: { data: Data[] }) {
   const router = useRouter();
   const [rows, setRows] = React.useState<Data[]>(data);
+  const [showCollegesList, setShowCollegesList] = React.useState(false);
+  const [showEventsList, setShowEventsList] = React.useState(false);
+
+  // Conditional rendering for alternative views
+  if (showCollegesList) {
+    return <CollegesList data={rows} onBack={() => setShowCollegesList(false)} />;
+  }
+  if (showEventsList) {
+    return <EventsList data={rows} onBack={() => setShowEventsList(false)} />;
+  }
 
   const handleUpdate = React.useCallback(
     (id: string) => {
@@ -269,7 +645,6 @@ export function DataTable({ data }: { data: Data[] }) {
           },
           credentials: "include",
         });
-
         const data = await response.json();
         toast.success(data.message);
         setRows(updatedRows);
@@ -359,7 +734,6 @@ export function DataTable({ data }: { data: Data[] }) {
               return newSelection;
             });
           };
-
           return (
             <Checkbox
               checked={row.getIsSelected()}
@@ -556,7 +930,7 @@ export function DataTable({ data }: { data: Data[] }) {
   const table = useReactTable({
     data: rows,
     columns,
-    initialState: { pagination: { pageSize: 50 } }, // default to 50 rows per page
+    initialState: { pagination: { pageSize: 50 } },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -573,10 +947,8 @@ export function DataTable({ data }: { data: Data[] }) {
     },
   });
 
-  // Compute the current (filtered) total of registrants
   const totalRegistrants = table.getFilteredRowModel().rows.length;
 
-  // Handler to clear all filters and sorting
   const clearAllFilters = () => {
     setColumnFilters([]);
     setSorting([]);
@@ -618,7 +990,6 @@ export function DataTable({ data }: { data: Data[] }) {
     };
   };
 
-
   const handleExportToExcel = () => {
     const filteredRows = table.getRowModel().rows;
     const collegeData: Record<string, Data[]> = {};
@@ -631,18 +1002,18 @@ export function DataTable({ data }: { data: Data[] }) {
     });
 
     const excelData: any[][] = [];
-    // Overall header rows
-    excelData.push(["Visveraya technological university in association with Global Academy of technology"]);
+    excelData.push([
+      "Visveraya Technological University in association with Global Academy of Technology",
+    ]);
     excelData.push(["24th VTU Youth Fest @ GAT"]);
     excelData.push([]); // blank row
 
     for (const collegeName of Object.keys(collegeData)) {
       const rowsForCollege = collegeData[collegeName];
-      const collegeAssignedCode = rowsForCollege[0].collegeCode || "N/A";
-      const vtuCode = (rowsForCollege[0] as any).vtuCode || "N/A";
+      const vtuCode = rowsForCollege[0].collegeCode || "N/A";
+      const collegeAssignedCode = (rowsForCollege[0] as any).vtuCode || "N/A";
       const accomodationCollege = rowsForCollege[0].accomodation ? "Yes" : "No";
 
-      // College header rows
       excelData.push([`College: ${collegeName}`]);
       excelData.push([`College Assigned Code: ${collegeAssignedCode}`]);
       excelData.push([`VTU Code: ${vtuCode}`]);
@@ -650,11 +1021,20 @@ export function DataTable({ data }: { data: Data[] }) {
       excelData.push([`Accommodation Allocated: N/A`]);
       excelData.push([]);
 
-      // Student Details Table (exclude Team Manager)
       const studentRows = rowsForCollege.filter((r) => r.type !== "Team Manager");
       if (studentRows.length > 0) {
         excelData.push(["Student Details"]);
-        excelData.push(["SL No", "Student Code", "Name", "USN", "Phone", "Email", "Gender", "DOB", "Accomodation"]);
+        excelData.push([
+          "SL No",
+          "Student Code",
+          "Name",
+          "USN",
+          "Phone",
+          "Email",
+          "Gender",
+          "DOB",
+          "Accomodation",
+        ]);
         studentRows.forEach((row, index) => {
           const studentCode = row.usn || "";
           excelData.push([
@@ -665,14 +1045,13 @@ export function DataTable({ data }: { data: Data[] }) {
             row.phone || "",
             row.email || "",
             row.gender || "",
-            row.blood|| "",
+            row.blood || "",
             row.accomodation ? "Yes" : "No",
           ]);
         });
         excelData.push([]);
       }
 
-      // Team Manager Details Table
       const teamManagerRows = rowsForCollege.filter((r) => r.type === "Team Manager");
       if (teamManagerRows.length > 0) {
         excelData.push(["Team Manager Details"]);
@@ -691,7 +1070,6 @@ export function DataTable({ data }: { data: Data[] }) {
         excelData.push([]);
       }
 
-      // Event Registration Table
       const eventsMap: Record<string, { name: string; role: string }[]> = {};
       rowsForCollege.forEach((row) => {
         if (row.events && Array.isArray(row.events)) {
@@ -732,7 +1110,6 @@ export function DataTable({ data }: { data: Data[] }) {
       { wch: 15 },
     ];
 
-    // Apply basic cell styling (if supported)
     const headerTitles = new Set([
       "SL No",
       "Student Code",
@@ -761,6 +1138,10 @@ export function DataTable({ data }: { data: Data[] }) {
     saveAs(new Blob([wbout], { type: "application/octet-stream" }), "registrants.xlsx");
   };
 
+  // If the Colleges List view is toggled, render that instead.
+  if (showCollegesList) {
+    return <CollegesList data={rows} onBack={() => setShowCollegesList(false)} />;
+  }
 
   return (
     <div className="w-full px-5 rounded-xl my-12">
@@ -777,12 +1158,16 @@ export function DataTable({ data }: { data: Data[] }) {
             className="pl-10 w-[26rem]"
           />
         </div>
-        <Button
-          variant="outline"
-          onClick={clearAllFilters}
-          className="ml-2"
-        >
+        <Button variant="outline" onClick={clearAllFilters} className="ml-2">
           Clear Filters
+        </Button>
+        {/* Button to switch to Colleges List */}
+        <Button variant="outline" onClick={() => setShowCollegesList(true)}>
+          Go to Colleges List
+        </Button>
+        {/* Button to switch to Events List */}
+        <Button variant="outline" onClick={() => setShowEventsList(true)}>
+          Go to Events List
         </Button>
         <Button
           variant="outline"
@@ -794,7 +1179,7 @@ export function DataTable({ data }: { data: Data[] }) {
         </Button>
         <Button
           variant="outline"
-          className="ml-auto bg-primary text-white hover:scale-105  hover:text-white"
+          className="ml-auto bg-primary text-white hover:scale-105 hover:text-white"
           onClick={handleExportToExcel}
         >
           <FileDown className="mr-2 h-4 w-4" />
