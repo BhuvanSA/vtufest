@@ -107,10 +107,7 @@ const CollegeNameFilter: React.FC<CollegeNameFilterProps> = ({ column, table }) 
           onChange={(e) => setSearchQuery(e.target.value)}
           className="mb-2"
         />
-        <DropdownMenuItem
-          onClick={() => column.setFilterValue(undefined)}
-          className="cursor-pointer"
-        >
+        <DropdownMenuItem onClick={() => column.setFilterValue(undefined)} className="cursor-pointer">
           All
         </DropdownMenuItem>
         {filteredOptions.map((college) => (
@@ -160,10 +157,7 @@ const TypeFilter: React.FC<TypeFilterProps> = ({ column, table }) => {
           onChange={(e) => setSearchQuery(e.target.value)}
           className="mb-2"
         />
-        <DropdownMenuItem
-          onClick={() => column.setFilterValue(undefined)}
-          className="cursor-pointer"
-        >
+        <DropdownMenuItem onClick={() => column.setFilterValue(undefined)} className="cursor-pointer">
           All
         </DropdownMenuItem>
         {filteredTypes.map((t) => (
@@ -218,10 +212,7 @@ const EventFilter: React.FC<EventFilterProps> = ({ column, table }) => {
           onChange={(e) => setSearchQuery(e.target.value)}
           className="mb-2"
         />
-        <DropdownMenuItem
-          onClick={() => column.setFilterValue(undefined)}
-          className="cursor-pointer"
-        >
+        <DropdownMenuItem onClick={() => column.setFilterValue(undefined)} className="cursor-pointer">
           All
         </DropdownMenuItem>
         {filteredOptions.map((event) => (
@@ -270,7 +261,6 @@ export function DataTable({ data }: { data: Data[] }) {
           },
           credentials: "include",
         });
-
         const data = await response.json();
         toast.success(data.message);
         setRows(updatedRows);
@@ -411,7 +401,7 @@ export function DataTable({ data }: { data: Data[] }) {
           </Button>
         ),
         cell: ({ row }) => (
-          <div className="capitalize">{row.getValue("name") as string}</div>
+          <div className="capitalize text-black">{row.getValue("name") as string}</div>
         ),
       },
       {
@@ -428,28 +418,28 @@ export function DataTable({ data }: { data: Data[] }) {
           </Button>
         ),
         cell: ({ row }) => (
-          <div className="uppercase">{row.getValue("usn") as string}</div>
+          <div className="uppercase text-black">{row.getValue("usn") as string}</div>
         ),
       },
       {
         accessorKey: "phone",
         header: "Phone",
-        cell: ({ row }) => <div>{row.getValue("phone") as string}</div>,
+        cell: ({ row }) => <div className="text-black">{row.getValue("phone") as string}</div>,
       },
       {
         accessorKey: "email",
         header: "Email",
-        cell: ({ row }) => <div>{row.getValue("email") as string}</div>,
+        cell: ({ row }) => <div className="text-black">{row.getValue("email") as string}</div>,
       },
       {
         accessorKey: "gender",
         header: "Gender",
-        cell: ({ row }) => <div>{row.getValue("gender") as string}</div>,
+        cell: ({ row }) => <div className="text-black">{row.getValue("gender") as string}</div>,
       },
       {
         accessorKey: "blood",
         header: "DOB",
-        cell: ({ row }) => <div>{row.getValue("blood") as string}</div>,
+        cell: ({ row }) => <div className="text-black">{row.getValue("blood") as string}</div>,
       },
       {
         accessorKey: "collegeName",
@@ -457,7 +447,7 @@ export function DataTable({ data }: { data: Data[] }) {
           <CollegeNameFilter column={column} table={table} />
         ),
         cell: ({ row }) => (
-          <div className="capitalize">{row.getValue("collegeName") as string}</div>
+          <div className="capitalize text-black">{row.getValue("collegeName") as string}</div>
         ),
         filterFn: (row, columnId, filterValue) => {
           if (!filterValue) return true;
@@ -469,7 +459,7 @@ export function DataTable({ data }: { data: Data[] }) {
         accessorKey: "type",
         header: ({ column, table }) => <TypeFilter column={column} table={table} />,
         cell: ({ row }) => (
-          <div className="capitalize">{row.getValue("type") as string}</div>
+          <div className="capitalize text-black">{row.getValue("type") as string}</div>
         ),
         filterFn: (row, columnId, filterValue) => {
           if (!filterValue) return true;
@@ -484,19 +474,19 @@ export function DataTable({ data }: { data: Data[] }) {
           const events = row.getValue("events") as { eventName: string; role?: string }[];
           const type = row.getValue("type") as string;
           return (
-            <div className="capitalize">
+            <div className="capitalize text-black">
               {type !== "Participant/Accompanist" ? (
                 events.map((e) => e.eventName).join(", ")
               ) : (
                 <>
-                  <div className="mb-1 text-black">
+                  <div className="mb-1">
                     <span className="font-bold">Participant: </span>
                     {events
                       .filter((v) => v.role === "Participant")
                       .map((e) => e.eventName)
                       .join(", ")}
                   </div>
-                  <div className="text-black">
+                  <div>
                     <span className="font-bold">Accompanist: </span>
                     {events
                       .filter((v) => v.role === "Accompanist")
@@ -529,7 +519,7 @@ export function DataTable({ data }: { data: Data[] }) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuLabel className="text-primary text-l">
+                <DropdownMenuLabel className="text-black text-l">
                   Actions
                 </DropdownMenuLabel>
                 <DropdownMenuItem onClick={() => handleUpdate(data.id)}>
@@ -621,23 +611,25 @@ export function DataTable({ data }: { data: Data[] }) {
 
   const handleExportToExcel = () => {
     const filteredRows = table.getRowModel().rows;
-    const collegeData: Record<string, Data[]> = {};
+    const collegeData: Record<string, { rows: Data[] }> = {};
     filteredRows.forEach((row) => {
       const collegeName = row.getValue("collegeName") as string;
       if (!collegeData[collegeName]) {
-        collegeData[collegeName] = [];
+        collegeData[collegeName] = { rows: [] };
       }
-      collegeData[collegeName].push(row.original);
+      collegeData[collegeName].rows.push(row.original);
     });
 
     const excelData: any[][] = [];
     // Overall header rows
-    excelData.push(["Visveraya Technological University in association with Global Academy of Technology"]);
+    excelData.push([
+      "Visveraya Technological University in association with Global Academy of Technology"
+    ]);
     excelData.push(["24th VTU Youth Fest @ GAT"]);
     excelData.push([]); // blank row
 
     for (const collegeName of Object.keys(collegeData)) {
-      const rowsForCollege = collegeData[collegeName];
+      const rowsForCollege = collegeData[collegeName].rows;
       const vtuCode = rowsForCollege[0].collegeCode || "N/A";
       const collegeAssignedCode = (rowsForCollege[0] as any).vtuCode || "N/A";
       const accomodationCollege = rowsForCollege[0].accomodation ? "Yes" : "No";
@@ -654,7 +646,17 @@ export function DataTable({ data }: { data: Data[] }) {
       const studentRows = rowsForCollege.filter((r) => r.type !== "Team Manager");
       if (studentRows.length > 0) {
         excelData.push(["Student Details"]);
-        excelData.push(["SL No", "Student Code", "Name", "USN", "Phone", "Email", "Gender", "DOB", "Accomodation"]);
+        excelData.push([
+          "SL No",
+          "Student Code",
+          "Name",
+          "USN",
+          "Phone",
+          "Email",
+          "Gender",
+          "DOB",
+          "Accomodation",
+        ]);
         studentRows.forEach((row, index) => {
           const studentCode = row.usn || "";
           excelData.push([
@@ -767,7 +769,15 @@ export function DataTable({ data }: { data: Data[] }) {
   const collegesData = React.useMemo(() => {
     const map = new Map<
       string,
-      { collegeName: string; collegeCode: string; accomodation: string; events: Set<string> }
+      {
+        collegeName: string;
+        collegeCode: string;
+        accomodation: string;
+        events: Set<string>;
+        registrants: number;
+        maleCount: number;
+        femaleCount: number;
+      }
     >();
     rows.forEach((row) => {
       const collegeName = row.collegeName;
@@ -777,9 +787,19 @@ export function DataTable({ data }: { data: Data[] }) {
           collegeCode: row.collegeCode,
           accomodation: row.accomodation,
           events: new Set<string>(),
+          registrants: 0,
+          maleCount: 0,
+          femaleCount: 0,
         });
       }
       const college = map.get(collegeName)!;
+      college.registrants += 1;
+      // Count gender using a case-insensitive comparison
+      if (row.gender.toLowerCase() === "male") {
+        college.maleCount += 1;
+      } else if (row.gender.toLowerCase() === "female") {
+        college.femaleCount += 1;
+      }
       row.events.forEach((e) => {
         if (e.eventName) {
           college.events.add(e.eventName);
@@ -817,6 +837,30 @@ export function DataTable({ data }: { data: Data[] }) {
           return aValue.localeCompare(bValue);
         },
       },
+      {
+        accessorKey: "numEvents",
+        header: "No. of Events",
+        cell: ({ row }) => (row.original.events as string[]).length,
+        enableSorting: true,
+      },
+      {
+        accessorKey: "registrants",
+        header: "No. of Registrants",
+        cell: ({ row }) => row.original.registrants,
+        enableSorting: true,
+      },
+      {
+        accessorKey: "maleCount",
+        header: "Male Participants",
+        cell: ({ row }) => row.original.maleCount,
+        enableSorting: true,
+      },
+      {
+        accessorKey: "femaleCount",
+        header: "Female Participants",
+        cell: ({ row }) => row.original.femaleCount,
+        enableSorting: true,
+      },
     ],
     []
   );
@@ -839,25 +883,25 @@ export function DataTable({ data }: { data: Data[] }) {
   // Render
   /////////////
   return (
-    <div className="w-full px-5 rounded-xl my-12">
+    <div className="w-full px-5 rounded-xl my-12 text-black">
       {/* Top Controls */}
       <div className="flex flex-wrap items-center gap-3 py-4">
         <div className="relative max-w-sm">
           {view === "registrants" && (
             <>
-              <Search className="absolute left-2 top-3 h-4 w-5 text-muted-foreground" />
+              <Search className="absolute left-2 top-3 h-4 w-5 text-black" />
               <Input
                 placeholder="Search name..."
                 value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
                 onChange={(event) =>
                   table.getColumn("name")?.setFilterValue(event.target.value)
                 }
-                className="pl-10 w-[26rem]"
+                className="pl-10 w-[26rem] text-black"
               />
             </>
           )}
         </div>
-        <Button variant="outline" onClick={clearAllFilters} className="ml-2">
+        <Button variant="outline" onClick={clearAllFilters} className="ml-2 text-black">
           Clear Filters
         </Button>
         {view === "registrants" && (
@@ -889,13 +933,17 @@ export function DataTable({ data }: { data: Data[] }) {
           </>
         )}
         {/* Toggle button for switching views */}
-        <Button variant="outline" className="ml-2" onClick={() => setView(view === "registrants" ? "colleges" : "registrants")}>
+        <Button
+          variant="outline"
+          className="ml-2 text-black"
+          onClick={() => setView(view === "registrants" ? "colleges" : "registrants")}
+        >
           {view === "registrants" ? "Go to Colleges List" : "Back to Registrants"}
         </Button>
         {view === "registrants" && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="ml-2">
+              <Button variant="outline" className="ml-2 text-black">
                 <Columns className="mr-2 h-4 w-4" />
                 Columns <ChevronDown />
               </Button>
@@ -907,7 +955,7 @@ export function DataTable({ data }: { data: Data[] }) {
                 .map((column) => (
                   <DropdownMenuCheckboxItem
                     key={column.id}
-                    className="capitalize"
+                    className="capitalize text-black"
                     checked={column.getIsVisible()}
                     onCheckedChange={(value) => column.toggleVisibility(!!value)}
                   >
@@ -922,7 +970,7 @@ export function DataTable({ data }: { data: Data[] }) {
       {view === "registrants" ? (
         <>
           {/* Display total registrants */}
-          <div className="mb-2 text-sm text-gray-700">
+          <div className="mb-2 text-sm text-black">
             Total Registrants: {totalRegistrants}
           </div>
 
@@ -933,7 +981,7 @@ export function DataTable({ data }: { data: Data[] }) {
                 {table.getHeaderGroups().map((headerGroup) => (
                   <TableRow key={headerGroup.id}>
                     {headerGroup.headers.map((header) => (
-                      <TableHead key={header.id}>
+                      <TableHead key={header.id} className="text-black">
                         {header.isPlaceholder
                           ? null
                           : flexRender(header.column.columnDef.header, header.getContext())}
@@ -942,11 +990,11 @@ export function DataTable({ data }: { data: Data[] }) {
                   </TableRow>
                 ))}
               </TableHeader>
-              <TableBody className="text-primary">
+              <TableBody className="text-black">
                 {table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => (
                     <TableRow
-                      className="hover:bg-blue-50 text-black"
+                      className="hover:bg-blue-50"
                       key={row.id}
                       data-state={row.getIsSelected() && "selected"}
                     >
@@ -975,7 +1023,7 @@ export function DataTable({ data }: { data: Data[] }) {
               <select
                 value={table.getState().pagination.pageSize}
                 onChange={(e) => table.setPageSize(Number(e.target.value))}
-                className="border rounded p-1"
+                className="border rounded p-1 text-black"
               >
                 <option value={10}>10</option>
                 <option value={25}>25</option>
@@ -1009,7 +1057,7 @@ export function DataTable({ data }: { data: Data[] }) {
       ) : (
         <>
           {/* Colleges List View */}
-          <div className="mb-2 text-sm text-gray-700">
+          <div className="mb-2 text-sm text-black">
             Total Colleges: {collegesData.length}
           </div>
           <div className="rounded-md border overflow-auto min-h-[18rem] shadow-lg">
@@ -1018,7 +1066,7 @@ export function DataTable({ data }: { data: Data[] }) {
                 {collegeTable.getHeaderGroups().map((headerGroup) => (
                   <TableRow key={headerGroup.id}>
                     {headerGroup.headers.map((header) => (
-                      <TableHead key={header.id}>
+                      <TableHead key={header.id} className="text-black">
                         {header.isPlaceholder
                           ? null
                           : flexRender(header.column.columnDef.header, header.getContext())}
@@ -1027,7 +1075,7 @@ export function DataTable({ data }: { data: Data[] }) {
                   </TableRow>
                 ))}
               </TableHeader>
-              <TableBody className="text-primary">
+              <TableBody className="text-black">
                 {collegeTable.getRowModel().rows?.length ? (
                   collegeTable.getRowModel().rows.map((row) => (
                     <TableRow key={row.id}>
@@ -1055,7 +1103,7 @@ export function DataTable({ data }: { data: Data[] }) {
               <select
                 value={collegeTable.getState().pagination.pageSize}
                 onChange={(e) => collegeTable.setPageSize(Number(e.target.value))}
-                className="border rounded p-1"
+                className="border rounded p-1 text-black"
               >
                 <option value={10}>10</option>
                 <option value={25}>25</option>
