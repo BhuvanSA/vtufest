@@ -185,7 +185,6 @@ type EventFilterProps = {
 
 const EventFilter: React.FC<EventFilterProps> = ({ column, table }) => {
   const allRows = table.getPreFilteredRowModel().rows;
-  // Flatten all event names
   const allEvents = allRows.flatMap((row: any) =>
     (row.original.events as { eventName: string }[]).map((e) => e.eventName)
   );
@@ -547,7 +546,7 @@ export function DataTable({ data }: { data: Data[] }) {
   const table = useReactTable({
     data: rows,
     columns,
-    initialState: { pagination: { pageSize: 50 } }, // default to 50 rows per page
+    initialState: { pagination: { pageSize: 50 } },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -564,10 +563,8 @@ export function DataTable({ data }: { data: Data[] }) {
     },
   });
 
-  // Compute the current (filtered) total of registrants
   const totalRegistrants = table.getFilteredRowModel().rows.length;
 
-  // Handler to clear all filters and sorting
   const clearAllFilters = () => {
     setColumnFilters([]);
     setSorting([]);
@@ -621,12 +618,11 @@ export function DataTable({ data }: { data: Data[] }) {
     });
 
     const excelData: any[][] = [];
-    // Overall header rows
     excelData.push([
       "Visveraya Technological University in association with Global Academy of Technology"
     ]);
     excelData.push(["24th VTU Youth Fest @ GAT"]);
-    excelData.push([]); // blank row
+    excelData.push([]);
 
     for (const collegeName of Object.keys(collegeData)) {
       const rowsForCollege = collegeData[collegeName].rows;
@@ -634,7 +630,6 @@ export function DataTable({ data }: { data: Data[] }) {
       const collegeAssignedCode = (rowsForCollege[0] as any).vtuCode || "N/A";
       const accomodationCollege = rowsForCollege[0].accomodation ? "Yes" : "No";
 
-      // College header rows
       excelData.push([`College: ${collegeName}`]);
       excelData.push([`College Assigned Code: ${collegeAssignedCode}`]);
       excelData.push([`VTU Code: ${vtuCode}`]);
@@ -642,7 +637,6 @@ export function DataTable({ data }: { data: Data[] }) {
       excelData.push([`Accommodation Allocated: N/A`]);
       excelData.push([]);
 
-      // Student Details Table (exclude Team Manager)
       const studentRows = rowsForCollege.filter((r) => r.type !== "Team Manager");
       if (studentRows.length > 0) {
         excelData.push(["Student Details"]);
@@ -674,7 +668,6 @@ export function DataTable({ data }: { data: Data[] }) {
         excelData.push([]);
       }
 
-      // Team Manager Details Table
       const teamManagerRows = rowsForCollege.filter((r) => r.type === "Team Manager");
       if (teamManagerRows.length > 0) {
         excelData.push(["Team Manager Details"]);
@@ -693,7 +686,6 @@ export function DataTable({ data }: { data: Data[] }) {
         excelData.push([]);
       }
 
-      // Event Registration Table
       const eventsMap: Record<string, { name: string; role: string }[]> = {};
       rowsForCollege.forEach((row) => {
         if (row.events && Array.isArray(row.events)) {
@@ -734,7 +726,6 @@ export function DataTable({ data }: { data: Data[] }) {
       { wch: 15 },
     ];
 
-    // Apply basic cell styling (if supported)
     const headerTitles = new Set([
       "SL No",
       "Student Code",
@@ -764,7 +755,7 @@ export function DataTable({ data }: { data: Data[] }) {
   };
 
   /////////////
-  // COLLEGES VIEW: Aggregate colleges from rows and setup a table for them
+  // COLLEGES VIEW: Aggregate colleges from rows
   /////////////
   const collegesData = React.useMemo(() => {
     const map = new Map<
@@ -794,7 +785,6 @@ export function DataTable({ data }: { data: Data[] }) {
       }
       const college = map.get(collegeName)!;
       college.registrants += 1;
-      // Count gender using a case-insensitive comparison
       if (row.gender.toLowerCase() === "male") {
         college.maleCount += 1;
       } else if (row.gender.toLowerCase() === "female") {
@@ -812,6 +802,8 @@ export function DataTable({ data }: { data: Data[] }) {
     }));
   }, [rows]);
 
+  const [collegeSorting, setCollegeSorting] = React.useState<SortingState>([]);
+  const [collegeColumnFilters, setCollegeColumnFilters] = React.useState<ColumnFiltersState>([]);
   const collegeColumns = React.useMemo<ColumnDef<any>[]>(
     () => [
       {
@@ -865,30 +857,29 @@ export function DataTable({ data }: { data: Data[] }) {
     []
   );
 
-  const [collegeSorting, setCollegeSorting] = React.useState<SortingState>([]);
   const collegeTable = useReactTable({
     data: collegesData,
     columns: collegeColumns,
     initialState: { pagination: { pageSize: 10 } },
     onSortingChange: setCollegeSorting,
+    onColumnFiltersChange: setCollegeColumnFilters,
     getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     state: {
       sorting: collegeSorting,
+      columnFilters: collegeColumnFilters,
     },
   });
 
-  /////////////
-  // Render
-  /////////////
   return (
     <div className="w-full px-5 rounded-xl my-12 text-black">
       {/* Top Controls */}
       <div className="flex flex-wrap items-center gap-3 py-4">
-        <div className="relative max-w-sm">
-          {view === "registrants" && (
-            <>
+        {view === "registrants" ? (
+          <>
+            <div className="relative max-w-sm">
               <Search className="absolute left-2 top-3 h-4 w-5 text-black" />
               <Input
                 placeholder="Search name..."
@@ -898,14 +889,10 @@ export function DataTable({ data }: { data: Data[] }) {
                 }
                 className="pl-10 w-[26rem] text-black"
               />
-            </>
-          )}
-        </div>
-        <Button variant="outline" onClick={clearAllFilters} className="ml-2 text-black">
-          Clear Filters
-        </Button>
-        {view === "registrants" && (
-          <>
+            </div>
+            <Button variant="outline" onClick={clearAllFilters} className="ml-2 text-black">
+              Clear Filters
+            </Button>
             <Button
               variant="outline"
               className="ml-auto bg-[#00B140] text-white hover:scale-105 hover:bg-[#00B140] hover:text-white"
@@ -916,7 +903,7 @@ export function DataTable({ data }: { data: Data[] }) {
             </Button>
             <Button
               variant="outline"
-              className="ml-auto bg-primary text-white hover:scale-105  hover:text-white"
+              className="ml-auto bg-primary text-white hover:scale-105 hover:text-white"
               onClick={handleExportToExcel}
             >
               <FileDown className="mr-2 h-4 w-4" />
@@ -931,8 +918,22 @@ export function DataTable({ data }: { data: Data[] }) {
               Delete Selected
             </Button>
           </>
+        ) : (
+          // In the colleges view, add a filter for college name
+          <div className="relative max-w-sm">
+            <Search className="absolute left-2 top-3 h-4 w-5 text-black" />
+            <Input
+              placeholder="Search college name..."
+              value={
+                (collegeTable.getColumn("collegeName")?.getFilterValue() as string) ?? ""
+              }
+              onChange={(e) =>
+                collegeTable.getColumn("collegeName")?.setFilterValue(e.target.value)
+              }
+              className="pl-10 w-[26rem] text-black"
+            />
+          </div>
         )}
-        {/* Toggle button for switching views */}
         <Button
           variant="outline"
           className="ml-2 text-black"
@@ -969,12 +970,9 @@ export function DataTable({ data }: { data: Data[] }) {
 
       {view === "registrants" ? (
         <>
-          {/* Display total registrants */}
           <div className="mb-2 text-sm text-black">
             Total Registrants: {totalRegistrants}
           </div>
-
-          {/* Registrants Table */}
           <div className="rounded-md border overflow-auto min-h-[18rem] shadow-lg">
             <Table>
               <TableHeader>
@@ -1015,8 +1013,6 @@ export function DataTable({ data }: { data: Data[] }) {
               </TableBody>
             </Table>
           </div>
-
-          {/* Advanced Pagination & Page Size Selector for Registrants */}
           <div className="flex flex-col md:flex-row items-center justify-between py-4">
             <div className="flex items-center gap-2">
               <span>Rows per page:</span>
@@ -1056,7 +1052,6 @@ export function DataTable({ data }: { data: Data[] }) {
         </>
       ) : (
         <>
-          {/* Colleges List View */}
           <div className="mb-2 text-sm text-black">
             Total Colleges: {collegesData.length}
           </div>
@@ -1096,7 +1091,6 @@ export function DataTable({ data }: { data: Data[] }) {
               </TableBody>
             </Table>
           </div>
-          {/* Pagination for Colleges Table */}
           <div className="flex flex-col md:flex-row items-center justify-between py-4">
             <div className="flex items-center gap-2">
               <span>Rows per page:</span>
