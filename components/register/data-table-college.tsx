@@ -163,7 +163,28 @@ export function DataTable({ data }: { data: Data[] }) {
             },
             {
                 accessorKey: "paymentUrl",
-                header: "Payment URL",
+                header: ({ column }) => {
+                    const filterCycle = ["", "Paid", "Not Paid"];
+                    const currentFilter = (column.getFilterValue() as string) ?? "";
+                    const currentIndex = filterCycle.indexOf(currentFilter);
+                    const nextIndex = (currentIndex + 1) % filterCycle.length;
+                    const nextFilter = filterCycle[nextIndex];
+
+                    const handleFilterChange = () => {
+                        if (nextFilter === "") {
+                            column.setFilterValue(undefined); // Clears the filter
+                        } else {
+                            column.setFilterValue(nextFilter);
+                        }
+                    };
+
+                    return (
+                        <Button variant="ghost" onClick={handleFilterChange}>
+                            Payment URL <ListFilterIcon className="p-1" />{" "}
+                            {currentFilter !== "" ? `: ${currentFilter}` : ""}
+                        </Button>
+                    );
+                },
                 cell: ({ row }) => {
                     const imageKey = row.getValue("paymentUrl");
                     const imageUrl = `https://${process.env.UPLOADTHING_APP_ID}.ufs.sh/f/${imageKey}`;
@@ -180,7 +201,16 @@ export function DataTable({ data }: { data: Data[] }) {
                             )}
                         </>
                     );
-                }
+                },
+                filterFn: (row, columnId, filterValue) => {
+                    const imageKey = row.getValue(columnId);
+                    if (filterValue === "Paid") {
+                        return !!imageKey;
+                    } else if (filterValue === "Not Paid") {
+                        return !imageKey;
+                    }
+                    return true;
+                },
             },
             {
                 accessorKey: "txnNumber",
@@ -189,8 +219,34 @@ export function DataTable({ data }: { data: Data[] }) {
             },
             {
                 accessorKey: "Amount",
-                header: "Amount",
-                cell: ({ row }) => row.getValue("Amount") || 0,
+                header: ({ column }) => {
+                    const filterCycle = ["", "8000", "4000"];
+                    const currentFilter = (column.getFilterValue() as string) ?? "";
+                    const currentIndex = filterCycle.indexOf(currentFilter);
+                    const nextIndex = (currentIndex + 1) % filterCycle.length;
+                    const nextFilter = filterCycle[nextIndex];
+
+                    const handleFilterChange = () => {
+                        if (nextFilter === "") {
+                            column.setFilterValue(undefined); // Clears the filter
+                        } else {
+                            column.setFilterValue(nextFilter);
+                        }
+                    };
+
+                    return (
+                        <Button variant="ghost" onClick={handleFilterChange}>
+                            Amount <ListFilterIcon className="p-1" />{" "}
+                            {currentFilter !== "" ? `: ${currentFilter}` : ""}
+                        </Button>
+                    );
+                },
+                filterFn: (row, columnId, filterValue) => {
+                    if (!filterValue || filterValue === "") return true;
+
+                    const amount = row.getValue(columnId);
+                    return amount == filterValue;
+                },
             },
             {
                 accessorKey: "arrivalTime",
