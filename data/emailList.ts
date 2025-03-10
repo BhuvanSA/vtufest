@@ -266,6 +266,8 @@ export const emailList = [
     "principal@bietdvg.edu",
     "principalasa@acharya.ac.in",
     "principal@sode-edu.in",
+    "gecmh22@gmail.com",
+    "principalvsmit@gmail.com",
     "principal.acsce@gmail.com",
     "01skresults@gmail.com",
     "Principal@agmrcet.com",
