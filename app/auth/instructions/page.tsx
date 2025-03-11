@@ -69,7 +69,7 @@ const instructions = [
     stepNumber: 1,
     title: "College Registration",
     description:
-      "Register your college on the Sign-Up page using your official principal's email. Only verified principal email IDs are accepted. If your email isn't listed, contact support immediately at 99866770082 or via our website.",
+      "Register your college on the Sign-Up page using your official principal's email. Only verified principal email IDs are accepted. If your email isn't listed, contact support immediately at 9945864767 or via our website.",
     icon: <UserPlus className="h-10 w-10 text-red-700" />,
   },
   {
