@@ -72,6 +72,44 @@ export type Data = {
   status: "Pending" | "Processing" | "Success" | "Failed";
 };
 
+//////////////////////////////
+// Accomodation Column Filter
+//////////////////////////////
+
+type AccomodationFilterProps = {
+  column: any;
+  table: any;
+};
+
+const AccomodationFilter: React.FC<AccomodationFilterProps> = ({ column, table }) => {
+  const options = ["Yes", "No"];
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost">
+          Accomodation
+          <ChevronDown className="ml-1 h-4 w-4" />
+          {column.getFilterValue() ? `: ${column.getFilterValue()}` : ""}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56 p-2">
+        <DropdownMenuItem onClick={() => column.setFilterValue(undefined)} className="cursor-pointer">
+          All
+        </DropdownMenuItem>
+        {options.map((option) => (
+          <DropdownMenuItem
+            key={option}
+            onClick={() => column.setFilterValue(option)}
+            className="cursor-pointer"
+          >
+            {option}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+
 //////////////////////////
 // College Name Filter  //
 //////////////////////////
@@ -456,6 +494,20 @@ export function DataTable({ data }: { data: Data[] }) {
         cell: ({ row }) => (
           <div className="text-black">{row.getValue("blood") as string}</div>
         ),
+      },
+      {
+        // New Accomodation Column
+        accessorKey: "accomodation",
+        header: ({ column, table }) => <AccomodationFilter column={column} table={table} />,
+        cell: ({ row }) => (
+          <div className="text-black">{row.getValue("accomodation") ? "Yes" : "No"}</div>
+        ),
+        filterFn: (row, columnId, filterValue) => {
+          if (!filterValue) return true;
+          const value = row.getValue(columnId);
+          const display = value ? "Yes" : "No";
+          return display === filterValue;
+        },
       },
       {
         accessorKey: "collegeName",
@@ -1186,6 +1238,9 @@ export function DataTable({ data }: { data: Data[] }) {
                 <option value={25}>25</option>
                 <option value={50}>50</option>
                 <option value={100}>100</option>
+                <option value={500}>100</option>
+                <option value={1000}>100</option>
+                <option value={5000}>100</option>
               </select>
             </div>
             <div className="flex items-center gap-4">
