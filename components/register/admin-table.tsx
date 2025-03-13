@@ -221,7 +221,7 @@ const TypeFilter: React.FC<TypeFilterProps> = ({ column, table }) => {
 };
 
 //////////////////////////
-// Modified Events Filter
+// Modified Events Filter (for registrants view)
 //////////////////////////
 
 type EventFilterProps = {
@@ -298,25 +298,18 @@ const EventFilter: React.FC<EventFilterProps> = ({ column, table }) => {
 };
 
 //////////////////////////
-// College Events Filter
+// College Events Filter (Dynamic)
 //////////////////////////
 
 type CollegeEventFilterProps = {
   column: any;
   table: any;
+  eventsList: string[];
 };
 
-const ALL_EVENTS = [
-  "Event 1", "Event 2", "Event 3", "Event 4", "Event 5",
-  "Event 6", "Event 7", "Event 8", "Event 9", "Event 10",
-  "Event 11", "Event 12", "Event 13", "Event 14", "Event 15",
-  "Event 16", "Event 17", "Event 18", "Event 19", "Event 20",
-  "Event 21", "Event 22", "Event 23", "Event 24", "Event 25",
-];
-
-const CollegeEventFilter: React.FC<CollegeEventFilterProps> = ({ column, table }) => {
+const CollegeEventFilter: React.FC<CollegeEventFilterProps> = ({ column, table, eventsList }) => {
   const [searchQuery, setSearchQuery] = React.useState("");
-  const filteredOptions = ALL_EVENTS.filter((event) =>
+  const filteredOptions = eventsList.filter((event) =>
     event.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -925,7 +918,7 @@ export function DataTable({ data }: { data: Data[] }) {
     saveAs(new Blob([wbout], { type: "application/octet-stream" }), "registrants.xlsx");
   };
 
-  // Download Custom Excel for Registrants – note the unchanged functionality
+  // Download Custom Excel for Registrants – unchanged functionality
   const handleExportCustomExcel = () => {
     const filteredRows = table.getRowModel().rows;
     const collegeData: Record<string, { rows: Data[] }> = {};
@@ -1162,6 +1155,15 @@ export function DataTable({ data }: { data: Data[] }) {
     }));
   }, [rows]);
 
+  // Compute dynamic events list from collegesData
+  const allCollegeEvents = React.useMemo(() => {
+    const eventSet = new Set<string>();
+    collegesData.forEach((college) => {
+      college.events.forEach((e) => eventSet.add(e));
+    });
+    return Array.from(eventSet).sort();
+  }, [collegesData]);
+
   const [collegeSorting, setCollegeSorting] = React.useState<SortingState>([]);
   const [collegeColumnFilters, setCollegeColumnFilters] = React.useState<ColumnFiltersState>([]);
   const collegeColumns = React.useMemo<ColumnDef<any>[]>(
@@ -1201,7 +1203,7 @@ export function DataTable({ data }: { data: Data[] }) {
             >
               Events <ArrowUpDown className="p-1" />
             </Button>
-            <CollegeEventFilter column={column} table={table} />
+            <CollegeEventFilter column={column} table={table} eventsList={allCollegeEvents} />
           </div>
         ),
         sortingFn: (a, b, columnId) => {
@@ -1241,7 +1243,7 @@ export function DataTable({ data }: { data: Data[] }) {
         enableSorting: true,
       },
     ],
-    []
+    [allCollegeEvents]
   );
 
   const collegeTable = useReactTable({
