@@ -298,6 +298,64 @@ const EventFilter: React.FC<EventFilterProps> = ({ column, table }) => {
 };
 
 //////////////////////////
+// College Events Filter
+//////////////////////////
+
+type CollegeEventFilterProps = {
+  column: any;
+  table: any;
+};
+
+const ALL_EVENTS = [
+  "Event 1", "Event 2", "Event 3", "Event 4", "Event 5",
+  "Event 6", "Event 7", "Event 8", "Event 9", "Event 10",
+  "Event 11", "Event 12", "Event 13", "Event 14", "Event 15",
+  "Event 16", "Event 17", "Event 18", "Event 19", "Event 20",
+  "Event 21", "Event 22", "Event 23", "Event 24", "Event 25",
+];
+
+const CollegeEventFilter: React.FC<CollegeEventFilterProps> = ({ column, table }) => {
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const filteredOptions = ALL_EVENTS.filter((event) =>
+    event.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost">
+          <ChevronDown className="ml-1 h-4 w-4" />
+          {column.getFilterValue() ? `: ${column.getFilterValue()}` : ""}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56 p-2 max-h-60 overflow-y-auto">
+        <Input
+          placeholder="Search event..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="mb-2"
+        />
+        <DropdownMenuItem
+          onClick={() => column.setFilterValue(undefined)}
+          className="cursor-pointer"
+        >
+          All
+        </DropdownMenuItem>
+        {filteredOptions.map((event) => (
+          <DropdownMenuItem
+            key={event}
+            onClick={() => column.setFilterValue(event)}
+            className="cursor-pointer"
+          >
+            {event}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+
+//////////////////////////
 //      DataTable       //
 //////////////////////////
 
@@ -561,17 +619,19 @@ export function DataTable({ data }: { data: Data[] }) {
       },
       {
         accessorKey: "events",
-        header: ({ column, table }) => (
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            >
-              Events <ArrowUpDown className="p-1" />
-            </Button>
-            <EventFilter column={column} table={table} />
-          </div>
-        ),
+        header: ({ column, table }) => {
+          return (
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+              >
+                Events <ArrowUpDown className="p-1" />
+              </Button>
+              <EventFilter column={column} table={table} />
+            </div>
+          );
+        },
         sortingFn: (rowA, rowB, columnId) => {
           const eventsA = rowA.getValue(columnId) as { eventName: string }[];
           const eventsB = rowB.getValue(columnId) as { eventName: string }[];
@@ -1131,13 +1191,30 @@ export function DataTable({ data }: { data: Data[] }) {
       },
       {
         accessorKey: "events",
-        header: "Events",
-        cell: ({ row }) => (row.getValue("events") as string[]).join(", "),
+        header: ({ column, table }) => (
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
+            >
+              Events <ArrowUpDown className="p-1" />
+            </Button>
+            <CollegeEventFilter column={column} table={table} />
+          </div>
+        ),
         sortingFn: (a, b, columnId) => {
           const aValue = (a.getValue(columnId) as string[]).join(", ");
           const bValue = (b.getValue(columnId) as string[]).join(", ");
           return aValue.localeCompare(bValue);
         },
+        filterFn: (row, columnId, filterValue) => {
+          if (!filterValue) return true;
+          const eventsArray = row.getValue(columnId) as string[];
+          return eventsArray.includes(filterValue);
+        },
+        cell: ({ row }) => (row.getValue("events") as string[]).join(", "),
       },
       {
         accessorKey: "numEvents",
@@ -1382,7 +1459,7 @@ export function DataTable({ data }: { data: Data[] }) {
       ) : (
         <>
           <div className="mb-2 text-sm text-black">
-            Total Colleges: {collegesData.length}
+            Total Colleges: {collegeTable.getFilteredRowModel().rows.length}
           </div>
           <div className="rounded-md border overflow-auto min-h-[18rem] shadow-lg">
             <Table>
