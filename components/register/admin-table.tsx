@@ -1279,6 +1279,8 @@ export function DataTable({ data }: { data: Data[] }) {
                 <option value={25}>25</option>
                 <option value={50}>50</option>
                 <option value={100}>100</option>
+                <option value={1000}>1000</option>
+                <option value={5000}>5000</option>
               </select>
             </div>
             <div className="flex items-center gap-4">
@@ -1358,8 +1360,7 @@ export function DataTable({ data }: { data: Data[] }) {
                 <option value={50}>50</option>
                 <option value={100}>100</option>
                 <option value={500}>100</option>
-                <option value={1000}>100</option>
-                <option value={5000}>100</option>
+              
               </select>
             </div>
             <div className="flex items-center gap-4">
