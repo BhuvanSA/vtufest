@@ -281,4 +281,5 @@ export const emailList = [
     "deanstudentaffairs@atme.edu.in",
     "cultural_vdit@klsvdit.edu.in",
     "sports@bmssa.ac.in",
+    "principal@cambridge.edu.in",
 ];
