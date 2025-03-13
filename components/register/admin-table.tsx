@@ -825,7 +825,7 @@ export function DataTable({ data }: { data: Data[] }) {
     saveAs(new Blob([wbout], { type: "application/octet-stream" }), "registrants.xlsx");
   };
 
-  // New Download Custom Excel Button for Registrants
+  // Download Custom Excel for Registrants – note the unchanged functionality
   const handleExportCustomExcel = () => {
     const filteredRows = table.getRowModel().rows;
     const collegeData: Record<string, { rows: Data[] }> = {};
@@ -980,7 +980,7 @@ export function DataTable({ data }: { data: Data[] }) {
     saveAs(new Blob([wbout], { type: "application/octet-stream" }), "registrants_custom.xlsx");
   };
 
-  // NEW: Define handleDownloadCollegesExcel for the colleges view export
+  // NEW: Added definition for handleDownloadCollegesExcel to fix the application error in Colleges view
   const handleDownloadCollegesExcel = () => {
     const rows = collegeTable.getRowModel().rows;
     const excelData: any[][] = [
@@ -1179,10 +1179,10 @@ export function DataTable({ data }: { data: Data[] }) {
               <FileDown className="mr-2 h-4 w-4" />
               Download current view as Excel
             </Button>
-            {/* New Download Custom Excel Button */}
+            {/* Download Custom Excel button now uses an orange background */}
             <Button
               variant="outline"
-              className="ml-auto bg-secondary text-white hover:scale-105 hover:text-white"
+              className="ml-auto bg-orange-500 text-white hover:scale-105 hover:bg-orange-600 hover:text-white"
               onClick={handleExportCustomExcel}
             >
               <FileDown className="mr-2 h-4 w-4" />
