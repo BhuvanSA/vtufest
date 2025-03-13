@@ -825,7 +825,7 @@ export function DataTable({ data }: { data: Data[] }) {
     saveAs(new Blob([wbout], { type: "application/octet-stream" }), "registrants.xlsx");
   };
 
-  // New download function for custom export
+  // New Download Custom Excel Button for Registrants
   const handleExportCustomExcel = () => {
     const filteredRows = table.getRowModel().rows;
     const collegeData: Record<string, { rows: Data[] }> = {};
@@ -978,6 +978,40 @@ export function DataTable({ data }: { data: Data[] }) {
     XLSX.utils.book_append_sheet(wb, ws, "Registrants");
     const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array", cellStyles: true });
     saveAs(new Blob([wbout], { type: "application/octet-stream" }), "registrants_custom.xlsx");
+  };
+
+  // NEW: Define handleDownloadCollegesExcel for the colleges view export
+  const handleDownloadCollegesExcel = () => {
+    const rows = collegeTable.getRowModel().rows;
+    const excelData: any[][] = [
+      [
+        "College Name",
+        "College Code",
+        "Accommodation",
+        "Events",
+        "No. of Events",
+        "No. of Registrants",
+        "Male Participants",
+        "Female Participants",
+      ],
+    ];
+    rows.forEach((row) => {
+      excelData.push([
+        row.getValue("collegeName") as string,
+        row.getValue("collegeCode") as string,
+        row.getValue("accomodation") ? "Yes" : "No",
+        (row.getValue("events") as string[]).join(", "),
+        (row.original.events as string[]).length,
+        row.original.registrants,
+        row.original.maleCount,
+        row.original.femaleCount,
+      ]);
+    });
+    const ws = XLSX.utils.aoa_to_sheet(excelData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Colleges");
+    const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array", cellStyles: true });
+    saveAs(new Blob([wbout], { type: "application/octet-stream" }), "colleges.xlsx");
   };
 
   /////////////
@@ -1360,7 +1394,6 @@ export function DataTable({ data }: { data: Data[] }) {
                 <option value={50}>50</option>
                 <option value={100}>100</option>
                 <option value={500}>100</option>
-              
               </select>
             </div>
             <div className="flex items-center gap-4">
