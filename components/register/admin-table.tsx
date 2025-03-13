@@ -219,7 +219,7 @@ const TypeFilter: React.FC<TypeFilterProps> = ({ column, table }) => {
 };
 
 //////////////////////////
-// Events Column Filter //
+// Events Column Filter (for Registrants view)
 //////////////////////////
 
 type EventFilterProps = {
@@ -285,6 +285,9 @@ export function DataTable({ data }: { data: Data[] }) {
 
   // New view state: "registrants" (default) or "colleges"
   const [view, setView] = React.useState<"registrants" | "colleges">("registrants");
+
+  // State for filtering colleges by event
+  const [selectedCollegeEvent, setSelectedCollegeEvent] = React.useState<string | undefined>(undefined);
 
   const handleUpdate = React.useCallback(
     (id: string) => {
@@ -539,39 +542,17 @@ export function DataTable({ data }: { data: Data[] }) {
       },
       {
         accessorKey: "events",
-        header: ({ column, table }) => <EventFilter column={column} table={table} />,
-        cell: ({ row }) => {
-          const events = row.getValue("events") as { eventName: string; role?: string }[];
-          const type = row.getValue("type") as string;
-          return (
-            <div className="capitalize text-black">
-              {type !== "Participant/Accompanist" ? (
-                events.map((e) => e.eventName).join(", ")
-              ) : (
-                <>
-                  <div className="mb-1">
-                    <span className="font-bold">Participant: </span>
-                    {events
-                      .filter((v) => v.role === "Participant")
-                      .map((e) => e.eventName)
-                      .join(", ")}
-                  </div>
-                  <div>
-                    <span className="font-bold">Accompanist: </span>
-                    {events
-                      .filter((v) => v.role === "Accompanist")
-                      .map((e) => e.eventName)
-                      .join(", ")}
-                  </div>
-                </>
-              )}
-            </div>
-          );
+        header: "Events",
+        cell: ({ row }) => (row.getValue("events") as string[]).join(", "),
+        sortingFn: (a, b, columnId) => {
+          const aValue = (a.getValue(columnId) as string[]).join(", ");
+          const bValue = (b.getValue(columnId) as string[]).join(", ");
+          return aValue.localeCompare(bValue);
         },
         filterFn: (row, columnId, filterValue) => {
           if (!filterValue) return true;
-          const events = row.getValue(columnId) as { eventName: string }[];
-          return events.some((e) => e.eventName === filterValue);
+          const events = row.getValue(columnId) as string[];
+          return events.includes(filterValue);
         },
       },
       {
@@ -825,7 +806,7 @@ export function DataTable({ data }: { data: Data[] }) {
     saveAs(new Blob([wbout], { type: "application/octet-stream" }), "registrants.xlsx");
   };
 
-  // Download Custom Excel for Registrants – note the unchanged functionality
+  // Download Custom Excel for Registrants – unchanged functionality
   const handleExportCustomExcel = () => {
     const filteredRows = table.getRowModel().rows;
     const collegeData: Record<string, { rows: Data[] }> = {};
@@ -1062,6 +1043,15 @@ export function DataTable({ data }: { data: Data[] }) {
     }));
   }, [rows]);
 
+  // Compute union of all events across colleges for the dropdown filter
+  const allCollegeEvents = React.useMemo(() => {
+    const eventsSet = new Set<string>();
+    collegesData.forEach((college) => {
+      college.events.forEach((e) => eventsSet.add(e));
+    });
+    return Array.from(eventsSet);
+  }, [collegesData]);
+
   const [collegeSorting, setCollegeSorting] = React.useState<SortingState>([]);
   const [collegeColumnFilters, setCollegeColumnFilters] = React.useState<ColumnFiltersState>([]);
   const collegeColumns = React.useMemo<ColumnDef<any>[]>(
@@ -1097,6 +1087,11 @@ export function DataTable({ data }: { data: Data[] }) {
           const aValue = (a.getValue(columnId) as string[]).join(", ");
           const bValue = (b.getValue(columnId) as string[]).join(", ");
           return aValue.localeCompare(bValue);
+        },
+        filterFn: (row, columnId, filterValue) => {
+          if (!filterValue) return true;
+          const events = row.getValue(columnId) as string[];
+          return events.includes(filterValue);
         },
       },
       {
@@ -1179,7 +1174,7 @@ export function DataTable({ data }: { data: Data[] }) {
               <FileDown className="mr-2 h-4 w-4" />
               Download current view as Excel
             </Button>
-            {/* Download Custom Excel button now uses an orange background */}
+            {/* Download Custom Excel button with orange background */}
             <Button
               variant="outline"
               className="ml-auto bg-orange-500 text-white hover:scale-105 hover:bg-orange-600 hover:text-white"
@@ -1199,27 +1194,63 @@ export function DataTable({ data }: { data: Data[] }) {
           </>
         ) : (
           <>
-            <div className="relative max-w-sm">
-              <Search className="absolute left-2 top-3 h-4 w-5 text-black" />
-              <Input
-                placeholder="Search college name..."
-                value={
-                  (collegeTable.getColumn("collegeName")?.getFilterValue() as string) ?? ""
-                }
-                onChange={(e) =>
-                  collegeTable.getColumn("collegeName")?.setFilterValue(e.target.value)
-                }
-                className="pl-10 w-[26rem] text-black"
-              />
+            <div className="flex gap-3">
+              <div className="relative max-w-sm">
+                <Search className="absolute left-2 top-3 h-4 w-5 text-black" />
+                <Input
+                  placeholder="Search college name..."
+                  value={
+                    (collegeTable.getColumn("collegeName")?.getFilterValue() as string) ?? ""
+                  }
+                  onChange={(e) =>
+                    collegeTable.getColumn("collegeName")?.setFilterValue(e.target.value)
+                  }
+                  className="pl-10 w-[26rem] text-black"
+                />
+              </div>
+              {/* New dropdown for filtering by event in Colleges view */}
+              <div className="relative max-w-sm">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost">
+                      Filter by Event {selectedCollegeEvent ? `: ${selectedCollegeEvent}` : ""}
+                      <ChevronDown className="ml-1 h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56 p-2 max-h-60 overflow-y-auto">
+                    <DropdownMenuItem
+                      onClick={() => {
+                        setSelectedCollegeEvent(undefined);
+                        collegeTable.getColumn("events")?.setFilterValue(undefined);
+                      }}
+                      className="cursor-pointer"
+                    >
+                      All
+                    </DropdownMenuItem>
+                    {allCollegeEvents.map((event) => (
+                      <DropdownMenuItem
+                        key={event}
+                        onClick={() => {
+                          setSelectedCollegeEvent(event);
+                          collegeTable.getColumn("events")?.setFilterValue(event);
+                        }}
+                        className="cursor-pointer"
+                      >
+                        {event}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+              <Button
+                variant="outline"
+                className="ml-auto bg-primary text-white hover:scale-105 hover:text-white"
+                onClick={handleDownloadCollegesExcel}
+              >
+                <FileDown className="mr-2 h-4 w-4" />
+                Download Colleges as Excel
+              </Button>
             </div>
-            <Button
-              variant="outline"
-              className="ml-auto bg-primary text-white hover:scale-105 hover:text-white"
-              onClick={handleDownloadCollegesExcel}
-            >
-              <FileDown className="mr-2 h-4 w-4" />
-              Download Colleges as Excel
-            </Button>
           </>
         )}
         <Button
