@@ -279,4 +279,5 @@ export const emailList = [
     "deeptishetty@vtu.ac.in",
     "principalbit4@gmail.com",
     "deanstudentaffairs@atme.edu.in",
+    "cultural_vdit@klsvdit.edu.in",
 ];
