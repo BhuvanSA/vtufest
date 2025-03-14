@@ -250,14 +250,75 @@ export function DataTable({ data }: { data: Data[] }) {
             },
             {
                 accessorKey: "arrivalTime",
-                header: "Arrival Time",
+                header: ({ column }) => (
+                    <button
+                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                        className="flex items-center space-x-2"
+                    >
+                        <span>Arrival Time</span>
+                        {column.getIsSorted() === "asc" ? "🔼" : column.getIsSorted() === "desc" ? "🔽" : "↕"}
+                    </button>
+                ),
                 cell: ({ row }) => row.getValue("arrivalTime") || "Not Entered",
+                sortingFn: (rowA, rowB, columnId) => {
+                    const timeA = rowA.getValue(columnId);
+                    const timeB = rowB.getValue(columnId);
+            
+                    if (!timeA) return 1; // Place empty values at the bottom
+                    if (!timeB) return -1;
+            
+                    const parseTime = (time) => {
+                        const [hours, minutes, period] = time.match(/(\d+):(\d+) (\w{2})/).slice(1);
+                        let h = parseInt(hours, 10);
+                        let m = parseInt(minutes, 10);
+                        if (period === "PM" && h !== 12) h += 12;
+                        if (period === "AM" && h === 12) h = 0;
+                        return h * 60 + m; // Convert to minutes since midnight
+                    };
+            
+                    return parseTime(timeA) - parseTime(timeB);
+                }
             },
+            
             {
                 accessorKey: "arrivalDate",
-                header: "Arrival Date",
-                cell: ({ row }) => row.getValue("arrivalDate") || "Not Entered",
+                header: ({ column }) => {
+                    return (
+                        <div className="flex flex-col space-y-2">
+                            <Input
+                                type="date"
+                                onChange={(e) => column.setFilterValue((old: any) => ({ ...old, from: e.target.value || undefined }))}
+                                placeholder="From Date"
+                                className="w-[150px]"
+                            />
+                            <Input
+                                type="date"
+                                onChange={(e) => column.setFilterValue((old: any) => ({ ...old, to: e.target.value || undefined }))}
+                                placeholder="To Date"
+                                className="w-[150px]"
+                            />
+                        </div>
+                    );
+                },
+                cell: ({ row }) => {
+                    const dateValue = row.getValue("arrivalDate");
+                    return dateValue ? new Date(dateValue).toISOString().split("T")[0] : "Not Entered";
+                },
+                filterFn: (row, columnId, filterValue) => {
+                    if (!filterValue || (!filterValue.from && !filterValue.to)) return true;
+            
+                    const dateValue = row.getValue(columnId);
+                    if (!dateValue) return false;
+            
+                    const rowDate = new Date(dateValue).toISOString().split("T")[0]; // Convert to YYYY-MM-DD
+            
+                    const fromDate = filterValue.from ? new Date(filterValue.from).toISOString().split("T")[0] : null;
+                    const toDate = filterValue.to ? new Date(filterValue.to).toISOString().split("T")[0] : null;
+            
+                    return (!fromDate || rowDate >= fromDate) && (!toDate || rowDate <= toDate);
+                },
             },
+            
             // {
             //     accessorKey: "paymentVerified",
             //     header: "Payment Verified",
