@@ -1189,8 +1189,9 @@ export function DataTable({ data }: { data: Data[] }) {
   };
 
   // 5. Code Wise Export
-  // In this export, we keep the Student Code in the same position (second column)
-  // and now append the College Code as the last column.
+  // In this export, the Student Code remains in the same (second) column of participant rows.
+  // However, instead of including the College Code in each row,
+  // we now output a header row for each college that has the college code in its last cell.
   const handleExportCodeWiseExcel = () => {
     const filteredRows = table.getRowModel().rows;
     const participantsByCollege: Record<string, Data[]> = {};
@@ -1210,9 +1211,15 @@ export function DataTable({ data }: { data: Data[] }) {
       const { collegeName, collegeCode, studentStart } = mapping;
       const participants = participantsByCollege[collegeName] || [];
       if (participants.length > 0) {
-        // Add college header with its assigned code already shown in header later
-        excelData.push([`College: ${collegeName}`]);
-        // Header row: SL No, Student Code, Name, USN, Phone, Gender, DOB, Email, Accomodation, Events Participating In, Events Accompanying In, College Code
+        // Add a header row that shows the college name in the first cell and the college code in the last cell.
+        // The table width is 11 columns. We set the first cell to "College: <collegeName>",
+        // the last cell to the collegeCode, and the cells in between as empty.
+        excelData.push([
+          `College: ${collegeName}`,
+          "", "", "", "", "", "", "", "", "",
+          collegeCode
+        ]);
+        // Then output the table header (without a college code column)
         excelData.push([
           "SL No",
           "Student Code",
@@ -1225,7 +1232,6 @@ export function DataTable({ data }: { data: Data[] }) {
           "Accomodation",
           "Events Participating In",
           "Events Accompanying In",
-          "College Code",
         ]);
         let codeCounter = studentStart;
         participants.forEach((participant, index) => {
@@ -1265,7 +1271,6 @@ export function DataTable({ data }: { data: Data[] }) {
             participant.accomodation ? "Yes" : "No",
             eventsParticipating,
             eventsAccompanying,
-            collegeCode,
           ]);
           codeCounter++;
         });
@@ -1286,7 +1291,6 @@ export function DataTable({ data }: { data: Data[] }) {
       { wch: 15 },
       { wch: 30 },
       { wch: 30 },
-      { wch: 15 },
     ];
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Code Wise Participants");
