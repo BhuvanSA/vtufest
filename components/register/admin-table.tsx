@@ -54,7 +54,7 @@ import Image from "next/image";
 
 export type Data = {
   id: string;
-  accomodation: string;
+  accomodation: boolean;
   collegeCode: string;
   photo: string;
   name: string;
@@ -62,7 +62,7 @@ export type Data = {
   usn: string;
   phone: string;
   email: string;
-  blood: string;
+  blood: string; // using this as DOB as per your code
   gender: string;
   type:
     | "Team Manager"
@@ -736,6 +736,7 @@ export function DataTable({ data }: { data: Data[] }) {
     table.resetSorting();
   };
 
+  // Existing PDF export (unchanged)
   const handleExportToPDF = () => {
     const filteredSortedRows = table.getRowModel().rows;
     const exportData: string[][] = filteredSortedRows.map((row) => [
@@ -770,353 +771,173 @@ export function DataTable({ data }: { data: Data[] }) {
     };
   };
 
-  const handleExportToExcel = () => {
+  // New: Export Participants Excel
+  const handleExportParticipantsExcel = () => {
     const filteredRows = table.getRowModel().rows;
-    const collegeData: Record<string, { rows: Data[] }> = {};
+    // Group participants (non–Team Manager) by college
+    const collegeData: Record<string, Data[]> = {};
     filteredRows.forEach((row) => {
-      const collegeName = row.getValue("collegeName") as string;
-      if (!collegeData[collegeName]) {
-        collegeData[collegeName] = { rows: [] };
+      if (row.original.type !== "Team Manager") {
+        const collegeName = row.original.collegeName;
+        if (!collegeData[collegeName]) {
+          collegeData[collegeName] = [];
+        }
+        collegeData[collegeName].push(row.original);
       }
-      collegeData[collegeName].rows.push(row.original);
     });
 
     const excelData: any[][] = [];
-    excelData.push([
-      "Visveraya Technological University in association with Global Academy of Technology"
-    ]);
-    excelData.push(["24th VTU Youth Fest @ GAT"]);
-    excelData.push([]);
-
-    for (const collegeName of Object.keys(collegeData)) {
-      const rowsForCollege = collegeData[collegeName].rows;
-      const vtuCode = rowsForCollege[0].collegeCode || "N/A";
-      const collegeAssignedCode = (rowsForCollege[0] as any).vtuCode || "N/A";
-      const accomodationCollege = rowsForCollege[0].accomodation ? "Yes" : "No";
-
+    Object.keys(collegeData).forEach((collegeName) => {
+      const participants = collegeData[collegeName];
+      // College header row
       excelData.push([`College: ${collegeName}`]);
-      excelData.push([`College Assigned Code: ${collegeAssignedCode}`]);
-      excelData.push([`VTU Code: ${vtuCode}`]);
-      excelData.push([`Accomodation: ${accomodationCollege}`]);
-      excelData.push([`Accommodation Allocated: N/A`]);
-      excelData.push([]);
-
-      const studentRows = rowsForCollege.filter((r) => r.type !== "Team Manager");
-      if (studentRows.length > 0) {
-        excelData.push(["Student Details"]);
-        excelData.push([
-          "SL No",
-          "Student Code",
-          "Name",
-          "USN",
-          "Phone",
-          "Email",
-          "Gender",
-          "DOB",
-          "Accomodation",
-        ]);
-        studentRows.forEach((row, index) => {
-          const studentCode = row.usn || "";
-          excelData.push([
-            index + 1,
-            studentCode,
-            row.name || "",
-            row.usn || "",
-            row.phone || "",
-            row.email || "",
-            row.gender || "",
-            row.blood || "",
-            row.accomodation ? "Yes" : "No",
-          ]);
-        });
-        excelData.push([]);
-      }
-
-      const teamManagerRows = rowsForCollege.filter((r) => r.type === "Team Manager");
-      if (teamManagerRows.length > 0) {
-        excelData.push(["Team Manager Details"]);
-        excelData.push(["SL No", "Name", "Designation", "Phone", "Email", "Gender", "DOB"]);
-        teamManagerRows.forEach((row, index) => {
-          excelData.push([
-            index + 1,
-            row.name || "",
-            row.designation || "",
-            row.phone || "",
-            row.email || "",
-            row.gender || "",
-            row.dateOfBirth || "",
-          ]);
-        });
-        excelData.push([]);
-      }
-
-      const eventsMap: Record<string, { name: string; role: string }[]> = {};
-      rowsForCollege.forEach((row) => {
-        if (row.events && Array.isArray(row.events)) {
-          row.events.forEach((ev: { eventName: string; role?: string }) => {
-            if (ev.eventName) {
-              if (!eventsMap[ev.eventName]) {
-                eventsMap[ev.eventName] = [];
-              }
-              eventsMap[ev.eventName].push({
-                name: row.name,
-                role: ev.role || "",
-              });
-            }
-          });
-        }
-      });
-      for (const eventName of Object.keys(eventsMap)) {
-        excelData.push([`Event: ${eventName}`]);
-        excelData.push(["SL No", "Name", "Role"]);
-        eventsMap[eventName].forEach((entry, index) => {
-          excelData.push([index + 1, entry.name, entry.role]);
-        });
-        excelData.push([]);
-      }
-      excelData.push([]);
-    }
-
-    const ws = XLSX.utils.aoa_to_sheet(excelData);
-    ws["!cols"] = [
-      { wch: 8 },
-      { wch: 20 },
-      { wch: 30 },
-      { wch: 20 },
-      { wch: 20 },
-      { wch: 30 },
-      { wch: 15 },
-      { wch: 20 },
-      { wch: 15 },
-    ];
-
-    const headerTitles = new Set([
-      "SL No",
-      "Student Code",
-      "Name",
-      "USN",
-      "Phone",
-      "Email",
-      "Gender",
-      "DOB",
-      "Accomodation",
-      "Designation",
-    ]);
-    for (let cell in ws) {
-      if (ws.hasOwnProperty(cell) && cell[0] !== "!") {
-        if (!ws[cell].s) ws[cell].s = {};
-        ws[cell].s.font = { sz: 12, name: "Calibri" };
-        if (headerTitles.has(ws[cell].v)) {
-          ws[cell].s.font.bold = true;
-        }
-      }
-    }
-
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Registrants");
-    const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array", cellStyles: true });
-    saveAs(new Blob([wbout], { type: "application/octet-stream" }), "registrants.xlsx");
-  };
-
-  // Download Custom Excel for Registrants – unchanged functionality
-  const handleExportCustomExcel = () => {
-    const filteredRows = table.getRowModel().rows;
-    const collegeData: Record<string, { rows: Data[] }> = {};
-    filteredRows.forEach((row) => {
-      const collegeName = row.getValue("collegeName") as string;
-      if (!collegeData[collegeName]) {
-        collegeData[collegeName] = { rows: [] };
-      }
-      collegeData[collegeName].rows.push(row.original);
-    });
-
-    const excelData: any[][] = [];
-    excelData.push([
-      "Visveraya Technological University in association with Global Academy of Technology"
-    ]);
-    excelData.push(["24th VTU Youth Fest @ GAT"]);
-    excelData.push([]);
-
-    for (const collegeName of Object.keys(collegeData)) {
-      const rowsForCollege = collegeData[collegeName].rows;
-      const vtuCode = rowsForCollege[0].collegeCode || "N/A";
-      const collegeAssignedCode = (rowsForCollege[0] as any).vtuCode || "N/A";
-      const accomodationCollege = rowsForCollege[0].accomodation ? "Yes" : "No";
-
-      excelData.push([`College: ${collegeName}`]);
-      excelData.push([`College Assigned Code: ${collegeAssignedCode}`]);
-      excelData.push([`VTU Code: ${vtuCode}`]);
-      excelData.push([`Accomodation: ${accomodationCollege}`]);
-      // Removed "Accommodation Allocated: N/A" row
-      excelData.push([]);
-
-      const participantRows = rowsForCollege.filter((r) => r.type !== "Team Manager");
-      if (participantRows.length > 0) {
-        excelData.push(["Participant Details"]);
-        excelData.push([
-          "SL No",
-          "Name",
-          "USN",
-          "Email",
-          "Events Participating In",
-          "Events Accompanying In",
-          "Candidate Signature",
-        ]);
-        participantRows.forEach((row, index) => {
-          const email = row.email ? row.email.toLowerCase() : "";
-          let eventsParticipating = "";
-          let eventsAccompanying = "";
-          if (row.type === "Participant/Accompanist") {
-            eventsParticipating = row.events
-              .filter((e) => e.role === "Participant")
-              .map((e) => e.eventName)
-              .join(", ");
-            eventsAccompanying = row.events
-              .filter((e) => e.role === "Accompanist")
-              .map((e) => e.eventName)
-              .join(", ");
-          } else if (row.type === "Participant") {
-            eventsParticipating = Array.isArray(row.events)
-              ? row.events.map((e) => e.eventName).join(", ")
-              : "";
-            eventsAccompanying = "";
-          } else if (row.type === "Accompanist") {
-            eventsAccompanying = Array.isArray(row.events)
-              ? row.events.map((e) => e.eventName).join(", ")
-              : "";
-            eventsParticipating = "";
-          } else {
-            eventsParticipating = Array.isArray(row.events)
-              ? row.events.map((e) => e.eventName).join(", ")
-              : "";
-            eventsAccompanying = "";
-          }
-          excelData.push([
-            index + 1,
-            row.name || "",
-            row.usn || "",
-            email,
-            eventsParticipating,
-            eventsAccompanying,
-            "", // blank candidate signature column
-          ]);
-        });
-        excelData.push([]);
-      }
-
-      const teamManagerRows = rowsForCollege.filter((r) => r.type === "Team Manager");
-      if (teamManagerRows.length > 0) {
-        excelData.push(["Team Manager Details"]);
-        excelData.push([
-          "SL No",
-          "Name",
-          "USN",
-          "Email",
-          "Events Participating In",
-          "Events Accompanying In",
-          "Candidate Signature",
-        ]);
-        teamManagerRows.forEach((row, index) => {
-          const email = row.email ? row.email.toLowerCase() : "";
-          const eventsParticipating = Array.isArray(row.events)
-            ? row.events.map((e) => e.eventName).join(", ")
-            : "";
-          const eventsAccompanying = "";
-          excelData.push([
-            index + 1,
-            row.name || "",
-            row.usn || "",
-            email,
-            eventsParticipating,
-            eventsAccompanying,
-            "",
-          ]);
-        });
-        excelData.push([]);
-      }
-      excelData.push([]);
-    }
-
-    const ws = XLSX.utils.aoa_to_sheet(excelData);
-    ws["!cols"] = [
-      { wch: 8 },
-      { wch: 30 },
-      { wch: 20 },
-      { wch: 30 },
-      { wch: 40 },
-      { wch: 40 },
-      { wch: 30 },
-    ];
-
-    const headerTitles = new Set([
-      "SL No",
-      "Name",
-      "USN",
-      "Email",
-      "Events Participating In",
-      "Events Accompanying In",
-      "Candidate Signature",
-    ]);
-    for (let cell in ws) {
-      if (ws.hasOwnProperty(cell) && cell[0] !== "!") {
-        if (!ws[cell].s) ws[cell].s = {};
-        ws[cell].s.font = { sz: 12, name: "Calibri" };
-        if (headerTitles.has(ws[cell].v)) {
-          ws[cell].s.font.bold = true;
-        }
-      }
-    }
-
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Registrants");
-    const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array", cellStyles: true });
-    saveAs(new Blob([wbout], { type: "application/octet-stream" }), "registrants_custom.xlsx");
-  };
-
-  // NEW: Added definition for handleDownloadCollegesExcel to fix the application error in Colleges view
-  const handleDownloadCollegesExcel = () => {
-    const rows = collegeTable.getRowModel().rows;
-    const excelData: any[][] = [
-      [
-        "College Name",
-        "College Code",
-        "Accommodation",
-        "Events",
-        "No. of Events",
-        "No. of Registrants",
-        "Male Participants",
-        "Female Participants",
-      ],
-    ];
-    rows.forEach((row) => {
+      // Header row for participants data:
       excelData.push([
-        row.getValue("collegeName") as string,
-        row.getValue("collegeCode") as string,
-        row.getValue("accomodation") ? "Yes" : "No",
-        (row.getValue("events") as string[]).join(", "),
-        (row.original.events as string[]).length,
-        row.original.registrants,
-        row.original.maleCount,
-        row.original.femaleCount,
+        "SL No",
+        "Student Code", // blank column for later insertion
+        "Name",
+        "USN",
+        "Phone",
+        "Gender",
+        "DOB",
+        "Email",
+        "Accomodation",
+        "Events Participating In",
+        "Events Accompanying In",
       ]);
+      participants.forEach((participant, index) => {
+        let eventsParticipating = "";
+        let eventsAccompanying = "";
+        if (participant.type === "Participant/Accompanist") {
+          eventsParticipating = participant.events
+            .filter((e) => e.role === "Participant")
+            .map((e) => e.eventName)
+            .join(", ");
+          eventsAccompanying = participant.events
+            .filter((e) => e.role === "Accompanist")
+            .map((e) => e.eventName)
+            .join(", ");
+        } else if (participant.type === "Participant") {
+          eventsParticipating = Array.isArray(participant.events)
+            ? participant.events.map((e) => e.eventName).join(", ")
+            : "";
+        } else if (participant.type === "Accompanist") {
+          eventsAccompanying = Array.isArray(participant.events)
+            ? participant.events.map((e) => e.eventName).join(", ")
+            : "";
+        } else {
+          eventsParticipating = Array.isArray(participant.events)
+            ? participant.events.map((e) => e.eventName).join(", ")
+            : "";
+        }
+        excelData.push([
+          index + 1,
+          "", // Blank student code column
+          participant.name || "",
+          participant.usn || "",
+          participant.phone || "",
+          participant.gender || "",
+          participant.blood || "",
+          participant.email || "",
+          participant.accomodation ? "Yes" : "No",
+          eventsParticipating,
+          eventsAccompanying,
+        ]);
+      });
+      excelData.push([]); // Blank row for separation
     });
+
     const ws = XLSX.utils.aoa_to_sheet(excelData);
+    ws["!cols"] = [
+      { wch: 8 },
+      { wch: 15 },
+      { wch: 25 },
+      { wch: 15 },
+      { wch: 20 },
+      { wch: 12 },
+      { wch: 15 },
+      { wch: 30 },
+      { wch: 15 },
+      { wch: 30 },
+      { wch: 30 },
+    ];
+
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Colleges");
+    XLSX.utils.book_append_sheet(wb, ws, "Participants");
     const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array", cellStyles: true });
-    saveAs(new Blob([wbout], { type: "application/octet-stream" }), "colleges.xlsx");
+    saveAs(new Blob([wbout], { type: "application/octet-stream" }), "participants.xlsx");
   };
 
-  /////////////
+  // New: Export Events Excel
+  const handleExportEventsExcel = () => {
+    const filteredRows = table.getRowModel().rows;
+    // Group events by college – each registrant’s events are added separately
+    const collegeEventsData: Record<string, any[]> = {};
+    filteredRows.forEach((row) => {
+      const collegeName = row.original.collegeName;
+      if (Array.isArray(row.original.events) && row.original.events.length > 0) {
+        if (!collegeEventsData[collegeName]) {
+          collegeEventsData[collegeName] = [];
+        }
+        row.original.events.forEach((event: { eventName: string; role?: string }) => {
+          collegeEventsData[collegeName].push({
+            studentName: row.original.name,
+            usn: row.original.usn,
+            role: event.role || "",
+            eventName: event.eventName,
+          });
+        });
+      }
+    });
+
+    const excelData: any[][] = [];
+    Object.keys(collegeEventsData).forEach((collegeName) => {
+      const eventsArr = collegeEventsData[collegeName];
+      // College header row
+      excelData.push([`College: ${collegeName}`]);
+      // Header row for events data:
+      excelData.push([
+        "SL No",
+        "Student Name",
+        "USN",
+        "Role",
+        "Event Name",
+      ]);
+      eventsArr.forEach((entry, index) => {
+        excelData.push([
+          index + 1,
+          entry.studentName,
+          entry.usn,
+          entry.role,
+          entry.eventName,
+        ]);
+      });
+      excelData.push([]);
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(excelData);
+    ws["!cols"] = [
+      { wch: 8 },
+      { wch: 25 },
+      { wch: 15 },
+      { wch: 15 },
+      { wch: 30 },
+    ];
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Events");
+    const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array", cellStyles: true });
+    saveAs(new Blob([wbout], { type: "application/octet-stream" }), "events.xlsx");
+  };
+
   // COLLEGES VIEW: Aggregate colleges from rows
-  /////////////
   const collegesData = React.useMemo(() => {
     const map = new Map<
       string,
       {
         collegeName: string;
         collegeCode: string;
-        accomodation: string;
+        accomodation: boolean;
         events: Set<string>;
         registrants: number;
         maleCount: number;
@@ -1293,18 +1114,18 @@ export function DataTable({ data }: { data: Data[] }) {
             <Button
               variant="outline"
               className="ml-auto bg-primary text-white hover:scale-105 hover:text-white"
-              onClick={handleExportToExcel}
+              onClick={handleExportParticipantsExcel}
             >
               <FileDown className="mr-2 h-4 w-4" />
-              Download current view as Excel
+              Download Participants Excel
             </Button>
             <Button
               variant="outline"
-              className="ml-auto bg-orange-500 text-white hover:scale-105 hover:bg-orange-600 hover:text-white"
-              onClick={handleExportCustomExcel}
+              className="ml-auto bg-secondary text-white hover:scale-105 hover:text-white"
+              onClick={handleExportEventsExcel}
             >
               <FileDown className="mr-2 h-4 w-4" />
-              Download Custom Excel
+              Download Events Excel
             </Button>
             <Button
               variant="outline"
@@ -1333,7 +1154,9 @@ export function DataTable({ data }: { data: Data[] }) {
             <Button
               variant="outline"
               className="ml-auto bg-primary text-white hover:scale-105 hover:text-white"
-              onClick={handleDownloadCollegesExcel}
+              onClick={() => {
+                // You can add a separate download for colleges if needed
+              }}
             >
               <FileDown className="mr-2 h-4 w-4" />
               Download Colleges as Excel
