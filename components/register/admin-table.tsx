@@ -293,7 +293,7 @@ const TypeFilter: React.FC<TypeFilterProps> = ({ column, table }) => {
         <Button variant="ghost">
           Type
           <ChevronDown className="ml-1 h-4 w-4" />
-          {column.getFilterValue() ? `: ${column.getFilterValue() as string}` : ""}
+          {column.getFilterValue() ? `: ${column.getFilterValue()}` : ""}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 p-2 max-h-60 overflow-y-auto">
@@ -363,7 +363,7 @@ const EventFilter: React.FC<EventFilterProps> = ({ column, table }) => {
         <Button variant="ghost">
           Filter Events
           <ChevronDown className="ml-1 h-4 w-4" />
-          {column.getFilterValue() ? `: ${column.getFilterValue() as string}` : ""}
+          {column.getFilterValue() ? `: ${column.getFilterValue()}` : ""}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 p-2 max-h-60 overflow-y-auto">
@@ -645,7 +645,7 @@ export function DataTable({ data }: { data: Data[] }) {
         accessorKey: "email",
         header: "Email",
         cell: ({ row }) => (
-          <div className="text-black">{row.getValue("email") as string}</div>
+          <div className="text-black">{(row.getValue("email") as string || "").toLowerCase()}</div>
         ),
       },
       {
@@ -896,7 +896,7 @@ export function DataTable({ data }: { data: Data[] }) {
           participant.phone || "",
           participant.gender || "",
           participant.blood || "",
-          participant.email || "",
+          (participant.email || "").toLowerCase(),
           participant.accomodation ? "Yes" : "No",
           eventsParticipating,
           eventsAccompanying,
@@ -1029,7 +1029,7 @@ export function DataTable({ data }: { data: Data[] }) {
           "Candidate Signature",
         ]);
         participantRows.forEach((row, index) => {
-          const email = row.email ? row.email.toLowerCase() : "";
+          const email = (row.email || "").toLowerCase();
           let eventsParticipating = "";
           let eventsAccompanying = "";
           if (row.type === "Participant/Accompanist") {
@@ -1080,7 +1080,7 @@ export function DataTable({ data }: { data: Data[] }) {
           "Candidate Signature",
         ]);
         teamManagerRows.forEach((row, index) => {
-          const email = row.email ? row.email.toLowerCase() : "";
+          const email = (row.email || "").toLowerCase();
           const eventsParticipating = Array.isArray(row.events)
             ? row.events.map((e) => e.eventName).join(", ")
             : "";
@@ -1157,7 +1157,7 @@ export function DataTable({ data }: { data: Data[] }) {
           tm.name || "",
           tm.usn || "",
           tm.phone || "",
-          tm.email || "",
+          (tm.email || "").toLowerCase(),
           tm.gender || "",
           tm.blood || "",
           (tm as any).designation || "",
@@ -1189,8 +1189,9 @@ export function DataTable({ data }: { data: Data[] }) {
   };
 
   // 5. Code Wise Export
+  // In this export, we keep the Student Code in the same position (second column)
+  // and now append the College Code as the last column.
   const handleExportCodeWiseExcel = () => {
-    // Group participants (excluding Team Managers) by college
     const filteredRows = table.getRowModel().rows;
     const participantsByCollege: Record<string, Data[]> = {};
     filteredRows.forEach((row) => {
@@ -1209,9 +1210,9 @@ export function DataTable({ data }: { data: Data[] }) {
       const { collegeName, collegeCode, studentStart } = mapping;
       const participants = participantsByCollege[collegeName] || [];
       if (participants.length > 0) {
-        // Add college header with its assigned code
-        excelData.push([`College: ${collegeName}`, `College Code: ${collegeCode}`]);
-        // Table header row
+        // Add college header with its assigned code already shown in header later
+        excelData.push([`College: ${collegeName}`]);
+        // Header row: SL No, Student Code, Name, USN, Phone, Gender, DOB, Email, Accomodation, Events Participating In, Events Accompanying In, College Code
         excelData.push([
           "SL No",
           "Student Code",
@@ -1224,6 +1225,7 @@ export function DataTable({ data }: { data: Data[] }) {
           "Accomodation",
           "Events Participating In",
           "Events Accompanying In",
+          "College Code",
         ]);
         let codeCounter = studentStart;
         participants.forEach((participant, index) => {
@@ -1259,10 +1261,11 @@ export function DataTable({ data }: { data: Data[] }) {
             participant.phone || "",
             participant.gender || "",
             participant.blood || "",
-            participant.email || "",
+            (participant.email || "").toLowerCase(),
             participant.accomodation ? "Yes" : "No",
             eventsParticipating,
             eventsAccompanying,
+            collegeCode,
           ]);
           codeCounter++;
         });
@@ -1283,6 +1286,7 @@ export function DataTable({ data }: { data: Data[] }) {
       { wch: 15 },
       { wch: 30 },
       { wch: 30 },
+      { wch: 15 },
     ];
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Code Wise Participants");
