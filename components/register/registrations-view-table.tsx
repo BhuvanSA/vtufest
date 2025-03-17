@@ -345,9 +345,44 @@ export function DataTable({ data }: { data: Data[] }) {
             },
             {
                 accessorKey: "gender",
-                header: "Gender",
-                cell: ({ row }) => (<div className="capitalize">{row.getValue("gender")}</div>),
-            },
+                header: ({ column, table }) => (
+                  <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost">
+                    Gender
+                    <ChevronDown className="ml-1 h-4 w-4" />
+                    {column.getFilterValue() ? `: ${column.getFilterValue()}` : ""}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56 p-2 max-h-60 overflow-y-auto">
+                  <DropdownMenuItem
+                    onClick={() => column.setFilterValue(undefined)}
+                    className="cursor-pointer"
+                  >
+                    All
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => column.setFilterValue("male")}
+                    className="cursor-pointer"
+                  >
+                    Male
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => column.setFilterValue("female")}
+                    className="cursor-pointer"
+                  >
+                    Female
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+                  </DropdownMenu>
+                ),
+                cell: ({ row }) => <div>{row.getValue("gender") as string}</div>,
+                filterFn: (row, columnId, filterValue) => {
+                  if (!filterValue) return true;
+                  const gender = row.getValue(columnId) as string;
+                  return gender === filterValue;
+                },
+              },
             {
                 accessorKey: "dateOfBirth",
                 header: "Date Of Birth",
