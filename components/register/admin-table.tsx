@@ -1097,6 +1097,112 @@ export function DataTable({ data }: { data: Data[] }) {
   };
 
   //////////////////////////
+  // NEW EXPORT FUNCTIONS FOR COLLEGES VIEW
+  //////////////////////////
+
+  // 6. Colleges Excel Export – includes segregation of team managers by gender
+  const handleExportCollegesExcel = () => {
+    const excelData: any[][] = [];
+    // Header row
+    excelData.push([
+      "College Name",
+      "College Code",
+      "Total Registrants",
+      "Male Registrants",
+      "Female Registrants",
+      "Team Manager (Male)",
+      "Team Manager (Female)"
+    ]);
+
+    // Loop over each college in your aggregated data
+    collegesData.forEach((college) => {
+      // Get all rows for this college from the full rows list
+      const collegeRows = rows.filter((row) => row.collegeName === college.collegeName);
+      let teamManagerMale = 0;
+      let teamManagerFemale = 0;
+      collegeRows.forEach((row) => {
+        if (row.type === "Team Manager") {
+          if (row.gender.toLowerCase() === "male") {
+            teamManagerMale++;
+          } else if (row.gender.toLowerCase() === "female") {
+            teamManagerFemale++;
+          }
+        }
+      });
+      excelData.push([
+        college.collegeName,
+        college.collegeCode,
+        college.registrants,
+        college.maleCount,
+        college.femaleCount,
+        teamManagerMale,
+        teamManagerFemale,
+      ]);
+    });
+    const ws = XLSX.utils.aoa_to_sheet(excelData);
+    ws["!cols"] = [
+      { wch: 30 },
+      { wch: 20 },
+      { wch: 20 },
+      { wch: 20 },
+      { wch: 20 },
+      { wch: 20 },
+      { wch: 20 },
+    ];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Colleges");
+    const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array", cellStyles: true });
+    saveAs(new Blob([wbout], { type: "application/octet-stream" }), "colleges.xlsx");
+  };
+
+  // 7. Arrival Time Export – outputs college name, college code, an assigned code, date/time placeholders, and no. of participants
+  const handleExportArrivalExcel = () => {
+    const excelData: any[][] = [];
+    // Header row for arrival info
+    excelData.push([
+      "College Name",
+      "College Code",
+      "Assigned Code",
+      "Date of Arrival",
+      "Time of Arrival",
+      "No. of Participants"
+    ]);
+
+    collegesData.forEach((college) => {
+      // Find the corresponding mapping entry (case-insensitive match)
+      const mappingEntry = collegeMapping.find(
+        (m) => m.collegeName.toLowerCase() === college.collegeName.toLowerCase()
+      );
+      // Use the mapping's collegeCode as the assigned code (or "N/A" if not found)
+      const assignedCode = mappingEntry ? mappingEntry.collegeCode : "N/A";
+      // If you have actual arrival data, replace these placeholders.
+      const arrivalDate = "TBD";
+      const arrivalTime = "TBD";
+      excelData.push([
+        college.collegeName,
+        college.collegeCode,
+        assignedCode,
+        arrivalDate,
+        arrivalTime,
+        college.registrants,
+      ]);
+    });
+    const ws = XLSX.utils.aoa_to_sheet(excelData);
+    ws["!cols"] = [
+      { wch: 30 },
+      { wch: 20 },
+      { wch: 20 },
+      { wch: 20 },
+      { wch: 20 },
+      { wch: 20 },
+    ];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Arrival Time");
+    const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array", cellStyles: true });
+    saveAs(new Blob([wbout], { type: "application/octet-stream" }), "colleges_arrival_time.xlsx");
+  };
+
+  //////////////////////////
   // COLLEGES VIEW: Aggregate colleges from rows
   //////////////////////////
   const collegesData = React.useMemo(() => {
@@ -1297,9 +1403,22 @@ export function DataTable({ data }: { data: Data[] }) {
                 className="pl-10 w-[26rem] text-black"
               />
             </div>
-            <Button variant="outline" className="ml-auto bg-primary text-white hover:scale-105 hover:text-white" onClick={() => { /* Existing colleges export functionality (if needed) */ }}>
+            {/* Two new buttons for the colleges view */}
+            <Button
+              variant="outline"
+              className="ml-auto bg-primary text-white hover:scale-105 hover:text-white"
+              onClick={handleExportCollegesExcel}
+            >
               <FileDown className="mr-2 h-4 w-4" />
-              Download Colleges as Excel
+              Download Colleges Excel
+            </Button>
+            <Button
+              variant="outline"
+              className="ml-auto bg-secondary text-white hover:scale-105 hover:text-white"
+              onClick={handleExportArrivalExcel}
+            >
+              <FileDown className="mr-2 h-4 w-4" />
+              Download Arrival Time Excel
             </Button>
           </>
         )}
