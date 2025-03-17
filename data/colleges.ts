@@ -231,6 +231,7 @@ export const colleges = [
                 name: "VISHWANATHA RAO DESHPANDE RURAL INSTITUTE OF TECHNOLOGY",
                 code: "2VD",
             },
+            {name: "Visveraya Technological University",code:"2VX"},
         ],
     },
     {
