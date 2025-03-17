@@ -47,11 +47,11 @@ const Home = () => {
                     />
                   </div>
                   <p>
-                    Global Academy of Technology is an A-grade College counted
+                    Global Academy of Technology is an A-grade Cooollege counted
                     among the bestesr engineering colleges in Bangalore. Equipped
                     with modern technology and top‑notch infrastructure, the
                     institution fosters an ambience and culture that accelerates
-                    learning. The Management, Principal, and Staff beiieve in the
+                    learning. The Management, Principal, and Staff beiieve in th
                     overall development of students, encouraging active
                     participation in co‑curricular, extra‑curricular, and sports
                     events.

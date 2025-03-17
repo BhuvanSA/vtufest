@@ -50,7 +50,11 @@ export function PaymentScreenshotTable({
         accessorKey: "collegeName",
         header: "College Name",
         cell: ({ row }) => {
-          return <div className="capitalize">{row.getValue("collegeName") as string}</div>;
+          return (
+            <div className="capitalize">
+              {row.getValue("collegeName") as string}
+            </div>
+          );
         },
       },
       {
@@ -79,7 +83,9 @@ export function PaymentScreenshotTable({
           return (
             <Button
               variant="outline"
-              onClick={() => router.push(`/admin/payment-screenshots/${payment.id}`)}
+              onClick={() =>
+                router.push(`/admin/payment-screenshots/${payment.id}`)
+              }
             >
               View
             </Button>
@@ -111,7 +117,10 @@ export function PaymentScreenshotTable({
                   <TableHead key={header.id}>
                     {header.isPlaceholder
                       ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                   </TableHead>
                 ))}
               </TableRow>
@@ -123,14 +132,20 @@ export function PaymentScreenshotTable({
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="text-center py-10">
+                <TableCell
+                  colSpan={columns.length}
+                  className="text-center py-10"
+                >
                   No Payment Screenshots Found.
                 </TableCell>
               </TableRow>
@@ -141,6 +156,20 @@ export function PaymentScreenshotTable({
 
       {/* Pagination Controls */}
       <div className="flex items-center justify-between py-4">
+        <div className="flex items-center gap-2">
+          <span>Rows per page:</span>
+          <select
+            value={table.getState().pagination.pageSize}
+            onChange={(e) => table.setPageSize(Number(e.target.value))}
+            className="border rounded p-1 text-black"
+          >
+            <option value={10}>10</option>
+            <option value={25}>25</option>
+            <option value={50}>50</option>
+            <option value={100}>100</option>
+            <option value={200}>200</option>
+          </select>
+        </div>
         <Button
           variant="outline"
           size="sm"
@@ -150,7 +179,8 @@ export function PaymentScreenshotTable({
           Previous
         </Button>
         <span>
-          Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+          Page {table.getState().pagination.pageIndex + 1} of{" "}
+          {table.getPageCount()}
         </span>
         <Button
           variant="outline"

@@ -26,7 +26,7 @@ function InstructionStep({
   title,
   description,
   icon,
-  detailImage = "https://via.placeholder.com/400x200", // Replace with your image URL if needed
+  detailImage = "/images/Untitled design-3.png", // Replace with your image URL if needed
 }: InstructionStepProps) {
   const [expanded, setExpanded] = useState(false);
 
@@ -69,7 +69,7 @@ const instructions = [
     stepNumber: 1,
     title: "College Registration",
     description:
-      "Register your college on the Sign-Up page using your official principal's email. Only verified principal email IDs are accepted. If your email isn't listed, contact support immediately at 99866770082 or via our website.",
+      "Register your college on the Sign-Up page using your official principal's email. Only verified principal email IDs are accepted. If your email isn't listed, contact support immediately at 9945864767 or via our website.",
     icon: <UserPlus className="h-10 w-10 text-red-700" />,
   },
   {
@@ -114,8 +114,6 @@ const instructions = [
       "Make your payment via UPI (₹4,000 for up to 10 events; ₹8,000 for 11 or more events). Upload your transaction details and a screenshot for verification. Upon successful verification, your registration is confirmed.",
     icon: <CheckCircle className="h-10 w-10 text-red-700" />,
   },
-  
-
 ];
 
 export default function RegistrationInstructions() {
@@ -155,8 +153,15 @@ export default function RegistrationInstructions() {
           className="inline-block px-8 py-4 bg-yellow-300 text-red-700 font-extrabold rounded-full shadow-lg transform hover:scale-110 transition-transform duration-300"
         >
           For more detailed Info: Registration guide
-        
         </a>
+      </div>
+      {/* Additional Image at the End */}
+      <div className="mt-12">
+        <img
+          src="/images/Untitled design-3.png"
+          alt="Additional Visual"
+          className="mx-auto rounded-lg shadow-xl"
+        />
       </div>
     </div>
   );
