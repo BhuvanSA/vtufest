@@ -261,9 +261,7 @@ type TypeFilterProps = {
 const TypeFilter: React.FC<TypeFilterProps> = ({ column, table }) => {
   const types = ["Team Manager", "Participant/Accompanist", "Participant", "Accompanist"];
   const [searchQuery, setSearchQuery] = React.useState("");
-  const filteredTypes = types.filter((t) =>
-    t.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredTypes = types.filter((t) => t.toLowerCase().includes(searchQuery.toLowerCase()));
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -315,9 +313,7 @@ const EventFilter: React.FC<EventFilterProps> = ({ column, table }) => {
     count: collegeSet.size,
   }));
   const [searchQuery, setSearchQuery] = React.useState("");
-  const filteredOptions = options.filter(opt =>
-    opt.event.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredOptions = options.filter(opt => opt.event.toLowerCase().includes(searchQuery.toLowerCase()));
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -379,7 +375,7 @@ const CollegeEventFilter: React.FC<CollegeEventFilterProps> = ({ column, table, 
 };
 
 //////////////////////////
-//      DataTable       //
+// DataTable
 //////////////////////////
 export function DataTable({ data }: { data: Data[] }) {
   const router = useRouter();
@@ -473,7 +469,9 @@ export function DataTable({ data }: { data: Data[] }) {
               .map((r) => r.id);
             table.setRowSelection((prev) => {
               const newSelection = { ...prev };
-              matchingRows.forEach((idx) => { newSelection[idx] = checked; });
+              matchingRows.forEach((idx) => {
+                newSelection[idx] = checked;
+              });
               return newSelection;
             });
           };
@@ -1003,10 +1001,6 @@ export function DataTable({ data }: { data: Data[] }) {
   };
 
   // 5. Code Wise Export
-  // For each college (in the provided mapping order) that has participants,
-  // output a header row with 11 cells: the first cell contains "College: <collegeName>"
-  // and the last cell contains the college code.
-  // Then output the participant table header (11 columns) and data rows with student codes assigned.
   const handleExportCodeWiseExcel = () => {
     const filteredRows = table.getRowModel().rows;
     const participantsByCollege: Record<string, Data[]> = {};
@@ -1139,6 +1133,7 @@ export function DataTable({ data }: { data: Data[] }) {
         teamManagerFemale,
       ]);
     });
+
     const ws = XLSX.utils.aoa_to_sheet(excelData);
     ws["!cols"] = [
       { wch: 30 },
@@ -1155,16 +1150,20 @@ export function DataTable({ data }: { data: Data[] }) {
     saveAs(new Blob([wbout], { type: "application/octet-stream" }), "colleges.xlsx");
   };
 
-  // 7. Updated Arrival Time Export – outputs college name, college code, an assigned code, accommodation detail, and number of participants
+  // 7. Updated Arrival Time Export – outputs college name, college code, an assigned code, accommodation detail,
+  // and counts for participants (male/female) and team managers (male/female)
   const handleExportArrivalExcel = () => {
     const excelData: any[][] = [];
-    // Updated header row without date/time columns and with Accomodation column
+    // Updated header row with separate counts for participants and team managers
     excelData.push([
       "College Name",
       "College Code",
       "Assigned Code",
       "Accomodation",
-      "No. of Participants"
+      "Participants (Male)",
+      "Participants (Female)",
+      "Team Manager (Male)",
+      "Team Manager (Female)"
     ]);
 
     collegesData.forEach((college) => {
@@ -1174,19 +1173,47 @@ export function DataTable({ data }: { data: Data[] }) {
       );
       // Use the mapping's collegeCode as the assigned code (or "N/A" if not found)
       const assignedCode = mappingEntry ? mappingEntry.collegeCode : "N/A";
-      // Push a new row without the arrival date and time, and include accomodation detail
+
+      // Get all rows for the current college
+      const collegeRows = rows.filter((row) => row.collegeName === college.collegeName);
+      let teamManagerMale = 0;
+      let teamManagerFemale = 0;
+      let participantMale = 0;
+      let participantFemale = 0;
+      collegeRows.forEach((row) => {
+        if (row.type === "Team Manager") {
+          if (row.gender.toLowerCase() === "male") {
+            teamManagerMale++;
+          } else if (row.gender.toLowerCase() === "female") {
+            teamManagerFemale++;
+          }
+        } else {
+          if (row.gender.toLowerCase() === "male") {
+            participantMale++;
+          } else if (row.gender.toLowerCase() === "female") {
+            participantFemale++;
+          }
+        }
+      });
+
       excelData.push([
         college.collegeName,
         college.collegeCode,
         assignedCode,
         college.accomodation ? "Yes" : "No",
-        college.registrants,
+        participantMale,
+        participantFemale,
+        teamManagerMale,
+        teamManagerFemale,
       ]);
     });
 
     const ws = XLSX.utils.aoa_to_sheet(excelData);
     ws["!cols"] = [
       { wch: 30 },
+      { wch: 20 },
+      { wch: 20 },
+      { wch: 20 },
       { wch: 20 },
       { wch: 20 },
       { wch: 20 },
