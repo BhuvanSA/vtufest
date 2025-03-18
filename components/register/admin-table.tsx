@@ -1155,16 +1155,15 @@ export function DataTable({ data }: { data: Data[] }) {
     saveAs(new Blob([wbout], { type: "application/octet-stream" }), "colleges.xlsx");
   };
 
-  // 7. Arrival Time Export – outputs college name, college code, an assigned code, date/time placeholders, and no. of participants
+  // 7. Updated Arrival Time Export – outputs college name, college code, an assigned code, accommodation detail, and number of participants
   const handleExportArrivalExcel = () => {
     const excelData: any[][] = [];
-    // Header row for arrival info
+    // Updated header row without date/time columns and with Accomodation column
     excelData.push([
       "College Name",
       "College Code",
       "Assigned Code",
-      "Date of Arrival",
-      "Time of Arrival",
+      "Accomodation",
       "No. of Participants"
     ]);
 
@@ -1175,22 +1174,19 @@ export function DataTable({ data }: { data: Data[] }) {
       );
       // Use the mapping's collegeCode as the assigned code (or "N/A" if not found)
       const assignedCode = mappingEntry ? mappingEntry.collegeCode : "N/A";
-      // If you have actual arrival data, replace these placeholders.
-      const arrivalDate = "TBD";
-      const arrivalTime = "TBD";
+      // Push a new row without the arrival date and time, and include accomodation detail
       excelData.push([
         college.collegeName,
         college.collegeCode,
         assignedCode,
-        arrivalDate,
-        arrivalTime,
+        college.accomodation ? "Yes" : "No",
         college.registrants,
       ]);
     });
+
     const ws = XLSX.utils.aoa_to_sheet(excelData);
     ws["!cols"] = [
       { wch: 30 },
-      { wch: 20 },
       { wch: 20 },
       { wch: 20 },
       { wch: 20 },
@@ -1387,7 +1383,7 @@ export function DataTable({ data }: { data: Data[] }) {
               <FileDown className="mr-2 h-4 w-4" />
               Download Code Wise Excel
             </Button>
-            <Button variant="outline" className="bg-red-500 text-white hover:scale-105 hover:bg-red-500 hover:text-primary-foreground" onClick={() => handleDeleteSelected()}>
+            <Button variant="outline" className="bg-red-500 text-white hover:scale-105 hover:bg-red-500 hover:text-primary-foreground ml-auto" onClick={() => handleDeleteSelected()}>
               <Trash2 className="mr-2 h-4 w-4" />
               Delete Selected
             </Button>
@@ -1414,7 +1410,7 @@ export function DataTable({ data }: { data: Data[] }) {
             </Button>
             <Button
               variant="outline"
-              className="ml-auto bg-secondary text-white hover:scale-105 hover:text-white"
+              className="ml-auto bg-red-500 text-white hover:scale-105 hover:bg-red-600 hover:text-white"
               onClick={handleExportArrivalExcel}
             >
               <FileDown className="mr-2 h-4 w-4" />
