@@ -178,6 +178,7 @@ const collegeMapping = [
   { collegeName: "BMS SCHOOL OF ARCHITECTURE", collegeCode: "GA-097", studentStart: 5851 },
   { collegeName: "GOVERNMENT S.K.S.J.T. INSTITUTE OF TECHNOLOGY", collegeCode: "GA-098", studentStart: 5901 },
   { collegeName: "CAMBRIDGE INSTITUTE OF TECHNOLOGY", collegeCode: "GA-099", studentStart: 5951 },
+  { collegeName: "Visveraya Technological University", collegeCode: "GA-100", studentStart: 6001 },
 ];
 
 //////////////////////////////
