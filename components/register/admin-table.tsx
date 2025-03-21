@@ -833,7 +833,7 @@ export function DataTable({ data }: { data: Data[] }) {
       collegeData[collegeName].rows.push(row.original);
     });
     const excelData: any[][] = [];
-    excelData.push(["Visveraya Technological University in association with Global Academy of Technology"]);
+    excelData.push(["Visvesvaraya Technological University in association with Global Academy of Technology"]);
     excelData.push(["24th VTU Youth Fest @ GAT"]);
     excelData.push([]);
     Object.keys(collegeData).forEach((collegeName) => {
