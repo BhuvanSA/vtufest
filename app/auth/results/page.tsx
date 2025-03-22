@@ -74,8 +74,32 @@ import logo70 from "@/public/images/logo70.png";
 import logo71 from "@/public/images/logo71.png";
 import logo72 from "@/public/images/logo72.png";
 import logo73 from "@/public/images/logo73.png";
-
-
+import logo74 from "@/public/images/logo74.png";
+import logo75 from "@/public/images/logo75.png";
+import logo76 from "@/public/images/logo76.png";
+import logo77 from "@/public/images/logo77.png";
+import logo78 from "@/public/images/logo78.png";
+import logo79 from "@/public/images/logo79.png";
+import logo80 from "@/public/images/logo80.png";
+import logo81 from "@/public/images/logo81.png";
+import logo82 from "@/public/images/logo82.png";
+import logo83 from "@/public/images/logo83.png";
+import logo84 from "@/public/images/logo84.png";
+import logo85 from "@/public/images/logo85.png";
+import logo86 from "@/public/images/logo40.png";
+import logo87 from "@/public/images/logo40.png";
+import logo88 from "@/public/images/logo88.png";
+import logo89 from "@/public/images/logo89.png";
+import logo90 from "@/public/images/logo90.png";
+import logo91 from "@/public/images/logo91.png";
+import logo92 from "@/public/images/logo92.png";
+import logo93 from "@/public/images/logo93.png";
+import logo94 from "@/public/images/logo94.png";
+import logo95 from "@/public/images/logo95.png";
+import logo96 from "@/public/images/logo96.png";
+import logo97 from "@/public/images/logo97.png";
+import logo98 from "@/public/images/logo98.png";
+import logo99 from "@/public/images/logo99.png";
 import type { StaticImageData } from "next/image";
 
 // ---------------------------------------------------
@@ -163,9 +187,32 @@ const colleges: College[] = [
 { code: "GA-071", name: "RV Institute of Technology and Management",              logo: logo71 }, // GA-071
 { code: "GA-072", name: "BASAVESHWARA ENGINERING COLLEGE",                        logo: logo72 }, // GA-072
 { code: "GA-073", name: "CITY ENGINEERING COLLEGE",                              logo: logo73 }, // GA-073
-
-
-  
+{ code: "GA-074", name: "SJB INSTITUTE OF TECHNOLOGY",                              logo: logo74 }, // GA-074
+{ code: "GA-075", name: "ST.JOSEPH ENGINEERING COLLEGE",                              logo: logo75 }, // GA-075
+{ code: "GA-076", name: "MALNAD COLLEGE OF ENGINEERING",                              logo: logo76 }, // GA-076
+{ code: "GA-077", name: "R R INSTITUTE OF TECHNOLOGY",                              logo: logo77 }, // GA-077
+{ code: "GA-078", name: "CHANNA BASAVESHWARA INSTITUTE OF TECHNOLOGY",                              logo: logo78 }, // GA-078
+{ code: "GA-079", name: " SHRIDEVI INSTITUTE OF ENGINEERING AND TECHNOLOGY",                              logo: logo79 }, // GA-079
+{ code: "GA-080", name: "MAHARAJA INSTITUTE OF TECH",                              logo: logo80 }, // GA-080
+{ code: "GA-081", name: "COORG INSTITUTE OF TECHNOLOGY",                              logo: logo81 }, // GA-081
+{ code: "GA-082", name: "AGM RURAL COLLEGE OF ENGINEERING & TECHNOLOGY",                              logo: logo82 }, // GA-082
+{ code: "GA-083", name: "BAHUBALI COLLEGE OF ENGINEERING",                              logo: logo83 }, // GA-083
+{ code: "GA-084", name: "V S M'S INSTITUTE OF TECHNOLOGY",                              logo: logo84 }, // GA-084
+{ code: "GA-085", name: "H K B K COLLEGE OF ENGINEERING",                              logo: logo85 }, // GA-085
+{ code: "GA-086", name: "GOVT. ENGINEERING COLLEGE MANDYA",                              logo: logo86 }, // GA-086
+{ code: "GA-087", name: "GOVT. ENGINEERING COLLEGE MOSALEHOSAHALLI HASSAN",                              logo: logo87 }, // GA-087
+{ code: "GA-088", name: "BANGALORE INSTITUTE OF TECHNOLOGY",                              logo: logo88 }, // GA-088
+{ code: "GA-089", name: "ACADEMY FOR TECHNICAL AND MANAGEMENT EXCELLENCE",                              logo: logo89 }, // GA-089
+{ code: "GA-090", name: "SIR M VISVESVARAYA INSTITUTE OF TECHNOLOGY",                              logo: logo90 }, // GA-090
+{ code: "GA-091", name: " K.S SCHOOL OF ENGG & MGMT",                              logo: logo91 }, // GA-091
+{ code: "GA-092", name: "NEW HORIZON COLLEGE OF ENGINEERING",                              logo: logo92 }, // GA-092
+{ code: "GA-093", name: "BANGALORE TECHNOLOGICAL INSTITUTE",                              logo: logo93 }, // GA-093
+{ code: "GA-094", name: "BHEEMANNA KHANDRE INSTITUTE OF TECHNOLOGY",                              logo: logo94 }, // GA-094
+{ code: "GA-095", name: "VISHWANATHA RAO DESHPANDE RURAL INSTITUTE OF TECHNOLOGY",                              logo: logo95 }, // GA-095
+{ code: "GA-096", name: "DR. AMBEDKAR INSTITUTE OF TECHNOLOGY",                              logo: logo96 }, // GA-096
+{ code: "GA-097", name: "BMS SCHOOL OF ARCHITECTURE",                              logo: logo97 }, // GA-097
+{ code: "GA-098", name: "GOVERNMENT S.K.S.J.T. INSTITUTE OF TECHNOLOGY",                              logo: logo98 }, // GA-098
+{ code: "GA-099", name: "CAMBRIDGE INSTITUTE OF TECHNOLOGY",                              logo: logo99 }, // GA-099
 ];
 
 // ---------------------------------------------------
@@ -211,6 +258,20 @@ const eventsData: { [day: string]: Event[] } = {
     { name: "Event 4: Sample Event", winners: [colleges[63], colleges[64], colleges[65]] },
     { name: "Event 5: Sample Event", winners: [colleges[66], colleges[67], colleges[68]] },
     { name: "Event 6: Sample Event", winners: [colleges[69], colleges[70], colleges[71]] },
+  ],
+  "Day 5": [
+    { name: "Event 1: Sample Event", winners: [colleges[72], colleges[73], colleges[74]] },
+    { name: "Event 2: Sample Event", winners: [colleges[75], colleges[76], colleges[77]] },
+    { name: "Event 3: Sample Event", winners: [colleges[78], colleges[79], colleges[80]] },
+    { name: "Event 4: Sample Event", winners: [colleges[81], colleges[82], colleges[83]] },
+    { name: "Event 5: Sample Event", winners: [colleges[84], colleges[85], colleges[86]] },
+    { name: "Event 6: Sample Event", winners: [colleges[87], colleges[88], colleges[89]] },
+  ],
+  "Day 6": [
+    { name: "Event 1: Sample Event", winners: [colleges[90], colleges[91], colleges[92]] },
+    { name: "Event 2: Sample Event", winners: [colleges[93], colleges[94], colleges[95]] },
+    { name: "Event 3: Sample Event", winners: [colleges[96], colleges[97], colleges[98]] },
+    { name: "Event 4: Sample Event", winners: [colleges[99], colleges[99], colleges[99]] },
   ],
 };
 
