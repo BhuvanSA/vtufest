@@ -163,12 +163,12 @@ const collegeMapping = [
   { collegeName: "AGM RURAL COLLEGE OF ENGINEERING &TECHNOLOGY", collegeCode: "GA-082", studentStart: 5101 },
   { collegeName: "BAHUBALI COLLEGE OF ENGINEERING", collegeCode: "GA-083", studentStart: 5151 },
   { collegeName: "V S M'S INSTITUTE OF TECHNOLOGY", collegeCode: "GA-084", studentStart: 5201 },
-  { collegeName: "H K B K COLLEGE OF ENGINEERING", collegeCode: "GA-085", studentStart: 5251 },
+  { collegeName: "HKBK COLLEGE OF ENGINEERING", collegeCode: "GA-085", studentStart: 5251 },
   { collegeName: "GOVT. ENGINEERING COLLEGE MANDYA", collegeCode: "GA-086", studentStart: 5301 },
-  { collegeName: "GOVT. ENGINEERING COLLEGE MOSALEHOSAHALLI HASSAN", collegeCode: "GA-087", studentStart: 5351 },
+  { collegeName: "Government Engineering College Mosalehosahalli Hassan", collegeCode: "GA-087", studentStart: 5351 },
   { collegeName: "BANGALORE INSTITUTE OF TECHNOLOGY", collegeCode: "GA-088", studentStart: 5401 },
   { collegeName: "ACADEMY FOR TECHNICAL AND MANAGEMENT EXCELLENCE", collegeCode: "GA-089", studentStart: 5451 },
-  { collegeName: "SIR M VISVESVARAYA INSTITUTE OF TECHNOLOGY", collegeCode: "GA-090", studentStart: 5501 },
+  { collegeName: "SIR M. VISVESVARAYA INSTITUTE OF TECHNOLOGY", collegeCode: "GA-090", studentStart: 5501 },
   { collegeName: "K.S SCHOOL OF ENGG & MGMT", collegeCode: "GA-091", studentStart: 5551 },
   { collegeName: "NEW HORIZON COLLEGE OF ENGINEERING", collegeCode: "GA-092", studentStart: 5601 },
   { collegeName: "BANGALORE TECHNOLOGICAL INSTITUTE", collegeCode: "GA-093", studentStart: 5651 },
@@ -178,6 +178,7 @@ const collegeMapping = [
   { collegeName: "BMS SCHOOL OF ARCHITECTURE", collegeCode: "GA-097", studentStart: 5851 },
   { collegeName: "GOVERNMENT S.K.S.J.T. INSTITUTE OF TECHNOLOGY", collegeCode: "GA-098", studentStart: 5901 },
   { collegeName: "CAMBRIDGE INSTITUTE OF TECHNOLOGY", collegeCode: "GA-099", studentStart: 5951 },
+  { collegeName: "Visveraya Technological University", collegeCode: "GA-100", studentStart: 6001 },
 ];
 
 //////////////////////////////
@@ -261,9 +262,7 @@ type TypeFilterProps = {
 const TypeFilter: React.FC<TypeFilterProps> = ({ column, table }) => {
   const types = ["Team Manager", "Participant/Accompanist", "Participant", "Accompanist"];
   const [searchQuery, setSearchQuery] = React.useState("");
-  const filteredTypes = types.filter((t) =>
-    t.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredTypes = types.filter((t) => t.toLowerCase().includes(searchQuery.toLowerCase()));
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -315,9 +314,7 @@ const EventFilter: React.FC<EventFilterProps> = ({ column, table }) => {
     count: collegeSet.size,
   }));
   const [searchQuery, setSearchQuery] = React.useState("");
-  const filteredOptions = options.filter(opt =>
-    opt.event.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredOptions = options.filter(opt => opt.event.toLowerCase().includes(searchQuery.toLowerCase()));
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -379,7 +376,7 @@ const CollegeEventFilter: React.FC<CollegeEventFilterProps> = ({ column, table, 
 };
 
 //////////////////////////
-//      DataTable       //
+// DataTable
 //////////////////////////
 export function DataTable({ data }: { data: Data[] }) {
   const router = useRouter();
@@ -473,7 +470,9 @@ export function DataTable({ data }: { data: Data[] }) {
               .map((r) => r.id);
             table.setRowSelection((prev) => {
               const newSelection = { ...prev };
-              matchingRows.forEach((idx) => { newSelection[idx] = checked; });
+              matchingRows.forEach((idx) => {
+                newSelection[idx] = checked;
+              });
               return newSelection;
             });
           };
@@ -834,7 +833,7 @@ export function DataTable({ data }: { data: Data[] }) {
       collegeData[collegeName].rows.push(row.original);
     });
     const excelData: any[][] = [];
-    excelData.push(["Visveraya Technological University in association with Global Academy of Technology"]);
+    excelData.push(["Visvesvaraya Technological University in association with Global Academy of Technology"]);
     excelData.push(["24th VTU Youth Fest @ GAT"]);
     excelData.push([]);
     Object.keys(collegeData).forEach((collegeName) => {
@@ -1003,10 +1002,6 @@ export function DataTable({ data }: { data: Data[] }) {
   };
 
   // 5. Code Wise Export
-  // For each college (in the provided mapping order) that has participants,
-  // output a header row with 11 cells: the first cell contains "College: <collegeName>"
-  // and the last cell contains the college code.
-  // Then output the participant table header (11 columns) and data rows with student codes assigned.
   const handleExportCodeWiseExcel = () => {
     const filteredRows = table.getRowModel().rows;
     const participantsByCollege: Record<string, Data[]> = {};
@@ -1094,6 +1089,141 @@ export function DataTable({ data }: { data: Data[] }) {
     XLSX.utils.book_append_sheet(wb, ws, "Code Wise Participants");
     const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array", cellStyles: true });
     saveAs(new Blob([wbout], { type: "application/octet-stream" }), "code_wise_participants.xlsx");
+  };
+
+  //////////////////////////
+  // NEW EXPORT FUNCTIONS FOR COLLEGES VIEW
+  //////////////////////////
+
+  // 6. Colleges Excel Export – includes segregation of team managers by gender
+  const handleExportCollegesExcel = () => {
+    const excelData: any[][] = [];
+    // Header row
+    excelData.push([
+      "College Name",
+      "College Code",
+      "Total Registrants",
+      "Male Registrants",
+      "Female Registrants",
+      "Team Manager (Male)",
+      "Team Manager (Female)"
+    ]);
+
+    // Loop over each college in your aggregated data
+    collegesData.forEach((college) => {
+      // Get all rows for this college from the full rows list
+      const collegeRows = rows.filter((row) => row.collegeName === college.collegeName);
+      let teamManagerMale = 0;
+      let teamManagerFemale = 0;
+      collegeRows.forEach((row) => {
+        if (row.type === "Team Manager") {
+          if (row.gender.toLowerCase() === "male") {
+            teamManagerMale++;
+          } else if (row.gender.toLowerCase() === "female") {
+            teamManagerFemale++;
+          }
+        }
+      });
+      excelData.push([
+        college.collegeName,
+        college.collegeCode,
+        college.registrants,
+        college.maleCount,
+        college.femaleCount,
+        teamManagerMale,
+        teamManagerFemale,
+      ]);
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(excelData);
+    ws["!cols"] = [
+      { wch: 30 },
+      { wch: 20 },
+      { wch: 20 },
+      { wch: 20 },
+      { wch: 20 },
+      { wch: 20 },
+      { wch: 20 },
+    ];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Colleges");
+    const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array", cellStyles: true });
+    saveAs(new Blob([wbout], { type: "application/octet-stream" }), "colleges.xlsx");
+  };
+
+  // 7. Updated Arrival Time Export – outputs college name, college code, an assigned code, accommodation detail,
+  // and counts for participants (male/female) and team managers (male/female)
+  const handleExportArrivalExcel = () => {
+    const excelData: any[][] = [];
+    // Updated header row with separate counts for participants and team managers
+    excelData.push([
+      "College Name",
+      "College Code",
+      "Assigned Code",
+      "Accomodation",
+      "Participants (Male)",
+      "Participants (Female)",
+      "Team Manager (Male)",
+      "Team Manager (Female)"
+    ]);
+
+    collegesData.forEach((college) => {
+      // Find the corresponding mapping entry (case-insensitive match)
+      const mappingEntry = collegeMapping.find(
+        (m) => m.collegeName.toLowerCase() === college.collegeName.toLowerCase()
+      );
+      // Use the mapping's collegeCode as the assigned code (or "N/A" if not found)
+      const assignedCode = mappingEntry ? mappingEntry.collegeCode : "N/A";
+
+      // Get all rows for the current college
+      const collegeRows = rows.filter((row) => row.collegeName === college.collegeName);
+      let teamManagerMale = 0;
+      let teamManagerFemale = 0;
+      let participantMale = 0;
+      let participantFemale = 0;
+      collegeRows.forEach((row) => {
+        if (row.type === "Team Manager") {
+          if (row.gender.toLowerCase() === "male") {
+            teamManagerMale++;
+          } else if (row.gender.toLowerCase() === "female") {
+            teamManagerFemale++;
+          }
+        } else {
+          if (row.gender.toLowerCase() === "male") {
+            participantMale++;
+          } else if (row.gender.toLowerCase() === "female") {
+            participantFemale++;
+          }
+        }
+      });
+
+      excelData.push([
+        college.collegeName,
+        college.collegeCode,
+        assignedCode,
+        college.accomodation ? "Yes" : "No",
+        participantMale,
+        participantFemale,
+        teamManagerMale,
+        teamManagerFemale,
+      ]);
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(excelData);
+    ws["!cols"] = [
+      { wch: 30 },
+      { wch: 20 },
+      { wch: 20 },
+      { wch: 20 },
+      { wch: 20 },
+      { wch: 20 },
+      { wch: 20 },
+      { wch: 20 },
+    ];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Arrival Time");
+    const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array", cellStyles: true });
+    saveAs(new Blob([wbout], { type: "application/octet-stream" }), "colleges_arrival_time.xlsx");
   };
 
   //////////////////////////
@@ -1281,7 +1411,7 @@ export function DataTable({ data }: { data: Data[] }) {
               <FileDown className="mr-2 h-4 w-4" />
               Download Code Wise Excel
             </Button>
-            <Button variant="outline" className="bg-red-500 text-white hover:scale-105 hover:bg-red-500 hover:text-primary-foreground" onClick={() => handleDeleteSelected()}>
+            <Button variant="outline" className="bg-red-500 text-white hover:scale-105 hover:bg-red-500 hover:text-primary-foreground ml-auto" onClick={() => handleDeleteSelected()}>
               <Trash2 className="mr-2 h-4 w-4" />
               Delete Selected
             </Button>
@@ -1297,9 +1427,22 @@ export function DataTable({ data }: { data: Data[] }) {
                 className="pl-10 w-[26rem] text-black"
               />
             </div>
-            <Button variant="outline" className="ml-auto bg-primary text-white hover:scale-105 hover:text-white" onClick={() => { /* Existing colleges export functionality (if needed) */ }}>
+            {/* Two new buttons for the colleges view */}
+            <Button
+              variant="outline"
+              className="ml-auto bg-primary text-white hover:scale-105 hover:text-white"
+              onClick={handleExportCollegesExcel}
+            >
               <FileDown className="mr-2 h-4 w-4" />
-              Download Colleges as Excel
+              Download Colleges Excel
+            </Button>
+            <Button
+              variant="outline"
+              className="ml-auto bg-red-500 text-white hover:scale-105 hover:bg-red-600 hover:text-white"
+              onClick={handleExportArrivalExcel}
+            >
+              <FileDown className="mr-2 h-4 w-4" />
+              Download Arrival Time Excel
             </Button>
           </>
         )}
