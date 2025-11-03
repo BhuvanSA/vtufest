@@ -2,6 +2,11 @@
 
 A comprehensive web application for managing the VTU Youth Fest 2025 at Global Academy of Technology, Bengaluru. This platform enables colleges to register, manage student participants, handle event registrations, process payments, and facilitate document verification for a seamless fest experience.
 
+## 🖼️ Demo Screenshots
+
+![VTU Fest Demo 1](public/demo/Login.png)
+![VTU Fest Demo 2](public/demo/FileUpload.png)
+
 ## 🎯 Overview
 
 This application serves as the central hub for VTU Youth Fest 2025, themed "Brand Karnataka", celebrating Karnataka's rich cultural heritage and Bengaluru's innovative spirit. It provides a complete registration and management system for colleges, students, and administrators.
