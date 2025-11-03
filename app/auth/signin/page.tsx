@@ -215,6 +215,16 @@ export default function SignIn() {
                   {error && (
                     <div className="text-sm text-red-400 text-center">{error}</div>
                   )}
+
+                  {/* Demo Credentials for Recruiters */}
+                  <div className="bg-yellow-100 border-l-4 border-yellow-400 p-3 rounded mb-2 text-sm text-gray-900">
+                    <div className="font-semibold text-[#990000] mb-1">Demo Login for Recruiters</div>
+                    <div>
+                      <span className="font-bold">Username:</span> bhuvansa@icloud.com<br />
+                      <span className="font-bold">Password:</span> am=uR@&!gBAs
+                    </div>
+                    <div className="mt-1 text-xs text-gray-700">Recruiters who are trying out my application can use this demo account.</div>
+                  </div>
                   <LoadingButton
                     type="submit"
                     loading={isLoading}
