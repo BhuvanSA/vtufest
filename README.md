@@ -135,10 +135,10 @@ This application serves as the central hub for VTU Youth Fest 2025, themed "Bran
    REDIS_URL="redis://localhost:6379"
    UPLOADTHING_SECRET="your-uploadthing-secret"
    UPLOADTHING_APP_ID="your-uploadthing-app-id"
-   EMAIL_HOST="smtp.gmail.com"
-   EMAIL_PORT="587"
-   EMAIL_USER="your-email@gmail.com"
-   EMAIL_PASS="your-app-password"
+   SMTP_HOST="smtp.gmail.com"
+   SMTP_PORT="587"
+   SMTP_EMAIL="your-email@gmail.com"
+   SMTP_PASSWORD="your-app-password"
    NEXT_PUBLIC_APP_URL="http://localhost:3000"
    ```
 

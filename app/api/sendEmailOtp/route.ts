@@ -60,16 +60,18 @@ export async function POST(request: Request) {
 
         // Configure Nodemailer
         const transporter = nodemailer.createTransport({
-            service: "gmail", // Use your email provider
+            host: process.env.SMTP_HOST,
+            port: parseInt(process.env.SMTP_PORT || "587", 10),
+            secure: process.env.SMTP_PORT === "465", // true for 465, false for other ports
             auth: {
-                user: process.env.EMAIL_USER as string, // Your email address
-                pass: process.env.EMAIL_PASSWORD as string, // Your email password or app password
+                user: process.env.SMTP_EMAIL,
+                pass: process.env.SMTP_PASSWORD,
             },
         });
 
         // Email content with updated CSS theme and copy button for OTP
         const mailOptions = {
-            from: process.env.EMAIL_USER, // Sender email address
+            from: process.env.SMTP_EMAIL, // Sender email address
             to: email, // Receiver email address
             subject: "Your OTP for Verification",
             html: `<!DOCTYPE html>

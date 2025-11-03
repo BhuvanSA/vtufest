@@ -145,15 +145,17 @@ export async function POST(request: Request) {
 
         if (newUser) {
             const transporter = nodemailer.createTransport({
-                service: "gmail", // Use your email provider
+                host: process.env.SMTP_HOST,
+                port: parseInt(process.env.SMTP_PORT || "587", 10),
+                secure: process.env.SMTP_PORT === "465", // true for 465, false for other ports
                 auth: {
-                    user: process.env.EMAIL_USER as string, // Your email address
-                    pass: process.env.EMAIL_PASSWORD as string, // Your email password or app password
+                    user: process.env.SMTP_EMAIL,
+                    pass: process.env.SMTP_PASSWORD,
                 },
             });
 
             const mailOptions = {
-                from: process.env.EMAIL_USER,
+                from: process.env.SMTP_EMAIL,
                 to: email,
                 subject:
                     "Login Credentials for Interact-2025 Registration Portal",

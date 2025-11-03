@@ -10,17 +10,17 @@ export async function POST(req: Request) {
     }
 
     const transporter = nodemailer.createTransport({
-      host: process.env.EMAIL_HOST, // e.g., smtp.gmail.com
-      port: parseInt(process.env.EMAIL_PORT || "465", 10), // e.g., 465 for Gmail
-      secure: true, // true for 465, false for other ports
+      host: process.env.SMTP_HOST,
+      port: parseInt(process.env.SMTP_PORT || "587", 10),
+      secure: process.env.SMTP_PORT === "465", // true for 465, false for other ports
       auth: {
-        user: process.env.EMAIL_USER, // Sender's email address
-        pass: process.env.EMAIL_PASSWORD, // Password or app-specific password
+        user: process.env.SMTP_EMAIL,
+        pass: process.env.SMTP_PASSWORD,
       },
     });
 
     const mailOptions = {
-      from: process.env.EMAIL_USER, // Sender's email
+      from: process.env.SMTP_EMAIL, // Sender's email
       to: process.env.EMAIL_TO, // Receiver's email from .env
       subject: "New Contact Form Submission",
       text: `
